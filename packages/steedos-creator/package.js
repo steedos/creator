@@ -127,4 +127,6 @@ Package.onUse(function(api) {
     api.addFiles('client/views/app_home.html', 'client');
 
     api.addFiles('client/views/table_actions.html', 'client');
+    api.addFiles('client/views/table_actions.coffee', 'client');
+    api.addFiles('client/views/table_actions.less', 'client');
 });
