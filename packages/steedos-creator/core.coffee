@@ -214,6 +214,7 @@ Creator.getTabularColumns = (object_name, columns) ->
 			# 	$(node).css()
 			col.className = "slds-cell-edit cellContainer"
 			col.createdCell = (cell, val, doc) ->
+				$(cell).attr("data-label", field_name)
 				Blaze.renderWithData(Template.creator_table_cell, {_id: doc._id, val: val, doc: doc, field: field, field_name: field_name, object_name:object_name}, cell);
 
 			# col.tmpl = Meteor.isClient && Template.creator_table_cell
@@ -231,6 +232,7 @@ Creator.getTabularColumns = (object_name, columns) ->
 		data: "_id"
 		width: '20px'
 		createdCell: (node, cellData, rowData) ->
+			$(node).attr("data-label", "Actions")
 			$(node).html(Blaze.toHTMLWithData Template.creator_table_actions, {_id: cellData}, node)
 	cols.push(action_col)
 	return cols
