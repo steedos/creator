@@ -86,5 +86,5 @@ if Meteor.isClient
 							related_field_name: related_field_name
 
 						list.push related
-						
+
 		return list
