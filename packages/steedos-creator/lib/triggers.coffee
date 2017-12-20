@@ -27,10 +27,10 @@ Triggers.init = (object_name)->
 		_.each obj.triggers, (trigger, trigger_name)->
 			initTrigger collection, trigger_name, trigger
 
-	# 需要使用 object_name 变量
-	collection.after.insert = (userId, doc)->
-		console.log this._super()
-		Meteor.call "object_recent_viewed", object_name, doc._id
+	if Meteor.isServer
+		# 需要使用 object_name 变量
+		collection.after.insert (userId, doc)->
+			Meteor.call "object_recent_viewed", object_name, doc._id
 
 if Meteor.isServer
 
