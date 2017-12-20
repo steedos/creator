@@ -6,8 +6,6 @@ Creator.Schemas = {}
 Creator.Collections = {}
 Creator.TabularTables = {}
 
-@PermissionSets = {}
-
 
 Meteor.startup ->
 	_.each Creator.Objects, (obj, object_name)->
@@ -21,7 +19,9 @@ Meteor.startup ->
 		Creator.Schemas[object_name] = new SimpleSchema(schema)
 		if object_name != "users"
 			Creator.Collections[object_name].attachSchema(Creator.Schemas[object_name])
-				
+		
+		Triggers.init(object_name)	
+			
 		if Meteor.isServer
 			Creator.Collections[object_name].allow
 				insert: (userId, doc) ->
@@ -30,27 +30,6 @@ Meteor.startup ->
 					return true
 				remove: (userId, doc) ->
 					return true
-
-			Creator.Collections[object_name].before.insert (userId, doc)->
-				doc.owner = userId
-				doc.created_by = userId;
-				doc.created = new Date();
-				doc.modified_by = userId;
-				doc.modified = new Date();
-
-			Creator.Collections[object_name].after.insert (userId, doc)->
-				Meteor.call "object_recent_viewed", object_name, doc._id
-
-			Creator.Collections[object_name].before.update (userId, doc, fieldNames, modifier, options)->
-				modifier.$set = modifier.$set || {};
-				modifier.$set.modified_by = userId
-				modifier.$set.modified = new Date();
-
-
-		if Meteor.isClient
-				Creator.Collections[object_name].before.insert (userId, doc)->
-					doc.space = Session.get("spaceId")
-
 
 		if obj.list_views?.default?.columns
 			Creator.TabularTables[object_name] = new Tabular.Table
