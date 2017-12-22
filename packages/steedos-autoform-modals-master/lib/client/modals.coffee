@@ -6,6 +6,7 @@ cmOnSuccessCallback = null
 AutoForm.addHooks 'cmForm',
 	onSuccess: ->
 		$('#afModal').modal('hide')
+
 	onError: (operation,error) ->
 		console.error error
 		if error.reason
@@ -74,31 +75,46 @@ Template.autoformModals.rendered = ->
 
 		AutoForm.resetForm(Session.get('cmFormId') or defaultFormId)
 
+		# 如果用户操作为保存并新建 再次触发一次点击事件 
+		if Session.get 'cmShowAgain'
+			keyPress = Session.get 'cmPressKey'
+			keyPress = '.' + keyPress.replace(/\s+/ig, '.')
+			$(keyPress).click()
+
+
 Template.autoformModals.events
-	'click button:not(.close)': () ->
+
+	'click button.btn-insert': () ->
+		$("#afModal #cmForm").submit()
+
+	'click button.btn-update': ()->
+		$("#afModal #cmForm").submit()
+
+	'click button.btn-remove': ()->
 		collection = Session.get 'cmCollection'
 		operation = Session.get 'cmOperation'
-		showRemoveButton = Session.get 'cmShowRemoveButton' 
-
-		if operation != 'insert'
-			_id = Session.get('cmDoc')._id
-
-		if operation == 'remove' or (showRemoveButton and $(event.target).hasClass("btn-remove"))
-			collectionObj(collection).remove _id, (e)->
-				if e
-					console.error e
-					if e.reason
-						toastr?.error?(t(e.reason))
-					else if e.message
-						toastr?.error?(t(error.message))
-					else
-						toastr?.error?('Sorry, this could not be deleted.')
+		_id = Session.get('cmDoc')._id
+		collectionObj(collection).remove _id, (e)->
+			if e
+				console.error e
+				if e.reason
+					toastr?.error?(t(e.reason))
+				else if e.message
+					toastr?.error?(t(error.message))
 				else
-					$('#afModal').modal('hide')
-					cmOnSuccessCallback?()
-					toastr?.success?(t("afModal_remove_suc"))
-		else if showRemoveButton and operation == 'update'
-			$("#afModal #cmForm").submit()
+					toastr?.error?('Sorry, this could not be deleted.')
+			else
+				$('#afModal').modal('hide')
+				cmOnSuccessCallback?()
+				toastr?.success?(t("afModal_remove_suc"))
+
+	'click button.btn-update-and-create': ()->
+		$("#afModal #cmForm").submit()
+		Session.set 'cmShowAgain', true
+
+	'click button.btn-insert-and-create': ()->
+		$("#afModal #cmForm").submit()
+		Session.set 'cmShowAgain', true
 
 
 helpers =
@@ -223,6 +239,21 @@ Template.afModal.events
 			Session.set 'cmPrompt', 'Are you sure?'
 		else
 			Session.set 'cmPrompt', ''
+
+		# 记录本次点击事件的className
+
+		keyClassName = e.currentTarget.className
+		Session.set 'cmPressKey', keyClassName
+
+		# 上次的操作是保存并新建，清空 cmDoc，并设置 cmOperation为 insert
+
+		if Session.get 'cmShowAgain'
+			Session.set 'cmDoc', undefined
+			Session.set 'cmOperation', 'insert'
+
+		# 重置 cmShowAgain
+
+		Session.set 'cmShowAgain', false
 
 		$('#afModal').data('bs.modal').options.backdrop = t.data.backdrop or true
 		$('#afModal').modal 'show'
