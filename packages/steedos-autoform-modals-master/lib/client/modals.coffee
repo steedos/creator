@@ -177,6 +177,9 @@ helpers =
 	shouldUpdateQuickForm: () ->
 		return Template.instance()?.shouldUpdateQuickForm.get()
 
+	cmSaveAndInsert: ()->
+		Session.get 'cmSaveAndInsert'
+
 Template.autoformModals.helpers helpers
 
 Template.afModal.events
@@ -200,6 +203,7 @@ Template.afModal.events
 		Session.set 'cmModalDialogClass', t.data.dialogClass
 		Session.set 'cmModalContentClass', t.data.contentClass
 		Session.set 'cmShowRemoveButton', t.data.showRemoveButton or false
+		Session.set 'cmSaveAndInsert', t.data.saveAndInsert
 		cmOnSuccessCallback = t.data.onSuccess
 
 		if not _.contains registeredAutoFormHooks, t.data.formId
