@@ -132,6 +132,7 @@ Template.creator_list.events
 			$(".btn.creator-edit").click()
 
 	'click .table-cell-edit': (event, template) ->
+		debugger
 		field = this.field_name
 
 		dataTable = $(event.currentTarget).closest('table').DataTable()
@@ -141,6 +142,8 @@ Template.creator_list.events
 		if rowData
 			template.edit_fields.set(field)
 			Session.set 'cmDoc', rowData
+			Session.set 'cmIsMultipleUpdate', true
+			Session.set 'cmTargetIds', Session.get("tabular_selected_ids")?[Session.get("object_name")]
 
 			setTimeout ()->
 				$(".edit-list-table-cell").click()
