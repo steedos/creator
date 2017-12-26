@@ -35,6 +35,12 @@ Creator.baseObject =
 			omit: true
 
 	permission_set:
+		none: 
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
 		user:
 			allowCreate: true
 			allowDelete: true

@@ -53,6 +53,8 @@ Creator.Object = (options)->
 			self.permission_set[item_name] = {}
 		self.permission_set[item_name] = _.extend(_.clone(self.permission_set[item_name]), item)
 
+	self.permissions = new ReactiveVar(Creator.baseObject.permission_set.none)
+
 	if db[self.name]
 		Creator.Collections[self.name] = db[self.name]
 	else if !Creator.Collections[self.name]
@@ -63,8 +65,6 @@ Creator.Object = (options)->
 	self.schema = new SimpleSchema(schema)
 	if self.name != "users"
 		Creator.Collections[self.name].attachSchema(self.schema)
-
-	self.permissions = new ReactiveVar(Creator.baseObject.permission_set.user)
 
 	Creator.objectsByName[self.name] = self
 
@@ -106,12 +106,13 @@ if Meteor.isClient
 
 	Meteor.startup ->
 		Tracker.autorun ->
-			lang = Session.get("steedos-locale")
-			_.each Creator.objectsByName, (object, object_name)->
-				object.i18n()
+			if Session.get("steedos-locale")
+				_.each Creator.objectsByName, (object, object_name)->
+					object.i18n()
 
 		Tracker.autorun ->
-			Meteor.call "creator.object_permissions", Session.get("spaceId"), (error, result)->
-				console.log result
-				_.each result, (permissions, object_name)->
-					Creator.getObject(object_name).permissions.set(permissions)
+			if Session.get("spaceId")
+				Meteor.call "creator.object_permissions", Session.get("spaceId"), (error, result)->
+					console.log result
+					_.each result, (permissions, object_name)->
+						Creator.getObject(object_name).permissions.set(permissions)
