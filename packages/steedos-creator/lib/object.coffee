@@ -113,6 +113,5 @@ if Meteor.isClient
 		Tracker.autorun ->
 			if Session.get("spaceId")
 				Meteor.call "creator.object_permissions", Session.get("spaceId"), (error, result)->
-					console.log result
 					_.each result, (permissions, object_name)->
 						Creator.getObject(object_name).permissions.set(permissions)
