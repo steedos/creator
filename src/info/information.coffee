@@ -34,7 +34,7 @@ Creator.Objects.informations =
 			inlineHelpText: ""
 			required: true
 		score_point:
-			type:"select"
+			type:"checkbox"
 			label:"打分形式",
 			defaultValue: ""
 			description: ""

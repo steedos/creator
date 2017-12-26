@@ -8,14 +8,13 @@ Creator.subs = {}
 
 Meteor.startup ->
 	_.each Creator.Objects, (obj, object_name)->
-		
 		new Creator.Object(obj);
-		
-		Creator.initTriggers(object_name)	
+
+		Creator.initTriggers(object_name)
 		Creator.initListViews(object_name)
 
 		if Meteor.isServer
-			# 危险
+# 危险
 			Creator.Collections[object_name].allow
 				insert: (userId, doc) ->
 					return true
@@ -25,18 +24,18 @@ Meteor.startup ->
 					return true
 
 	Creator.initApps()
-	
+
 
 Creator.initApps = ()->
 	if Meteor.isServer
 		_.each Creator.Apps, (app, app_id)->
-			db_app = db.apps.findOne(app_id) 
+			db_app = db.apps.findOne(app_id)
 			if !db_app
 				app._id = app_id
 				db.apps.insert(app)
-			# else
-			# 	app._id = app_id
-			# 	db.apps.update({_id: app_id}, app)
+# else
+# 	app._id = app_id
+# 	db.apps.update({_id: app_id}, app)
 
 Creator.getObject = (object_name)->
 	if !object_name
@@ -51,10 +50,8 @@ Creator.getSchema = (object_name)->
 	return Creator.getObject(object_name)?.schema
 
 Creator.getObjectSchema = (obj) ->
-
 	schema = {}
 	_.each obj.fields, (field, field_name)->
-
 		fs = {}
 		fs.autoform = {}
 		fs.autoform.multiple = field.multiple
@@ -69,12 +66,12 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "date"
 			fs.type = Date
 			fs.autoform.type = "bootstrap-datetimepicker"
-			fs.autoform.dateTimePickerOptions = 
+			fs.autoform.dateTimePickerOptions =
 				format: "YYYY-MM-DD"
 		else if field.type == "datetime"
 			fs.type = Date
 			fs.autoform.type = "bootstrap-datetimepicker"
-			fs.autoform.dateTimePickerOptions = 
+			fs.autoform.dateTimePickerOptions =
 				format: "YYYY-MM-DD HH:mm"
 		else if field.type == "lookup" or field.type == "master_detail"
 			fs.type = String
@@ -139,8 +136,12 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "boolean"
 			fs.type = Boolean
 			fs.autoform.type = "boolean-checkbox"
-		else if field.type = "reference"
+		else if field.type == "reference"
 			fs.type = String
+		else if field.type == "checkbox"
+			fs.type = [String]
+			fs.autoform.type = "select-checkbox"
+			fs.autoform.options = field.options
 		else
 			fs.type = field.type
 
@@ -149,7 +150,7 @@ Creator.getObjectSchema = (obj) ->
 
 		if field.allowedValues
 			fs.allowedValues = field.allowedValues
-						
+
 		if !field.required
 			fs.optional = true
 
@@ -161,10 +162,8 @@ Creator.getObjectSchema = (obj) ->
 
 		if field.is_wide
 			fs.autoform.is_wide = true
-			
+
 		schema[field_name] = fs
-
-
 	return schema
 
 
@@ -173,7 +172,7 @@ Creator.getObjectUrl = (object_name, record_id, app_id) ->
 		app_id = Session.get("app_id")
 	if record_id
 		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/view/" + record_id)
-	else 
+	else
 		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/list")
 
 Creator.getCollection = (object_name)->
@@ -196,14 +195,14 @@ Creator.getPermissions = (object_name)->
 
 	obj = Creator.getObject(object_name)
 	if !obj
-		permissions = 
+		permissions =
 			allowCreate: false
 			allowDelete: false
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false 
-	else	
+			viewAllRecords: false
+	else
 		permissions = obj.getPermissions()
 
 	return permissions
@@ -220,7 +219,7 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	if permissions.viewAllRecords and record?.owner? != Meteor.userId()
 		permissions.allowRead = false
-		
+
 	return permissions
 
 
@@ -236,4 +235,4 @@ Creator.isSpaceAdmin = (spaceId)->
 	if Meteor.userId()
 		space = Creator.getObject("spaces")?.db?.findOne(spaceId)
 		if space?.admins
-			return space.admins.indexOf(Meteor.userId())>=0
+			return space.admins.indexOf(Meteor.userId()) >= 0
