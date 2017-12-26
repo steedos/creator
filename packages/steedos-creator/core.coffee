@@ -76,6 +76,26 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "bootstrap-datetimepicker"
 			fs.autoform.dateTimePickerOptions = 
 				format: "YYYY-MM-DD HH:mm"
+		else if field.type == "html"
+			fs.type = String
+			fs.autoform.afFieldInput = 
+				type: "summernote"
+				class: 'editor'
+				settings: 
+					height: 200
+					dialogsInBody: true
+					toolbar:  [
+						['font1', ['style']],
+						['font2', ['bold', 'underline', 'italic', 'clear']],
+						['font3', ['fontname']],
+						['color', ['color']],
+						['para', ['ul', 'ol', 'paragraph']],
+						['table', ['table']],
+						['insert', ['link', 'picture']],
+						['view', ['codeview']]
+					]
+					fontNames: ['Arial', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', '宋体','黑体','微软雅黑','仿宋','楷体','隶书','幼圆']
+
 		else if field.type == "lookup" or field.type == "master_detail"
 			fs.type = String
 

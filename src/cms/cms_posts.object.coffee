@@ -9,6 +9,9 @@ Creator.Objects.cms_posts =
 			is_name: true
 		postDate: 
 			type: "datetime"
+		htmlBody:
+			type: "html"
+			is_wide: true
 		site:
 			type: "master_detail"
 			reference_to: "cms_sites"
