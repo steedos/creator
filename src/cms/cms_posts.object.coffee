@@ -6,6 +6,7 @@ Creator.Objects.cms_posts =
 		title: 
 			type: "text"
 			required: true
+			is_name: true
 		postDate: 
 			type: "datetime"
 		site:
@@ -17,3 +18,5 @@ Creator.Objects.cms_posts =
 	list_views:
 		default:
 			columns: ["title", "site", "postDate", "author"]
+		all:
+			filter_scope: "space"

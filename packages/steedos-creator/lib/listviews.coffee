@@ -120,7 +120,11 @@ Creator.initListViews = (object_name)->
 		info: false
 		searching: true
 		autoWidth: false
-		changeSelector: Creator.tabularChangeSelector
+		changeSelector: (selector, userId)->
+			if !selector.space
+				selector = 
+					_id: "nothing"
+			return selector
 
 if Meteor.isClient
 	Creator.getRelatedList = (object_name, record_id)->
