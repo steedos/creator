@@ -35,6 +35,7 @@ Creator.Objects.crm_customers =
 		description: 
 			label: "描述"
 			type: "textarea"
+			is_wide: true
 
 	list_views:
 		default:
