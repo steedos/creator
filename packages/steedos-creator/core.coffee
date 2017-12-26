@@ -265,10 +265,11 @@ Creator.evaluateFormula = (formular, context)->
 Creator.evaluateFilters = (filters, context)->
 	selector = {}
 	_.each filters, (filter)->
-		name = filter[0]
-		action = filter[1]
-		value = Creator.evaluateFormula(filter[2], context)
-		if action == "eq"
-			selector[name] = value
+		if filter?.length == 3
+			name = filter[0]
+			action = filter[1]
+			value = Creator.evaluateFormula(filter[2], context)
+			if action == "eq"
+				selector[name] = value
 	return selector
 
