@@ -22,11 +22,10 @@ Template.creator_table_cell.helpers
 		return val
 
 	cellHref: ()->
-
 		if this.field.reference_to
 			href = Creator.getObjectUrl(this.field.reference_to, this.val)
 
-		else if this.field_name == "name"
+		else if this.field_name == "name" || this.field.is_name
 			href = Creator.getObjectUrl(this.object_name, this._id)
 
 		return href
