@@ -62,7 +62,7 @@ Creator.Objects.informations =
 			label: "我的上报信息"
 			filter_scope: "mine"
 
-	permissions:
+	permission_set:
 		user:
 			allowCreate: true
 			allowDelete: true

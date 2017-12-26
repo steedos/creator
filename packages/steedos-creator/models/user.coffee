@@ -13,7 +13,7 @@ Creator.Objects.users =
 		all:
 			filter_scope: "all"
 			filters: [["_id", "eq", "{userId}"]]
-	permissions:
+	permission_set:
 		user:
 			allowCreate: false
 			allowDelete: false
