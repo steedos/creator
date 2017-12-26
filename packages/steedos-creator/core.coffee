@@ -214,18 +214,7 @@ Creator.getPermissions = (object_name)->
 		object_name = Session.get("object_name")
 
 	obj = Creator.getObject(object_name)
-	if !obj
-		permissions =
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
-			allowRead: false
-			modifyAllRecords: false
-			viewAllRecords: false
-	else
-		permissions = obj.getPermissions()
-
-	return permissions
+	return obj.permissions.get()
 
 Creator.getRecordPermissions = (object_name, record, userId)->
 	if !object_name and Meteor.isClient
@@ -249,13 +238,16 @@ Creator.getApp = (app_id)->
 	app = Creator.Apps[app_id]
 	return app
 
-Creator.isSpaceAdmin = (spaceId)->
-	if !spaceId and Meteor.isClient
-		spaceId = Session.get("spaceId")
+Creator.isSpaceAdmin = (spaceId, userId)->
+	if Meteor.isClient
+		if !spaceId 
+			spaceId = Session.get("spaceId")
+		if !userId
+			userId = Meteor.userId()
 	if Meteor.userId()
 		space = Creator.getObject("spaces")?.db?.findOne(spaceId)
 		if space?.admins
-			return space.admins.indexOf(Meteor.userId()) >= 0
+			return space.admins.indexOf(userId) >= 0
 
 Creator.evaluateFormula = (formular, context)->
 	formular = formular.replace "{userId}", Meteor.userId()

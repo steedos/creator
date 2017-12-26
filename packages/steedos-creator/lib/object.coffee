@@ -64,15 +64,11 @@ Creator.Object = (options)->
 	if self.name != "users"
 		Creator.Collections[self.name].attachSchema(self.schema)
 
+	self.permissions = new ReactiveVar(Creator.baseObject.permission_set.user)
+
 	Creator.objectsByName[self.name] = self
 
 	return self
-
-Creator.Object.prototype.getPermissions = ()->
-	if Creator.isSpaceAdmin()
-		return this.permission_set.admin
-	else
-		return this.permission_set.user
 
 Creator.Object.prototype.i18n = ()->
 	# set object label
@@ -113,3 +109,9 @@ if Meteor.isClient
 			lang = Session.get("steedos-locale")
 			_.each Creator.objectsByName, (object, object_name)->
 				object.i18n()
+
+		Tracker.autorun ->
+			Meteor.call "creator.object_permissions", Session.get("spaceId"), (error, result)->
+				console.log result
+				_.each result, (permissions, object_name)->
+					Creator.getObject(object_name).permissions.set(permissions)
