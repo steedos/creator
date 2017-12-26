@@ -41,6 +41,7 @@ baseObject用于定义所有对象适用的基础fields, triggers, indexes. list
 - omit: 所有页面都不显示
 - multiple: 表示数组字段，可以多选
 - group：字段分组，在显示表单时自动按分组显示
+- is_wide: 宽字段，显示时占满整行
 
 ### permissions 权限
 Object权限分以下类型
