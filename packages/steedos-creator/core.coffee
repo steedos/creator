@@ -256,3 +256,19 @@ Creator.isSpaceAdmin = (spaceId)->
 		space = Creator.getObject("spaces")?.db?.findOne(spaceId)
 		if space?.admins
 			return space.admins.indexOf(Meteor.userId()) >= 0
+
+Creator.evaluateFormula = (formular, context)->
+	formular = formular.replace "{userId}", Meteor.userId()
+	formular = formular.replace "{spaceId}", Session.get("spaceId")
+	return formular				
+
+Creator.evaluateFilters = (filters, context)->
+	selector = {}
+	_.each filters, (filter)->
+		name = filter[0]
+		action = filter[1]
+		value = Creator.evaluateFormula(filter[2], context)
+		if action == "eq"
+			selector[name] = value
+	return selector
+
