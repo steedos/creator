@@ -75,7 +75,6 @@ Creator.initListViews = (object_name)->
 		columns = object.list_views.default.columns
 
 	if Meteor.isClient
-		console.log "initListViews:#{object_name}"
 		Creator.TabularSelectedIds[object_name] = []
 
 	new Tabular.Table

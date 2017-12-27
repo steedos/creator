@@ -28,7 +28,7 @@ Creator.Objects.instances =
 			filter_scope: "space"
 			filters: [["outbox_users", "eq", "{userId}"]]
 
-	permissions:
+	permission_set:
 		user:
 			allowCreate: false
 			allowDelete: false

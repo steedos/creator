@@ -107,6 +107,7 @@ Package.onUse(function(api) {
     api.addFiles('models/content_document.coffee');
 
     api.addFiles('server/methods/object_options.coffee', 'server');
+    api.addFiles('server/methods/object_permissions.coffee', 'server');
     api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
 
     api.addFiles('server/publications/object.coffee', 'server');
