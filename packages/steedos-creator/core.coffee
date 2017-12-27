@@ -183,6 +183,9 @@ Creator.getObjectSchema = (obj) ->
 		if field.is_wide
 			fs.autoform.is_wide = true
 
+		if field.defaultValue
+			fs.defaultValue = field.defaultValue
+			
 		schema[field_name] = fs
 	return schema
 
