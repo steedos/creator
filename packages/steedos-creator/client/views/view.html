@@ -125,7 +125,14 @@
 													<div class="slds-has-flexi-truncate slds-p-horizontal_x-small full view-page-block-item">
 														<div class="slds-form-element slds-form-element_edit slds-grow slds-hint-parent slds-p-vertical_xx-small override--slds-form-element uiInput">
 															{{#if this}}
-																{{> afQuickField name=this}}
+																<div class="test-id__field-label-container">
+																	<span class="test-id__field-label slds-form-element__label">{{label this}}</span>
+																</div>
+																<div class="slds-form-element__control slds-grid itemBody">
+																	<span class="test-id__field-value slds-form-element__static slds-grow">
+																		{{> creator_table_cell _id=record._id val=(keyValue this) doc=record field=(keyField this) field_name=this object_name=object_name disabled=true}}
+																	</span>
+																</div>
 															{{/if}}
 														</div>
 													</div>
@@ -149,4 +156,4 @@
 	{{#afModal class="btn btn-primary related-object-row-edit hidden" collection=editCollection doc=doc operation="update" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=updateButtonContent saveAndInsert=true}} {{_ "Edit"}} {{/afModal}}
 
 	{{#afModal class="btn btn-primary creator-record-edit hidden" collection=collection doc=record._id operation="update" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=updateButtonContent saveAndInsert=true}} {{_ "Edit"}} {{/afModal}}
-</template> 
+</template>
