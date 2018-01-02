@@ -17,7 +17,7 @@ Meteor.startup ->
 		Creator.initListViews(object_name)
 
 		if Meteor.isServer
-# 危险
+# TODO 危险
 			Creator.Collections[object_name].allow
 				insert: (userId, doc) ->
 					return true
