@@ -157,6 +157,7 @@ Package.onUse(function(api) {
 
     api.addFiles('client/colResizable-1.6.js', 'client');
 
+    api.addFiles('client/views/_helpers.coffee', 'client');
     api.addFiles('client/views/list.html', 'client');
     api.addFiles('client/views/list.coffee', 'client');
     api.addFiles('client/views/list.less', 'client');

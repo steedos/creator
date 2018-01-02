@@ -1,10 +1,9 @@
 Template.creator_list.onCreated ->
 	this.edit_fields = new ReactiveVar()
 
-Template.creator_list.helpers
+Template.creator_list.helpers Creator.helpers
 
-	object_name: ()->
-		return Session.get("object_name")
+Template.creator_list.helpers
 
 	collection: ()->
 		return "Creator.Collections." + Session.get("object_name")
@@ -62,8 +61,6 @@ Template.creator_list.helpers
 					return selector
 		return {_id: "nothing"}
 
-	object: ()->
-		return Creator.getObject()
 
 	itemCount: ()->
 		collection = Session.get("object_name")
