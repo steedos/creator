@@ -208,6 +208,15 @@ Template.creator_list.events
 		$(".slds-table td").removeClass("slds-has-focus")
 		$(event.currentTarget).addClass("slds-has-focus")
 
+	'mouseenter .slds-table': (event, template)->
+		table = $(event.currentTarget).closest("table")
+		table.colResizable({
+			liveDrag: false,
+			gripInnerHtml: "<div class='grip' style='width:  calc(.25rem - 1px);height: 2rem;cursor: col-resize;background:  #0070d2;top: 1px;right: -1px;position:  relative;opacity: 0;'></div>",
+			draggingClass: "dragging",
+			resizeMode: 'fit'
+		});
+
 Template.creator_list.onDestroyed ->
 	object_name = Session.get("object_name")
 	if object_name
