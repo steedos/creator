@@ -69,7 +69,7 @@ Creator.Objects.archive_records =
 			group:"档号"
 
 		category_code:
-			type:"lookup"
+			type:"master_detail"
 			label:"类别号"
 			defaultValue: ""
 			reference_to: "archive_classification"
