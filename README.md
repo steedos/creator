@@ -26,6 +26,7 @@ baseObject用于定义所有对象适用的基础fields, triggers, indexes. list
 - enable_files: 启用上传附件功能
 - enable_chatter: 启用讨论功能
 - enable_tasks: 启用任务功能
+- enable_audit: 启用审计跟踪功能
 
 ### fields支持的字段类型
 - lookup: 相关表，联合reference_to字段，从关联表中选择记录
