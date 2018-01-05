@@ -2,6 +2,7 @@ Creator.Objects.archive_records =
 	name: "archive_records"
 	icon: "orders"
 	label: "文书档案"
+	enable_search: true
 	fields:
 		archival_category_code:
 			type: "text"

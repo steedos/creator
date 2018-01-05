@@ -2,6 +2,7 @@ Creator.Objects.informations =
 	name: "informations"
 	icon: "contact"
 	label: "信息上报"
+	enable_search: true
 	fields:
 		title: 
 			type: "text"
