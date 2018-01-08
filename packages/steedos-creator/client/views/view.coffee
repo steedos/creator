@@ -269,7 +269,6 @@ Template.creator_view.helpers
 Template.creator_view.events
 
 	'click .list-action-custom': (event, template) ->
-		console.log 'click .list-action-custom========33'
 		id = Creator.getObjectRecord()._id
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)
@@ -304,7 +303,6 @@ Template.creator_view.events
 		$(".table-cell-edit", event.currentTarget).click();
 
 	'click #creator-tabular .table-cell-edit': (event, template) ->
-		console.log 'click .table-cell-edit field:========34=='
 		field = this.field_name
 		object_name = this.object_name
 		collection_name = Creator.getObject(object_name).label
@@ -321,14 +319,12 @@ Template.creator_view.events
 			Session.set 'cmDoc', rowData
 
 			Meteor.defer ()->
-				console.log 'click .table-cell-edit field:==========1155=='
-				$(".btn.creator-edit").click()
+				$(".btn.creator-cell-edit").click()
 
 	'click .group-section-control': (event, template) ->
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
 
 	'click .add-related-object-record': (event, template) ->
-		console.log 'click .add-related-object-record===11'
 		object_name = event.currentTarget.dataset.objectName
 		collection_name = Creator.getObject(object_name).label
 		collection = "Creator.Collections.#{object_name}"
@@ -350,20 +346,7 @@ Template.creator_view.events
 			$(".creator-add").click()
 		return 
 
-		
-		# actionKey = event.currentTarget.dataset.actionKey
-		# objectName = event.currentTarget.dataset.objectName
-		# id = event.currentTarget.dataset.id
-		# object = Creator.getObject(objectName)
-		# action = object.actions[actionKey]
-		# collection_name = object.label
-		# Session.set("action_fields", undefined)
-		# Session.set("action_collection", "Creator.Collections.#{objectName}")
-		# Session.set("action_collection_name", collection_name)
-		# Session.set("action_save_and_insert", true)
-
 	'click .list-item-action': (event, template) ->
-		console.log 'click .list-item-action'
 		actionKey = event.currentTarget.dataset.actionKey
 		objectName = event.currentTarget.dataset.objectName
 		id = event.currentTarget.dataset.id
@@ -395,8 +378,7 @@ Template.creator_view.events
 			Session.set 'cmDoc', doc
 
 			Meteor.defer ()->
-				console.log 'click .table-cell-edit field:==========115599'
-				$(".btn.creator-edit").click()
+				$(".btn.creator-cell-edit").click()
 
 	'change .btn-upload-file': (event, template)->
 		files = event.target.files
