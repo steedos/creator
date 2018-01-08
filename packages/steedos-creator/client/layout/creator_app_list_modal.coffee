@@ -2,7 +2,8 @@ Template.creator_app_list_modal.helpers
 	apps: ()->
 		apps = []
 		_.each Creator.Apps, (v, k)->
-			apps.push v
+			if v.visible != false
+				apps.push v
 		return apps
 
 	app_objects: ()->
