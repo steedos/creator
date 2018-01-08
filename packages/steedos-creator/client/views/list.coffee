@@ -121,7 +121,7 @@ Template.creator_list.events
 	'click .list-item-action': (event) ->
 		actionKey = event.currentTarget.dataset.actionKey
 		objectName = event.currentTarget.dataset.objectName
-		id = event.currentTarget.dataset.id
+		recordId = event.currentTarget.dataset.recordId
 		object = Creator.getObject(objectName)
 		action = object.actions[actionKey]
 		collection_name = object.label
@@ -129,7 +129,7 @@ Template.creator_list.events
 		Session.set("action_collection", "Creator.Collections.#{objectName}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
-		Creator.executeAction objectName, action, id
+		Creator.executeAction objectName, action, recordId
 
 	'click .table-cell-edit': (event, template) ->
 		field = this.field_name

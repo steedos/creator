@@ -92,7 +92,7 @@ Creator.baseObject =
 
 	actions:
 
-		new:
+		standard_new:
 			label: "新建"
 			visible: ()->
 				permissions = Creator.getPermissions()
@@ -101,7 +101,7 @@ Creator.baseObject =
 			on: "list"
 			todo: "standard_new"
 
-		edit:
+		standard_edit:
 			label: "编辑"
 			visible: (object_name, record_id, record_permissions)->
 				if record_permissions
@@ -114,7 +114,7 @@ Creator.baseObject =
 			on: "record"
 			todo: "standard_edit"
 
-		delete:
+		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
 				if record_permissions
@@ -125,33 +125,6 @@ Creator.baseObject =
 					if record_permissions
 						return record_permissions["allowDelete"]
 			on: "record_more"
-			todo: "standard_delete"
-
-		list_item_edit:
-			label: "编辑"
-			visible: (object_name, record_id, record_permissions)->
-				if record_permissions
-					return record_permissions["allowEdit"]
-				else
-					record = Creator.Collections[object_name].findOne record_id
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						return record_permissions["allowDelete"]
-
-			on: "list_item"
-			todo: "standard_edit"
-
-		list_item_delete:
-			label: "删除"
-			visible: (object_name, record_id, record_permissions)->
-				if record_permissions
-					return record_permissions["allowDelete"]
-				else
-					record = Creator.Collections[object_name].findOne record_id
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						return record_permissions["allowDelete"]
-			on: "list_item"
 			todo: "standard_delete"
 
 		"export":

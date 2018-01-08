@@ -230,6 +230,8 @@ Template.creator_view.helpers
 		# actions = _.where(actions, {on: "record", visible: true})
 		actions = _.filter actions, (action)->
 			if action.on == "record"
+				if action.only_list_item
+					return false
 				if typeof action.visible == "function"
 					return action.visible(object_name, record_id, permissions)
 				else
@@ -246,6 +248,8 @@ Template.creator_view.helpers
 		actions = _.values(obj.actions) 
 		actions = _.filter actions, (action)->
 			if action.on == "record_more"
+				if action.only_list_item
+					return false
 				if typeof action.visible == "function"
 					return action.visible(object_name, record_id, permissions)
 				else
@@ -337,7 +341,7 @@ Template.creator_view.events
 	'click .list-item-action': (event, template) ->
 		actionKey = event.currentTarget.dataset.actionKey
 		objectName = event.currentTarget.dataset.objectName
-		id = event.currentTarget.dataset.id
+		recordId = event.currentTarget.dataset.recordId
 		object = Creator.getObject(objectName)
 		action = object.actions[actionKey]
 		collection_name = object.label
@@ -345,7 +349,7 @@ Template.creator_view.events
 		Session.set("action_collection", "Creator.Collections.#{objectName}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
-		Creator.executeAction objectName, action, id
+		Creator.executeAction objectName, action, recordId
 
 	'click .slds-table td': (event)->
 		$(".slds-table td").removeClass("slds-has-focus")
