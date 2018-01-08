@@ -4,6 +4,21 @@ Creator.Objects.archive_records =
 	label: "档案"
 	enable_search: true
 	fields:
+		archives_name:
+			type:"text"
+			label:"档案馆名称"
+			omit:true
+			group:"来源"
+		archives_identifier:
+			type:"text"
+			label:"档案馆代码"
+			omit:true
+			group:"来源"
+		fonds_name:
+			type:"text"
+			label:"全宗名称"
+			omit:true
+			group:"来源"
 		archival_category_code:
 			type: "text"
 			label:"档案门类代码"
@@ -15,6 +30,7 @@ Creator.Objects.archive_records =
 			label:"立档单位名称"
 			defaultValue: ""
 			omit:true
+			group:"来源"
 
 		aggregation_level:
 			type: "select"
@@ -139,9 +155,19 @@ Creator.Objects.archive_records =
 			label:"主题词"
 			omit:true
 			group:"内容描述"
+		keyword:
+			type:"text"
+			label:"关键词"
+			omit:true
+			group:"内容描述"
 		personal_name:
 			type:"text"
 			label:"人名"
+			group:"内容描述"
+		abstract:
+			type:"text"
+			label:"摘要"
+			omit:true
 			group:"内容描述"
 		documnt_number:
 			type:"text"
@@ -173,7 +199,11 @@ Creator.Objects.archive_records =
 			format:"YYYYMMDD"
 			group:"内容描述"
 			omit:true
-
+		precedence:
+			type:"text"
+			label:"紧急程度"
+			omit:true
+			group:"内容描述"
 		prinpipal_receiver:
 			type:"text",
 			label:"主送",
