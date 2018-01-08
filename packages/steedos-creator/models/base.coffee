@@ -103,55 +103,54 @@ Creator.baseObject =
 
 		edit:
 			label: "编辑"
-			visible: (objectName, recordId, recordPermissions)->
-				if recordPermissions
-					return recordPermissions["allowEdit"]
+			visible: (object_name, record_id, record_permissions)->
+				if record_permissions
+					return record_permissions["allowEdit"]
 				else
-					record = Creator.Collections[object_name].findOne recordId
-					recordPermissions = Creator.getRecordPermissions objectName, record, Meteor.userId()
-					if recordPermissions
-						return recordPermissions["allowEdit"]
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						return record_permissions["allowEdit"]
 			on: "record"
 			todo: "standard_edit"
 
 		delete:
 			label: "删除"
-			visible: (objectName, recordId, recordPermissions)->
-				if recordPermissions
-					return recordPermissions["allowDelete"]
+			visible: (object_name, record_id, record_permissions)->
+				if record_permissions
+					return record_permissions["allowDelete"]
 				else
-					record = Creator.Collections[object_name].findOne recordId
-					recordPermissions = Creator.getRecordPermissions objectName, record, Meteor.userId()
-					if recordPermissions
-						return recordPermissions["allowDelete"]
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						return record_permissions["allowDelete"]
 			on: "record_more"
 			todo: "standard_delete"
 
 		list_item_edit:
 			label: "编辑"
-			visible: (objectName, recordId, recordPermissions)->
-				if recordPermissions
-					return recordPermissions["allowEdit"]
+			visible: (object_name, record_id, record_permissions)->
+				if record_permissions
+					return record_permissions["allowEdit"]
 				else
-					record = Creator.Collections[object_name].findOne recordId
-					recordPermissions = Creator.getRecordPermissions objectName, record, Meteor.userId()
-					if recordPermissions
-						return recordPermissions["allowDelete"]
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						return record_permissions["allowDelete"]
 
 			on: "list_item"
 			todo: "standard_edit"
 
 		list_item_delete:
 			label: "删除"
-			visible: (objectName, recordId, recordPermissions)->
-				debugger
-				if recordPermissions
-					return recordPermissions["allowDelete"]
+			visible: (object_name, record_id, record_permissions)->
+				if record_permissions
+					return record_permissions["allowDelete"]
 				else
-					record = Creator.Collections[object_name].findOne recordId
-					recordPermissions = Creator.getRecordPermissions objectName, record, Meteor.userId()
-					if recordPermissions
-						return recordPermissions["allowDelete"]
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						return record_permissions["allowDelete"]
 			on: "list_item"
 			todo: "standard_delete"
 
