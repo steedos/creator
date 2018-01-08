@@ -152,8 +152,6 @@ Template.creator_list.events
 		tr = $(event.currentTarget).closest("tr")
 		rowData = dataTable.row(tr).data()
 
-		console.log 'click .table-cell-edit rowData:', rowData
-		console.log 'click .table-cell-edit field:', field
 		if rowData
 			Session.set("action_fields", field)
 			Session.set("action_collection", "Creator.Collections.#{objectName}")
@@ -162,10 +160,8 @@ Template.creator_list.events
 			Session.set 'cmDoc', rowData
 			Session.set 'cmIsMultipleUpdate', true
 			Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
-			console.log 'click .table-cell-edit field:=========='
 			Meteor.defer ()->
-				console.log 'click .table-cell-edit field:==========1155'
-				$(".btn.creator-edit").click()
+				$(".btn.creator-cell-edit").click()
 
 	'dblclick .slds-table td': (event) ->
 		$(".table-cell-edit", event.currentTarget).click()

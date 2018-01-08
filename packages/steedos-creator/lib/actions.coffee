@@ -30,8 +30,6 @@ if Meteor.isClient
 			return 
 
 		"standard_edit": (fields)->
-			console.log 'click .list-action-custom========339922'
-			console.log 'click .list-action-custom========339922', this
 			record_id = this.record_id
 			object_name = this.object_name
 
