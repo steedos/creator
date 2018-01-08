@@ -1,6 +1,15 @@
 # Steedos Creator
 华炎新一代云端软件开发平台，智能创建多租户的云端业务系统。
 
+
+### Apps
+Apps 表示功能模块，Apps下包含Objects
+- name， app 名称
+- label，app 显示名
+- icon_slds，app 图标
+- objects，此app包含的objects数组，会显示在app的主菜单上
+- visible, 是否默认显示，不默认显示的App可以通过Permission Sets控制显示给部分用户
+
 ### Objects
 Objects 是Creator的核心，Object对象中可以定义以下内容
 - fields，Creatror根据object.fields生成schema
@@ -68,6 +77,15 @@ Object权限分以下类型
 API
 - object权限：Creator.getPermissions(object_name)
 - record权限：Creator.getRecordPermissions(object_name, record, userId)
+
+### PermissionSet 权限集
+管理员可以设定权限集，用于定义每一个用户对app, object, object field的访问权限。
+- 每个对象可以预定义两个权限集 admin, user。工作区管理员享有admin权限。
+- 自定义权限集时需要指定对应的用户。
+- 多个权限集可以叠加，以相对较高权限为最终用户权限。
+- 权限集中可以设定用户授权访问的Apps
+- 可以为具体对象指定权限。
+- 可以为具体字段指定权限。
 
 ### list_views 列表
 用于定义Object的列表显示样式
