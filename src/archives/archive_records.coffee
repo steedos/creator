@@ -53,13 +53,10 @@ Creator.Objects.archive_records =
 			omit:true
 
 		fonds_identifier:
-			type:"select"
+			type:"master_detail"
 			label:"全宗号"
-			options:[
-				{label:"集团公司",value:"A001"}
-			]
+			reference_to:"archive_fonds"
 			group:"档号"
-			omit:true
 		year:
 			type: "text"
 			label:"年度"
@@ -533,6 +530,7 @@ Creator.Objects.archive_records =
 		#是否接收，默认是未接收
 		is_receive:
 			type:"boolean"
+			defaultValue:false
 			omit:true
 		
 		received:
@@ -582,6 +580,14 @@ Creator.Objects.archive_records =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true 
+	triggers:
+		"before.insert.server.default": 
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				doc.is_receive = false
+				return doc
+
 	actions: 
 		receive:
 			label: "接收"
@@ -590,16 +596,4 @@ Creator.Objects.archive_records =
 			todo:()-> 
 				Creator.TabularSelectedIds?["archive_records"]
 				Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"])
-	triggers:
-		"before.insert.server.default": 
-			on: "server"
-			when: "before.insert"
-			todo: (userId, doc)->
-				console.log "before insert"
-				doc.is_receive = false
-		"after.insert.server.default": 
-			on: "server"
-			when: "after.insert"
-			todo: (userId, doc)->
-				console.log "after insert"	
-			
+	
