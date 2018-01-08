@@ -1,16 +1,8 @@
 Template.creator_list.onCreated ->
-	# this.edit_fields = new ReactiveVar()
 
 Template.creator_list.helpers Creator.helpers
 
 Template.creator_list.helpers
-
-	collection: ()->
-		return "Creator.Collections." + Session.get("object_name")
-
-	# collectionName: ()->
-	# 	if Session.get("object_name")
-	# 		return Creator.getObject(Session.get("object_name")).label
 
 	tabular_table: ()->
 		return Creator.getTable(Session.get("object_name"))
@@ -19,11 +11,6 @@ Template.creator_list.helpers
 		permissions = Creator.getPermissions()
 		if permissions
 			return permissions[permissionName]
-
-
-	# fields: ->
-	# 	return Template.instance()?.edit_fields.get()
-
 
 	selector: ()->
 		object_name = Session.get("object_name")

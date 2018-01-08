@@ -13,10 +13,10 @@ Template.creator_table_actions.helpers
 			return val
 		actions = _.values(actions) 
 		actions = _.filter actions, (action)->
-			actionKey = if self.is_related then "related_list_item" else "list_item"
+			actionKey = "list_item"
 			if action.on == actionKey
 				if typeof action.visible == "function"
-					return action.visible(self)
+					return action.visible(self.object_name, self._id, self.record_permissions)
 				else
 					return action.visible
 			else

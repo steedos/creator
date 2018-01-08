@@ -79,9 +79,6 @@ getFieldsForReorder = (schema, keys) ->
 	return fields
 
 Template.creator_view.onCreated ->
-	# this.edit_collection = new ReactiveVar()
-	# this.related_collection = new ReactiveVar()
-	# this.collection_name = new ReactiveVar()
 
 Template.creator_view.onRendered ->
 	this.autorun ->
@@ -106,15 +103,6 @@ Template.creator_view.helpers
 
 	collection: ()->
 		return "Creator.Collections." + Session.get("object_name")
-
-	# editFields: ()->
-	# 	return Template.instance()?.edit_fields?.get()
-
-	# editCollection: ()->
-	# 	return Template.instance()?.edit_collection?.get() || Session.get("action_collection")
-
-	# collectionName: ()->
-	# 	return Template.instance().collection_name?.get()
 
 	schema: ()->
 		return Creator.getSchema(Session.get("object_name"))
@@ -227,26 +215,23 @@ Template.creator_view.helpers
 	related_object: ()->
 		return Creator.Objects[this.object_name]
 
-	# related_collection: ()->
-	# 	return Template.instance()?.related_collection?.get()
-
 	allowCreate: ()->
 		return Creator.getPermissions(this.object_name).allowCreate
 
 	detail_info_visible: ()->
 		return Session.get("detail_info_visible")
 
-	# doc: ()->
-	# 	return Session.get("action_record_id")
-
 	actions: ()->
 		obj = Creator.getObject()
+		object_name = obj.name
+		record_id = Session.get "record_id"
+		permissions = obj.permissions.get()
 		actions = _.values(obj.actions) 
 		# actions = _.where(actions, {on: "record", visible: true})
 		actions = _.filter actions, (action)->
 			if action.on == "record"
 				if typeof action.visible == "function"
-					return action.visible()
+					return action.visible(object_name, record_id, permissions)
 				else
 					return action.visible
 			else
@@ -255,11 +240,14 @@ Template.creator_view.helpers
 
 	moreActions: ()->
 		obj = Creator.getObject()
+		object_name = obj.name
+		record_id = Session.get "record_id"
+		permissions = obj.permissions.get()
 		actions = _.values(obj.actions) 
 		actions = _.filter actions, (action)->
 			if action.on == "record_more"
 				if typeof action.visible == "function"
-					return action.visible()
+					return action.visible(object_name, record_id, permissions)
 				else
 					return action.visible
 			else
