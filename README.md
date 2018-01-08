@@ -144,6 +144,7 @@ triggers 用于定义在服务端执行的触发器
     - todo: 传入触发的函数
 - trigger.todo 函数中可以使用以下变量
   - this.object_name
+- trigger.todo 函数，如果return的是false，则中断操作，如在before.insert里return false,则不执行insert操作。
 
 
 ### SAAS 多租户
