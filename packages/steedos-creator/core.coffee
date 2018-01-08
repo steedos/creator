@@ -26,7 +26,7 @@ Meteor.startup ->
 				remove: (userId, doc) ->
 					return true
 
-	Creator.initApps()
+	# Creator.initApps()
 
 
 # Creator.initApps = ()->
