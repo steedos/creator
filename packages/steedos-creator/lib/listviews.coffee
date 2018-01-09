@@ -140,6 +140,8 @@ Creator.initListViews = (object_name)->
 					_id: "nothing"
 			return selector
 
+
+
 if Meteor.isClient
 	Creator.getRelatedList = (object_name, record_id)->
 		list = []
@@ -214,5 +216,5 @@ Creator.getListView = (object_name, list_view_id)->
 			list_view = object.list_views[view_ids[0]]
 		
 		Creator.getTable(object_name)?.options.columns = Creator.getTabularColumns(object_name, list_view.columns);
-
+		Creator.getTable(object_name)?.options.language.zeroRecords = t("list_view_no_records")
 	return list_view

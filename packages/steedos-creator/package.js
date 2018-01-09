@@ -40,11 +40,11 @@ Package.onUse(function(api) {
     api.use('session@1.1.6');
     api.use('blaze@2.1.9');
     api.use('templating@1.2.15');
-    api.use('modules')
     api.use('flemay:less-autoprefixer@1.2.0');
     api.use('simple:json-routes@2.1.0');
     api.use('nimble:restivus@0.8.7');
     api.use('aldeed:simple-schema@1.3.3');
+    api.use('aldeed:schema-index@1.1.1');
     api.use('aldeed:collection2@2.5.0');
     api.use('aldeed:tabular@1.6.1');
 	api.use('meteorhacks:unblock@1.1.0');
