@@ -1,47 +1,26 @@
 <template name="filter_option">
-    <div class="uiPanel--default uiPanel positioned west open active" style="top: {{top}}; left: {{left}}">
+    <div class="uiPanel--default uiPanel positioned west open active filter_option_uiPanel" style="top: {{top}}; left: {{left}}">
         <div class="option-container">
             <div class="panel-content">
                 <div class="forceFilterPanelCallout">
                     <div>
-                        <div class="forceFilterPanelFieldSelector">
-                            <label class="inputLabel uiLabel" for="field">
-                                Field
-                            </label>
-                            <div class="forceRecordLayout valueInput">
-                                <select class="form-control" id="field">
-                                {{#each fields}}
-                                    <option class="uiInputSelectOption" value="{{this}}" {{is_selected filter_item.field this}}>{{this}}</option>
-                                {{/each}}
-                                </select>
+                        {{#autoForm id="filter-option" schema=schema doc=filter_item}}
+                            <div class="forceFilterPanelFieldSelector">
+                                <div class="forceRecordLayout valueInput">
+                                    {{> afQuickField name="field"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="forceFilterPanelFieldSelector">
-                            <label class="inputLabel uiLabel" for="operation">
-                                Operator
-                            </label>
-                            <div class="forceRecordLayout valueInput">
-                                <select class="form-control" id="operation">
-                                    <option class="uiInputSelectOption" value="EQUALS" {{is_selected filter_item.operation "EQUALS"}}>equals</option>
-                                    <option class="uiInputSelectOption" value="NOT_EQUAL" {{is_selected filter_item.operation "NOT_EQUAL"}}>not equal to</option>
-                                    <option class="uiInputSelectOption" value="LESS_THAN" {{is_selected filter_item.operation "LESS_THAN"}}>less than</option>
-                                    <option class="uiInputSelectOption" value="GREATER_THAN" {{is_selected filter_item.operation "GREATER_THAN"}}>greater than</option>
-                                    <option class="uiInputSelectOption" value="LESS_OR_EQUAL" {{is_selected filter_item.operation "LESS_OR_EQUAL"}}>less or equal</option>
-                                    <option class="uiInputSelectOption" value="GREATER_OR_EQUAL" {{is_selected filter_item.operation "GREATER_OR_EQUAL"}}>greater or equal</option>
-                                    <option class="uiInputSelectOption" value="CONTAINS" {{is_selected filter_item.operation "CONTAINS"}}>CONTAINS</option>
-                                    <option class="uiInputSelectOption" value="NOT_CONTAIN" {{is_selected filter_item.operation "NOT_CONTAIN"}}>does not contain</option>
-                                    <option class="uiInputSelectOption" value="STARTS_WITH" {{is_selected filter_item.operation "STARTS_WITH"}}>starts with</option>
-                                </select>
+                            <div class="forceFilterPanelFieldSelector">
+                                <div class="forceRecordLayout valueInput">
+                                    {{> afQuickField name="operation"}}
+                                </div>
                             </div>
-                        </div>
-                        <div class="forceFilterPanelFieldSelector">
-                            <label class="inputLabel uiLabel" for="value">
-                                Value
-                            </label>
-                            <div class="forceRecordLayout valueInput">
-                                <input type="text" id="value" value="{{filter_item.value}}" class="form-control input uiInput uiInputText uiInput--default uiInput--input">
+                            <div class="forceFilterPanelFieldSelector">
+                                <div class="forceRecordLayout valueInput">
+                                    {{> afQuickField name="value"}}
+                                </div>
                             </div>
-                        </div>
+                        {{/autoForm}}
                     </div>
                     <button class="slds-button slds-button--neutral uiButton save-filter">
                         <span class="bBody truncate">Done</span>
