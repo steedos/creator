@@ -215,16 +215,22 @@ Creator.getListViews = (object_name)->
 
 
 Creator.getListView = (object_name, list_view_id)->
-
 	object = Creator.getObject(object_name)
+	custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
 	if object.list_views
 		if object.list_views[list_view_id]
 			list_view = object.list_views[list_view_id]
+		else if custom_list_view
+			list_view = 
+				columns: ["name"]
+				filter_scope: "space"
+				label: custom_list_view.name
+				name: custom_list_view.name
+				_id: list_view_id
 		else
 			view_ids = _.keys(object.list_views) 
 			view_ids = _.without(view_ids, "default")
 			list_view = object.list_views[view_ids[0]]
-		
 		Creator.getTable(object_name)?.options.columns = Creator.getTabularColumns(object_name, list_view.columns);
 		Creator.getTable(object_name)?.options.language.zeroRecords = t("list_view_no_records")
 	return list_view

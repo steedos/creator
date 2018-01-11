@@ -23,6 +23,8 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "bootstrap-datetimepicker"
 			fs.autoform.dateTimePickerOptions =
 				format: "YYYY-MM-DD HH:mm"
+		else if field.type == "[Object]"
+			fs.type = [Object]
 		else if field.type == "html"
 			fs.type = String
 			fs.autoform.afFieldInput = 

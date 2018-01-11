@@ -43,6 +43,13 @@
 													</a>
 												</li>
 												{{/each}}
+												{{#each custom_view}}
+												<li class="slds-dropdown__item crm-header-menu-item" role="presentation">
+													<a role="option" tabindex="-1" href="javascript:void(0);" class="custom-list-view-switch">
+														<span class="">{{this.name}}</span>
+													</a>
+												</li>
+												{{/each}}
 											</ul>
 										</div>
 									</h1>
@@ -68,10 +75,19 @@
 						</div>
 						<div class="slds-col slds-no-flex slds-grid slds-align-bottom">
 							<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-m-left_x-small" aria-expanded="false">
-								<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true" title="List View Controls" disabled>
+								<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true" title="List View Controls" data-toggle="dropdown">
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="settings"}}
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="down"}}
 								</button>
+								<div class="dropdown-menu dropdown-menu-right" role="menu">
+									<ul class="slds-dropdown__list list-view-controls">
+										<li class="slds-dropdown__item add-list-view" role="presentation">
+											<a href="javascript:void(0);" title="new" class="" role="option" tabindex="-1">
+												<span>New</span>
+											</a>
+										</li>
+									</ul>
+								</div>
 							</div>
 							<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-m-left_xx-small">
 								<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true" title="Change view" disabled>
@@ -89,7 +105,7 @@
 								<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="Charts" disabled>
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="chart"}}
 								</button>
-								<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="Filters" disabled>
+								<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list" title="Filters" {{is_filter_list_disabled}}>
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
 								</button>
 							</div>
@@ -97,13 +113,74 @@
 					</div>
 				</div>
 				<div class="slds-grid table-grid-content">
-					<div class="slds-table tale-content slds-table--header-fixed_container list-table-container">
-						{{#if list_view_visible}}
-							{{> tabular table=tabular_table selector=selector class="slds-table slds-table_bordered slds-table_resizable-cols slds-table_cell-buffer slds-table_edit slds-hint-parent slds-max-medium-table_stacked"}}
-						{{/if}}
+					<div class="slds-col slds-no-space">
+						<div class="slds-table tale-content slds-table--header-fixed_container list-table-container">
+							{{#if list_view_visible}}
+								{{> tabular table=tabular_table selector=selector class="slds-table slds-table_bordered slds-table_resizable-cols slds-table_cell-buffer slds-table_edit slds-hint-parent slds-max-medium-table_stacked"}}
+							{{/if}}
+						</div>
+					</div>
+					<div class="slds-grid slds-no-flex slds-hide filter-list-container">
+						<div class="filter-list slds-grid slds-grid_vertical">
+							<div class="slds-form slds-form_stacked slds-grow slds-scrollable_y slds-grid slds-grid_vertical">
+								<div class="slds-filters">
+									<div class="slds-filters__header slds-grid slds-has-divider_bottom-space">
+										<!-- <h2 class="slds-align-middle slds-text-heading_small">Filter</h2>
+										<button class="slds-button slds-button_icon slds-col_bump-left slds-button_icon slds-button_icon-small close-filter-panel" title="Close Filter Panel">
+											{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="forward"}}
+										</button> -->
+										<button class="slds-button slds-button_neutral cancel-change">Cancel</button>
+										<button class="slds-button slds-button_neutral">Save as</button>
+										<button class="slds-button slds-button_brand save-change">Save</button>
+									</div>
+									<div class="slds-filters__body">
+										<ol class="slds-list_vertical slds-list_vertical-space">
+											<li class="slds-item slds-hint-parent">
+												<div class="slds-filters__item slds-grid slds-grid_vertical-align-center">
+													<button href="javascript:void(0);" class="slds-button_reset slds-grow slds-has-blur-focus">
+														<span class="slds-assistive-text">Edit filter:</span>
+														<p class="slds-text-body_small">Show Me</p>
+														<p>All Products</p>
+													</button>
+												</div>
+											</li>
+										</ol>
+										<h3 class="slds-text-body_small slds-m-vertical_x-small">Matching all these filters</h3>
+										<ol class="slds-list_vertical slds-list_vertical-space">
+											{{#each filter_items}}
+											<li class="slds-item slds-hint-parent filter-item">
+												<div class="slds-filters__item slds-grid slds-grid_vertical-align-center">
+													<button href="javascript:void(0);" class="slds-button_reset slds-grow slds-has-blur-focus filter-option-item">
+														<span class="slds-assistive-text">Edit filter:</span>
+														{{#if this.field}}
+															<p class="slds-text-body_small">{{this.field}}</p>
+														{{else}}
+															<p class="slds-text-body_small">New Filter</p>
+														{{/if}}
+														<p>{{this.operation}} {{this.value}}</p>
+													</button>
+													<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-small remove-filter" title="">
+														{{> steedos_icon class="slds-button__icon slds-button__icon_hint" source="utility-sprite" name="close"}}
+													</button>
+												</div>
+											</li>
+											{{/each}}
+										</ol>
+									</div>
+									<div class="slds-filters__footer slds-grid slds-shrink-none">
+										<button class="slds-button_reset slds-text-link add-filter" href="javascript:void(0);">Add Filter</button>
+										<button class="slds-button_reset slds-text-link slds-col_bump-left remove-all-filters" href="javascript:void(0);">Remove All</button>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
+			{{#if show_filter_option}}
+				{{> filter_option top=top left=left index=index filter_item=filter_item}}
+			{{/if}}
 		</div>
 	</div>
+	{{#afModal class="btn btn-primary bnt-add-list-view hidden" collection="Creator.Collections.object_listviews" operation="insert" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="List View"}} {{_ "Create"}} {{/afModal}}
 </template>

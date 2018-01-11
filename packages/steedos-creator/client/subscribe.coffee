@@ -4,6 +4,10 @@ Meteor.startup ->
 	Tracker.autorun (c)->
 		if Session.get("object_name")
 			Creator.subs["Creator"].subscribe "object_recent_viewed", Session.get("object_name")
+
+	Tracker.autorun (c)->
+		if Session.get("object_name")
+			Creator.subs["Creator"].subscribe "object_listviews", Session.get("object_name")
 			
 Meteor.startup ->
 

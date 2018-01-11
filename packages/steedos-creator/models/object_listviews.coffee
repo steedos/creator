@@ -7,15 +7,23 @@ Creator.Objects.object_listviews =
 			type: "text"
 		object_name: 
 			type: "text"
+			defaultValue: ->
+				return Session.get "object_name"
 		shared:
 			type: "boolean"
 		filters:
-			type: [Object]
+			type: "[Object]"
 			omit: true
+		"filters.$.field":
+        	type: String
+		"filters.$.operation":
+        	type: String
+		"filters.$.value":
+        	type: String
 		filter_logic:
-			type: "text"
+			type: String
 			omit: true
-
+			
 	list_views:
 		default:
 			columns: ["name", "shared", "modified"]
