@@ -26,42 +26,43 @@ Template.creator_list.helpers
 		custom_list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 		if custom_list_view
 			filters = custom_list_view.filters
-			filters = _.map filters, (obj)->
-				query = {}
-				if obj.operation == "EQUALS"
-					query[obj.field] = 
-						$eq: obj.value
-				else if obj.operation == "NOT_EQUAL"
-					query[obj.field] = 
-						$ne: obj.value
-				else if obj.operation == "LESS_THAN"
-					query[obj.field] = 
-						$lt: obj.value
-				else if obj.operation == "GREATER_THAN"
-					query[obj.field] = 
-						$gt: obj.value
-				else if obj.operation == "LESS_OR_EQUAL"
-					query[obj.field] = 
-						$lte: obj.value
-				else if obj.operation == "GREATER_OR_EQUAL"
-					query[obj.field] = 
-						$gte: obj.value
-				else if obj.operation == "CONTAINS"
-					reg = new RegExp(obj.value, "i")
-					console.log "CONTAINS", reg
-					query[obj.field] = 
-						$regex: reg
-				else if obj.operation == "NOT_CONTAIN"
-					reg = new RegExp("^((?!" + obj.value + ").)*", "i")
-					query[obj.field] = 
-						$regex: reg
-				else if obj.operation == "STARTS_WITH"
-					reg = new RegExp("^" + obj.value, "i")
-					query[obj.field] = 
-						$regex: reg
-				return query
-			selector["$and"] = filters
-			console.log filters
+			if filters and filters.length > 0
+				filters = _.map filters, (obj)->
+					query = {}
+					if obj.operation == "EQUALS"
+						query[obj.field] = 
+							$eq: obj.value
+					else if obj.operation == "NOT_EQUAL"
+						query[obj.field] = 
+							$ne: obj.value
+					else if obj.operation == "LESS_THAN"
+						query[obj.field] = 
+							$lt: obj.value
+					else if obj.operation == "GREATER_THAN"
+						query[obj.field] = 
+							$gt: obj.value
+					else if obj.operation == "LESS_OR_EQUAL"
+						query[obj.field] = 
+							$lte: obj.value
+					else if obj.operation == "GREATER_OR_EQUAL"
+						query[obj.field] = 
+							$gte: obj.value
+					else if obj.operation == "CONTAINS"
+						reg = new RegExp(obj.value, "i")
+						console.log "CONTAINS", reg
+						query[obj.field] = 
+							$regex: reg
+					else if obj.operation == "NOT_CONTAIN"
+						reg = new RegExp("^((?!" + obj.value + ").)*", "i")
+						query[obj.field] = 
+							$regex: reg
+					else if obj.operation == "STARTS_WITH"
+						reg = new RegExp("^" + obj.value, "i")
+						query[obj.field] = 
+							$regex: reg
+					return query
+				selector["$and"] = filters
+				console.log filters
 		if Session.get("spaceId") and Meteor.userId()
 			if list_view.filter_scope == "spacex"
 				selector.space = 
