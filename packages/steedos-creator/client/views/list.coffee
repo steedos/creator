@@ -4,6 +4,7 @@ Template.creator_list.onCreated ->
 	this.filter_PTop = new ReactiveVar("-1000px")
 	this.filter_PLeft = new ReactiveVar("-1000px")
 	this.filter_index = new ReactiveVar()
+	this.is_edit_scope = new ReactiveVar()
 
 Template.creator_list.onRendered ->
 
@@ -159,6 +160,16 @@ Template.creator_list.helpers
 		if index > -1 and filter_items
 			return filter_items[index]
 
+	list_view_scope: ()->
+		scope = Session.get("filter_scope")
+		if scope == "space"
+			return "All"
+		else if scope == "mine"
+			return "My"
+
+	is_edit_scope: ()->
+		return Template.instance().is_edit_scope?.get()
+
 	show_filter_option: ()->
 		return Session.get("show_filter_option")
 
@@ -197,12 +208,13 @@ Template.creator_list.events
 	'click .custom-list-view-switch': (event)->
 		Session.set("list_view_visible", false)
 		list_view_id = String(this._id)
-		console.log list_view_id
 		Tracker.afterFlush ()->
 			list_view = Creator.getListView(Session.get("object_name"), list_view_id)
 			obj = Creator.Collections.object_listviews.findOne(list_view_id)
 			filter_items = obj.filters || []
+			filter_scope = obj.filter_scope
 			Session.set("filter_items", filter_items)
+			Session.set("filter_scope", filter_scope)
 			Session.set("list_view_id", list_view_id)
 			Session.set("list_view_visible", true)
 			
@@ -310,21 +322,41 @@ Template.creator_list.events
 		$(".btn-filter-list").removeClass("slds-is-selected")
 		$(".filter-list-container").addClass("slds-hide")
 
-	'click .filter-option-item': (event, template)->
-		index = $(event.currentTarget).closest(".filter-item").index()
+	'click .filter-scope': (event, template)->
+		template.is_edit_scope.set(true)
 
 		left = $(event.currentTarget).closest(".filter-list-container").offset().left
 		top = $(event.currentTarget).closest(".slds-item").offset().top
 
 		offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
 		offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
+		contentHeight = $(event.currentTarget).closest(".slds-item").height()
 
-		contentPadding = parseInt $(event.currentTarget).closest(".slds-filters__body").css("padding-left")
-		panelWidth = $(".uiPanel--default").width()
-		panelHeight = $(".uiPanel--default").height()
+		# 弹出框的高度和宽度写死
+		left = left - offsetLeft - 400 - 6
+		top = top - offsetTop - 170/2 + contentHeight/2
 
-		left = left - offsetLeft - panelWidth - 6
-		top = top - offsetTop - panelHeight/2
+		Session.set("show_filter_option", false)
+		Tracker.afterFlush ->
+			Session.set("show_filter_option", true)
+			template.filter_PLeft.set("#{left}px")
+			template.filter_PTop.set("#{top}px")
+
+	'click .filter-option-item': (event, template)->
+		template.is_edit_scope.set(false)
+
+		index = $(event.currentTarget).closest(".filter-item").index()
+
+		left = $(event.currentTarget).closest(".filter-list-container").offset().left
+		top = $(event.currentTarget).closest(".slds-item").offset().top
+		contentHeight = $(event.currentTarget).closest(".slds-item").height()
+
+		offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
+		offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
+
+		# 弹出框的高度和宽度写死
+		left = left - offsetLeft - 400 - 6
+		top = top - offsetTop - 336/2 + contentHeight/2
 
 		Session.set("show_filter_option", false)
 
@@ -362,13 +394,14 @@ Template.creator_list.events
 	'click .save-change': (event, template)->
 		list_view_id = Session.get("list_view_id")
 		filter_items = Session.get("filter_items")
+		filter_scope = Session.get("filter_scope")
 		filter_items = _.map filter_items, (obj) ->
 			if _.isEmpty(obj)
 				return false
 			else
 				return obj
 		filter_items = _.compact(filter_items)
-		Meteor.call "update_filters", list_view_id, filter_items, (error, result) -> 
+		Meteor.call "update_filters", list_view_id, filter_items, filter_scope, (error, result) -> 
 			if error 
 				console.log "error", error 
 			else if result

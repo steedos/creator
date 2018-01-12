@@ -137,10 +137,10 @@
 										<ol class="slds-list_vertical slds-list_vertical-space">
 											<li class="slds-item slds-hint-parent">
 												<div class="slds-filters__item slds-grid slds-grid_vertical-align-center">
-													<button href="javascript:void(0);" class="slds-button_reset slds-grow slds-has-blur-focus">
+													<button href="javascript:void(0);" class="slds-button_reset slds-grow slds-has-blur-focus filter-scope">
 														<span class="slds-assistive-text">Edit filter:</span>
 														<p class="slds-text-body_small">Show Me</p>
-														<p>All Products</p>
+														<p>{{list_view_scope}} {{_ object.label}}</p>
 													</button>
 												</div>
 											</li>
@@ -178,7 +178,7 @@
 				</div>
 			</div>
 			{{#if show_filter_option}}
-				{{> filter_option top=top left=left index=index filter_item=filter_item}}
+				{{> filter_option top=top left=left index=index filter_item=filter_item is_edit_scope=is_edit_scope}}
 			{{/if}}
 		</div>
 	</div>

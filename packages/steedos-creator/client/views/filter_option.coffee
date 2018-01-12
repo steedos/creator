@@ -65,8 +65,15 @@ Template.filter_option.helpers
         
         return filter_item
 
+    object_label: ()->
+        return Creator.getObject(Session.get("object_name")).label
+
+    is_scope_selected: (scope)->
+        if scope == Session.get("filter_scope")
+            return "checked"
+
 Template.filter_option.events 
-    "click .save-filter": (event, template) ->
+    'click .save-filter': (event, template) ->
         filter = AutoForm.getFormValues("filter-option").insertDoc
 
         index = this.index
@@ -74,6 +81,11 @@ Template.filter_option.events
         filter_items[index] = filter
 
         Session.set("filter_items", filter_items)
+        template.$(".uiPanel--default").css({"top": "-1000px", left: "-1000px"})
+
+    'click .save-scope': (event, template) ->
+        filter_scope = $("input[name='choose-filter-scope']:checked").val()
+        Session.set("filter_scope", filter_scope)
         template.$(".uiPanel--default").css({"top": "-1000px", left: "-1000px"})
 
     'change select[name="field"]': (event, template) ->

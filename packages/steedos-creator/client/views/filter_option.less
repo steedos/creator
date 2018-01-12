@@ -10,12 +10,13 @@
     overflow: visible;
     -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
     -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
+    width : 400px;
 
     .option-container {
         position: relative;
 
         .panel-content {
-            overflow: auto;
+            overflow: hidden;
             height: 100%;
             
             .forceFilterPanelCallout {
@@ -27,6 +28,10 @@
                     font-style: normal;
                     font-size: .8125rem;
                     color: rgb(112, 110, 107);
+                }
+                
+                .filter-scope-legend {
+                    margin-bottom: .5rem;
                 }
 
                 .form-control {
@@ -100,8 +105,8 @@
             border-right: 1px solid #d8dde6;
             border-top: 1px solid #d8dde6;
             z-index: 0;
-            width: calc(1.25rem + .0625rem);
-            height: calc(1.25rem + .0625rem);
+            width: calc(~"1.25rem + .0625rem");
+            height: calc(~"1.25rem + .0625rem");
             -webkit-transform: rotate(45deg);
             -ms-transform: rotate(45deg);
             transform: rotate(45deg);

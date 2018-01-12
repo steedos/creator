@@ -222,8 +222,8 @@ Creator.getListView = (object_name, list_view_id)->
 			list_view = object.list_views[list_view_id]
 		else if custom_list_view
 			list_view = 
-				columns: ["name"]
-				filter_scope: "space"
+				columns: custom_list_view.columns
+				filter_scope: custom_list_view.filter_scope
 				label: custom_list_view.name
 				name: custom_list_view.name
 				_id: list_view_id
