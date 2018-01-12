@@ -29,10 +29,17 @@ Creator.Objects["cfs.files.filerecord"] =
 			filter_scope: "spacex"
 
 	permission_set:
-		default:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+		user:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: true 
+		admin:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true 

@@ -102,18 +102,16 @@
 											</div>
 										</header>
 										<div class="slds-no-flex">
-											{{#unless isFileDetail}}
-												{{#if allowCreate}}
-													{{#if this.is_file}}
-														<button class="slds-button slds-button_neutral btn-upload-file">
-															上传
-															<input type="file" name="file" class="input-file-upload">
-														</button>
-													{{else}}
-														<button class="slds-button slds-button_neutral add-related-object-record" data-object-name="{{this.object_name}}">{{_ "New"}}</button>
-													{{/if}}
+											{{#if allowCreate}}
+												{{#if this.is_file}}
+													<button class="slds-button slds-button_neutral btn-upload-file">
+														上传
+														<input type="file" name="file" class="input-file-upload">
+													</button>
+												{{else}}
+													<button class="slds-button slds-button_neutral add-related-object-record" data-object-name="{{this.object_name}}">{{_ "New"}}</button>
 												{{/if}}
-											{{/unless}}
+											{{/if}}
 										</div>
 									</div>
 									<div class="slds-card__body" style="{{#if related_list_count}}{{else}}display:none;{{/if}}">
