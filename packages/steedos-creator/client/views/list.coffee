@@ -27,6 +27,13 @@ Template.creator_list.helpers
 		custom_list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 		if custom_list_view
 			filters = custom_list_view.filters
+			filter_scope = custom_list_view.filter_scope
+			if filter_scope == "space"
+				selector.space = Session.get("spaceId")
+			else if filter_scope == "mine"
+				selector.space = Session.get("spaceId")
+				selector.owner = Meteor.userId()
+
 			if filters and filters.length > 0
 				filters = _.map filters, (obj)->
 					query = {}
@@ -50,11 +57,10 @@ Template.creator_list.helpers
 							$gte: obj.value
 					else if obj.operation == "CONTAINS"
 						reg = new RegExp(obj.value, "i")
-						console.log "CONTAINS", reg
 						query[obj.field] = 
 							$regex: reg
 					else if obj.operation == "NOT_CONTAIN"
-						reg = new RegExp("^((?!" + obj.value + ").)*", "i")
+						reg = new RegExp("^((?!" + obj.value + ").)*$", "i")
 						query[obj.field] = 
 							$regex: reg
 					else if obj.operation == "STARTS_WITH"
@@ -63,7 +69,8 @@ Template.creator_list.helpers
 							$regex: reg
 					return query
 				selector["$and"] = filters
-				console.log filters
+			
+			return selector
 		if Session.get("spaceId") and Meteor.userId()
 			if list_view.filter_scope == "spacex"
 				selector.space = 
@@ -98,7 +105,6 @@ Template.creator_list.helpers
 				else if permissions.allowRead
 					selector.owner = Meteor.userId()
 					return selector
-			console.log selector
 		return {_id: "nothing"}
 
 
@@ -401,7 +407,9 @@ Template.creator_list.events
 			else
 				return obj
 		filter_items = _.compact(filter_items)
-		Meteor.call "update_filters", list_view_id, filter_items, filter_scope, (error, result) -> 
+		Session.set "list_view_visible", false
+		Meteor.call "update_filters", list_view_id, filter_items, filter_scope, (error, result) ->
+			Session.set "list_view_visible", true
 			if error 
 				console.log "error", error 
 			else if result
