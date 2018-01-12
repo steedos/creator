@@ -75,7 +75,7 @@ Creator.Object = (options)->
 
 	schema = Creator.getObjectSchema(self)
 	self.schema = new SimpleSchema(schema)
-	if self.name != "users"
+	if self.name != "users" and self.name != "cfs.files.filerecord"
 		if Meteor.isClient
 			Creator.Collections[self.name].attachSchema(self.schema, {replace: true})
 		else
