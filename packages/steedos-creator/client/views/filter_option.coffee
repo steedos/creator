@@ -10,8 +10,11 @@ Template.filter_option.helpers
                         return "name"
                     options: ()->
                         keys = Creator.getSchema(Session.get("object_name"))._firstLevelSchemaKeys
+                        schema = Creator.getSchema(Session.get("object_name"))._schema
                         keys = _.map keys, (key) ->
-                            return {label: key, value: key}
+                            obj = _.pick(schema, key)
+                            label = obj[key].label
+                            return {label: label, value: key}
                         return keys
             operation:
                 type: String
