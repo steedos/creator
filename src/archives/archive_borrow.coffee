@@ -171,19 +171,21 @@ Creator.Objects.archive_borrow =
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_borrow"].length ==0
 					alert("请先选择要归还的条目")
-				Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
-					Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{is_deleted:true}},
-						(error,result)->
-							console.log error
-						if !error
-							recordIds = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_documentIds
-							recordIds.forEach (recordId)->
-								Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false}})
-							#Creator.Collections["archive_borrow"].update(
-							toastr.success("归还成功，欢迎再次借阅")
-						else
-							toastr.error("归还失败，请再次操作")
-						)
+					return
+				if Session.get("list_view_id") =="mine"
+					Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
+						Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{is_deleted:true}},
+							(error,result)->
+								console.log error
+								if !error
+									recordIds = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_documentIds
+									recordIds.forEach (recordId)->
+										Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false}})
+									#Creator.Collections["archive_borrow"].update(
+									toastr.success("归还成功，欢迎再次借阅")
+								else
+									toastr.error("归还失败，请再次操作")
+								)
 
 
 		renew:
@@ -193,6 +195,7 @@ Creator.Objects.archive_borrow =
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_borrow"].length ==0
 					alert("请先选择要续借的条目")
+					return
 				now = new Date()
 				start_date = now
 				end_date =new Date(now.getTime()+7*24*3600*1000)

@@ -654,7 +654,16 @@ Creator.Objects.archive_records =
 			todo:()-> 
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先选择要接收的档案")
-				Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"])
+				Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],
+					(error,result) ->
+							console.log error
+							if !error
+								toastr.success("接收成功，等待审核")
+								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"接收档案","成功")
+							else
+								toastr.error("接收失败，请再次操作")
+								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"接收档案","失败")
+							)
 		transfer:
 			label:"移交"
 			visible:true
@@ -668,8 +677,12 @@ Creator.Objects.archive_records =
 							console.log error
 							if !error
 								toastr.success("移交成功，等待审核")
+								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"移交档案","成功")
+
 							else
 								toastr.error("移交失败，请再次操作")
+								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"移交档案","成功")
+
 							)
 		destroy:
 			label:"销毁"
@@ -684,8 +697,12 @@ Creator.Objects.archive_records =
 						console.log error
 						if !error
 							toastr.success("销毁成功，等待审核")
+							Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功")
+
 						else
 							toastr.error("销毁失败，请再次操作")
+							Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功")
+
 						)
 		borrow:
 			label:"借阅"
