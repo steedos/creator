@@ -120,6 +120,7 @@ Package.onUse(function(api) {
     
     api.addFiles('models/cms_files.coffee');
     api.addFiles('models/cms_files_cfs.coffee');
+    api.addFiles('models/cfs_files.coffee');
 
     api.addFiles('models/reports.coffee');
     api.addFiles('models/tasks.coffee');
@@ -132,7 +133,6 @@ Package.onUse(function(api) {
     api.addFiles('server/publications/object.coffee', 'server');
     api.addFiles('server/publications/related_object.coffee', 'server');
     api.addFiles('server/publications/object_tabular.coffee', 'server');
-    api.addFiles('server/publications/cfs_files.coffee', 'server');
 
     api.addFiles('server/routes/s3.coffee', 'server');
 
