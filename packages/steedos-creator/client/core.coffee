@@ -9,8 +9,6 @@ Creator.getLayout = (app_id)->
 Creator.createObject = (object_name,object_data)->
 	object = Creator.getObject(object_name)
 	collection_name = "Creator.Collections."+object_name
-	console.log object_name
-	console.log object_data
 	Session.set("action_collection",collection_name)
 	Session.set("action_save_and_insert",true)
 	Session.set("action_collection_name",object.label)

@@ -7,11 +7,7 @@ Creator.Objects.archive_borrow =
 		borrow_no:
 			type:"text"
 			label:"借阅单编号"
-			defaultValue:()->
-				now = new Date()				
-				count = Creator.Collections["archive_borrow"].find({year:now.getFullYear().toString()}).count()+1
-				strCount = (Array(6).join('0') + count).slice(-6)
-				return now.getFullYear().toString()  + strCount
+			omit:true
 			sortable:true
 			is_name:true
 			#defaultValue:当前年度的借阅单总数+1
@@ -155,20 +151,18 @@ Creator.Objects.archive_borrow =
 				doc.owner = userId
 				doc.is_deleted = false
 				doc.is_approved = false
+				count = Creator.Collections["archive_borrow"].find({year:now.getFullYear().toString()}).count()+1
+				strCount = (Array(6).join('0') + count).slice(-6)
+				doc.borrow_no = now.getFullYear().toString()  + strCount
 				doc.year = now.getFullYear().toString()
 				return true
 		"after.insert.server.default": 
 			on: "server"
 			when: "after.insert"
 			todo: (userId, doc)->
-				if doc
-					toastr.success("借阅成功，等待审核")
-				else
-					toastr.error("借阅失败，请再次操作")
 				doc.relate_documentIds.forEach (relate_documentId)->
 					Creator.Collections["archive_records"].update({_id:relate_documentId},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})	
 				return true
-		
 	actions: 
 		restore:
 			label: "归还"

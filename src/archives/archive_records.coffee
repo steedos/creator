@@ -704,7 +704,7 @@ Creator.Objects.archive_records =
 				doc.borrow_no = now.getFullYear().toString()  + strCount
 				collection_record = Creator.Collections["archive_records"]
 				#console.log collection_record.find({},{field:{year: 1}}).sort({year:-1}).limit(1)
-				doc.year = now.getFullYear()
+				doc.year = now.getFullYear().toString()
 				doc.unit_info = Creator.Collections["space_users"].findOne({user:Meteor.userId(),space:space},{fields:{company:1}}).company
 				doc.start_date = now
 				doc.end_date =new Date(now.getTime()+7*24*3600*1000)
