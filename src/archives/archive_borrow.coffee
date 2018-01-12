@@ -161,6 +161,10 @@ Creator.Objects.archive_borrow =
 			on: "server"
 			when: "after.insert"
 			todo: (userId, doc)->
+				if doc
+					toastr.success("借阅成功，等待审核")
+				else
+					toastr.error("借阅失败，请再次操作")
 				doc.relate_documentIds.forEach (relate_documentId)->
 					Creator.Collections["archive_records"].update({_id:relate_documentId},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})	
 				return true
