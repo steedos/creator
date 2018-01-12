@@ -1,12 +1,4 @@
-request = Npm.require('request')
-path = Npm.require('path')
-fs = Npm.require('fs')
-
 logger = new Logger 'Records_QHD -> InstancesToArchive'
-
-pathname = path.join(__meteor_bootstrap__.serverDir, '../../../cfs/files/instances');
-
-absolutePath = path.resolve(pathname);
 
 # spaces: Array 工作区ID
 # contract_flows： Array 合同类流程
@@ -89,7 +81,7 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 根据FONDSID查找全宗号
 	fond = db.archive_fonds.findOne({'name':formData?.fonds_name})
-	formData.fonds_identifier = fond?._id
+	formData.fonds_identifier = fond?.code
 	# 根据机构查找对应的类别号
 	classification = db.archive_classification.findOne({'dept':/{formData?.organizational_structure}/})
 	# formData.fonds_identifier = classification?._id
@@ -110,7 +102,7 @@ _minxiInstanceData = (formData, instance) ->
 
 	formData.external_id = instance._id
 
-	formData.is_receive = false
+	formData.is_received = false
 
 	fieldNames = _.keys(formData)
 
@@ -131,66 +123,9 @@ _minxiInstanceData = (formData, instance) ->
 		if !fieldValue
 			fieldValue = ''
 
-	# 正文附件上传
-	collection = cfs.files
+	attachmentsToArchive = new AttachmentsToArchive(instance.space,instance._id,formData)
 
-	fileCollection = Creator.getObject("cms_files").db
-
-	mainFilesHandle = (f)->
-		try
-			filename = f.name()
-			size = f.size()
-			extention = 
-			object_name = 'archive_records'
-			space = instance?.space
-			record_id = formData?._id
-			owner_name = 'OA同步'
-
-			newFile = new FS.File()
-			newFile.attachData f.createReadStream('instances'), {type: f.original.type}, (err) ->
-				if err
-					throw new Meteor.Error(err.error, err.reason)
-				newFile.name filename
-				newFile.size size
-				metadata = {
-						space : space,
-						record_id : record_id,
-						object_name : object_name,
-						owner_name : owner_name,
-						current:true,
-						main:true
-					}
-				newFile.metadata = metadata
-
-				fileObj = collection.insert newFile
-
-				if fileObj
-					# 更新cms_files表 cfs.cms_files.update
-					newFileObjId = fileCollection.direct.insert {
-						name: filename
-						description: ''
-						extention: filename.split('.').pop()
-						size: size
-						versions: [fileObj?._id]
-						parent: {o:object_name,ids:[record_id]}
-						owner: owner_name
-						space: space
-						created: (new Date())
-					}
-					fileObj.update({$set: {'metadata.parent' : newFileObjId}})
-				else
-					logger.error "文件上传失败：#{f._id},#{f.name()}. error: "
-		catch e
-			logger.error "文件下载失败：#{f._id},#{f.name()}. error: " + e
-
-	# 正文
-	mainFile = cfs.instances.find({
-		'metadata.instance': instance._id,
-		'metadata.current': true,
-		"metadata.main": true
-	})
-
-	mainFile.forEach mainFilesHandle
+	attachmentsToArchive.syncAttachments()
 
 	console.log("_minxiInstanceData end", instance._id)
 
