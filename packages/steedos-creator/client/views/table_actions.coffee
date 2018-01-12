@@ -10,10 +10,7 @@ Template.creator_table_actions.helpers
 		record_id = this._id
 		record_permissions = this.record_permissions
 		obj = Creator.getObject(object_name)
-		actions = _.map obj.actions, (val, key) ->
-			val._ACTION_KEY = key
-			return val
-		actions = _.values(actions) 
+		actions = _.values(obj.actions) 
 		actions = _.filter actions, (action)->
 			if action.on == "record" or action.on == "record_more"
 				if action.only_detail
