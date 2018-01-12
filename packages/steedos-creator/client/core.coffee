@@ -6,14 +6,17 @@ Creator.getLayout = (app_id)->
 	else
 		return "creatorLayout"
 
-Creator.createObject = (object_name)->
+Creator.createObject = (object_name,object_data)->
 	object = Creator.getObject(object_name)
-	object_name = "Creator.Collections."+object_name
-	Session.set("action_collection",object_name)
+	collection_name = "Creator.Collections."+object_name
+	console.log object_name
+	console.log object_data
+	Session.set("action_collection",collection_name)
 	Session.set("action_save_and_insert",true)
 	Session.set("action_collection_name",object.label)
 	Session.set('action_object_name',object_name)
 	Session.set("action_fields",undefined)
+	Session.set("cmDoc",object_data)
 	$(".creator-add").click()
 
 Creator.editObject = (object_name,record_id)->
