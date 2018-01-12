@@ -38,6 +38,13 @@ Template.filter_option.helpers
                 autoform:
                     type:()->
                         return Session.get("schema_type")
+                    options: ()->
+                        field = Session.get("schema_field")
+                        if field and Session.get("schema_type") == "select"
+                            schema = Creator.getSchema(Session.get("object_name"))._schema
+                            obj = _.pick(schema, field)
+                            options = obj[field].autoform?.options
+                            return options
 
         new SimpleSchema(schema)
 
@@ -45,6 +52,7 @@ Template.filter_option.helpers
         filter_item = Template.instance().data?.filter_item
         schema_type = ""
         if filter_item and filter_item.field
+            Session.set "schema_field", filter_item.field
             _schema = Creator.getSchema(Session.get("object_name"))._schema
             _.each _schema, (obj, key)->
                 if key == filter_item.field
@@ -72,7 +80,7 @@ Template.filter_option.events
         _.each _schema, (obj, key)->
             if key == field
                 type = obj.autoform.type || "text"
-
+        Session.set "schema_field", field
         Session.set "schema_type", type
 
         console.log type
