@@ -18,7 +18,7 @@ InstancesToArchive = (spaces, contract_flows, ins_ids) ->
 
 InstancesToArchive.success = (instance)->
 	console.log("success, name is #{instance.name}, id is #{instance._id}")
-	db.instances.direct.update({_id: instance._id}, {$set: {is_recorded: true}})
+	# db.instances.update({_id: instance._id}, {$set: {is_recorded: true}})
 
 InstancesToArchive.failed = (instance, error)->
 	console.log("failed, name is #{instance.name}, id is #{instance._id}. error: ")
@@ -59,20 +59,19 @@ getFormatName = (fileName) ->
 		pos=fileName.lastIndexOf(".")+1
 		extension = fileName.substring(pos) || ""
 		return extension
-# 获取格式名称
+# 获取格式版本
 getFormatVersion = (fileType) ->
 	if fileType?
 		return fileType
 # 生成计算机文件名
 getComputerFileName = (formData) ->
-
-
-# 整理附件数据
-_minxiAttachmentInfo = (formData, fileObj) ->
-	formData.format_name.push "格式名称：" + getFormatName fileObj?.archives?.name
-	formData.format_version.push "格式版本：" + getFormatVersion fileObj?.archives?.type
-	formData.computer_file_name.push getComputerFileName formData
-	formData.document_size.push fileObj?.archives?.size + "字节"
+	computer_file_name = formData?.fonds_identifier + ' - ' +
+						 formData?.archival_category_code + ' · ' +
+						 formData?.year + ' - ' +
+						 formData?.organizational_structure + ' - ' +
+						 formData?.retention_peroid + ' - ' +
+						 formData?.item_number + ' - ' + 'D' +
+						 formData?.fileCount
 
 # 整理档案表数据
 _minxiInstanceData = (formData, instance) ->
@@ -132,47 +131,66 @@ _minxiInstanceData = (formData, instance) ->
 		if !fieldValue
 			fieldValue = ''
 
-	formData.format_name = new Array
-	formData.format_version = new Array
-	formData.computer_file_name = new Array
-	formData.document_size = new Array
+	# 正文附件上传
+	collection = cfs.files
+
+	fileCollection = Creator.getObject("cms_files").db
 
 	mainFilesHandle = (f)->
 		try
-			newFile = new FS.File
-			newFile.attachData(
-				fileStream = f.createReadStream('instances'),
-				{
-					type: f.original.type
-				},
-				(err) ->
-					if err
-						throw new Meteor.Error(err.error, err.reason)
-					newFile.name f.name()
-					metadata = {
-							archive: formData._id,
-							instance: instance._id,
-							current:true,
-							main:true
-						}
-					newFile.metadata = metadata
-					fileObj = cfs.archives.insert(newFile)
-					if fileObj?
-						_minxiAttachmentInfo formData,fileObj
-					else
-						logger.error "正文附件上传失败：#{f._id},#{f.name()}. error: " + e
-			)
-		catch e
-			logger.error "正文附件下载失败：#{f._id},#{f.name()}. error: " + e
+			filename = f.name()
+			size = f.size()
+			extention = 
+			object_name = 'archive_records'
+			space = instance?.space
+			record_id = formData?._id
+			owner_name = 'OA同步'
 
+			newFile = new FS.File()
+			newFile.attachData f.createReadStream('instances'), {type: f.original.type}, (err) ->
+				if err
+					throw new Meteor.Error(err.error, err.reason)
+				newFile.name filename
+				newFile.size size
+				metadata = {
+						space : space,
+						record_id : record_id,
+						object_name : object_name,
+						owner_name : owner_name,
+						current:true,
+						main:true
+					}
+				newFile.metadata = metadata
+
+				fileObj = collection.insert newFile
+
+				if fileObj
+					# 更新cms_files表 cfs.cms_files.update
+					newFileObjId = fileCollection.direct.insert {
+						name: filename
+						description: ''
+						extention: filename.split('.').pop()
+						size: size
+						versions: [fileObj?._id]
+						parent: {o:object_name,ids:[record_id]}
+						owner: owner_name
+						space: space
+						created: (new Date())
+					}
+					fileObj.update({$set: {'metadata.parent' : newFileObjId}})
+				else
+					logger.error "文件上传失败：#{f._id},#{f.name()}. error: "
+		catch e
+			logger.error "文件下载失败：#{f._id},#{f.name()}. error: " + e
+
+	# 正文
 	mainFile = cfs.instances.find({
 		'metadata.instance': instance._id,
 		'metadata.current': true,
 		"metadata.main": true
 	})
 
-	mainFile.forEach (f) ->
-		mainFilesHandle f
+	mainFile.forEach mainFilesHandle
 
 	console.log("_minxiInstanceData end", instance._id)
 
@@ -193,7 +211,7 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 		InstancesToArchive.failed instance, "立档单位 不能为空"
 
 InstancesToArchive::syncNonContractInstances = () ->
-	instance = db.instances.findOne({_id: 'hEKkSrLCoQ4Q2Y5z4'})
+	instance = db.instances.findOne({_id: 'DBrLPoHhLz4EoivXs'})
 	if instance
 		InstancesToArchive.syncNonContractInstance instance
 
