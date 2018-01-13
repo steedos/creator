@@ -7,23 +7,20 @@ Template.creator_report.onRendered ->
 		pivotGridChart = $('#pivotgrid-chart').dxChart(
 			commonSeriesSettings: type: 'bar'
 			tooltip:
-				enabled: false
-				customizeTooltip: (args) ->
-					valueText = Globalize.formatCurrency(args.originalValue, 'USD', maximumFractionDigits: 0)
-					{ html: args.seriesName + ' | Total<div class=\'currency\'>' + valueText + '</div>' }
+				enabled: true
 			size: height: 300
 			adaptiveLayout: width: 450).dxChart('instance')
 		pivotGrid = $('#pivotgrid').dxPivotGrid(
 			allowSortingBySummary: true
 			allowFiltering: true
 			showBorders: true
-			showColumnGrandTotals: false
-			showRowGrandTotals: false
-			showRowTotals: false
-			showColumnTotals: false
+			showColumnGrandTotals: true
+			showRowGrandTotals: true
+			showRowTotals: true
+			showColumnTotals: true
 			fieldChooser:
 				enabled: true
-				height: 400
+				height: 600
 			dataSource:
 				fields: [
 					{
