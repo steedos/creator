@@ -81,7 +81,7 @@ Template.creator_report.onRendered ->
 		'country': 'United States of America'
 		'city': 'Los Angeles'
 		'amount': 850
-		'date': new Date('2013-01-13')
+		'date': new Date('2014-01-13')
 	}
 	{
 		'id': 10250
@@ -97,7 +97,7 @@ Template.creator_report.onRendered ->
 		'country': 'Canada'
 		'city': 'Vancouver'
 		'amount': 1965
-		'date': new Date('2013-01-03')
+		'date': new Date('2014-01-03')
 	}
 	{
 		'id': 10252
@@ -113,7 +113,7 @@ Template.creator_report.onRendered ->
 		'country': 'Brazil'
 		'city': 'Rio de Janeiro'
 		'amount': 5260
-		'date': new Date('2013-01-17')
+		'date': new Date('2015-01-17')
 	}
 	{
 		'id': 10254
@@ -129,6 +129,6 @@ Template.creator_report.onRendered ->
 		'country': 'Paraguay'
 		'city': 'Asuncion'
 		'amount': 3140
-		'date': new Date('2013-01-01')
+		'date': new Date('2015-01-01')
 	}
 ]
