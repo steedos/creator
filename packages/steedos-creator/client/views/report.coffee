@@ -5,128 +5,111 @@ Template.creator_report.helpers
 Template.creator_report.onRendered ->
 	DevExpress.localization.locale("zh")
 	$ ->
-		pivotGridChart = $('#pivotgrid-chart').dxChart(
-			commonSeriesSettings: type: 'bar'
-			tooltip:
-				enabled: true
-			size: height: 300
-			adaptiveLayout: width: 450).dxChart('instance')
-		pivotGrid = $('#pivotgrid').dxPivotGrid(
-			allowSortingBySummary: true
-			allowFiltering: true
-			showBorders: true
-			showColumnGrandTotals: true
-			showRowGrandTotals: true
-			showRowTotals: true
-			showColumnTotals: true
-			fieldChooser:
-				enabled: true
-				height: 600
-			dataSource:
-				fields: [
-					{
-						caption: 'Region'
-						width: 120
-						dataField: 'region'
-						area: 'row'
-						sortBySummaryField: 'Total'
-					}
-					{
-						caption: 'City'
-						dataField: 'city'
-						width: 150
-						area: 'row'
-					}
-					{
-						dataField: 'date'
-						dataType: 'date'
-						area: 'column'
-					}
-					{
-						groupName: 'date'
-						groupInterval: 'month'
-						visible: false
-					}
-					{
-						caption: 'Total'
-						dataField: 'amount'
-						dataType: 'number'
-						summaryType: 'sum'
-						format: 'currency'
-						area: 'data'
-					}
-				]
-				store: report_data).dxPivotGrid('instance')
-		pivotGrid.bindChart pivotGridChart,
-			dataFieldsDisplayMode: 'splitPanes'
-			alternateDataFields: false
-		return
+		report_id = Session.get "report_id"
+		unless report_id
+			return
+		reportObject = Creator.Reports[report_id]
+		objectName = reportObject.object_name
+		objectFields = Creator.getObject(objectName).fields
+		Meteor.call "report_data",{object_name: objectName, space:Session.get("spaceId")}, (error, result)->
+			if error
+				console.error('report_data method error:', error)
+				return
+			
+			reportFields = []
+			reportData = result
+			_.each reportObject.rows, (row)->
+				rowField = objectFields[row]
+				caption = rowField.label
+				unless caption
+					caption = objectName + "_" + row
+				reportFields.push 
+					caption: caption
+					width: 100
+					dataField: row
+					area: 'row'
+			_.each reportObject.columns, (column)->
+				columnField = objectFields[column]
+				caption = columnField.label
+				unless caption
+					caption = objectName + "_" + column
+				reportFields.push 
+					caption: caption
+					width: 100
+					dataField: column
+					area: 'column'
+			_.each reportObject.values, (value)->
+				unless value.field
+					return
+				unless value.operation
+					return
+				valueField = objectFields[value.field]
+				caption = value.label
+				unless caption
+					caption = valueField.label
+				unless caption
+					caption = objectName + "_" + value.field
+				reportFields.push 
+					caption: caption
+					dataField: value.field
+					# dataType: valueField.type
+					summaryType: value.operation
+					area: 'data'
 
-
-
-@report_data = [
-	{
-		'id': 10248
-		'region': 'North America'
-		'country': 'United States of America'
-		'city': 'New York'
-		'amount': 1740
-		'date': new Date('2013-01-06')
-	}
-	{
-		'id': 10249
-		'region': 'North America'
-		'country': 'United States of America'
-		'city': 'Los Angeles'
-		'amount': 850
-		'date': new Date('2014-01-13')
-	}
-	{
-		'id': 10250
-		'region': 'North America'
-		'country': 'United States of America'
-		'city': 'Denver'
-		'amount': 2235
-		'date': new Date('2013-01-07')
-	}
-	{
-		'id': 10251
-		'region': 'North America'
-		'country': 'Canada'
-		'city': 'Vancouver'
-		'amount': 1965
-		'date': new Date('2014-01-03')
-	}
-	{
-		'id': 10252
-		'region': 'North America'
-		'country': 'Canada'
-		'city': 'Edmonton'
-		'amount': 880
-		'date': new Date('2013-01-10')
-	}
-	{
-		'id': 10253
-		'region': 'South America'
-		'country': 'Brazil'
-		'city': 'Rio de Janeiro'
-		'amount': 5260
-		'date': new Date('2015-01-17')
-	}
-	{
-		'id': 10254
-		'region': 'South America'
-		'country': 'Argentina'
-		'city': 'Buenos Aires'
-		'amount': 2790
-		'date': new Date('2013-01-21')
-	}
-	{
-		'id': 10255
-		'region': 'South America'
-		'country': 'Paraguay'
-		'city': 'Asuncion'
-		'amount': 3140
-		'date': new Date('2015-01-01')
-	}
-]
+			pivotGridChart = $('#pivotgrid-chart').dxChart(
+				commonSeriesSettings: type: 'bar'
+				tooltip:
+					enabled: true
+				size: height: 300
+				adaptiveLayout: width: 450).dxChart('instance')
+			pivotGrid = $('#pivotgrid').dxPivotGrid(
+				allowSortingBySummary: true
+				allowFiltering: true
+				showBorders: true
+				showColumnGrandTotals: true
+				showRowGrandTotals: true
+				showRowTotals: true
+				showColumnTotals: true
+				fieldChooser:
+					enabled: true
+					height: 600
+				dataSource:
+					fields: reportFields
+					# fields: [
+					# 	# {
+					# 	# 	caption: 'Region'
+					# 	# 	width: 320
+					# 	# 	dataField: 'region'
+					# 	# 	area: 'row'
+					# 	# 	sortBySummaryField: 'Total'
+					# 	# }
+					# 	# {
+					# 	# 	caption: 'City'
+					# 	# 	dataField: 'city'
+					# 	# 	width: 150
+					# 	# 	area: 'row'
+					# 	# }
+					# 	{
+					# 		dataField: 'date'
+					# 		# dataType: 'date'
+					# 		area: 'column'
+					# 	}
+					# 	# {
+					# 	# 	groupName: 'date'
+					# 	# 	groupInterval: 'month'
+					# 	# 	visible: false
+					# 	# }
+					# 	{
+					# 		caption: 'Total'
+					# 		dataField: 'amount'
+					# 		dataType: 'number'
+					# 		summaryType: 'count'
+					# 		# format: 'currency'
+					# 		area: 'data'
+					# 	}
+					# ]
+					store: reportData).dxPivotGrid('instance')
+			pivotGrid.bindChart pivotGridChart,
+				dataFieldsDisplayMode: 'splitPanes'
+				alternateDataFields: false
+			return

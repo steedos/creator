@@ -128,7 +128,8 @@ Package.onUse(function(api) {
     api.addFiles('server/methods/object_options.coffee', 'server');
     api.addFiles('server/methods/object_permissions.coffee', 'server');
     api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
-	api.addFiles('server/methods/object_recent_record.coffee', 'server');
+    api.addFiles('server/methods/object_recent_record.coffee', 'server');
+    api.addFiles('server/methods/report_data.coffee', 'server');
 
     api.addFiles('server/publications/object.coffee', 'server');
     api.addFiles('server/publications/related_object.coffee', 'server');

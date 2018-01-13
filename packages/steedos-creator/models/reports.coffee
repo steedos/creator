@@ -30,6 +30,8 @@ Creator.Objects.reports =
 		values: 
 			type: [Object]
 			blackbox: true
+		"values.$.label":
+			type: "text"
 		"values.$.field":
 			type: "text"
 		"values.$.operation":
