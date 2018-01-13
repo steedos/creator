@@ -3,6 +3,7 @@ Template.creator_report.helpers
 
 
 Template.creator_report.onRendered ->
+	DevExpress.localization.locale("zh")
 	$ ->
 		pivotGridChart = $('#pivotgrid-chart').dxChart(
 			commonSeriesSettings: type: 'bar'
