@@ -170,6 +170,7 @@ Package.onUse(function(api) {
     api.addFiles('client/views/app_home.html', 'client');
 
     api.addFiles('client/views/report.html', 'client');
+    api.addFiles('client/views/report.coffee', 'client');
 
     api.addFiles('client/views/table_cell.html', 'client');
     api.addFiles('client/views/table_cell.coffee', 'client');
