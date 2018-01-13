@@ -1,6 +1,6 @@
-Creator.Objects.crm_customers = 
-	name: "crm_customers"
-	label: "客户"
+Creator.Objects.companies = 
+	name: "companies"
+	label: "单位"
 	icon: "account"
 	enable_files: true
 	enable_search: true
