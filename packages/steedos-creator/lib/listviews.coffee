@@ -45,10 +45,13 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 
 			cols.push(col)
 
+	objectColName = "tabular-col-#{object_name.replace(/\./g,'_')}"
+
 	action_col = 
 		title: '<div class="slds-th__action"></div>'
 		data: "_id"
 		width: '20px'
+		className: "tabular-col-actions #{objectColName}"
 		orderable: false
 		createdCell: (node, cellData, rowData) ->
 			record = rowData
@@ -62,7 +65,7 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 		title: '<div class="slds-th__action"></div>'
 		data: "_id"
 		width: '20px'
-		className: "slds-cell-edit cellContainer"
+		className: "slds-cell-edit cellContainer tabular-col-checkbox #{objectColName}"
 		orderable: false
 		createdCell: (node, cellData, rowData) ->
 			$(node).attr("data-label", "Checkbox")
@@ -85,9 +88,9 @@ Creator.initListViews = (object_name)->
 		Creator.TabularSelectedIds[object_name] = []
 
 	new Tabular.Table
-		name: "creator_" + object_name,
-		collection: Creator.Collections[object_name],
-		pub: "steedos_object_tabular",
+		name: "creator_" + object_name
+		collection: Creator.Collections[object_name]
+		pub: "steedos_object_tabular"
 		columns: Creator.getTabularColumns(object_name, columns)
 		headerCallback: ( thead, data, start, end, display )->
 			$(thead).find('th').eq(0).css("width","32px").html(Blaze.toHTMLWithData Template.creator_table_checkbox, {_id: "#", object_name: object_name})
