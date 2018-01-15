@@ -11,19 +11,8 @@ Npm.depends({
     'MD5': '1.3.0',
     'moment-timezone': '0.5.13',
     busboy: "0.2.13",
+    mkdirp: "0.3.5"
 });
-// Npm.depends({
-//     'aliyun-sdk': '1.9.2',
-//     busboy: "0.2.13",
-//     cookies: "0.6.1",
-//     mime: "1.3.4",
-//     'csv': "1.1.0",
-//     'url': '0.11.0',
-//     'request': '2.40.0',
-//     'xinge': '1.1.3',
-//     'huawei-push': '0.0.6-0',
-//     'xiaomi-push': '0.4.5'
-// });
 
 Package.onUse(function(api) {
     api.versionsFrom('1.0');
@@ -131,6 +120,7 @@ Package.onUse(function(api) {
     
     api.addFiles('models/cms_files.coffee');
     api.addFiles('models/cms_files_cfs.coffee');
+    api.addFiles('models/cfs_files.coffee');
 
     api.addFiles('models/reports.coffee');
     api.addFiles('models/tasks.coffee');
@@ -140,6 +130,7 @@ Package.onUse(function(api) {
     api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
     api.addFiles('server/methods/object_recent_record.coffee', 'server');
     api.addFiles('server/methods/object_listviews_options.coffee', 'server');
+    api.addFiles('server/methods/report_data.coffee', 'server');
 
     api.addFiles('server/publications/object.coffee', 'server');
     api.addFiles('server/publications/related_object.coffee', 'server');
@@ -181,6 +172,10 @@ Package.onUse(function(api) {
     api.addFiles('client/views/view.coffee', 'client');
     api.addFiles('client/views/view.less', 'client');
     api.addFiles('client/views/app_home.html', 'client');
+
+    api.addFiles('client/views/report.html', 'client');
+    api.addFiles('client/views/report.coffee', 'client');
+    api.addFiles('client/views/report.less', 'client');
 
     api.addFiles('client/views/table_cell.html', 'client');
     api.addFiles('client/views/table_cell.coffee', 'client');
