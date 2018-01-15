@@ -173,16 +173,18 @@ Template.autoformModals.rendered = ->
 Template.autoformModals.events
 
 	'click button.btn-insert': (event,template) ->
-		$("#afModal #cmForm").submit()
+		formId = Session.get('cmFormId') or defaultFormId
+		$("#"+formId, "#afModal").submit()
 
 	'click button.btn-update': (event,template)->
 		isMultipleUpdate = Session.get('cmIsMultipleUpdate')
 		targetIds = Session.get('cmTargetIds')
 		isMultipleChecked = template.$(".ckb-multiple-update").is(":checked")
+		formId = Session.get('cmFormId') or defaultFormId
 		if isMultipleUpdate and isMultipleChecked and targetIds?.length > 1
 			collection = Session.get 'cmCollection'
 			target_ids = targetIds
-			doc = AutoForm.getFormValues(Session.get('cmFormId') or defaultFormId).updateDoc
+			doc = AutoForm.getFormValues(formId).updateDoc
 			object_name = Session.get("object_name")
 			Meteor.call 'af_modal_multiple_update', { target_ids, doc, object_name}, (e)->
 				if e
@@ -197,7 +199,7 @@ Template.autoformModals.events
 					$('#afModal').modal('hide')
 					cmOnSuccessCallback?()
 		else
-			$("#afModal #cmForm").submit()
+			$("#"+formId, "#afModal").submit()
 
 	'click button.btn-remove': (event,template)->
 		collection = Session.get 'cmCollection'
@@ -220,11 +222,13 @@ Template.autoformModals.events
 				toastr?.success?(t("afModal_remove_suc"))
 
 	'click button.btn-update-and-create': (event,template)->
-		$("#afModal #cmForm").submit()
+		formId = Session.get('cmFormId') or defaultFormId
+		$("#"+formId, "#afModal").submit()
 		Session.set 'cmShowAgain', true
 
 	'click button.btn-insert-and-create': (event,template)->
-		$("#afModal #cmForm").submit()
+		formId = Session.get('cmFormId') or defaultFormId
+		$("#"+formId, "#afModal").submit()
 		Session.set 'cmShowAgain', true
 	
 	'click .group-section-control': (event, template) ->

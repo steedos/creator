@@ -421,6 +421,18 @@ Template.creator_list.events
 			else if result
 				Session.set("filter_items", filter_items)
 
+	'click .filters-save-as': (event, template)->
+		filter_items = Session.get("filter_items")
+		filter_items = _.map filter_items, (obj) ->
+			if _.isEmpty(obj)
+				return false
+			else
+				return obj
+		filter_items = _.compact(filter_items)
+		console.log filter_items
+		Session.set "cmDoc", {filters: filter_items}
+		$(".btn-add-list-view").click()
+
 	'click .select-fields-to-display': (event, template)->
 		Modal.show("select_fields")
 

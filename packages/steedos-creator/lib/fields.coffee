@@ -161,6 +161,9 @@ Creator.getObjectSchema = (obj) ->
 		if field.is_wide
 			fs.autoform.is_wide = true
 
+		if field.hidden
+			fs.autoform.type = "hidden"
+
 		if field.defaultValue
 			if FormulaEngine.checkFormula(field.defaultValue)
 				fs.autoform.defaultValue = ()->

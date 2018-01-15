@@ -45,6 +45,7 @@ Creator.Objects.object_listviews =
 				doc.filter_scope = filter_scope
 				doc.columns = columns
 			
+				doc.filters = Session.get("cmDoc")?.filters || []
 				console.log doc
 				
 	list_views:
