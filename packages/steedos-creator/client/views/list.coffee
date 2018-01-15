@@ -1,4 +1,12 @@
 Template.creator_list.onCreated ->
+	Session.set("show_filter_option", true)
+
+	this.filter_PTop = new ReactiveVar("-1000px")
+	this.filter_PLeft = new ReactiveVar("-1000px")
+	this.filter_index = new ReactiveVar()
+	this.is_edit_scope = new ReactiveVar()
+
+Template.creator_list.onRendered ->
 
 Template.creator_list.helpers Creator.helpers
 
@@ -16,6 +24,53 @@ Template.creator_list.helpers
 		object_name = Session.get("object_name")
 		list_view = Creator.getListView(object_name, Session.get("list_view_id"))
 		selector = {}
+		custom_list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+		if custom_list_view
+			filters = custom_list_view.filters
+			filter_scope = custom_list_view.filter_scope
+			if filter_scope == "space"
+				selector.space = Session.get("spaceId")
+			else if filter_scope == "mine"
+				selector.space = Session.get("spaceId")
+				selector.owner = Meteor.userId()
+
+			if filters and filters.length > 0
+				filters = _.map filters, (obj)->
+					query = {}
+					if obj.operation == "EQUALS"
+						query[obj.field] = 
+							$eq: obj.value
+					else if obj.operation == "NOT_EQUAL"
+						query[obj.field] = 
+							$ne: obj.value
+					else if obj.operation == "LESS_THAN"
+						query[obj.field] = 
+							$lt: obj.value
+					else if obj.operation == "GREATER_THAN"
+						query[obj.field] = 
+							$gt: obj.value
+					else if obj.operation == "LESS_OR_EQUAL"
+						query[obj.field] = 
+							$lte: obj.value
+					else if obj.operation == "GREATER_OR_EQUAL"
+						query[obj.field] = 
+							$gte: obj.value
+					else if obj.operation == "CONTAINS"
+						reg = new RegExp(obj.value, "i")
+						query[obj.field] = 
+							$regex: reg
+					else if obj.operation == "NOT_CONTAIN"
+						reg = new RegExp("^((?!" + obj.value + ").)*$", "i")
+						query[obj.field] = 
+							$regex: reg
+					else if obj.operation == "STARTS_WITH"
+						reg = new RegExp("^" + obj.value, "i")
+						query[obj.field] = 
+							$regex: reg
+					return query
+				selector["$and"] = filters
+			
+			return selector
 		if Session.get("spaceId") and Meteor.userId()
 			if list_view.filter_scope == "spacex"
 				selector.space = 
@@ -64,9 +119,12 @@ Template.creator_list.helpers
 	list_views: ()->
 		return Creator.getListViews()
 
+	custom_view: ()->
+		return Creator.Collections.object_listviews.find({object_name: Session.get("object_name")})
+
 	list_view: ()->
 		list_view = Creator.getListView(Session.get("object_name"), Session.get("list_view_id"))
-		if list_view?.name != Session.get("list_view_id")
+		if list_view?.name != Session.get("list_view_id") and !list_view?._id
 			Session.set("list_view_id", list_view.name)
 		return list_view
 
@@ -89,6 +147,47 @@ Template.creator_list.helpers
 			else
 				return false
 		return actions
+
+	left: ()->
+		return Template.instance().filter_PLeft?.get()
+
+	top: ()->
+		return Template.instance().filter_PTop?.get()
+
+	index: ()->
+		return Template.instance().filter_index?.get()
+	
+	filter_items: ()->
+		return Session.get("filter_items")
+
+	filter_item: ()->
+		index = Template.instance().filter_index?.get()
+		filter_items = Session.get("filter_items")
+		if index > -1 and filter_items
+			return filter_items[index]
+
+	list_view_scope: ()->
+		scope = Session.get("filter_scope")
+		if scope == "space"
+			return "All"
+		else if scope == "mine"
+			return "My"
+
+	is_edit_scope: ()->
+		return Template.instance().is_edit_scope?.get()
+
+	show_filter_option: ()->
+		return Session.get("show_filter_option")
+
+	is_custom_list_view: ()->
+		if Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+			return true
+		else
+			return false
+
+	is_filter_list_disabled: ()->
+		unless Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+			return "disabled"
 
 Template.creator_list.events
 	# 'click .table-creator tr': (event) ->
@@ -118,6 +217,19 @@ Template.creator_list.events
 			Session.set("list_view_id", list_view_id)
 			Session.set("list_view_visible", true)
 
+	'click .custom-list-view-switch': (event)->
+		Session.set("list_view_visible", false)
+		list_view_id = String(this._id)
+		Tracker.afterFlush ()->
+			list_view = Creator.getListView(Session.get("object_name"), list_view_id)
+			obj = Creator.Collections.object_listviews.findOne(list_view_id)
+			filter_items = obj.filters || []
+			filter_scope = obj.filter_scope
+			Session.set("filter_items", filter_items)
+			Session.set("filter_scope", filter_scope)
+			Session.set("list_view_id", list_view_id)
+			Session.set("list_view_visible", true)
+			
 	'click .list-item-action': (event) ->
 		actionKey = event.currentTarget.dataset.actionKey
 		objectName = event.currentTarget.dataset.objectName
@@ -213,6 +325,105 @@ Template.creator_list.events
 				$("table.slds-table thead th", event.currentTarget).each ->
 					width = $(this).outerWidth()
 					$(".slds-th__action", this).css("width", "#{width}px")
+
+	'click .btn-filter-list': (event, template)->
+		$(event.currentTarget).toggleClass("slds-is-selected")
+		$(".filter-list-container").toggleClass("slds-hide")
+
+	'click .close-filter-panel': (event, template)->
+		$(".btn-filter-list").removeClass("slds-is-selected")
+		$(".filter-list-container").addClass("slds-hide")
+
+	'click .filter-scope': (event, template)->
+		template.is_edit_scope.set(true)
+
+		left = $(event.currentTarget).closest(".filter-list-container").offset().left
+		top = $(event.currentTarget).closest(".slds-item").offset().top
+
+		offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
+		offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
+		contentHeight = $(event.currentTarget).closest(".slds-item").height()
+
+		# 弹出框的高度和宽度写死
+		left = left - offsetLeft - 400 - 6
+		top = top - offsetTop - 170/2 + contentHeight/2
+
+		Session.set("show_filter_option", false)
+		Tracker.afterFlush ->
+			Session.set("show_filter_option", true)
+			template.filter_PLeft.set("#{left}px")
+			template.filter_PTop.set("#{top}px")
+
+	'click .filter-option-item': (event, template)->
+		template.is_edit_scope.set(false)
+
+		index = $(event.currentTarget).closest(".filter-item").index()
+
+		left = $(event.currentTarget).closest(".filter-list-container").offset().left
+		top = $(event.currentTarget).closest(".slds-item").offset().top
+		contentHeight = $(event.currentTarget).closest(".slds-item").height()
+
+		offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
+		offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
+
+		# 弹出框的高度和宽度写死
+		left = left - offsetLeft - 400 - 6
+		top = top - offsetTop - 336/2 + contentHeight/2
+
+		Session.set("show_filter_option", false)
+
+		Tracker.afterFlush ->
+			Session.set("show_filter_option", true)
+			template.filter_index.set(index)
+			template.filter_PLeft.set("#{left}px")
+			template.filter_PTop.set("#{top}px")
+	
+	'click .add-list-view': (event, template)->
+		$(".bnt-add-list-view").click()
+
+	'click .add-filter': (event, template)->
+		filter_items = Session.get("filter_items")
+		filter_items.push({})
+		Session.set("filter_items", filter_items)
+		setTimeout ->
+			template.$(".filter-option-item:last").click()
+		, 1
+
+	'click .remove-all-filters': (event, template)->
+		Session.set("filter_items", [])
+
+	'click .remove-filter': (event, template)->
+		index = $(event.currentTarget).closest(".filter-item").index()
+		filter_items = Session.get("filter_items")
+		filter_items.splice(index, 1)
+		Session.set("filter_items", filter_items)
+
+	'click .cancel-change': (event, template)->
+		list_view_id = Session.get("list_view_id")
+		filters = Creator.Collections.object_listviews.findOne(list_view_id).filters
+		Session.set("filter_items", filters)
+
+	'click .save-change': (event, template)->
+		list_view_id = Session.get("list_view_id")
+		filter_items = Session.get("filter_items")
+		filter_scope = Session.get("filter_scope")
+		filter_items = _.map filter_items, (obj) ->
+			if _.isEmpty(obj)
+				return false
+			else
+				return obj
+		filter_items = _.compact(filter_items)
+		Session.set "list_view_visible", false
+		Meteor.call "update_filters", list_view_id, filter_items, filter_scope, (error, result) ->
+			Session.set "list_view_visible", true
+			if error 
+				console.log "error", error 
+			else if result
+				Session.set("filter_items", filter_items)
+
+	'click .select-fields-to-display': (event, template)->
+		Modal.show("select_fields")
+
 
 Template.creator_list.onDestroyed ->
 	object_name = Session.get("object_name")
