@@ -44,7 +44,7 @@ Package.onUse(function(api) {
     api.use('kadira:blaze-layout@2.3.0');
     api.use('kadira:flow-router@2.10.1');
 
-    api.use('aldeed:autoform-bs-datetimepicker');
+    api.use('aldeed:autoform-bs-datetimepicker@1.0.7');
     api.use('tsega:bootstrap3-datetimepicker@=3.1.3_3');
     api.use('steedos:autoform-bs-minicolors@1.0.0');
 
@@ -62,8 +62,8 @@ Package.onUse(function(api) {
     api.use('steedos:fullcalendar@3.4.0_1');
 	api.use('steedos:autoform-lookup@0.3.10');
 
-    api.use('natestrauser:select2');
-    api.use('aldeed:autoform-select2')
+    api.use('natestrauser:select2@4.0.3');
+    api.use('aldeed:autoform-select2@1.0.5')
 
     api.use('cfs:standard-packages@0.5.9');
     api.use('cfs:s3@0.1.3');    
@@ -84,7 +84,7 @@ Package.onUse(function(api) {
     // api.use('steedos:autoform-bs-datetimepicker');
 
     api.use('steedos:lightning-design-system@0.0.1');
-    api.use('steedos:datatables-extensions');
+    api.use('steedos:datatables-extensions@0.0.1');
 
     api.use('tap:i18n@1.7.0');
     
