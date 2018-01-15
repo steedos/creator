@@ -45,17 +45,15 @@ Creator.Objects.archive_audit =
 						"action_description"]
 		recent:
 			label: "最近查看"
-			filter_scope: "space"
 		all:
 			label: "全部"
-			filter_scope: "space"
 
-	permissions:
+	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
 			modifyAllRecords: false
 			viewAllRecords: false 
 		admin:
@@ -63,7 +61,15 @@ Creator.Objects.archive_audit =
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
+			modifyAllRecords: true
 			viewAllRecords: true 
 
-
+	triggers:
+		"before.insert.server.default": 
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				doc.created_by = userId;
+				doc.created = now
+				doc.owner = userId
+				return true
