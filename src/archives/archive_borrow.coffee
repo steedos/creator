@@ -161,7 +161,8 @@ Creator.Objects.archive_borrow =
 			when: "after.insert"
 			todo: (userId, doc)->
 				doc.relate_documentIds.forEach (relate_documentId)->
-					Creator.Collections["archive_records"].update({_id:relate_documentId},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})	
+					Creator.Collections["archive_records"].update({_id:relate_documentId},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})
+				Meteor.call("archive_Newaudit",relate_documentIds,"借阅档案","成功",doc.space)
 				return true
 	actions: 
 		restore:
@@ -182,9 +183,11 @@ Creator.Objects.archive_borrow =
 									recordIds.forEach (recordId)->
 										Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false}})
 									#Creator.Collections["archive_borrow"].update(
-									toastr.success("归还成功，欢迎再次借阅")
+									#toastr.success("归还成功，欢迎再次借阅")
+									Meteor.call("archive_Newaudit",recordIds,"归还档案","成功",Session.get("spaceId"))
 								else
-									toastr.error("归还失败，请再次操作")
+									#toastr.error("归还失败，请再次操作")
+									Meteor.call("archive_Newaudit",recordIds,"归还档案","失败",Session.get("spaceId"))
 								)
 
 
@@ -196,15 +199,20 @@ Creator.Objects.archive_borrow =
 				if Creator.TabularSelectedIds?["archive_borrow"].length ==0
 					alert("请先选择要续借的条目")
 					return
-				now = new Date()
-				start_date = now
-				end_date =new Date(now.getTime()+7*24*3600*1000)
-				Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
-					Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{start_date:start_date,end_date:end_date}},
-						(error,result)->
-							console.log error
-							if !error						
-								toastr.success("续借成功，等待审核")
-							else
-								toastr.error("续借失败，请再次操作")
-							)
+				if Session.get("list_view_id") =="mine"
+					now = new Date()
+					start_date = now
+					end_date =new Date(now.getTime()+7*24*3600*1000)
+					Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
+						Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{start_date:start_date,end_date:end_date}},
+							(error,result)->
+								console.log error
+								if !error
+									recordIds = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_documentIds
+									#Creator.Collections["archive_borrow"].update(
+									#toastr.success("归还成功，欢迎再次借阅")
+									Meteor.call("archive_Newaudit",recordIds,"续借档案","成功",Session.get("spaceId"))
+								else
+									#toastr.error("归还失败，请再次操作")
+									Meteor.call("archive_Newaudit",recordIds,"续借档案","失败",Session.get("spaceId"))
+								)

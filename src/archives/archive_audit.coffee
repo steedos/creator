@@ -70,6 +70,6 @@ Creator.Objects.archive_audit =
 			when: "before.insert"
 			todo: (userId, doc)->
 				doc.created_by = userId;
-				doc.created = now
+				doc.created = new Date()
 				doc.owner = userId
 				return true
