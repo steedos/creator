@@ -203,7 +203,9 @@ Template.autoformModals.events
 		collection = Session.get 'cmCollection'
 		operation = Session.get 'cmOperation'
 		_id = Session.get('cmDoc')._id
+		$("body").addClass("loading")
 		collectionObj(collection).remove _id, (e)->
+			$("body").removeClass("loading")
 			if e
 				console.error e
 				if e.reason
