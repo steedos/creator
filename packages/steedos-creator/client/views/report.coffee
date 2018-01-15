@@ -1,6 +1,26 @@
 Template.creator_report.helpers
 
+
 renderTabularReport = (reportObject)->
+	spaceId = Session.get("spaceId")
+	unless spaceId
+		return
+	objectName = reportObject.object_name
+	objectFields = Creator.getObject(objectName)?.fields
+	if _.isEmpty objectFields
+		return
+	Meteor.call "report_data",{object_name: objectName, space:spaceId}, (error, result)->
+		if error
+			console.error('report_data method error:', error)
+			return
+		
+		reportColumns = reportObject.columns
+		reportData = result
+
+		pivotGrid = $('#pivotgrid').dxDataGrid(
+			dataSource: reportData
+			columns: reportColumns).dxDataGrid('instance')
+		return
 
 
 renderSummaryReport = (reportObject)->
@@ -24,25 +44,14 @@ renderSummaryReport = (reportObject)->
 				dataField: group
 				groupIndex: index
 
-		# pivotGridChart = $('#pivotgrid-chart').dxChart(
-		# 	commonSeriesSettings: type: 'bar'
-		# 	tooltip:
-		# 		enabled: true
-		# 	size: height: 300
-		# 	adaptiveLayout: width: 450).dxChart('instance')
 		pivotGrid = $('#pivotgrid').dxDataGrid(
 			dataSource: reportData
 			allowColumnReordering: true
 			grouping: 
 				autoExpandAll: true
-			paging:
-				pageSize: 20
+			paging: false
 			columns: reportColumns).dxDataGrid('instance')
-		# pivotGrid.bindChart pivotGridChart,
-		# 	dataFieldsDisplayMode: 'splitPanes'
-		# 	alternateDataFields: false
 		return
-
 
 
 renderMatrixReport = (reportObject)->

@@ -21,8 +21,12 @@ Creator.Reports.company_summary =
 	filters: []
 	columns: ["name", "phone", "fax", "owner", "created"]
 	groups: ["priority"]
-	values: [{
-		label: '客户数量'
-		field: "name"
-		operation: "count"
-	}]
+
+
+Creator.Reports.company_tabular =
+	name: "Customer List"
+	object_name: "companies"
+	report_type: "tabular"
+	filter_scope: "space"
+	filters: []
+	columns: ["name", "priority", "phone", "fax", "owner", "created"]
