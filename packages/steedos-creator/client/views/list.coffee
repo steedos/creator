@@ -179,6 +179,12 @@ Template.creator_list.helpers
 	show_filter_option: ()->
 		return Session.get("show_filter_option")
 
+	is_custom_list_view: ()->
+		if Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+			return true
+		else
+			return false
+
 	is_filter_list_disabled: ()->
 		unless Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 			return "disabled"
@@ -414,6 +420,9 @@ Template.creator_list.events
 				console.log "error", error 
 			else if result
 				Session.set("filter_items", filter_items)
+
+	'click .select-fields-to-display': (event, template)->
+		Modal.show("select_fields")
 
 
 Template.creator_list.onDestroyed ->

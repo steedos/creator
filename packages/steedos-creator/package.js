@@ -136,7 +136,6 @@ Package.onUse(function(api) {
     api.addFiles('server/publications/related_object.coffee', 'server');
     api.addFiles('server/publications/object_tabular.coffee', 'server');
     api.addFiles('server/publications/object_listviews.coffee', 'server');
-    api.addFiles('server/publications/cfs_files.coffee', 'server');
 
     api.addFiles('server/routes/s3.coffee', 'server');
 
