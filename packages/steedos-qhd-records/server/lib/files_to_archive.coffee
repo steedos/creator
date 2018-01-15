@@ -25,7 +25,7 @@ getFileHistoryName = (fileName, historyName, stuff) ->
 insertCMSFile = (fileObj,fileVersions,i)->
 	fileCollection = Creator.getObject("cms_files").db
 	# 名字需要重新取，根据档案规则
-	strCount = (Array(2).join('0') + (i+1)).slice(-2)
+	strCount = (Array(2).join('0') + i).slice(-2)
 	fileName = "集团公司" + strCount
 
 	newCMSFileObjId = fileCollection.direct.insert {
@@ -113,7 +113,7 @@ syncOriginalFile = (instance,archive)->
 
 	user = db.users.findOne({_id: space.owner})
 
-	options = {showTrace: true, showAttachments: true, absolute: true}
+	options = {showTrace: false, showAttachments: false, absolute: true}
 
 	html = InstanceReadOnlyTemplate.getInstanceHtml(user, space, instance, options)
 
@@ -123,12 +123,12 @@ syncOriginalFile = (instance,archive)->
 
 	newFile.name fileName
 
-	newFile.size 1024
+	# newFile.size 1024
 
 	newFile.metadata = {
 				owner: f?.metadata?.owner
 				owner_name : f?.metadata?.owner_name,
-				space : space,
+				space : instance?.space,
 				record_id : archive?._id,
 				object_name : object_name,
 				parent : '',
@@ -142,8 +142,7 @@ syncOriginalFile = (instance,archive)->
 		fileObj = collection.insert newFile
 		if fileObj
 			console.log "====================="
-			console.log 'fileObj',fileObj._id
-			# 更新CMS
+			insertCMSFile fileObj,[fileObj._id],1
 		else
 			return null
 			logger.error "文件上传失败：#{f._id},#{f.name()}. error: "
@@ -184,6 +183,7 @@ AttachmentsToArchive::syncAttachments = ()->
 		files.push f
 
 	files.forEach (file,i)->
+		i = i + 2
 		syncFile file,i,instance.space,archive
 
 	length = files.length
@@ -211,7 +211,7 @@ AttachmentsToArchive::syncAttachments = ()->
 			disFiles.push f
 
 		disFiles.forEach (file,i)->
-			i = i + length
+			i = i + length + 1
 			syncFile file,i,instance.space,archive
 	
 
