@@ -5,7 +5,7 @@ Creator.Reports.company_matrix =
 	filter_scope: "space"
 	filters: []
 	columns: ["created"]
-	rows: ["priority"]
+	rows: ["owner.name"]
 	values: [{
 		label: '客户数量'
 		field: "name"
@@ -19,7 +19,7 @@ Creator.Reports.company_summary =
 	report_type: "summary"
 	filter_scope: "space"
 	filters: []
-	columns: ["name", "phone", "fax", "owner", "created"]
+	columns: ["name", "phone", "fax", "owner.name", "created"]
 	groups: ["priority"]
 
 
@@ -29,4 +29,4 @@ Creator.Reports.company_tabular =
 	report_type: "tabular"
 	filter_scope: "space"
 	filters: []
-	columns: ["name", "priority", "phone", "fax", "owner", "created"]
+	columns: ["name", "priority.label", "phone", "fax", "owner.name", "created"]

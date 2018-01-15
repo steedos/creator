@@ -9,12 +9,15 @@ renderTabularReport = (reportObject)->
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		return
-	Meteor.call "report_data",{object_name: objectName, space:spaceId}, (error, result)->
+	filterFields = reportObject.columns
+	Meteor.call "report_data",{object_name: objectName, space: spaceId, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
 			return
 		
-		reportColumns = reportObject.columns
+		reportColumns = reportObject.columns.map (item, index)->
+			return item.split(".")[0]
+
 		reportData = result
 
 		pivotGrid = $('#pivotgrid').dxDataGrid(
@@ -31,17 +34,20 @@ renderSummaryReport = (reportObject)->
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		return
-	Meteor.call "report_data",{object_name: objectName, space:spaceId}, (error, result)->
+	filterFields = _.union reportObject.columns, reportObject.groups
+	Meteor.call "report_data",{object_name: objectName, space:spaceId, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
 			return
 		
-		reportColumns = reportObject.columns
+		reportColumns = reportObject.columns.map (item, index)->
+			return item.split(".")[0]
 		reportData = result
 		_.each reportObject.groups, (group, index)->
-			groupField = objectFields[group]
+			groupFieldKey = group.split(".")[0]
+			groupField = objectFields[groupFieldKey]
 			reportColumns.push 
-				dataField: group
+				dataField: groupFieldKey
 				groupIndex: index
 
 		pivotGrid = $('#pivotgrid').dxDataGrid(
@@ -62,7 +68,10 @@ renderMatrixReport = (reportObject)->
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		return
-	Meteor.call "report_data",{object_name: objectName, space:spaceId}, (error, result)->
+	filterValueFields = reportObject.values.map (item, index)->
+		return item.field
+	filterFields = _.union reportObject.columns, reportObject.rows, filterValueFields
+	Meteor.call "report_data",{object_name: objectName, space:spaceId, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
 			return
@@ -70,39 +79,42 @@ renderMatrixReport = (reportObject)->
 		reportFields = []
 		reportData = result
 		_.each reportObject.rows, (row)->
-			rowField = objectFields[row]
+			rowFieldKey = row.split(".")[0]
+			rowField = objectFields[rowFieldKey]
 			caption = rowField.label
 			unless caption
-				caption = objectName + "_" + row
+				caption = objectName + "_" + rowFieldKey
 			reportFields.push 
 				caption: caption
 				width: 100
-				dataField: row
+				dataField: rowFieldKey
 				area: 'row'
 		_.each reportObject.columns, (column)->
-			columnField = objectFields[column]
+			columnFieldKey = column.split(".")[0]
+			columnField = objectFields[columnFieldKey]
 			caption = columnField.label
 			unless caption
-				caption = objectName + "_" + column
+				caption = objectName + "_" + columnFieldKey
 			reportFields.push 
 				caption: caption
 				width: 100
-				dataField: column
+				dataField: columnFieldKey
 				area: 'column'
 		_.each reportObject.values, (value)->
 			unless value.field
 				return
 			unless value.operation
 				return
-			valueField = objectFields[value.field]
+			valueFieldKey = value.field.split(".")[0]
+			valueField = objectFields[valueFieldKey]
 			caption = value.label
 			unless caption
 				caption = valueField.label
 			unless caption
-				caption = objectName + "_" + value.field
+				caption = objectName + "_" + valueFieldKey
 			reportFields.push 
 				caption: caption
-				dataField: value.field
+				dataField: valueFieldKey
 				# dataType: valueField.type
 				summaryType: value.operation
 				area: 'data'
