@@ -123,7 +123,7 @@ _minxiInstanceData = (formData, instance) ->
 		if !fieldValue
 			fieldValue = ''
 
-	attachmentsToArchive = new AttachmentsToArchive(instance.space,instance._id,formData)
+	attachmentsToArchive = new AttachmentsToArchive(instance,formData)
 
 	attachmentsToArchive.syncAttachments()
 
