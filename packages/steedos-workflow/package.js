@@ -59,6 +59,12 @@ Package.onUse(function(api) {
 	api.use('steedos:base@0.0.70');
 	api.use('steedos:logger@0.0.2');
 	api.use('spacebars-compiler@1.0.6');
+	api.use('perak:markdown@1.0.5');
+	api.use('q42:autoform-markdown@1.0.0');
+	
+	// api.use('steedos:autoform-modals@0.3.9_10');
+	// api.use('steedos:autoform@0.0.9');
+
 
 	api.use('tap:i18n', ['client', 'server']);
 	//api.add_files("package-tap.i18n", ["client", "server"]);
