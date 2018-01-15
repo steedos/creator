@@ -9,7 +9,7 @@
 
 Creator.Reports.crm_customer_list =
 	name: "Customer List"
-	object_name: "crm_customers"
+	object_name: "companies"
 	report_type: "summary"
 	filter_scope: "space"
 	filters: []
