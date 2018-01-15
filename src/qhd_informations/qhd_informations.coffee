@@ -34,7 +34,8 @@ Creator.Objects.qhd_informations =
 				{label: "上级采用", value: "上级采用"},
 				{label: "领导批示", value: "领导批示"},
 				{label: "正常使用", value: "领导批示"},
-				{label: "月度好信息", value: "月度好信息"}
+				{label: "月度好信息", value: "月度好信息"},
+				{label:"专报信息",value:"专报信息"}
 			]
 		# isuse:
 		# 	type:"boolean"
