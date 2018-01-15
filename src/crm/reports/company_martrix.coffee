@@ -5,7 +5,7 @@ Creator.Reports.company_matrix =
 	filter_scope: "space"
 	filters: []
 	columns: ["created"]
-	rows: ["owner.name"]
+	rows: ["priority.label"]
 	values: [{
 		label: '客户数量'
 		field: "name"
@@ -20,7 +20,7 @@ Creator.Reports.company_summary =
 	filter_scope: "space"
 	filters: []
 	columns: ["name", "phone", "fax", "owner.name", "created"]
-	groups: ["priority"]
+	groups: ["priority.label"]
 
 
 Creator.Reports.company_tabular =
