@@ -92,6 +92,11 @@
 													<span>Select Fields to Display</span>
 												</a>
 											</li>
+											<li class="slds-dropdown__item delete-list-view" role="presentation">
+												<a href="javascript:void(0);" title="delete" class="" role="option" tabindex="-1">
+													<span>Delete</span>
+												</a>
+											</li>
 										{{/if}}
 									</ul>
 								</div>
@@ -189,5 +194,6 @@
 			{{/if}}
 		</div>
 	</div>
-	{{#afModal class="btn btn-primary bnt-add-list-view hidden" collection="Creator.Collections.object_listviews" operation="insert" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="List View"}} {{_ "Create"}} {{/afModal}}
+	{{#afModal class="btn btn-primary btn-add-list-view hidden" collection="Creator.Collections.object_listviews" operation="insert" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="List View"}} {{_ "Create"}} {{/afModal}}
+	{{#afModal class="btn btn-primary btn-delete-list-view hidden" collection="Creator.Collections.object_listviews" operation="remove" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="List View"}} {{_ "Delete"}} {{/afModal}}
 </template>

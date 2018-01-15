@@ -379,7 +379,7 @@ Template.creator_list.events
 			template.filter_PTop.set("#{top}px")
 	
 	'click .add-list-view': (event, template)->
-		$(".bnt-add-list-view").click()
+		$(".btn-add-list-view").click()
 
 	'click .add-filter': (event, template)->
 		filter_items = Session.get("filter_items")
@@ -424,6 +424,10 @@ Template.creator_list.events
 	'click .select-fields-to-display': (event, template)->
 		Modal.show("select_fields")
 
+	'click .delete-list-view': (event, template)->
+		list_view_id = Session.get("list_view_id")
+		Session.set "cmDoc", {_id: list_view_id}
+		$(".btn-delete-list-view").click()
 
 Template.creator_list.onDestroyed ->
 	object_name = Session.get("object_name")
