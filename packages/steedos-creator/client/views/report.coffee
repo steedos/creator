@@ -27,6 +27,7 @@ renderTabularReport = (reportObject)->
 
 		pivotGrid = $('#pivotgrid').dxDataGrid(
 			dataSource: reportData
+			paging: false
 			columns: reportColumns).dxDataGrid('instance')
 		return
 
@@ -172,6 +173,7 @@ renderMatrixReport = (reportObject)->
 			size: height: 300
 			adaptiveLayout: width: 450).dxChart('instance')
 		pivotGrid = $('#pivotgrid').dxPivotGrid(
+			paging: false
 			allowSortingBySummary: true
 			allowFiltering: true
 			showBorders: true
