@@ -37,6 +37,7 @@ baseObject用于定义所有对象适用的基础fields, triggers, indexes. list
 - enable_chatter: 启用讨论功能
 - enable_tasks: 启用任务功能
 - enable_audit: 启用审计跟踪功能
+- enable_api: 启用API接口
 
 ### fields支持的字段类型
 - lookup: 相关表，联合reference_to字段，从关联表中选择记录
@@ -122,7 +123,7 @@ API
 用于定义界面上的按钮与操作，
 - action.todo 如果是函数，直接执行
 - action.todo 如果是字符串，表示系统内置函数，Creator找到该内置函数并执行
-- action.on: 
+- action.on:
   - "list" 为列表定义action，显示在列表右上角
   - "record" 为记录定义action，显示在记录查看页右上角
 - action.todo 函数中可以使用以下变量
