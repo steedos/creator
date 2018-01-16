@@ -16,7 +16,12 @@ renderTabularReport = (reportObject)->
 			return
 		
 		reportColumns = reportObject.columns.map (item, index)->
-			return item.split(".")[0]
+			itemFieldKey = item.replace(/\./g,"_")
+			itemField = objectFields[item.split(".")[0]]
+			return {
+				caption: itemField.label
+				dataField: itemFieldKey
+			}
 
 		reportData = result
 
@@ -41,20 +46,26 @@ renderSummaryReport = (reportObject)->
 			return
 		
 		reportColumns = reportObject.columns.map (item, index)->
-			return item.split(".")[0]
+			itemFieldKey = item.replace(/\./g,"_")
+			itemField = objectFields[item.split(".")[0]]
+			return {
+				caption: itemField.label
+				dataField: itemFieldKey
+			}
 		reportData = result
+		console.log "reportData:", reportData
 		_.each reportObject.groups, (group, index)->
-			groupFieldKey = group.split(".")[0]
-			groupField = objectFields[groupFieldKey]
+			groupFieldKey = group.replace(/\./g,"_")
+			groupField = objectFields[group.split(".")[0]]
 			reportColumns.push 
+				caption: groupField.label
 				dataField: groupFieldKey
 				groupIndex: index
 
+		console.log "reportColumns:", reportColumns
+
 		pivotGrid = $('#pivotgrid').dxDataGrid(
 			dataSource: reportData
-			allowColumnReordering: true
-			grouping: 
-				autoExpandAll: true
 			paging: false
 			columns: reportColumns).dxDataGrid('instance')
 		return
@@ -79,8 +90,8 @@ renderMatrixReport = (reportObject)->
 		reportFields = []
 		reportData = result
 		_.each reportObject.rows, (row)->
-			rowFieldKey = row.split(".")[0]
-			rowField = objectFields[rowFieldKey]
+			rowFieldKey = row.replace(/\./g,"_")
+			rowField = objectFields[row.split(".")[0]]
 			caption = rowField.label
 			unless caption
 				caption = objectName + "_" + rowFieldKey
@@ -90,8 +101,8 @@ renderMatrixReport = (reportObject)->
 				dataField: rowFieldKey
 				area: 'row'
 		_.each reportObject.columns, (column)->
-			columnFieldKey = column.split(".")[0]
-			columnField = objectFields[columnFieldKey]
+			columnFieldKey = column.replace(/\./g,"_")
+			columnField = objectFields[column.split(".")[0]]
 			caption = columnField.label
 			unless caption
 				caption = objectName + "_" + columnFieldKey
@@ -105,8 +116,8 @@ renderMatrixReport = (reportObject)->
 				return
 			unless value.operation
 				return
-			valueFieldKey = value.field.split(".")[0]
-			valueField = objectFields[valueFieldKey]
+			valueFieldKey = value.field.replace(/\./g,"_")
+			valueField = objectFields[value.field.split(".")[0]]
 			caption = value.label
 			unless caption
 				caption = valueField.label

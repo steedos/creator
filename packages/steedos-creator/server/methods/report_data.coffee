@@ -24,6 +24,7 @@ Meteor.methods
 		if compoundFields.length
 			return result.map (item,index)->
 				_.each compoundFields, (compoundFieldItem, index)->
+					itemKey = compoundFieldItem.name + "_" + compoundFieldItem.childKey.replace(/\./g, "_")
 					itemValue = item[compoundFieldItem.name]
 					switch compoundFieldItem.field.type
 						when "lookup"
@@ -36,14 +37,14 @@ Meteor.methods
 							referenceItem = Creator.getCollection(reference_to).findOne {_id: itemValue}, fields: compoundFilterFields
 							console.log "referenceItem:", referenceItem
 							if referenceItem
-								item[compoundFieldItem.name] = referenceItem[compoundFieldItem.childKey]
+								item[itemKey] = referenceItem[compoundFieldItem.childKey]
 						when "master_detail"
 							options = compoundFieldItem.field.options
 						when "select"
 							options = compoundFieldItem.field.options
-							item[compoundFieldItem.name] = _.findWhere(options, {value: itemValue})?.label
+							item[itemKey] = _.findWhere(options, {value: itemValue})?.label
 						else
-							item[compoundFieldItem.name] = itemValue
+							item[itemKey] = itemValue
 				return item
 		else
 			return result
