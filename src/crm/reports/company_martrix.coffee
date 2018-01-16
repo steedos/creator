@@ -21,6 +21,20 @@ Creator.Reports.company_summary =
 	filters: []
 	columns: ["name", "phone", "fax", "owner.name", "created"]
 	groups: ["priority.label"]
+	values: [{
+		label: '总计数：{0}'
+		field: "priority"
+		operation: "count"
+		grouping: true
+	},{
+		field: "created"
+		operation: "max"
+		grouping: true
+	},{
+		label: '汇总计数：{0}'
+		field: "name"
+		operation: "count"
+	}]
 
 
 Creator.Reports.company_tabular =
