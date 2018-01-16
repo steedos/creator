@@ -27,6 +27,8 @@ Creator.Objects.reports =
 			type: "[text]"
 		rows: 
 			type: "[text]"
+		groups: 
+			type: "[text]"
 		values: 
 			type: [Object]
 			blackbox: true
