@@ -174,6 +174,7 @@ Creator.Objects.archive_records =
 			type:"date"
 			label:"文件日期"
 			format:"YYYYMMDD"
+			required:true
 			group:"内容描述"
 			sortable:true
 
@@ -190,6 +191,11 @@ Creator.Objects.archive_records =
 			format:"YYYYMMDD"
 			group:"内容描述"
 			# omit:true
+		destroy_date:
+			type:"date"
+			label:"销毁日期"
+			group:"内容描述"
+			omit:true
 		precedence:
 			type:"text"
 			label:"紧急程度"
@@ -620,7 +626,8 @@ Creator.Objects.archive_records =
 		destroy:
 			label:"待销毁"
 			filter_scope: "space"
-			filters: [["is_destroyed", "$eq", false],["retention_peroid"]]
+			filters: [["is_received", "$eq", true],["destroy_date","$lte",new Date()]]
+			columns:["year","title","document_date","retention_peroid"]
 		transfered:
 			label:"已移交"
 			filter_scope: "space"
@@ -653,7 +660,9 @@ Creator.Objects.archive_records =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				doc.is_receive = false
+				doc.is_received = false
+				duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
+				doc.destroy_date = new Date(doc.document_date.getTime()+duration*365*24*3600*1000)
 				# doc.archives_name = " "
 				# doc.archives_identifier = ' '
 				# doc.fonds_name = ' '
