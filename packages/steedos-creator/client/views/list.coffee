@@ -321,10 +321,6 @@ Template.creator_list.events
 			resizeMode:'overflow'
 			draggingClass: "dragging"
 			disabledColumns: [0]
-			onResize: ()->
-				$("table.slds-table thead th", event.currentTarget).each ->
-					width = $(this).outerWidth()
-					$(".slds-th__action", this).css("width", "#{width}px")
 
 	'click .btn-filter-list': (event, template)->
 		$(event.currentTarget).toggleClass("slds-is-selected")
@@ -370,6 +366,15 @@ Template.creator_list.events
 		left = left - offsetLeft - 400 - 6
 		top = top - offsetTop - 336/2 + contentHeight/2
 
+		# 计算弹出框是否超出屏幕底部，导致出现滚动条，如果超出，调整top位置
+		# 计算方式：屏幕高度 - 弹出框的绝对定位 - 弹出框的高度 - 弹出框父容器position:relative的offsetTop - 弹出框距离屏幕底部10px
+		# 如果计算得出值小于0，则调整top，相应上调超出的高度
+		windowHeight = $(window).height()
+		windowOffset = $(window).height() - top - 336 - offsetTop - 10
+
+		if windowOffset < 0
+			top = top + windowOffset
+
 		Session.set("show_filter_option", false)
 
 		Tracker.afterFlush ->
@@ -400,7 +405,7 @@ Template.creator_list.events
 
 	'click .cancel-change': (event, template)->
 		list_view_id = Session.get("list_view_id")
-		filters = Creator.Collections.object_listviews.findOne(list_view_id).filters
+		filters = Creator.Collections.object_listviews.findOne(list_view_id).filters || []
 		Session.set("filter_items", filters)
 
 	'click .save-change': (event, template)->

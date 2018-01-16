@@ -175,6 +175,7 @@ Creator.Objects.archive_records =
 			type:"date"
 			label:"文件日期"
 			format:"YYYYMMDD"
+			required:true
 			group:"内容描述"
 			sortable:true
 
@@ -191,6 +192,11 @@ Creator.Objects.archive_records =
 			format:"YYYYMMDD"
 			group:"内容描述"
 			# omit:true
+		destroy_date:
+			type:"date"
+			label:"销毁日期"
+			group:"内容描述"
+			omit:true
 		precedence:
 			type:"text"
 			label:"紧急程度"
@@ -535,9 +541,10 @@ Creator.Objects.archive_records =
 			omit:true
 
 		received_by:
-			type:"text"
-			label:'接收人'
-			omit:true
+			type: "lookup"
+			label:"接收人"
+			reference_to: "users"
+			omit: true
 		#是否移交，默认是不存在，在“全部”视图下点击移交，进入“待移交”视图，此时is_transfer=false
 		#审核通过之后，is_transfer = true
 		is_transfered:
@@ -549,10 +556,16 @@ Creator.Objects.archive_records =
 			label:"移交时间"
 			omit:true
 		transfered_by:
-			type:"text"
+			type: "lookup"
 			label:"移交人"
+<<<<<<< HEAD
 			omit:true
 
+=======
+			reference_to: "users"
+			omit: true
+		
+>>>>>>> master
 		#是否销毁，默认是不存在，在“全部”视图下点击销毁，进入“待销毁”视图，此时is_destroy=false
 		#审核通过之后，is_transfer = true
 		is_destroyed:
@@ -565,9 +578,10 @@ Creator.Objects.archive_records =
 			omit:true
 
 		destroyed_by:
-			type:"text"
-			label:'销毁人'
-			omit:true
+			type: "lookup"
+			label:"销毁人"
+			reference_to: "users"
+			omit: true
 		is_borrowed:
 			type:"boolean"
 			defaultValue:false
@@ -599,31 +613,33 @@ Creator.Objects.archive_records =
 			label: "最近查看"
 			filter_scope: "space"
 		all:
-			label: "全部档案"
+			label: "全部"
 			filter_scope: "space"
 			filters: [["is_received", "$eq", true]]
-		company:
-			label:"本单位档案"
-			filter_scope: "space"
-			filters:[[]]
 		receive:
-			label:"待接收档案"
+			label:"待接收"
 			filter_scope: "space"
 			filters: [["is_received", "$eq", false]]
+		received:
+			label:"已接收"
+			filter_scope:"space"
+			filters:[["is_received", "$eq", true]]
+			columns:["year","title","received","received_by"]
 		transfer:
-			label:"待移交档案"
+			label:"待移交"
 			filter_scope: "space"
 			filters: [["is_transfered", "$eq", false]]
 		destroy:
-			label:"待销毁档案"
+			label:"待销毁"
 			filter_scope: "space"
-			filters: [["is_destroyed", "$eq", false]]
+			filters: [["is_received", "$eq", true],["destroy_date","$lte",new Date()]]
+			columns:["year","title","document_date","retention_peroid"]
 		transfered:
-			label:"已移交档案"
+			label:"已移交"
 			filter_scope: "space"
 			filters: [["is_transfered", "$eq", true]]
 		destroyed:
-			label:"已销毁档案"
+			label:"已销毁"
 			filter_scope: "space"
 			filters: [["is_destroyed", "$eq", true]]
 		borrow:
@@ -650,7 +666,9 @@ Creator.Objects.archive_records =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				doc.is_receive = false
+				doc.is_received = false
+				duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
+				doc.destroy_date = new Date(doc.document_date.getTime()+duration*365*24*3600*1000)
 				# doc.archives_name = " "
 				# doc.archives_identifier = ' '
 				# doc.fonds_name = ' '
@@ -697,16 +715,16 @@ Creator.Objects.archive_records =
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先选择要接收的档案")
-				Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],
-					(error,result) ->
-							console.log error
-							space = Session.get("spaceId")
-							if !error
-								toastr.success("接收成功，等待审核")
-								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"接收档案","成功",space)
-							else
-								toastr.error("接收失败，请再次操作")
-								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"接收档案","失败",space)
+					 return 
+				if Session.get("list_view_id")!= "receive"
+					alert("请在视图下操作")
+					return
+				else					
+					space = Session.get("spaceId")
+					Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],space,
+						(error,result) ->
+							text = "共接收"+Creator.TabularSelectedIds?["archive_records"].length+"条,"+"成功"+result+"条"
+							swal(text)
 							)
 		transfer:
 			label:"移交"
@@ -716,17 +734,20 @@ Creator.Objects.archive_records =
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先移交要移交的档案")
 					 return
+				if Session.get("list_view_id")!= "all"
+					alert("请在全部视图下操作")
+					return
 				Meteor.call("archive_transfer",Creator.TabularSelectedIds?["archive_records"],
 					(error,result) ->
 							console.log error
 							space = Session.get("spaceId")
 							if !error
 								toastr.success("移交成功，等待审核")
-								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"移交档案","成功",space)
+								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"移交档案","成功",space)
 
 							else
 								toastr.error("移交失败，请再次操作")
-								Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"移交档案","失败",space)
+								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"移交档案","失败",space)
 
 							)
 		destroy:
@@ -736,6 +757,7 @@ Creator.Objects.archive_records =
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先选择要销毁的档案")
+<<<<<<< HEAD
 					 return
 				Meteor.call("archive_destroy",Creator.TabularSelectedIds?["archive_records"],
 					(error,result) ->
@@ -744,12 +766,26 @@ Creator.Objects.archive_records =
 						if !error
 							toastr.success("销毁成功，等待审核")
 							Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
+=======
+					 return 
+				if Session.get("list_view_id")!= "destroy"
+					alert("请在待销毁视图下操作")
+					return
+				else
+					Meteor.call("archive_destroy",Creator.TabularSelectedIds?["archive_records"],
+						(error,result) ->
+							console.log error
+							space = Session.get("spaceId")
+							if !error
+								toastr.success("销毁成功，等待审核")
+								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
+>>>>>>> master
 
-						else
-							toastr.error("销毁失败，请再次操作")
-							Meteor.call("archive_Newaudit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
+							else
+								toastr.error("销毁失败，请再次操作")
+								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
 
-						)
+							)
 		borrow:
 			label:"借阅"
 			visible:true
