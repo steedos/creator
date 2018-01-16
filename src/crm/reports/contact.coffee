@@ -5,7 +5,7 @@ Creator.Reports.contact_matrix =
 	filter_scope: "space"
 	filters: []
 	columns: ["created"]
-	rows: ["account_id.name"]
+	rows: ["company.name"]
 	values: [{
 		label: '关联数量'
 		field: "name"
@@ -19,9 +19,9 @@ Creator.Reports.contact_summary =
 	filter_scope: "space"
 	filters: []
 	columns: ["name", "birthdate", "department", "owner.name", "created"]
-	groups: ["account_id.name"]
+	groups: ["company.name"]
 	values: [{
-		field: "account_id"
+		field: "company"
 		operation: "count"
 		grouping: true
 	},{
@@ -41,4 +41,4 @@ Creator.Reports.contact_tabular =
 	report_type: "tabular"
 	filter_scope: "space"
 	filters: []
-	columns: ["name", "account_id.name", "birthdate", "department", "owner.name", "created"]
+	columns: ["name", "company.name", "birthdate", "department", "owner.name", "created"]

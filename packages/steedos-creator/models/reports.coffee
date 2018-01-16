@@ -10,8 +10,14 @@ Creator.Objects.reports =
 			type: "textarea"
 			is_wide: true
 		report_type:
-			type: "text"
-			allowedValues: ["tabular", "summary", "matrix"]
+			label: "报表类型"
+			type: "select"
+			defaultValue: "tabular"
+			options: [
+				{label: "列表", value: "tabular"},
+				{label: "汇总", value: "summary"},
+				{label: "矩阵", value: "matrix"}
+			]
 		object_name: 
 			type: "text"
 			required: true
