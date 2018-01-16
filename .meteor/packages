@@ -23,7 +23,7 @@ less
 reload
 session
 
-accounts-ui 
+accounts-ui
 accounts-password
 
 fortawesome:fontawesome
@@ -95,3 +95,5 @@ steedos:lightning-design-system
 steedos:cms
 
 # steedos:qhd-records
+
+steedos:api

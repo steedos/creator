@@ -1,6 +1,6 @@
 if Meteor.isServer
     @API = new Restivus
-        apiPath: 'steedos/api/',
+        apiPath: '/api/v2/',
         useDefaultAuth: true
         prettyJson: true
         enableCors: false
