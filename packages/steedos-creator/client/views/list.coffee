@@ -321,10 +321,6 @@ Template.creator_list.events
 			resizeMode:'overflow'
 			draggingClass: "dragging"
 			disabledColumns: [0]
-			onResize: ()->
-				$("table.slds-table thead th", event.currentTarget).each ->
-					width = $(this).outerWidth()
-					$(".slds-th__action", this).css("width", "#{width}px")
 
 	'click .btn-filter-list': (event, template)->
 		$(event.currentTarget).toggleClass("slds-is-selected")
