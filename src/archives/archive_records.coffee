@@ -701,16 +701,15 @@ Creator.Objects.archive_records =
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先选择要接收的档案")
 					 return 
-				Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],
-					(error,result) ->
-							console.log error
-							space = Session.get("spaceId")
-							if !error
-								toastr.success("接收成功，等待审核")
-								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"接收档案","成功",space)
-							else
-								toastr.error("接收失败，请再次操作")
-								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"接收档案","失败",space)
+				if Session.get("list_view_id")!= "receive"
+					alert("请在视图下操作")
+					return
+				else					
+					space = Session.get("spaceId")
+					Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],space,
+						(error,result) ->
+							text = "共接收"+Creator.TabularSelectedIds?["archive_records"].length+"条,"+"成功"+result+"条"
+							swal(text)
 							)
 		transfer:
 			label:"移交"
@@ -720,6 +719,9 @@ Creator.Objects.archive_records =
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先移交要移交的档案")
 					 return
+				if Session.get("list_view_id")!= "all"
+					alert("请在全部视图下操作")
+					return
 				Meteor.call("archive_transfer",Creator.TabularSelectedIds?["archive_records"],
 					(error,result) ->
 							console.log error
@@ -741,19 +743,23 @@ Creator.Objects.archive_records =
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					 alert("请先选择要销毁的档案")
 					 return 
-				Meteor.call("archive_destroy",Creator.TabularSelectedIds?["archive_records"],
-					(error,result) ->
-						console.log error
-						space = Session.get("spaceId")
-						if !error
-							toastr.success("销毁成功，等待审核")
-							Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
+				if Session.get("list_view_id")!= "destroy"
+					alert("请在待销毁视图下操作")
+					return
+				else
+					Meteor.call("archive_destroy",Creator.TabularSelectedIds?["archive_records"],
+						(error,result) ->
+							console.log error
+							space = Session.get("spaceId")
+							if !error
+								toastr.success("销毁成功，等待审核")
+								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
 
-						else
-							toastr.error("销毁失败，请再次操作")
-							Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
+							else
+								toastr.error("销毁失败，请再次操作")
+								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"销毁档案","成功",space)
 
-						)
+							)
 		borrow:
 			label:"借阅"
 			visible:true
