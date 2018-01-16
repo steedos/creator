@@ -162,7 +162,7 @@ Creator.Objects.archive_borrow =
 			todo: (userId, doc)->
 				doc.relate_documentIds.forEach (relate_documentId)->
 					Creator.Collections["archive_records"].update({_id:relate_documentId},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})
-				Meteor.call("archive_Newaudit",relate_documentIds,"借阅档案","成功",doc.space)
+				Meteor.call("archive_new_audit",relate_documentIds,"借阅档案","成功",doc.space)
 				return true
 	actions: 
 		restore:
@@ -184,10 +184,10 @@ Creator.Objects.archive_borrow =
 										Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false}})
 									#Creator.Collections["archive_borrow"].update(
 									#toastr.success("归还成功，欢迎再次借阅")
-									Meteor.call("archive_Newaudit",recordIds,"归还档案","成功",Session.get("spaceId"))
+									Meteor.call("archive_new_audit",recordIds,"归还档案","成功",Session.get("spaceId"))
 								else
 									#toastr.error("归还失败，请再次操作")
-									Meteor.call("archive_Newaudit",recordIds,"归还档案","失败",Session.get("spaceId"))
+									Meteor.call("archive_new_audit",recordIds,"归还档案","失败",Session.get("spaceId"))
 								)
 
 
@@ -211,8 +211,8 @@ Creator.Objects.archive_borrow =
 									recordIds = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_documentIds
 									#Creator.Collections["archive_borrow"].update(
 									#toastr.success("归还成功，欢迎再次借阅")
-									Meteor.call("archive_Newaudit",recordIds,"续借档案","成功",Session.get("spaceId"))
+									Meteor.call("archive_new_audit",recordIds,"续借档案","成功",Session.get("spaceId"))
 								else
 									#toastr.error("归还失败，请再次操作")
-									Meteor.call("archive_Newaudit",recordIds,"续借档案","失败",Session.get("spaceId"))
+									Meteor.call("archive_new_audit",recordIds,"续借档案","失败",Session.get("spaceId"))
 								)

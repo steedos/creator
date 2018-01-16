@@ -1,5 +1,5 @@
 Meteor.methods
-	archive_Newaudit: (selectedIds,business_activity,description,space) ->		
+	archive_new_audit: (selectedIds,business_activity,description,space) ->		
 		auditdoc = {}
 		auditdoc.business_status = "历史行为"
 		auditdoc.business_activity = business_activity
