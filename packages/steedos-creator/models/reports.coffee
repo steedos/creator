@@ -44,6 +44,9 @@ Creator.Objects.reports =
 			type: "text"
 		"values.$.operation":
 			type: "text"
+		"values.$.grouping":
+			type: "boolean"
+			defaultValue: false
 
 	list_views:
 		default:

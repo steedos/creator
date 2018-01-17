@@ -15,22 +15,21 @@ renderTabularReport = (reportObject)->
 			console.error('report_data method error:', error)
 			return
 		
-		reportColumns = reportObject.columns.map (item, index)->
+		reportColumns = reportObject.columns?.map (item, index)->
 			itemFieldKey = item.replace(/\./g,"_")
 			itemField = objectFields[item.split(".")[0]]
 			return {
 				caption: itemField.label
 				dataField: itemFieldKey
 			}
-
+		unless reportColumns
+			reportColumns = []
 		reportData = result
-
 		pivotGrid = $('#pivotgrid').dxDataGrid(
 			dataSource: reportData
 			paging: false
 			columns: reportColumns).dxDataGrid('instance')
 		return
-
 
 renderSummaryReport = (reportObject)->
 	spaceId = Session.get("spaceId")
@@ -49,13 +48,15 @@ renderSummaryReport = (reportObject)->
 			console.error('report_data method error:', error)
 			return
 		
-		reportColumns = reportObject.columns.map (item, index)->
+		reportColumns = reportObject.columns?.map (item, index)->
 			itemFieldKey = item.replace(/\./g,"_")
 			itemField = objectFields[item.split(".")[0]]
 			return {
 				caption: itemField.label
 				dataField: itemFieldKey
 			}
+		unless reportColumns
+			reportColumns = []
 		reportData = result
 		console.log "reportData:", reportData
 		_.each reportObject.groups, (group, index)->
@@ -106,7 +107,6 @@ renderSummaryReport = (reportObject)->
 			summary: reportSummary).dxDataGrid('instance')
 		return
 
-
 renderMatrixReport = (reportObject)->
 	spaceId = Session.get("spaceId")
 	unless spaceId
@@ -115,9 +115,10 @@ renderMatrixReport = (reportObject)->
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		return
-	filterValueFields = reportObject.values.map (item, index)->
+	filterValueFields = reportObject.values?.map (item, index)->
 		return item.field
 	filterFields = _.union reportObject.columns, reportObject.rows, filterValueFields
+	filterFields = _.without filterFields, null, undefined
 	Meteor.call "report_data",{object_name: objectName, space:spaceId, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
@@ -196,13 +197,13 @@ renderMatrixReport = (reportObject)->
 Template.creator_report.onRendered ->
 	DevExpress.localization.locale("zh")
 	$ ->
-		report_id = Session.get "report_id"
-		unless report_id
-			return
-		reportObject = Creator.Reports[report_id]
-		unless reportObject
+		record_id = Session.get "record_id"
+		unless record_id
 			return
 		Meteor.autorun (c)->
+			reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+			unless reportObject
+				return
 			switch reportObject.report_type
 				when 'tabular'
 					renderTabularReport(reportObject)
