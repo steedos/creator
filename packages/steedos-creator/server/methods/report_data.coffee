@@ -19,14 +19,10 @@ Meteor.methods
 		result = Creator.getCollection(object_name).find({space: space},fields: filterFields).fetch()
 		if compoundFields.length
 			return result.map (item,index)->
-				console.log "maping:", item.name, item.priority
 				_.each compoundFields, (compoundFieldItem, index)->
-					console.log "maping.compoundFields:", compoundFieldItem.name, compoundFieldItem.childKey
 					itemKey = compoundFieldItem.name + "_" + compoundFieldItem.childKey.replace(/\./g, "_")
 					itemValue = item[compoundFieldItem.name]
-					console.log "maping.compoundFields2,itemKey&itemValue:", itemKey, itemValue
 					type = compoundFieldItem.field.type
-					console.log "maping.compoundFields3,type:", type
 					if ["lookup", "master_detail"].indexOf(type) > -1
 						reference_to = compoundFieldItem.field.reference_to
 						compoundFilterFields = {}
