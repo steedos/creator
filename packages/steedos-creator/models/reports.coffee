@@ -47,7 +47,7 @@ Creator.Objects.reports =
 
 	list_views:
 		default:
-			columns: ["name"]
+			columns: ["name", "report_type", "object_name"]
 		all:
 			filter_scope: "space"
 	permission_set:

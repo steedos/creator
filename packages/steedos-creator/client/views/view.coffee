@@ -155,6 +155,12 @@ Template.creator_view.helpers
 	record: ()->
 		return Creator.getObjectRecord()
 
+	record_name: ()->
+		record = Creator.getObjectRecord()
+		name_field_key = Creator.getObject().NAME_FIELD_KEY
+		if record and name_field_key
+			return record[name_field_key]
+
 	backUrl: ()->
 		return Creator.getObjectUrl(Session.get("object_name"), null)
 
