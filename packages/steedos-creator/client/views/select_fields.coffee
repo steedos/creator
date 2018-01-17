@@ -30,8 +30,6 @@ Template.select_fields.helpers
     
     visible_fields: ()->
         visible_fields = Template.instance().visible_fields?.get()
-        visible_fields = _.sortBy visible_fields, (field) ->
-            return field.value
         return visible_fields
 
          
@@ -111,4 +109,34 @@ Template.select_fields.events
                 toastr.success("List view updated.")
 
             Modal.hide(template)
-                
+
+    'click .up-column': (event, template)->
+        visible_fields = template.visible_fields.get()
+        first_selected_index = $("#column-sub-select option:selected").index()
+        select_fields_length = $("#column-sub-select option:selected").length
+        if first_selected_index > 0
+            visible_fields.splice(first_selected_index + select_fields_length, 0, visible_fields[first_selected_index - 1])
+            visible_fields[first_selected_index - 1] = undefined
+            visible_fields = _.compact(visible_fields)
+            template.visible_fields.set(visible_fields)
+            $('#column-sub-select option').each ->
+                if $(this).index() >= (first_selected_index - 1) and $(this).index() < (first_selected_index + select_fields_length - 1)
+                    $(this).prop("selected", true)
+                else
+                    $(this).attr("selected", false)
+
+    'click .down-column': (event, template)->
+        visible_fields = template.visible_fields.get()
+        first_selected_index = $("#column-sub-select option:selected").index()
+        select_fields_length = $("#column-sub-select option:selected").length
+        if first_selected_index + select_fields_length < visible_fields.length
+            visible_fields.splice(first_selected_index, 0, visible_fields[first_selected_index + select_fields_length])
+            visible_fields[first_selected_index + select_fields_length + 1] = undefined
+            visible_fields = _.compact(visible_fields)
+            template.visible_fields.set(visible_fields)
+
+            $('#column-sub-select option').each ->
+                if $(this).index() >= (first_selected_index + 1) and $(this).index() < (first_selected_index + select_fields_length + 1)
+                    $(this).prop("selected", true)
+                else
+                    $(this).attr("selected", false)
