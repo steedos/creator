@@ -10,14 +10,14 @@ Meteor.startup ->
 			Creator.subs["Creator"].subscribe "object_listviews", Session.get("object_name")
 			
 Meteor.startup ->
-
+	Creator.subs["CreatorRecord"] = new SubsManager()
 	Tracker.autorun (c)->
 		if Session.get("object_name") and Session.get("record_id")
-			Creator.subs["Creator"].subscribe "creator_object_record", Session.get("object_name"), Session.get("record_id") 
+			Creator.subs["CreatorRecord"].subscribe "creator_object_record", Session.get("object_name"), Session.get("record_id") 
 
 	Tracker.autorun (c)->
 		if Session.get("action_object_name") and Session.get("action_record_id")
-			Creator.subs["Creator"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), ()->
+			Creator.subs["CreatorRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), ()->
 					Session.set 'cmDoc', Creator.Collections[Session.get("action_object_name")].findOne(Session.get("action_record_id"))
 
 

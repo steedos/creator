@@ -1,10 +1,7 @@
 Template.creator_report.helpers
 
 
-renderTabularReport = (reportObject)->
-	spaceId = Session.get("spaceId")
-	unless spaceId
-		return
+renderTabularReport = (reportObject, spaceId)->
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -31,10 +28,7 @@ renderTabularReport = (reportObject)->
 			columns: reportColumns).dxDataGrid('instance')
 		return
 
-renderSummaryReport = (reportObject)->
-	spaceId = Session.get("spaceId")
-	unless spaceId
-		return
+renderSummaryReport = (reportObject, spaceId)->
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -58,7 +52,6 @@ renderSummaryReport = (reportObject)->
 		unless reportColumns
 			reportColumns = []
 		reportData = result
-		console.log "reportData:", reportData
 		_.each reportObject.groups, (group, index)->
 			groupFieldKey = group.replace(/\./g,"_")
 			groupField = objectFields[group.split(".")[0]]
@@ -66,8 +59,6 @@ renderSummaryReport = (reportObject)->
 				caption: groupField.label
 				dataField: groupFieldKey
 				groupIndex: index
-		
-		console.log "reportColumns:", reportColumns
 
 		reportSummary = {}
 		totalSummaryItems = []
@@ -98,8 +89,6 @@ renderSummaryReport = (reportObject)->
 		unless _.isEmpty groupSummaryItems
 			reportSummary.groupItems = groupSummaryItems
 
-		console.log "reportSummary:", reportSummary
-
 		pivotGrid = $('#pivotgrid').dxDataGrid(
 			dataSource: reportData
 			paging: false
@@ -107,10 +96,7 @@ renderSummaryReport = (reportObject)->
 			summary: reportSummary).dxDataGrid('instance')
 		return
 
-renderMatrixReport = (reportObject)->
-	spaceId = Session.get("spaceId")
-	unless spaceId
-		return
+renderMatrixReport = (reportObject, spaceId)->
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -196,18 +182,22 @@ renderMatrixReport = (reportObject)->
 
 Template.creator_report.onRendered ->
 	DevExpress.localization.locale("zh")
-	$ ->
+	this.autorun (c)->
+		spaceId = Session.get("spaceId")
+		unless spaceId
+			return
 		record_id = Session.get "record_id"
 		unless record_id
 			return
-		Meteor.autorun (c)->
+		if Creator.subs["CreatorRecord"].ready()
+			c.stop()
 			reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
 			unless reportObject
 				return
 			switch reportObject.report_type
 				when 'tabular'
-					renderTabularReport(reportObject)
+					renderTabularReport(reportObject, spaceId)
 				when 'summary'
-					renderSummaryReport(reportObject)
+					renderSummaryReport(reportObject, spaceId)
 				when 'matrix'
-					renderMatrixReport(reportObject)
+					renderMatrixReport(reportObject, spaceId)
