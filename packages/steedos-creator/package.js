@@ -130,6 +130,8 @@ Package.onUse(function(api) {
 	api.addFiles('models/reports.coffee');
 	api.addFiles('models/tasks.coffee');
 
+    api.addFiles('models/settings.coffee');
+
 	api.addFiles('server/methods/object_options.coffee', 'server');
 	api.addFiles('server/methods/object_permissions.coffee', 'server');
 	api.addFiles('server/methods/object_recent_viewed.coffee', 'server');

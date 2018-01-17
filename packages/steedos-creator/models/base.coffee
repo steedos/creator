@@ -6,9 +6,11 @@ Creator.baseObject =
 			reference_to: "users"
 			omit: true
 			sortable: true
+			index: true
 		space:
 			type: "text"
 			omit: true
+			index: true
 		created:
 			type: "datetime"
 			label:"提交日期"
@@ -19,11 +21,13 @@ Creator.baseObject =
 			label:"提交人"
 			reference_to: "users"
 			omit: true
+			index: true
 		modified:
 			label:"最后修改时间"
 			type: "datetime"
 			omit: true
 			sortable: true
+			index: true
 		modified_by:
 			type: "lookup"
 			reference_to: "users"
@@ -31,12 +35,10 @@ Creator.baseObject =
 		last_activity: 
 			type: "datetime"
 			omit: true
-		last_referenced: 
-			type: "datetime"
-			omit: true
 		is_deleted:
 			type: "boolean"
 			omit: true
+			index: true
 
 	permission_set:
 		none: 
