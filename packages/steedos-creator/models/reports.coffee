@@ -24,10 +24,25 @@ Creator.Objects.reports =
 		filters: 
 			type: [Object]
 		"filters.$.field": 
+			label: "字段"
 			type: "text"
 		"filters.$.operation": 
-			type: "text"
+			label: "操作符"
+			type: "select"
+			defaultValue: "tabular"
+			options: [
+				{label: "equals", value: "EQUALS"},
+				{label: "not equal to", value: "NOT_EQUAL"},
+				{label: "less than", value: "LESS_THAN"},
+				{label: "greater than", value: "GREATER_THAN"},
+				{label: "less or equal", value: "LESS_OR_EQUAL"},
+				{label: "greater or equal", value: "GREATER_OR_EQUAL"},
+				{label: "contains", value: "CONTAINS"},
+				{label: "does not contain", value: "NOT_CONTAIN"},
+				{label: "starts with", value: "STARTS_WITH"},
+			]
 		"filters.$.value": 
+			label: "字段值"
 			type: "text"
 		columns:
 			type: "[text]"
