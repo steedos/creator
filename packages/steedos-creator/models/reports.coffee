@@ -4,9 +4,11 @@ Creator.Objects.reports =
 	icon: "report"
 	fields:
 		name: 
+			label: "名称"
 			type: "text"
 			required: true
 		description: 
+			label: "描述"
 			type: "textarea"
 			is_wide: true
 		report_type:
@@ -19,12 +21,14 @@ Creator.Objects.reports =
 				{label: "矩阵", value: "matrix"}
 			]
 		object_name: 
+			label: "对象名"
 			type: "text"
 			required: true
 		filters: 
+			label: "过虑条件"
 			type: [Object]
 		"filters.$.field": 
-			label: "字段"
+			label: "字段名"
 			type: "text"
 		"filters.$.operation": 
 			label: "操作符"
@@ -45,21 +49,35 @@ Creator.Objects.reports =
 			label: "字段值"
 			type: "text"
 		columns:
+			label: "显示列"
 			type: "[text]"
 		rows: 
+			label: "显示行"
 			type: "[text]"
 		groups: 
+			label: "分组"
 			type: "[text]"
 		values: 
+			label: "统计"
 			type: [Object]
 			blackbox: true
 		"values.$.label":
+			label: "标题"
 			type: "text"
 		"values.$.field":
+			label: "字段名"
 			type: "text"
 		"values.$.operation":
-			type: "text"
+			label: "统计类型"
+			type: "select"
+			options: [
+				{label: "计数", value: "count"},
+				{label: "最大值", value: "max"},
+				{label: "最小值", value: "min"},
+				{label: "汇总", value: "sum"}
+			]
 		"values.$.grouping":
+			label: "是否分组统计"
 			type: "boolean"
 			defaultValue: false
 
