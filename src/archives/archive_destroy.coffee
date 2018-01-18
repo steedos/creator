@@ -1,7 +1,7 @@
 Creator.Objects.archive_destroy = 
 	name: "archive_destroy"
 	icon: "product_item"
-	label: "销毁单"
+	label: "销毁"
 	enable_search: true
 	fields:
 		destroy_title:
@@ -43,7 +43,7 @@ Creator.Objects.archive_destroy =
 	
 	actions: 
 		receive:
-			label:"销毁"
+			label:"执行销毁"
 			visible: true
 			on:"record"
 			todo:(object_name, record_id, fields)->
