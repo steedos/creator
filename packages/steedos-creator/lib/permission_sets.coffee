@@ -32,25 +32,31 @@ if Meteor.isServer
 		else
 			permissions = _.clone(object.permission_set.user)
 		if psets.length>=0
+			permissions.related = {}
 			set_ids = _.pluck psets, "_id"
 			pos = Creator.getCollection("permission_objects").find({object_name: object_name, permission_set_id: {$in: set_ids}}).fetch()
 			_.each pos, (po)->
+				p = {}
 				if po.allowRead
-					permissions.allowRead = true
+					p.allowRead = true
 				if po.allowCreate
-					permissions.allowCreate = true
+					p.allowCreate = true
 				if po.allowEdit
-					permissions.allowEdit = true
+					p.allowEdit = true
 				if po.allowDelete
-					permissions.allowDelete = true
+					p.allowDelete = true
 				if po.modifyAllRecords
-					permissions.modifyAllRecords = true
-					permissions.allowCreate = true
-					permissions.allowEdit = true
-					permissions.allowDelete = true
+					p.modifyAllRecords = true
+					p.allowCreate = true
+					p.allowEdit = true
+					p.allowDelete = true
 				if po.viewAllRecords
-					permissions.viewAllRecords = true
-					permissions.allowRead = true
+					p.viewAllRecords = true
+					p.allowRead = true
+				if po.related_object_name
+					permissions.related[po.related_object_name] = p
+				else
+					permissions = _.extend(permissions, p)
 		
 			permissions.fields = {}
 			pfs = Creator.getCollection("permission_fields").find({object_name: object_name, permission_set_id: {$in: set_ids}}).fetch()
