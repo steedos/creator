@@ -569,7 +569,7 @@ Creator.Objects.archive_records =
 			omit:true
 		destroyed:
 			type:"datetime"
-			label:'销毁时间'
+			label:'实际销毁时间'
 			omit:true
 		
 		destroyed_by:
@@ -587,22 +587,26 @@ Creator.Objects.archive_records =
 			label:"借阅时间"
 			omit:true
 		borrowed_by:
-			type:"text"
-			label:'借阅人'
-			omit:true
+			type: "lookup"
+			label:"借阅人"
+			reference_to: "users"
+			omit: true
 		#如果是从OA归档过来的档案，则值为表单Id,否则不存在改字段
 		external_id:
 			type:"text"
 			label:'表单Id'
 			omit:true
 			group:"内容描述"
-
+		archive_destroy_id:
+			type:"master_detail"
+			label:"销毁单"
+			reference_to:"archive_destroy"
 	list_views:
 		default:
 			columns: [
 				"year", "item_number","retention_peroid",
 				"title","documnt_number", "document_date", "author",
-				"archive_dept", "security_classification","destroy_date"
+				"archive_dept", "security_classification","destroyed"
 				]
 		recent:
 			label: "最近查看"
@@ -624,11 +628,11 @@ Creator.Objects.archive_records =
 			label:"待移交"
 			filter_scope: "space"
 			filters: [["is_transfered", "$eq", false]]
-		# destroy:
-		# 	label:"待销毁"
-		# 	filter_scope: "space"
-		# 	filters: [["is_received", "$eq", true],["destroy_date","$lte",new Date()]]
-		# 	columns:["year","title","document_date","retention_peroid"]
+		destroy:
+			label:"待销毁"
+			filter_scope: "space"
+			filters: [["is_received", "$eq", true],["destroy_date","$lte",new Date()],["is_destroyed", "$eq", false]]
+			columns:["year","title","document_date","destroy_date","archive_destroy_id"]
 		transfered:
 			label:"已移交"
 			filter_scope: "space"
@@ -637,6 +641,7 @@ Creator.Objects.archive_records =
 			label:"已销毁"
 			filter_scope: "space"
 			filters: [["is_destroyed", "$eq", true]]
+			columns:["year","title","document_date","destroy_date","destroyed","archive_destroy_id"]
 		borrow:
 			label:"已借阅"
 			filter_scope: "space"
@@ -662,9 +667,16 @@ Creator.Objects.archive_records =
 			when: "before.insert"
 			todo: (userId, doc)->
 				doc.is_received = false
+				doc.is_destroyed = false
+				doc.is_borrowed = false
+				doc.created = new Date()
+				doc.created_by = userId
+				doc.owner = userId
 				duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
-				doc.destroy_date = new Date(doc.document_date.getTime()+duration*365*24*3600*1000)
-				# doc.archives_name = " "
+				year = doc.document_date.getFullYear()+duration
+				month = doc.document_date.getMonth()
+				day = doc.document_date.getDate()
+				destroy_date = new Date(year,month,day)
 				# doc.archives_identifier = ' '
 				# doc.fonds_name = ' '
 				# doc.archival_category_code = 'WS'
@@ -684,28 +696,27 @@ Creator.Objects.archive_records =
 				# doc.applicant_organization_name = ' '
 
 				return true
-		"after.insert.server.default": 
+		"after.update.server.default": 
 			on: "server"
-			when: "after.insert"
+			when: "after.update"
 			todo: (userId, doc)->
-				#Creator.Collections["archive_records"].update ({_id:doc._id},{$set:{electronic_record_code:doc._id}})
-	actions: 
+				duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
+				year = doc.document_date.getFullYear()+duration
+				month = doc.document_date.getMonth()
+				day = doc.document_date.getDate()
+				destroy_date = new Date(year,month,day)
+				# if doc.archive_destroy_id
+				# 	state = Creator.Collections["archive_destroy"].findOne({_id:doc.archive_destroy_id}).destroy_state
+				# 	if state=="已销毁"
+				# 		Creator.Collections["archive_destroy"].update({_id:doc.archive_destroy_id},{$set:{destroy_state:"未销毁"}})
+				#console.log doc.archive_destroy_id
+				Creator.Collections["archive_records"].direct.update({_id:doc._id},{$set:{destroy_date:destroy_date}})
+				# destroy_records = Creator.Collections["archive_destroy"].findOne({_id:doc.archive_destroy_id}).
+				# Creator.Collections["archive_destroy"].update ({_id:doc.archive_destroy_id},{$set:{modified:new Date,modified_by:Meteor.userId(),destroy_records:}})
+	actions: 	
 		receive:
 			label: "接收"
 			visible: true
-			# 	()->
-			# 	# object = Creator.getObject(this.object_name)
-			# 	# list_views = object.list_views
-			# 	# list_views = _.filter list_views, (list_view)->
-			# 	# # for i in list_views
-			# 	# # 	console.log list_views[i].name
-			# 	# 	if list_view.name=='receive'
-			# 	# 		return true
-			# 	# 	else
-			# 	# 		false
-			# 	return true	
-			# on: "list"
-			# only_list_item:"receive"
 			on: "list"
 			todo:()-> 
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
@@ -745,25 +756,25 @@ Creator.Objects.archive_records =
 								Meteor.call("archive_new_audit",Creator.TabularSelectedIds?["archive_records"],"移交档案","失败",space)
 
 							)
-		destroy:
-			label:"销毁"
-			visible:true
-			on: "list"
-			todo:()->
-				if Creator.TabularSelectedIds?["archive_records"].length == 0
-					 alert("请先选择要销毁的档案")
-					 return 
-				if Session.get("list_view_id")!= "destroy"
-					alert("请在待销毁视图下操作")
-					return
-				else
-					space = Session.get("spaceId")
-					Meteor.call("archive_destroy",Creator.TabularSelectedIds?["archive_records"],space,
-						(error,result) ->
-							text = "共销毁"+Creator.TabularSelectedIds?["archive_records"].length+"条,"+"成功"+result+"条"
-							swal(text)
+		# destroy:
+		# 	label:"销毁"
+		# 	visible:true
+		# 	on: "list"
+		# 	todo:()->
+		# 		if Creator.TabularSelectedIds?["archive_records"].length == 0
+		# 			 alert("请先选择要销毁的档案")
+		# 			 return 
+		# 		if Session.get("list_view_id")!= "destroy"
+		# 			alert("请在待销毁视图下操作")
+		# 			return
+		# 		else
+		# 			space = Session.get("spaceId")
+		# 			Meteor.call("archive_destroy",Creator.TabularSelectedIds?["archive_records"],space,
+		# 				(error,result) ->
+		# 					text = "共销毁"+Creator.TabularSelectedIds?["archive_records"].length+"条,"+"成功"+result+"条"
+		# 					swal(text)
 							
-						)
+		# 				)
 		borrow:
 			label:"借阅"
 			visible:true
