@@ -645,7 +645,7 @@ Creator.Objects.archive_records =
 		borrow:
 			label:"已借阅"
 			filter_scope: "space"
-			filters:[["is_borrowed","$eq",true],["is_receive","$eq",true]]
+			filters:[["is_borrowed","$eq",true],["is_received","$eq",true]]
 	permission_set:
 		user:
 			allowCreate: true
@@ -720,8 +720,8 @@ Creator.Objects.archive_records =
 			on: "list"
 			todo:()-> 
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
-					 alert("请先选择要接收的档案")
-					 return 
+					alert("请先选择要接收的档案")
+					return 
 				if Session.get("list_view_id")!= "receive"
 					alert("请在待接收视图下操作")
 					return
@@ -729,7 +729,7 @@ Creator.Objects.archive_records =
 					space = Session.get("spaceId")
 					Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],space,
 						(error,result) ->
-							text = "共接收"+Creator.TabularSelectedIds?["archive_records"].length+"条,"+"成功"+result+"条"
+							text = "共接收"+result[0]+"条,"+"成功"+result[1]+"条"
 							swal(text)
 							)
 		transfer:
@@ -778,31 +778,28 @@ Creator.Objects.archive_records =
 		borrow:
 			label:"借阅"
 			visible:true
-			on: "list"
-			todo:()->				
-				space = Session.get("spaceId")
-				if Creator.TabularSelectedIds?["archive_records"].length == 0
-					 alert("请先选择要借阅的档案")
-					 return
-				collection_borrow = Creator.Collections["archive_borrow"]
-				doc = {}
-				now = new Date()
-				count = collection_borrow.find({year:now.getFullYear().toString()}).count()+1
-				strCount = (Array(6).join('0') + count).slice(-6)
-				doc.borrow_no = now.getFullYear().toString()  + strCount
-				collection_record = Creator.Collections["archive_records"]
-				#console.log collection_record.find({},{field:{year: 1}}).sort({year:-1}).limit(1)
-				doc.year = now.getFullYear().toString()
-				doc.unit_info = Creator.Collections["space_users"].findOne({user:Meteor.userId(),space:space},{fields:{company:1}}).company
-				doc.start_date = now
-				doc.end_date =new Date(now.getTime()+7*24*3600*1000)
-				doc.use_with = "工作考察"
-				doc.use_fashion = "实体借阅"
-				doc.file_type = "立卷方式(文件级)"
-				doc.space = space
-				doc.is_approved = false 
-				doc.relate_documentIds = []
-				Creator.TabularSelectedIds?["archive_records"].forEach (selectedId)->
-					doc.relate_documentIds.push collection_record.findOne({_id:selectedId})._id
-				Creator.createObject("archive_borrow",doc)
+			on: "record"
+			todo:(object_name, record_id, fields)->				
+				if Session.get("list_view_id") == "all" || Session.get("list_view_id")== "received"
+					space = Session.get("spaceId")
+					doc = {}
+					now = new Date()
+					#collection_record = Creator.Collections["archive_records"]
+					#console.log collection_record.find({},{field:{year: 1}}).sort({year:-1}).limit(1)
+					doc.year = now.getFullYear().toString()
+					doc.unit_info = Creator.Collections["space_users"].findOne({user:Meteor.userId(),space:space},{fields:{company:1}}).company
+					doc.start_date = now
+					doc.end_date =new Date(now.getTime()+7*24*3600*1000)
+					doc.use_with = "工作考察"
+					doc.use_fashion = "实体借阅"
+					doc.file_type = "立卷方式(文件级)"
+					doc.space = space
+					doc.is_approved = false 
+					doc.relate_record = record_id
+					# Creator.TabularSelectedIds?["archive_records"].forEach (selectedId)->
+					# 	doc.relate_documentIds.push collection_record.findOne({_id:selectedId})._id
+					Creator.createObject("archive_borrow",doc)
+				else
+					alert("请在全部或已接收视图下执行操作")
+					return
 	
