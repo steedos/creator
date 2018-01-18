@@ -10,6 +10,8 @@ Creator.Objects.permission_objects =
 			reference_to: "permission_set"
 		object_name: 
 			type: "text"
+		related_object_name:
+			type: "text"
 		allowCreate: 
 			type: "boolean"
 		allowDelete: 
