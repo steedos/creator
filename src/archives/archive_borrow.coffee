@@ -4,10 +4,9 @@ Creator.Objects.archive_borrow =
 	label: "借阅"
 	enable_search: false
 	fields:
-		borrow_no:
+		borrow_name:
 			type:"text"
-			label:"借阅单编号"
-			omit:true
+			label:"标题"
 			sortable:true
 			is_name:true
 			#defaultValue:当前年度的借阅单总数+1
@@ -48,7 +47,7 @@ Creator.Objects.archive_borrow =
 		use_with:
 			type:"select"
 			label:"利用目的"
-			defaultValue:"工作考察"
+			defaultValue:"工作查考"
 			options:[
 				{label: "工作查考", value: "工作查考"},
 				{label: "遍史修志", value: "遍史修志"},
@@ -91,12 +90,11 @@ Creator.Objects.archive_borrow =
 			defaultValue:"未审批"
 			sortable:true
 			omit:true
-		relate_documentIds:
+		relate_record:
 			type:"lookup"
 			label:"题名"
 			is_wide:true
 			reference_to:"archive_records"
-			multiple:true
 		year:
 			type:"text"
 			label:"年度"
@@ -127,17 +125,16 @@ Creator.Objects.archive_borrow =
 			omit:true 
 	list_views:
 		default:
-			columns:["borrow_no","created","end_date","created_by","unit_info
-			","deparment_info","phone_number","relate_documentIds","year"]
+			columns:["borrow_name","created","end_date","created_by","unit_info
+			","deparment_info","phone_number","relate_record","year"]
 		all:
 			label:"所有借阅记录"
 		mine:
 			label:"我的借阅记录"
-			columns:["borrow_no","end_date","relate_documentIds","year"]
 			filter_scope: "mine"
 			filters: [["is_approved", "$eq", true],["is_deleted", "$eq", false]]
 		approving:
-			label:"待审批"
+			label:"审批中"
 			filter_scope: "mine"
 			filters: [["is_approved", "$eq", false]]
 	triggers:
@@ -151,27 +148,43 @@ Creator.Objects.archive_borrow =
 				doc.owner = userId
 				doc.is_deleted = false
 				doc.is_approved = false
-				count = Creator.Collections["archive_borrow"].find({year:now.getFullYear().toString()}).count()+1
-				strCount = (Array(6).join('0') + count).slice(-6)
-				doc.borrow_no = now.getFullYear().toString()  + strCount
 				doc.year = now.getFullYear().toString()
 				return true
 		"after.insert.server.default": 
 			on: "server"
 			when: "after.insert"
 			todo: (userId, doc)->
-				doc.relate_documentIds.forEach (relate_documentId)->
-					Creator.Collections["archive_records"].update({_id:relate_documentId},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})
-				Meteor.call("archive_new_audit",relate_documentIds,"借阅档案","成功",doc.space)
+				Creator.Collections["archive_records"].direct.update({_id:doc.relate_record},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})
+				Meteor.call("archive_new_audit",doc.relate_record,"借阅档案","成功",doc.space)
 				return true
+		"after.insert.client.default": 
+			on: "client"
+			when: "after.insert"
+			todo: (userId, doc)->
+				toastr.success("借阅成功")
+	permission_set:
+		user:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
+			viewAllRecords: false 
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true 
 	actions: 
 		restore:
 			label: "归还"
 			visible: true
 			on: "list"
 			todo:()->
-				if Creator.TabularSelectedIds?["archive_borrow"].length ==0
-					alert("请先选择要归还的条目")
+				if Creator.TabularSelectedIds?["archive_borrow"].length == 0
+					alert("请先选择要归还的借阅单")
 					return
 				if Session.get("list_view_id") =="mine"
 					Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
@@ -179,16 +192,17 @@ Creator.Objects.archive_borrow =
 							(error,result)->
 								console.log error
 								if !error
-									recordIds = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_documentIds
-									recordIds.forEach (recordId)->
-										Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false}})
+									recordId = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_record
+									Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false,modified:new Date(),modified_by:Meteor.userId()}})
 									#Creator.Collections["archive_borrow"].update(
-									#toastr.success("归还成功，欢迎再次借阅")
-									Meteor.call("archive_new_audit",recordIds,"归还档案","成功",Session.get("spaceId"))
+									alert("归还成功，欢迎再次借阅")
+									Meteor.call("archive_new_audit",recordId,"归还档案","成功",Session.get("spaceId"))
 								else
-									#toastr.error("归还失败，请再次操作")
-									Meteor.call("archive_new_audit",recordIds,"归还档案","失败",Session.get("spaceId"))
+									alert("归还失败，请再次操作")
+									Meteor.call("archive_new_audit",recordId,"归还档案","失败",Session.get("spaceId"))
 								)
+				else
+					alert("请在我的借阅视图下执行操作")
 
 
 		renew:
@@ -196,23 +210,34 @@ Creator.Objects.archive_borrow =
 			visible:true
 			on: "list"
 			todo:()->
-				if Creator.TabularSelectedIds?["archive_borrow"].length ==0
-					alert("请先选择要续借的条目")
+				if Creator.TabularSelectedIds?["archive_borrow"].length == 0
+					alert("请先选择要续借的借阅单")
 					return
 				if Session.get("list_view_id") =="mine"
 					now = new Date()
 					start_date = now
 					end_date =new Date(now.getTime()+7*24*3600*1000)
 					Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
-						Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{start_date:start_date,end_date:end_date}},
+						Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{start_date:start_date,end_date:end_date,is_approved:false}},
 							(error,result)->
 								console.log error
 								if !error
-									recordIds = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_documentIds
+									recordId = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_record
 									#Creator.Collections["archive_borrow"].update(
-									#toastr.success("归还成功，欢迎再次借阅")
-									Meteor.call("archive_new_audit",recordIds,"续借档案","成功",Session.get("spaceId"))
+									alert("续借成功")
+									Meteor.call("archive_new_audit",recordId,"续借档案","成功",Session.get("spaceId"))
 								else
-									#toastr.error("归还失败，请再次操作")
-									Meteor.call("archive_new_audit",recordIds,"续借档案","失败",Session.get("spaceId"))
+									alert("续借失败")
+									Meteor.call("archive_new_audit",recordId,"续借档案","失败",Session.get("spaceId"))
 								)
+				else
+					alert("请在我的借阅视图下执行操作")
+		view:
+			label:"查看原文"
+			visible:true
+			on: "record"
+			todo:(object_name, record_id, fields)->
+				if Session.get("list_view_id") =="mine"
+					FlowRouter.go("http://192.168.0.89:5000/app/archive/cms_files/view/bX27DGCYuiWBacerp")
+				else
+					alert("请在我的借阅视图下执行操作")
