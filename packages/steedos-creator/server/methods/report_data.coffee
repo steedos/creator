@@ -18,8 +18,6 @@ Meteor.methods
 				compoundFields.push({name: name, childKey: childKey, field: objectField})
 			filterFields[name] = 1
 
-		console.log "filters:", filters
-		console.log "filter_scope:", filter_scope
 		selector = {}
 		userId = this.userId
 		selector.space = space
@@ -65,7 +63,6 @@ Meteor.methods
 				return query
 			selector["$and"] = filters
 
-		console.log "selector", selector, JSON.stringify(selector)
 		result = Creator.getCollection(object_name).find(selector, fields: filterFields).fetch()
 		if compoundFields.length
 			return result.map (item,index)->
