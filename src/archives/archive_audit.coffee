@@ -58,10 +58,10 @@ Creator.Objects.archive_audit =
 			viewAllRecords: false 
 		admin:
 			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
-			modifyAllRecords: true
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
 			viewAllRecords: true 
 
 	triggers:

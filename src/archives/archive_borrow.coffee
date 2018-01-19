@@ -130,6 +130,7 @@ Creator.Objects.archive_borrow =
 			","deparment_info","phone_number","relate_record","year"]
 		all:
 			label:"所有借阅记录"
+			filter_scope: "space"
 		mine:
 			label:"我的借阅记录"
 			filter_scope: "mine"
@@ -169,16 +170,16 @@ Creator.Objects.archive_borrow =
 		user:
 			allowCreate: true
 			allowDelete: true
-			allowEdit: true
+			allowEdit: false
 			allowRead: true
-			modifyAllRecords: true
-			viewAllRecords: true 
+			modifyAllRecords: false
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
-			allowEdit: true
+			allowEdit: false
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true 
 	actions: 
 		restore:
