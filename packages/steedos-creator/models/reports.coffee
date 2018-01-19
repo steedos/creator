@@ -1,6 +1,6 @@
 Creator.Objects.reports = 
 	name: "reports"
-	label: "reports"
+	label: "报表"
 	icon: "report"
 	fields:
 		name: 
@@ -84,8 +84,15 @@ Creator.Objects.reports =
 	list_views:
 		default:
 			columns: ["name", "report_type", "object_name"]
-		all:
+		recent:
+			label: "最近查看"
 			filter_scope: "space"
+		all:
+			label: "所有报表"
+			filter_scope: "space"
+		mine:
+			label: "我的报表"
+			filter_scope: "mine"
 	permission_set:
 		user:
 			allowCreate: true
