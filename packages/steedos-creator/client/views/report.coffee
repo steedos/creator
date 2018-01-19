@@ -1,4 +1,7 @@
 Template.creator_report.helpers
+	reportObject: ->
+		record_id = Session.get "record_id"
+		return Creator.Reports[record_id] or Creator.getObjectRecord()
 
 
 renderTabularReport = (reportObject, spaceId)->
