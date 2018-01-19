@@ -1,4 +1,7 @@
 Template.creator_report.helpers
+	reportObject: ->
+		record_id = Session.get "record_id"
+		return Creator.Reports[record_id] or Creator.getObjectRecord()
 
 
 renderTabularReport = (reportObject, spaceId)->
@@ -9,8 +12,6 @@ renderTabularReport = (reportObject, spaceId)->
 	filterFields = reportObject.columns
 	filter_scope = reportObject.filter_scope || "space"
 	filters = reportObject.filters
-	console.log "filter_scope:", filter_scope
-	console.log "filters:", filters
 	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
@@ -43,8 +44,6 @@ renderSummaryReport = (reportObject, spaceId)->
 	filterFields = _.without filterFields, null, undefined
 	filter_scope = reportObject.filter_scope || "space"
 	filters = reportObject.filters
-	console.log "filter_scope:", filter_scope
-	console.log "filters:", filters
 	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
@@ -115,8 +114,6 @@ renderMatrixReport = (reportObject, spaceId)->
 	filterFields = _.without filterFields, null, undefined
 	filter_scope = reportObject.filter_scope || "space"
 	filters = reportObject.filters
-	console.log "filter_scope:", filter_scope
-	console.log "filters:", filters
 	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)

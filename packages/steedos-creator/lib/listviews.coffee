@@ -1,6 +1,31 @@
+Creator.getInitWidthPercent = (object_name, columns) ->
+	_schema = Creator.getSchema(object_name)?._schema
+	column_num = 0
+	if _schema
+		_.each columns, (field_name) ->
+			field = _.pick(_schema, field_name)
+			is_wide = field[field_name]?.autoform?.is_wide
+			if is_wide
+				column_num += 2
+			else
+				column_num += 1
+
+		init_width_percent = 100 / column_num
+		return init_width_percent
+
+Creator.getFieldIsWide = (object_name, field_name) ->
+	_schema = Creator.getSchema(object_name)._schema
+	if _schema
+		field = _.pick(_schema, field_name)
+		is_wide = field[field_name]?.autoform?.is_wide
+		return is_wide
+
 Creator.getTabularColumns = (object_name, columns, is_related) ->
 	obj = Creator.getObject(object_name)
 	cols = []
+	if Meteor.isClient
+		init_width_percent = Creator.getInitWidthPercent(object_name, columns)
+
 	_.each columns, (field_name)->
 		field = obj.fields[field_name]
 		if /\w+\.\$\.\w+/g.test(field_name)
@@ -9,19 +34,6 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 		if field?.type and !field.hidden
 			col = {}
 			col.data = field_name
-			#col.sTitle = null
-			# col.titleFn = ()->
-			# 	return "<a class='slds-th__action slds-text-link_reset' href='javascript:void(0);' role='button' tabindex='-1'>
-			# 				<span class='slds-assistive-text'>Sort by: </span>
-			# 				<span class='slds-truncate' title='Name'>" +  field.label + "</span>
-			# 				<div class='slds-icon_container'>
-			# 					<svg class='slds-icon slds-icon_x-small slds-icon-text-default slds-is-sortable__icon' aria-hidden='true'>
-			# 						<use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#arrowdown'>'
-			# 						</use>
-			# 					</svg>
-			# 				</div>
-			# 			</a>"
-				
 			col.sTitle = "<a class='slds-th__action slds-text-link_reset' href='javascript:void(0);' role='button' tabindex='-1' aria-label='#{field_name}'>
 							<span class='slds-assistive-text'>Sort by: </span>
 							<span class='slds-truncate' title='Name'>" +  field.label + "</span>
@@ -38,14 +50,25 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 			else
 				col.orderable = false
 			
-			list_view_id = Session?.get("list_view_id")
-			setting = Creator.Collections?.settings?.findOne({object_name: object_name})
-			if setting and setting.settings
-				column_width = setting.settings[list_view_id]?.column_width
-				if column_width
-					_.each column_width, (width, key)->
-						if field_name == key
-							col.width = width
+			if Meteor.isClient
+				list_view_id = Session.get("list_view_id")
+				setting = Creator.Collections?.settings?.findOne({object_name: object_name, record_id: "object_listviews"})
+				if setting and setting.settings
+					column_width = setting.settings[list_view_id]?.column_width
+					if column_width
+						_.each column_width, (width, key)->
+							if field_name == key
+								col.width = width
+					else
+						if Creator.getFieldIsWide(object_name, field_name)
+							col.width = "#{2 * init_width_percent}%"
+						else
+							col.width = "#{init_width_percent}%"
+				else
+					if Creator.getFieldIsWide(object_name, field_name)
+						col.width = "#{2 * init_width_percent}%"
+					else
+						col.width = "#{init_width_percent}%"
 
 			col.render =  (val, type, doc) ->
 				return
@@ -85,7 +108,7 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 	return cols
 
 Creator.getTabularOrder = (object_name, list_view_id, columns) ->
-	setting = Creator.Collections?.settings?.findOne({object_name: object_name})
+	setting = Creator.Collections?.settings?.findOne({object_name: object_name, record_id: "object_listviews"})
 	if setting and setting.settings
 		sort = setting.settings[list_view_id]?.sort || []
 		sort = _.map sort, (order)->
@@ -123,7 +146,7 @@ Creator.initListViews = (object_name)->
 			Tracker.nonreactive ->
 				object_name = Session.get("object_name")
 				list_view_id = Session.get("list_view_id")
-				setting = Creator.Collections.settings.findOne({object_name: object_name})
+				setting = Creator.Collections.settings.findOne({object_name: object_name, record_id: "object_listviews"})
 				column_width = setting?.settings[list_view_id]?.column_width
 		
 				if !column_width
