@@ -135,7 +135,7 @@ Creator.Objects.archive_borrow =
 			label:"我的借阅记录"
 			filter_scope: "mine"
 			filters: [["is_approved", "$eq", true],["is_deleted", "$eq", false]]
-
+			columns:["borrow_name","relate_record","is_approved","end_date"]
 		approving:
 			label:"审批中"
 			filter_scope: "mine"
@@ -242,6 +242,14 @@ Creator.Objects.archive_borrow =
 			on: "record"
 			todo:(object_name, record_id, fields)->
 				if Session.get("list_view_id") =="mine"
-					FlowRouter.go("http://192.168.0.89:5000/app/archive/cms_files/view/bX27DGCYuiWBacerp")
+					now = new Date()
+					object_borrow = Creator.Collections["archive_borrow"].findOne({_id:record_id},{fields:{is_approved:1,end_date:1}})
+					if object_borrow.is_approved
+						if (object_borrow.end_date - now) >0
+							alert("success")
+						else
+							alert("已到归还日期，不能查看原文")
+					else
+						alert("审核通过之后才可查看原文")
 				else
 					alert("请在我的借阅视图下执行操作")

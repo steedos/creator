@@ -601,6 +601,10 @@ Creator.Objects.archive_records =
 			type:"master_detail"
 			label:"销毁单"
 			reference_to:"archive_destroy"
+		related_modified:
+			type:"datetime"
+			label:"附属更新时间"
+			omit:true
 	list_views:
 		default:
 			columns: [
