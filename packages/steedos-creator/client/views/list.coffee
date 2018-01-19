@@ -129,7 +129,7 @@ Template.creator_list.helpers
 		return list_view
 
 	list_view_visible: ()->
-		return Session.get("list_view_visible")
+		return Session.get("list_view_visible") and Creator.subs["TabularSetting"].ready()
 
 	doc: ()->
 		return Session.get("action_record_id")
@@ -304,15 +304,15 @@ Template.creator_list.events
 		$(".slds-table td").removeClass("slds-has-focus")
 		$(event.currentTarget).addClass("slds-has-focus")
 
-	'scroll .list-table-container > div': (event, template)->
-		scrollLeft = $(event.currentTarget).scrollLeft()
-		$("table.slds-table thead th", event.currentTarget).each ->
-			$(".slds-th__action", this).css("transform", "translate3d(-#{scrollLeft}px, 0px, 0px)")
+	# 'scroll .list-table-container > div': (event, template)->
+	# 	scrollLeft = $(event.currentTarget).scrollLeft()
+	# 	$("table.slds-table thead th", event.currentTarget).each ->
+	# 		$(".slds-th__action", this).css("transform", "translate3d(-#{scrollLeft}px, 0px, 0px)")
 
-		$(".JCLRgrips .JCLRgrip", event.currentTarget).each ->
-			left = parseInt $(this).data().left
-			$(this).data("leftOffset", scrollLeft);
-			$(this).css("left", "#{left - scrollLeft}px")
+	# 	$(".JCLRgrips .JCLRgrip", event.currentTarget).each ->
+	# 		left = parseInt $(this).data().left
+	# 		$(this).data("leftOffset", scrollLeft);
+	# 		$(this).css("left", "#{left - scrollLeft}px")
 
 	'mouseenter .list-table-container': (event, template)->
 		$("table.slds-table", event.currentTarget).colResizable
@@ -321,6 +321,21 @@ Template.creator_list.events
 			resizeMode:'overflow'
 			draggingClass: "dragging"
 			disabledColumns: [0]
+			onResize: ()->
+				column_width = {}
+				$(".list-table-container table.slds-table thead th").each ->
+					field = $("> a", $(this)).attr("aria-label");
+					width = $(this).css("width")
+					if field
+						column_width[field] = width
+				object_name = Session.get("object_name")
+				list_view_id = Session.get("list_view_id")
+
+				Meteor.call "tabular_column_width_settings", object_name, list_view_id, column_width, (error, result) -> 
+					if error 
+						console.log "error", error 
+					if result
+						return
 
 	'click .btn-filter-list': (event, template)->
 		$(event.currentTarget).toggleClass("slds-is-selected")
@@ -445,6 +460,26 @@ Template.creator_list.events
 		list_view_id = Session.get("list_view_id")
 		Session.set "cmDoc", {_id: list_view_id}
 		$(".btn-delete-list-view").click()
+
+	'click th.slds-is-sortable': (event, template)->
+		order = $(event.currentTarget).attr("aria-sort")
+		if order == "descending"
+			order = "asc"
+		else if order == "ascending" 
+			order = "desc"
+		else
+			order = "asc"
+
+		field_name = $("> a", event.currentTarget).attr("aria-label");
+		sort = [[field_name, order]]
+		object_name = Session.get("object_name")
+		list_view_id = Session.get("list_view_id")
+
+		Meteor.call "tabular_sort_settings", object_name, list_view_id, sort, (error, result) -> 
+			if error 
+				console.log "error", error 
+			if result
+				return
 
 Template.creator_list.onDestroyed ->
 	object_name = Session.get("object_name")

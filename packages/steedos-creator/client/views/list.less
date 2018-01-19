@@ -56,6 +56,7 @@
 					}
 
 					.dataTable {
+						width: auto;
 						margin-top: 0 !important;
 						border-top: none !important;
 						td:not(:first-child) {
@@ -63,6 +64,18 @@
 						}
 						.creator_table_cell {
 							line-height: 1.25rem;
+						}
+						th.slds-is-sortable {
+							.slds-is-sortable__icon {
+								display: inline-block;
+								fill-opacity: 0;
+							}
+						}
+						th.slds-is-sortable:hover,
+						th.slds-is-sortable:focus {
+							.slds-is-sortable__icon {
+								fill-opacity: 1;
+							}
 						}
 					}
 				}

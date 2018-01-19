@@ -8,6 +8,14 @@ Meteor.startup ->
 	Tracker.autorun (c)->
 		if Session.get("object_name")
 			Creator.subs["Creator"].subscribe "object_listviews", Session.get("object_name")
+
+
+Meteor.startup ->
+	Creator.subs["TabularSetting"] = new SubsManager()
+	Tracker.autorun (c)->
+		object_name = Session.get("object_name")
+		if object_name
+			Creator.subs["TabularSetting"].subscribe "user_tabular_settings", object_name
 			
 Meteor.startup ->
 	Creator.subs["CreatorRecord"] = new SubsManager()
