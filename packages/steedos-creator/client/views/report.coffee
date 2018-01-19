@@ -7,7 +7,11 @@ renderTabularReport = (reportObject, spaceId)->
 	if _.isEmpty objectFields
 		return
 	filterFields = reportObject.columns
-	Meteor.call "report_data",{object_name: objectName, space: spaceId, fields: filterFields}, (error, result)->
+	filter_scope = reportObject.filter_scope || "space"
+	filters = reportObject.filters
+	console.log "filter_scope:", filter_scope
+	console.log "filters:", filters
+	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
 			return
@@ -37,7 +41,11 @@ renderSummaryReport = (reportObject, spaceId)->
 		return item.field
 	filterFields = _.union reportObject.columns, reportObject.groups, filterValueFields
 	filterFields = _.without filterFields, null, undefined
-	Meteor.call "report_data",{object_name: objectName, space:spaceId, fields: filterFields}, (error, result)->
+	filter_scope = reportObject.filter_scope || "space"
+	filters = reportObject.filters
+	console.log "filter_scope:", filter_scope
+	console.log "filters:", filters
+	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
 			return
@@ -105,7 +113,11 @@ renderMatrixReport = (reportObject, spaceId)->
 		return item.field
 	filterFields = _.union reportObject.columns, reportObject.rows, filterValueFields
 	filterFields = _.without filterFields, null, undefined
-	Meteor.call "report_data",{object_name: objectName, space:spaceId, fields: filterFields}, (error, result)->
+	filter_scope = reportObject.filter_scope || "space"
+	filters = reportObject.filters
+	console.log "filter_scope:", filter_scope
+	console.log "filters:", filters
+	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
 		if error
 			console.error('report_data method error:', error)
 			return

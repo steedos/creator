@@ -9,6 +9,7 @@ Creator.Objects.archive_borrow =
 			label:"标题"
 			sortable:true
 			is_name:true
+			required:true
 			#defaultValue:当前年度的借阅单总数+1
 		file_type:
 			type:"text"
@@ -129,14 +130,17 @@ Creator.Objects.archive_borrow =
 			","deparment_info","phone_number","relate_record","year"]
 		all:
 			label:"所有借阅记录"
+			filter_scope: "space"
 		mine:
 			label:"我的借阅记录"
 			filter_scope: "mine"
 			filters: [["is_approved", "$eq", true],["is_deleted", "$eq", false]]
+
 		approving:
 			label:"审批中"
 			filter_scope: "mine"
 			filters: [["is_approved", "$eq", false]]
+			columns:["borrow_name","created","end_date","created_by","owner"]
 	triggers:
 		"before.insert.server.default": 
 			on: "server"
@@ -164,18 +168,18 @@ Creator.Objects.archive_borrow =
 				toastr.success("借阅成功")
 	permission_set:
 		user:
-			allowCreate: false
-			allowDelete: false
+			allowCreate: true
+			allowDelete: true
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
-			allowEdit: true
+			allowEdit: false
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true 
 	actions: 
 		restore:

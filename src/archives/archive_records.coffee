@@ -623,7 +623,7 @@ Creator.Objects.archive_records =
 			label:"已接收"
 			filter_scope:"space"
 			filters:[["is_received", "$eq", true]]
-			columns:["year","title","received","received_by"]
+			columns:["year","title","received","received_by","borrowed_by"]
 		transfer:
 			label:"待移交"
 			filter_scope: "space"
@@ -646,6 +646,7 @@ Creator.Objects.archive_records =
 			label:"已借阅"
 			filter_scope: "space"
 			filters:[["is_borrowed","$eq",true],["is_received","$eq",true]]
+			columns:["title","borrowed","borrowed_by"]
 	permission_set:
 		user:
 			allowCreate: true
@@ -780,6 +781,10 @@ Creator.Objects.archive_records =
 			visible:true
 			on: "record"
 			todo:(object_name, record_id, fields)->				
+				borrower = Creator.Collections["archive_records"].findOne({_id:record_id}).borrowed_by
+				if borrower == Meteor.userId()
+					alert("您已借阅了此档案，归还之前无需重复借阅")
+					return
 				if Session.get("list_view_id") == "all" || Session.get("list_view_id")== "received"
 					space = Session.get("spaceId")
 					doc = {}
@@ -790,7 +795,7 @@ Creator.Objects.archive_records =
 					doc.unit_info = Creator.Collections["space_users"].findOne({user:Meteor.userId(),space:space},{fields:{company:1}}).company
 					doc.start_date = now
 					doc.end_date =new Date(now.getTime()+7*24*3600*1000)
-					doc.use_with = "工作考察"
+					doc.use_with = "工作查考"
 					doc.use_fashion = "实体借阅"
 					doc.file_type = "立卷方式(文件级)"
 					doc.space = space

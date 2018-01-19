@@ -40,7 +40,21 @@ Creator.Objects.archive_destroy =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-	
+	permission_set:
+		user:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
+			viewAllRecords: false 
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true 
 	actions: 
 		receive:
 			label:"执行销毁"
