@@ -16,7 +16,7 @@ Creator.Objects.archive_classification =
 			is_name:true
 			required:true
 		departments:
-			type:"textarea"
+			type:"[text]"
 			label:"所属部门"
 			multiple:true
 			is_wide:true

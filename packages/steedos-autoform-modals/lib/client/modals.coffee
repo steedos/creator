@@ -114,16 +114,16 @@ Template.autoformModals.rendered = ->
 	$('#afModal').on 'show.bs.modal', ->
 		self.shouldUpdateQuickForm.set(true)
 
+		operation = Session.get 'cmOperation'
+		if operation == 'update'
+			AutoForm.resetForm(Session.get('cmFormId') or defaultFormId)
+
 
 	$('#afModal').on 'shown.bs.modal', ->
 		if Steedos?.setModalMaxHeight
 			Steedos.setModalMaxHeight()
 		$(window).bind 'keyup', onEscKey
 		
-		operation = Session.get 'cmOperation'
-		if operation == 'update'
-			AutoForm.resetForm(Session.get('cmFormId') or defaultFormId)
-
 		setTimeout ->
 			$("#afModal .form-control:first").focus()
 		, 100

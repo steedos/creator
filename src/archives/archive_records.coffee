@@ -653,9 +653,9 @@ Creator.Objects.archive_records =
 			columns:["title","borrowed","borrowed_by"]
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true 
@@ -664,7 +664,7 @@ Creator.Objects.archive_records =
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
+			modifyAllRecords: true
 			viewAllRecords: true 
 	triggers:
 		"before.insert.server.default": 

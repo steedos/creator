@@ -246,7 +246,11 @@ Creator.Objects.archive_borrow =
 					object_borrow = Creator.Collections["archive_borrow"].findOne({_id:record_id},{fields:{is_approved:1,end_date:1}})
 					if object_borrow.is_approved
 						if (object_borrow.end_date - now) >0
-							alert("success")
+							Meteor.call("view_main_doc",record_id,
+								(error,result) ->
+								if result
+									window.location = "/api/files/files/#{result}?download=true"
+							)
 						else
 							alert("已到归还日期，不能查看原文")
 					else

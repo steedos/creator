@@ -31,14 +31,12 @@ Meteor.methods
 		)
 
 	# 查看原文：找出最后一版正文或者不带签章的PDF版本
-	view_main_doc: (archive_id) ->
+	view_main_doc: (record_id) ->
 		cfs.files = Creator.Collections["cfs.files.filerecord"]
-		file_obj = cfs.files.find(
-			'metadata.record_id': archive_id,
+		file_obj = cfs.files.findOne(
+			'metadata.record_id': record_id,
 			'metadata.main': true,
 			'metadata.current': true,
 			'metadata.is_private': false
-			).fetch()
-		console.log "-------------------------------"
-		console.log file_obj
-		return file_obj
+			)
+		return file_obj?._id
