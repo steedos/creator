@@ -4,6 +4,8 @@ Meteor.methods
 		space = options.space
 		fields = options.fields
 		object_name = options.object_name
+		filter_scope = options.filter_scope
+		filters = options.filters
 		filterFields = {}
 		compoundFields = []
 		objectFields = Creator.getObject(object_name)?.fields
@@ -16,7 +18,55 @@ Meteor.methods
 				compoundFields.push({name: name, childKey: childKey, field: objectField})
 			filterFields[name] = 1
 
-		result = Creator.getCollection(object_name).find({space: space},fields: filterFields).fetch()
+		console.log "filters:", filters
+		console.log "filter_scope:", filter_scope
+		selector = {}
+		userId = this.userId
+		selector.space = space
+		if filter_scope == "spacex"
+			selector.space = 
+				$in: [null,space]
+		else if filter_scope == "mine"
+			selector.owner = userId
+
+		if filters and filters.length > 0
+			filters = _.map filters, (obj)->
+				query = {}
+				if obj.operation == "EQUALS"
+					query[obj.field] = 
+						$eq: obj.value
+				else if obj.operation == "NOT_EQUAL"
+					query[obj.field] = 
+						$ne: obj.value
+				else if obj.operation == "LESS_THAN"
+					query[obj.field] = 
+						$lt: obj.value
+				else if obj.operation == "GREATER_THAN"
+					query[obj.field] = 
+						$gt: obj.value
+				else if obj.operation == "LESS_OR_EQUAL"
+					query[obj.field] = 
+						$lte: obj.value
+				else if obj.operation == "GREATER_OR_EQUAL"
+					query[obj.field] = 
+						$gte: obj.value
+				else if obj.operation == "CONTAINS"
+					reg = new RegExp(obj.value, "i")
+					query[obj.field] = 
+						$regex: reg
+				else if obj.operation == "NOT_CONTAIN"
+					reg = new RegExp("^((?!" + obj.value + ").)*$", "i")
+					query[obj.field] = 
+						$regex: reg
+				else if obj.operation == "STARTS_WITH"
+					reg = new RegExp("^" + obj.value, "i")
+					query[obj.field] = 
+						$regex: reg
+				return query
+			selector["$and"] = filters
+
+		console.log "selector", selector, JSON.stringify(selector)
+		result = Creator.getCollection(object_name).find(selector, fields: filterFields).fetch()
 		if compoundFields.length
 			return result.map (item,index)->
 				_.each compoundFields, (compoundFieldItem, index)->

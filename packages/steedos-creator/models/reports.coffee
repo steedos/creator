@@ -24,6 +24,14 @@ Creator.Objects.reports =
 			label: "对象名"
 			type: "text"
 			required: true
+		filter_scope:
+			label: "过虑范围"
+			type: "select"
+			defaultValue: "space"
+			options: [
+				{label: "工作区", value: "space"},
+				{label: "与我相关", value: "mine"}
+			]
 		filters: 
 			label: "过虑条件"
 			type: [Object]
@@ -33,7 +41,7 @@ Creator.Objects.reports =
 		"filters.$.operation": 
 			label: "操作符"
 			type: "select"
-			defaultValue: "tabular"
+			defaultValue: "EQUALS"
 			options: [
 				{label: "equals", value: "EQUALS"},
 				{label: "not equal to", value: "NOT_EQUAL"},
@@ -70,6 +78,7 @@ Creator.Objects.reports =
 		"values.$.operation":
 			label: "统计类型"
 			type: "select"
+			defaultValue: "count"
 			options: [
 				{label: "计数", value: "count"},
 				{label: "最大值", value: "max"},
