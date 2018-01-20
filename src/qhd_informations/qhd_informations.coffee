@@ -66,13 +66,14 @@ Creator.Objects.qhd_informations =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false 
+			readonly_fields: ["score"]
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true  
 	# triggers:
 		
 	# 	"before.insert.server.default": 

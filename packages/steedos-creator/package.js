@@ -113,7 +113,6 @@ Package.onUse(function(api) {
 	api.addFiles('models/object_listviews.coffee');
 	api.addFiles('models/permission_set.coffee');
 	api.addFiles('models/permission_objects.coffee');
-	api.addFiles('models/permission_fields.coffee');
 
     api.addFiles('models/space_object.coffee');
 

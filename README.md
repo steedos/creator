@@ -78,6 +78,13 @@ Object权限分以下类型
 - allowRead: 可查看owner=自己的记录
 - modifyAllRecords: 可修改所有人的记录
 - viewAllRecords: 可查看所有人的记录
+- actions [text]字段，用来控制显示哪些actions
+- listviews [text]字段，用来控制显示哪些listviews
+- related_objects 字段，用来控制相关列表中显示哪些内容
+- fields [text] ，用来控制显示的字段，如果没有配置此属性，则显示所有字段
+- readonly_fields [text] ，用来控制只读的字段
+备注：一个人可以属于多个权限集。如果多个权限集中定义了同一个object的权限，大部分属性取最大权限集合。除了以下属性：readonly_fields取最小权限集合。
+
 API
 - object权限：Creator.getPermissions(object_name)
 - record权限：Creator.getRecordPermissions(object_name, record, userId)
@@ -116,7 +123,6 @@ API
   - recent列表视图可查看用户最近点击的记录
   - list_view_id == "recent"时生效
   - 用户每次点击记录，系统都会自动保存点击信息。每个用户对每个对象最多保存10条记录。
-
 
 ### actions 按钮与操作
 

@@ -1,16 +1,3 @@
-Creator.permissionSetByName = 
-	admin: 
-		objects: {}
-		fields: {}
-	user: 
-		objects: {}
-		fields: {}
-
-Creator.getPermissionSet = (name)->
-	return Creator.permissionSetByName[name]
-
-
-
 if Meteor.isServer
 
 	Creator.getPermissions = (spaceId, userId)->
@@ -31,41 +18,38 @@ if Meteor.isServer
 			permissions = _.clone(object.permission_set.admin)
 		else
 			permissions = _.clone(object.permission_set.user)
+
 		if psets.length>=0
-			permissions.related = {}
 			set_ids = _.pluck psets, "_id"
 			pos = Creator.getCollection("permission_objects").find({object_name: object_name, permission_set_id: {$in: set_ids}}).fetch()
 			_.each pos, (po)->
-				p = {}
 				if po.allowRead
-					p.allowRead = true
+					permissions.allowRead = true
 				if po.allowCreate
-					p.allowCreate = true
+					permissions.allowCreate = true
 				if po.allowEdit
-					p.allowEdit = true
+					permissions.allowEdit = true
 				if po.allowDelete
-					p.allowDelete = true
+					permissions.allowDelete = true
 				if po.modifyAllRecords
-					p.modifyAllRecords = true
-					p.allowCreate = true
-					p.allowEdit = true
-					p.allowDelete = true
+					permissions.modifyAllRecords = true
+					permissions.allowCreate = true
+					permissions.allowEdit = true
+					permissions.allowDelete = true
 				if po.viewAllRecords
-					p.viewAllRecords = true
-					p.allowRead = true
-				if po.related_object_name
-					permissions.related[po.related_object_name] = p
-				else
-					permissions = _.extend(permissions, p)
-		
-			permissions.fields = {}
-			pfs = Creator.getCollection("permission_fields").find({object_name: object_name, permission_set_id: {$in: set_ids}}).fetch()
-			_.each pfs, (pf)->
-				permissions.fields[pf.field_name] = {}
-				if !pf.allowRead
-					permissions.fields[pf.field_name].hidden = true
-				if !pf.allowEdit
-					permissions.fields[pf.field_name].readonly = true
+					permissions.viewAllRecords = true
+					permissions.allowRead = true
+
+				permissions.list_views = _.union(permissions.list_views, po.list_views)
+				permissions.actions = _.union(permissions.actions, po.actions)
+				permissions.fields = _.union(permissions.fields, po.fields)
+				permissions.related_objects = _.union(permissions.fields, po.related_objects)
+				if po.readonly_fields?.length
+					if permissions.readonly_fields
+						permissions.readonly_fields = _.intersection(permissions.readonly_fields, po.readonly_fields)
+					else
+						permissions.readonly_fields = po.readonly_fields
+
 		return permissions
 
 
@@ -121,19 +105,28 @@ if Meteor.isClient
 						unless object
 							return
 						object.permissions.set(permissions)
-						_.each permissions.fields, (field, field_name)->
+						_.each permissions.readonly_fields, (field_name)->
 							f = object.fields[field_name]
 							if f
 								fs = object.schema._schema[field_name]
 								if !fs.autoform
 									fs.autoform = {}
-								if field.readonly
-									f.readonly = true
-									fs.autoform.readonly = true
-									fs.autoform.disabled = true
-								if field.hidden
-									f.hidden = true
-									f.omit = true
+								f.readonly = true
+								fs.autoform.readonly = true
+								fs.autoform.disabled = true
+						if permissions.fields?.length
+							_.each object.fields, (field, field_name)->
+								fs = object.schema._schema[field_name]
+								if !fs.autoform
+									fs.autoform = {}
+								if _.indexOf(permissions.fields, field_name)>=0
+									field.hidden = false
+									field.omit = false
+									fs.autoform.omit = false
+								else
+									field.hidden = true
+									field.omit = true
 									fs.autoform.omit = true
+
 					_.each result.assigned_apps, (app_name)->
 						Creator.Apps[app_name]?.visible = true
