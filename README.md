@@ -81,8 +81,8 @@ Object权限分以下类型
 - actions [text]字段，用来控制显示哪些actions
 - listviews [text]字段，用来控制显示哪些listviews
 - related_objects 字段，用来控制相关列表中显示哪些内容
-- fields [text] ，用来控制显示的字段，如果没有配置此属性，则显示所有字段
-- readonly_fields [text] ，用来控制只读的字段
+- fields [text] ，当前用户的可见字段，数据库中如果没有配置此属性，则表示不限制。
+- readonly_fields [text] ，当前用户不能编辑的字段
 备注：一个人可以属于多个权限集。如果多个权限集中定义了同一个object的权限，大部分属性取最大权限集合。除了以下属性：readonly_fields取最小权限集合。
 
 API
