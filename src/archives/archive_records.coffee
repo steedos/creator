@@ -742,10 +742,10 @@ Creator.Objects.archive_records =
 			on: "list"
 			todo:()-> 
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
-					alert("请先选择要接收的档案")
+					swal("请先选择要接收的档案")
 					return 
 				if Session.get("list_view_id")!= "receive"
-					alert("请在待接收视图下操作")
+					swal("请在待接收视图下操作")
 					return
 				else					
 					space = Session.get("spaceId")
@@ -760,10 +760,10 @@ Creator.Objects.archive_records =
 			on: "list"
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
-					 alert("请先移交要移交的档案")
+					 swal("请先移交要移交的档案")
 					 return
 				if Session.get("list_view_id")!= "all"
-					alert("请在全部视图下操作")
+					swal("请在全部视图下操作")
 					return
 				Meteor.call("archive_transfer",Creator.TabularSelectedIds?["archive_records"],
 					(error,result) ->
@@ -784,10 +784,10 @@ Creator.Objects.archive_records =
 		# 	on: "list"
 		# 	todo:()->
 		# 		if Creator.TabularSelectedIds?["archive_records"].length == 0
-		# 			 alert("请先选择要销毁的档案")
+		# 			 swal("请先选择要销毁的档案")
 		# 			 return 
 		# 		if Session.get("list_view_id")!= "destroy"
-		# 			alert("请在待销毁视图下操作")
+		# 			swal("请在待销毁视图下操作")
 		# 			return
 		# 		else
 		# 			space = Session.get("spaceId")
@@ -804,7 +804,7 @@ Creator.Objects.archive_records =
 			todo:(object_name, record_id, fields)->				
 				borrower = Creator.Collections["archive_records"].findOne({_id:record_id}).borrowed_by
 				if borrower == Meteor.userId()
-					alert("您已借阅了此档案，归还之前无需重复借阅")
+					swal("您已借阅了此档案，归还之前无需重复借阅")
 					return
 				if Session.get("list_view_id") == "all" || Session.get("list_view_id")== "received"
 					space = Session.get("spaceId")
@@ -826,6 +826,6 @@ Creator.Objects.archive_records =
 					# 	doc.relate_documentIds.push collection_record.findOne({_id:selectedId})._id
 					Creator.createObject("archive_borrow",doc)
 				else
-					alert("请在全部或已接收视图下执行操作")
+					swal("请在全部或已接收视图下执行操作")
 					return
 	
