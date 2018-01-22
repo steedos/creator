@@ -3,6 +3,57 @@ Template.creator_report.helpers
 		record_id = Session.get "record_id"
 		return Creator.Reports[record_id] or Creator.getObjectRecord()
 
+	actions: ()->
+		obj = Creator.getObject()
+		object_name = obj.name
+		record_id = Session.get "record_id"
+		permissions = obj.permissions.get()
+		actions = _.values(obj.actions) 
+		# actions = _.where(actions, {on: "record", visible: true})
+		actions = _.filter actions, (action)->
+			if action.on == "record"
+				if action.only_list_item
+					return false
+				if typeof action.visible == "function"
+					return action.visible(object_name, record_id, permissions)
+				else
+					return action.visible
+			else
+				return false
+		return actions
+
+	moreActions: ()->
+		obj = Creator.getObject()
+		object_name = obj.name
+		record_id = Session.get "record_id"
+		permissions = obj.permissions.get()
+		actions = _.values(obj.actions) 
+		actions = _.filter actions, (action)->
+			if action.on == "record_more"
+				if action.only_list_item
+					return false
+				if typeof action.visible == "function"
+					return action.visible(object_name, record_id, permissions)
+				else
+					return action.visible
+			else
+				return false
+		return actions
+
+
+Template.creator_report.events
+
+	'click .record-action-custom': (event, template) ->
+		id = Creator.getObjectRecord()._id
+		objectName = Session.get("object_name")
+		object = Creator.getObject(objectName)
+		collection_name = object.label
+		Session.set("action_fields", undefined)
+		Session.set("action_collection", "Creator.Collections.#{objectName}")
+		Session.set("action_collection_name", collection_name)
+		Session.set("action_save_and_insert", true)
+		Creator.executeAction objectName, this, id
+
 
 renderTabularReport = (reportObject, spaceId)->
 	objectName = reportObject.object_name

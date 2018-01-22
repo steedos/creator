@@ -51,24 +51,39 @@
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="settings"}}
 							</button>
 							<div class="slds-button-group" role="group">
-								<button class="slds-button slds-button_neutral">Edit</button>
-								<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last">
-									<button class="slds-button slds-button_icon slds-button_icon-border-filled" data-toggle="dropdown" aria-haspopup="true" title="Show More">
-										<svg class="slds-button__icon" aria-hidden="true">
-											<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#down" />
-										</svg>
-										<span class="slds-assistive-text">Show More</span>
-									</button>
-									<div class="dropdown-menu dropdown-menu-right crm-header-menu" role="menu">
-										<ul class="slds-dropdown__list slds-show">
-												<li class="slds-dropdown__item crm-header-menu-item list-action-custom" role="presentation">
-													<a href="javascript:void(0);" title="" class="" role="option" tabindex="-1">
-														<span>Delete</span>
-													</a>
-												</li>
-										</ul>
+								{{#each actions}}
+									<li class="slds-button slds-button--neutral slds-truncate record-action-custom">
+										<a href="javascript:void(0);" title="{{this.label}}" class="">
+											{{#if this.is_file}}
+												{{this.label}}
+												<input type="file" name="file" class="input-file-upload" data-parent="{{record._id}}">
+											{{else}}
+												<div class="slds-truncate" title="{{this.label}}">{{this.label}}</div>
+											{{/if}}
+										</a>
+									</li>
+								{{/each}}
+								{{#if moreActions}}
+									<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last">
+										<button class="slds-button slds-button_icon slds-button_icon-border-filled" data-toggle="dropdown" aria-haspopup="true" title="Show More">
+											<svg class="slds-button__icon" aria-hidden="true">
+												<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#down" />
+											</svg>
+											<span class="slds-assistive-text">Show More</span>
+										</button>
+										<div class="dropdown-menu dropdown-menu-right crm-header-menu" role="menu">
+											<ul class="slds-dropdown__list slds-show">
+												 {{#each moreActions}}
+													<li class="slds-dropdown__item crm-header-menu-item record-action-custom" role="presentation">
+														<a href="javascript:void(0);" title="{{this.label}}" class="" role="option" tabindex="-1">
+															<span>{{this.label}}</span>
+														</a>
+													</li>
+												{{/each}}
+											</ul>
+										</div>
 									</div>
-								</div>	
+								{{/if}}
 							</div>
 						</div>
 					</div>
