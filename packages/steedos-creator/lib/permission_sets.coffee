@@ -10,7 +10,7 @@ if Meteor.isServer
 			permissions.objects[object_name] = Creator.getObjectPermissions(spaceId, userId, object_name)
 		return permissions
 
-	Creator.unionPlus = (array,other)->
+	unionPlus = (array,other)->
 		if !array
 			array = []
 		if !other
@@ -47,10 +47,10 @@ if Meteor.isServer
 					permissions.viewAllRecords = true
 					permissions.allowRead = true
 
-				permissions.list_views = Creator.unionPlus(permissions.list_views, po.list_views)
-				permissions.actions = Creator.unionPlus(permissions.actions, po.actions)
-				permissions.fields = Creator.unionPlus(permissions.fields,po.fields)
-				permissions.related_objects = Creator.unionPlus(permissions.fields, po.related_objects)
+				permissions.list_views = unionPlus(permissions.list_views, po.list_views)
+				permissions.actions = unionPlus(permissions.actions, po.actions)
+				permissions.fields = unionPlus(permissions.fields,po.fields)
+				permissions.related_objects = unionPlus(permissions.fields, po.related_objects)
 				if po.readonly_fields?.length
 					if permissions.readonly_fields
 						permissions.readonly_fields = _.intersection(permissions.readonly_fields, po.readonly_fields)
