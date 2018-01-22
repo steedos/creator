@@ -110,14 +110,15 @@ if Meteor.isClient
 								fs = object.schema._schema[field_name]
 								if !fs.autoform
 									fs.autoform = {}
-								if _.indexOf(permissions.fields, field_name)>=0
-									field.hidden = false
-									field.omit = false
-									fs.autoform.omit = false
-								else
-									field.hidden = true
-									field.omit = true
-									fs.autoform.omit = true
+								if permissions.fields[1]
+									if _.indexOf(permissions.fields, field_name)>=0
+										field.hidden = false
+										field.omit = false
+										fs.autoform.omit = false
+									else
+										field.hidden = true
+										field.omit = true
+										fs.autoform.omit = true
 						else
 							permissions.fields = _.keys(object.fields)
 						_.each permissions.readonly_fields, (field_name)->

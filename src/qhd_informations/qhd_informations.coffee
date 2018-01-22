@@ -66,7 +66,6 @@ Creator.Objects.qhd_informations =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false 
-			readonly_fields: ["score"]
 		admin:
 			allowCreate: true
 			allowDelete: true
