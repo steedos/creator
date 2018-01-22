@@ -1,13 +1,13 @@
 xml2js = Npm.require 'xml2js'
+fs = Npm.require('fs')
+path = Npm.require('path')
+mkdirp = Npm.require('mkdirp')
 
 @Test = {}
+# 每次同步的条数
+limit_num = 10
 
-# Test.xml()
-Test.xml = () ->
-	# 查找对象数据
-	db.archive_records = Creator.Collections["archive_records"]
-	obj = db.archive_records.findOne({'_id':'54pvEyFaANHHYb6Tc'})
-
+saveXmlFile = (obj) ->
 	# 转xml
 	builder = new xml2js.Builder()
 	xml = builder.buildObject obj
@@ -15,51 +15,54 @@ Test.xml = () ->
 	# 转为buffer
 	stream = new Buffer xml
 
-	# 上传
-	newFile = new FS.File()
+	# 存储到服务器文件夹
+	now = new Date
+	year = now.getFullYear()
+	month = now.getMonth() + 1
+	day = now.getDate()
+	objectName = "archive_records"
 
-	newFile.name "metadata.xml"
+	# 文件路径
+	filePath = path.join(__meteor_bootstrap__.serverDir,'../../../export/' + year + '/' + month + '/' + day + '/' + objectName )
+	fileName = obj._id + ".xml"
+	fileAddress = path.join filePath, fileName
 
-	newFile.attachData stream, {type: 'text/xml'}, (err) ->
+	if !fs.existsSync filePath
+		mkdirp.sync filePath
+
+	# 写入文件
+	fs.writeFile fileAddress, stream, (err) ->
 		if err
-			throw new Meteor.Error(err.error, err.reason)
+			throw err
 
-		fileObj = cfs.files.insert newFile
-		
-		if fileObj
-			console.log fileObj?._id
-		else
-			return null
-			logger.error "文件上传失败：#{f._id},#{f.name()}. error: "
+# Test.xml()
+Test.xml = () ->
+	object_name = "archive_records"
+	# 查找对象数据
+	db.object = Creator.Collections[object_name]
 
+	# 总个数
+	total_num = db.object.find({}).count()
 
+	# 同步次数
+	times_num = parseInt total_num/limit_num + 1
 
-Meteor.methods
-	record_xml: (object_name) ->
-		collection = Creator.Collections[object_name]
+	i = 0
 
-		# 查找对象数据
-		obj = collection.findOne({'_id':'54pvEyFaANHHYb6Tc'})
+	# 防止一次查找过多数据，内存溢出，每次限制查找10条记录
+	while i < times_num
 
-		# 查找对象数据的所有子表数据
-		# (暂未开发)
+		# 查找
+		objs = db.object.find({},
+					{
+						sort: { 'created': 1 },
+						skip :limit_num * i,
+						limit : limit_num
+					})
 
-		builder = new xml2js.Builder()
+		objs.forEach (obj)->
+			# 存储为xml文件
+			saveXmlFile obj
 
-		xml = builder.buildObject obj
-
-		console.log xml
-
-		newFile = new FS.File()
-
-		newFile.name "FFFFFF.xml"
-
-		stream = new Buffer xml
-
-		console.log "---------------------"
-
-		console.log stream
-
-
-		return "aaaaaaaaa"
+		i++
 
