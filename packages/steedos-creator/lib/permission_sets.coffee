@@ -10,6 +10,13 @@ if Meteor.isServer
 			permissions.objects[object_name] = Creator.getObjectPermissions(spaceId, userId, object_name)
 		return permissions
 
+	Creator.unionPlus = (array,other)->
+		if !array
+			array = []
+		if !other
+			other = []
+		return _.union(array,other)
+
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
 		permissions = {}
 		psets = Creator.getCollection("permission_set").find({users: userId}).fetch()
@@ -40,10 +47,10 @@ if Meteor.isServer
 					permissions.viewAllRecords = true
 					permissions.allowRead = true
 
-				permissions.list_views = _.union(permissions.list_views, po.list_views)
-				permissions.actions = _.union(permissions.actions, po.actions)
-				permissions.fields = _.union(permissions.fields, po.fields)
-				permissions.related_objects = _.union(permissions.fields, po.related_objects)
+				permissions.list_views = Creator.unionPlus(permissions.list_views, po.list_views)
+				permissions.actions = Creator.unionPlus(permissions.actions, po.actions)
+				permissions.fields = Creator.unionPlus(permissions.fields,po.fields)
+				permissions.related_objects = Creator.unionPlus(permissions.fields, po.related_objects)
 				if po.readonly_fields?.length
 					if permissions.readonly_fields
 						permissions.readonly_fields = _.intersection(permissions.readonly_fields, po.readonly_fields)
@@ -110,15 +117,14 @@ if Meteor.isClient
 								fs = object.schema._schema[field_name]
 								if !fs.autoform
 									fs.autoform = {}
-								if permissions.fields[1]
-									if _.indexOf(permissions.fields, field_name)>=0
-										field.hidden = false
-										field.omit = false
-										fs.autoform.omit = false
-									else
-										field.hidden = true
-										field.omit = true
-										fs.autoform.omit = true
+								if _.indexOf(permissions.fields, field_name)>=0
+									field.hidden = false
+									field.omit = false
+									fs.autoform.omit = false
+								else
+									field.hidden = true
+									field.omit = true
+									fs.autoform.omit = true
 						else
 							permissions.fields = _.keys(object.fields)
 						_.each permissions.readonly_fields, (field_name)->
