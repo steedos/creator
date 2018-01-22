@@ -40,6 +40,7 @@ Creator.Objects.archive_destroy =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+				doc.destroy_state = "未销毁"
 	permission_set:
 		user:
 			allowCreate: false
