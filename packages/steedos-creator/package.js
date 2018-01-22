@@ -12,7 +12,8 @@ Npm.depends({
 	'MD5': '1.3.0',
 	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
-	mkdirp: "0.3.5"
+	mkdirp: "0.3.5",
+	"xml2js": "0.4.19"
 });
 
 Package.onUse(function(api) {
@@ -138,6 +139,8 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/object_listviews_options.coffee', 'server');
 	api.addFiles('server/methods/report_data.coffee', 'server');
 	api.addFiles('server/methods/user_tabular_settings.coffee', 'server');
+
+	api.addFiles('server/methods/object_xml2js.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
 	api.addFiles('server/publications/related_object.coffee', 'server');

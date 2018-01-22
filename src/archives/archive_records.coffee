@@ -25,6 +25,7 @@ Creator.Objects.archive_records =
 			type: "text"
 			label:"档案门类代码"
 			defaultValue: "WS"
+			group:"内容描述"
 			# omit:true
 
 		fonds_constituting_unit_name:
@@ -42,16 +43,19 @@ Creator.Objects.archive_records =
 				{label:"案卷",value:"案卷"},
 				{label:"文件",value:"文件"}]
 			# omit:true
+			group:"内容描述"
 
 		electronic_record_code:
 			type: "text"
 			label:"电子文件号"
 			defaultValue: ""
+			group:"电子文件号"
 			# omit:true
-
+		
 		archival_code:
 			type:"text"
 			label:"档号"
+			group:"档号"
 			# omit:true
 
 		fonds_identifier:
@@ -468,23 +472,28 @@ Creator.Objects.archive_records =
 				{label: "部门", value: "部门"},
 				{label: "个人", value: "个人"}
 			]
+			group:"机构人员"
 			# omit:true
 		agent_name:
 			type: "text"
 			label:"机构人员名称"
+			group:"机构人员"
 			# omit:true
 		organization_code:
 			type: "text"
 			label:"组织机构代码"
+			group:"机构人员"
 			# omit:true
 		agent_belongs_to:
 			type: "text"
 			label:"机构人员隶属"
+			group:"机构人员"
 			# omit:true
 
 		archive_date:
 			type:"date"
 			label:"归档日期"
+			group:"内容描述"
 			# omit:true
 		
 		archive_dept:
@@ -504,6 +513,7 @@ Creator.Objects.archive_records =
 				{label: "销毁", value: "销毁"},
 				{label: "出借", value: "出借"}
 			]
+			group:"内容描述"
 			# omit:true
 
 		main_dept:
@@ -522,11 +532,13 @@ Creator.Objects.archive_records =
 		storage_location:
 			type:"text"
 			label:"存放位置"
+			group:"内容描述"
 			# omit:true
 
 		reference:
 			type: "text"
 			label:"参见"
+			group:"内容描述"
 			# omit:true
 		#是否接收，默认是未接收
 		is_received:
@@ -567,16 +579,18 @@ Creator.Objects.archive_records =
 			type:"boolean"
 			label:'是否销毁'
 			omit:true
+			group:"销毁"
 		destroyed:
 			type:"datetime"
 			label:'实际销毁时间'
 			omit:true
-		
+			group:"销毁"
 		destroyed_by:
 			type: "lookup"
 			label:"销毁人"
 			reference_to: "users"
 			omit: true
+			group:"销毁"
 		is_borrowed:
 			type:"boolean"
 			defaultValue:false
@@ -600,7 +614,10 @@ Creator.Objects.archive_records =
 		archive_destroy_id:
 			type:"master_detail"
 			label:"销毁单"
+			filters:[["destroy_state", "$eq", "未销毁"]]
+			depend_on:["destroy_state"]
 			reference_to:"archive_destroy"
+			group:"销毁"
 		related_modified:
 			type:"datetime"
 			label:"附属更新时间"
