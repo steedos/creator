@@ -3,6 +3,6 @@ if Meteor.isServer
         apiPath: '/api/v2/',
         useDefaultAuth: true
         prettyJson: true
-        enableCors: false
+        enableCors: true
         defaultHeaders:
           'Content-Type': 'application/json'
