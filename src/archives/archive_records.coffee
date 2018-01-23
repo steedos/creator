@@ -1,9 +1,10 @@
-Creator.Objects.archive_records = 
+Creator.Objects.archive_records =
 	name: "archive_records"
 	icon: "record"
 	label: "档案"
 	enable_search: true
 	enable_files: true
+	enable_api: true
 	fields:
 		archives_name:
 			type:"text"
@@ -51,7 +52,7 @@ Creator.Objects.archive_records =
 			defaultValue: ""
 			group:"电子文件号"
 			# omit:true
-		
+
 		archival_code:
 			type:"text"
 			label:"档号"
@@ -67,7 +68,7 @@ Creator.Objects.archive_records =
 		year:
 			type: "text"
 			label:"年度"
-			defaultValue: "2018" 
+			defaultValue: "2018"
 			required:true
 			sortable:true
 			group:"档号"
@@ -98,7 +99,7 @@ Creator.Objects.archive_records =
 			label:"保管卷号"
 			group:"档号"
 			# omit:true
-		
+
 		classification_number:
 			type:"text"
 			label:"分类卷号"
@@ -121,7 +122,7 @@ Creator.Objects.archive_records =
 			type: "number"
 			label:"页号"
 			group:"档号"
-		
+
 		title:
 			type:"textarea"
 			label:"题名"
@@ -230,8 +231,8 @@ Creator.Objects.archive_records =
 				{label: "限制", value: "限制"},
 				{label: "秘密", value: "秘密"},
 				{label: "机密", value: "机密"},
-				{label: "绝密", value: "绝密"}				
-				
+				{label: "绝密", value: "绝密"}
+
 			]
 			required:true
 			sortable:true
@@ -279,13 +280,13 @@ Creator.Objects.archive_records =
 			type:"number"
 			label:"页数"
 			group:"形式特征"
-		
+
 		document_type:
 			type:"text"
 			label:"文件类型"
 			group:"形式特征"
 			# omit:true
-		
+
 		document_status:
 			type:"select",
 			label:"文件状态",
@@ -449,8 +450,8 @@ Creator.Objects.archive_records =
 				{label: "公布", value: "公布"},
 				{label: "复制", value: "复制"},
 				{label: "浏览", value: "浏览"},
-				{label: "解密", value: "解密"}	
-				
+				{label: "解密", value: "解密"}
+
 			]
 			# omit:true
 			group:"权限管理"
@@ -495,7 +496,7 @@ Creator.Objects.archive_records =
 			label:"归档日期"
 			group:"内容描述"
 			# omit:true
-		
+
 		archive_dept:
 			type:"text"
 			label:"归档部门"
@@ -528,7 +529,7 @@ Creator.Objects.archive_records =
 			label:"备注",
 			is_wide:true
 			group:"内容描述"
-			
+
 		storage_location:
 			type:"text"
 			label:"存放位置"
@@ -546,12 +547,12 @@ Creator.Objects.archive_records =
 			label:"是否接收"
 			defaultValue:false
 			omit:true
-		
+
 		received:
 			type:"datetime"
 			label:"接收时间"
 			omit:true
-		
+
 		received_by:
 			type: "lookup"
 			label:"接收人"
@@ -572,7 +573,7 @@ Creator.Objects.archive_records =
 			label:"移交人"
 			reference_to: "users"
 			omit: true
-		
+
 		#是否销毁，默认是不存在，在“全部”视图下点击销毁，进入“待销毁”视图，此时is_destroy=false
 		#审核通过之后，is_transfer = true
 		is_destroyed:
@@ -675,16 +676,16 @@ Creator.Objects.archive_records =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true 
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true
 	triggers:
-		"before.insert.server.default": 
+		"before.insert.server.default":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
@@ -718,7 +719,7 @@ Creator.Objects.archive_records =
 				# doc.applicant_organization_name = ' '
 
 				return true
-		"after.update.server.default": 
+		"after.update.server.default":
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc)->
@@ -735,19 +736,19 @@ Creator.Objects.archive_records =
 				Creator.Collections["archive_records"].direct.update({_id:doc._id},{$set:{destroy_date:destroy_date}})
 				# destroy_records = Creator.Collections["archive_destroy"].findOne({_id:doc.archive_destroy_id}).
 				# Creator.Collections["archive_destroy"].update ({_id:doc.archive_destroy_id},{$set:{modified:new Date,modified_by:Meteor.userId(),destroy_records:}})
-	actions: 	
+	actions:
 		receive:
 			label: "接收"
 			visible: true
 			on: "list"
-			todo:()-> 
+			todo:()->
 				if Creator.TabularSelectedIds?["archive_records"].length == 0
 					swal("请先选择要接收的档案")
-					return 
+					return
 				if Session.get("list_view_id")!= "receive"
 					swal("请在待接收视图下操作")
 					return
-				else					
+				else
 					space = Session.get("spaceId")
 					Meteor.call("archive_receive",Creator.TabularSelectedIds?["archive_records"],space,
 						(error,result) ->
@@ -785,7 +786,7 @@ Creator.Objects.archive_records =
 		# 	todo:()->
 		# 		if Creator.TabularSelectedIds?["archive_records"].length == 0
 		# 			 swal("请先选择要销毁的档案")
-		# 			 return 
+		# 			 return
 		# 		if Session.get("list_view_id")!= "destroy"
 		# 			swal("请在待销毁视图下操作")
 		# 			return
@@ -795,13 +796,13 @@ Creator.Objects.archive_records =
 		# 				(error,result) ->
 		# 					text = "共销毁"+Creator.TabularSelectedIds?["archive_records"].length+"条,"+"成功"+result+"条"
 		# 					swal(text)
-							
+
 		# 				)
 		borrow:
 			label:"借阅"
 			visible:true
 			on: "record"
-			todo:(object_name, record_id, fields)->				
+			todo:(object_name, record_id, fields)->
 				borrower = Creator.Collections["archive_records"].findOne({_id:record_id}).borrowed_by
 				if borrower == Meteor.userId()
 					swal("您已借阅了此档案，归还之前无需重复借阅")
@@ -820,7 +821,7 @@ Creator.Objects.archive_records =
 					doc.use_fashion = "实体借阅"
 					doc.file_type = "立卷方式(文件级)"
 					doc.space = space
-					doc.is_approved = false 
+					doc.is_approved = false
 					doc.relate_record = record_id
 					# Creator.TabularSelectedIds?["archive_records"].forEach (selectedId)->
 					# 	doc.relate_documentIds.push collection_record.findOne({_id:selectedId})._id
@@ -828,4 +829,3 @@ Creator.Objects.archive_records =
 				else
 					swal("请在全部或已接收视图下执行操作")
 					return
-	
