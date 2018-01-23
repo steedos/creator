@@ -76,10 +76,10 @@
 					<div class="slds-tabs_card slds-tabs_default creator-view-tabs_default" style="padding: 15px;">
 						<ul class="slds-tabs_default__nav" role="tablist">
 							<li class="slds-tabs_default__item" title="Item Two" role="presentation">
-								<a class="slds-tabs_default__link creator-view-tabs-link" role="tab" tabindex="-1" aria-selected="false" data-tab="creator-tabular">相关</a>
+								<a class="slds-tabs_default__link creator-view-tabs-link" role="tab" tabindex="-1" aria-selected="false" data-tab="creator-tabular">{{_ "creator_view_related_objects"}}</a>
 							</li>
 							<li class="slds-tabs_default__item slds-is-active" title="Item One" role="presentation">
-								<a class="slds-tabs_default__link creator-view-tabs-link" role="tab" tabindex="0" aria-selected="true" data-tab="creator-quick-form">详细信息</a>
+								<a class="slds-tabs_default__link creator-view-tabs-link" role="tab" tabindex="0" aria-selected="true" data-tab="creator-quick-form">{{_ "creator_view_details"}}</a>
 							</li>
 						</ul>
 						<div id="creator-tabular" class="slds-tabs_default__content creator-view-tabs-content slds-hide" role="tabpanel">
@@ -105,7 +105,7 @@
 											{{#if allowCreate}}
 												{{#if this.is_file}}
 													<button class="slds-button slds-button_neutral btn-upload-file">
-														上传
+														{{_ "creator_actions_upload_file"}}
 														<input type="file" name="file" class="input-file-upload">
 													</button>
 												{{else}}

@@ -71,7 +71,7 @@
 					</div>
 					<div class="slds-grid">
 						<div class="slds-col slds-align-middle">
-							<p class="slds-text-body_small tabular_info">{{itemCount}} 个项目</p>
+							<p class="slds-text-body_small tabular_info">{{_ "creator_list_item_counts" itemCount}}</p>
 						</div>
 						<div class="slds-col slds-no-flex slds-grid slds-align-bottom">
 							<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-m-left_x-small" aria-expanded="false">
@@ -83,18 +83,18 @@
 									<ul class="slds-dropdown__list list-view-controls">
 										<li class="slds-dropdown__item add-list-view" role="presentation">
 											<a href="javascript:void(0);" title="new" class="" role="option" tabindex="-1">
-												<span>New</span>
+												<span>{{_ "creator_list_new_list_view"}}</span>
 											</a>
 										</li>
 										{{#if is_custom_list_view}}
 											<li class="slds-dropdown__item select-fields-to-display" role="presentation">
 												<a href="javascript:void(0);" title="select fields to display" class="" role="option" tabindex="-1">
-													<span>Select Fields to Display</span>
+													<span>{{_ "creator_list_select_fields"}}</span>
 												</a>
 											</li>
 											<li class="slds-dropdown__item delete-list-view" role="presentation">
 												<a href="javascript:void(0);" title="delete" class="" role="option" tabindex="-1">
-													<span>Delete</span>
+													<span>{{_ "creator_list_delete_list_view"}}</span>
 												</a>
 											</li>
 										{{/if}}
@@ -141,9 +141,9 @@
 										<button class="slds-button slds-button_icon slds-col_bump-left slds-button_icon slds-button_icon-small close-filter-panel" title="Close Filter Panel">
 											{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="forward"}}
 										</button> -->
-										<button class="slds-button slds-button_neutral cancel-change">Cancel</button>
-										<button class="slds-button slds-button_neutral filters-save-as">Save as</button>
-										<button class="slds-button slds-button_brand save-change">Save</button>
+										<button class="slds-button slds-button_neutral cancel-change">{{_ "creator_list_filter_cancel"}}</button>
+										<button class="slds-button slds-button_neutral filters-save-as">{{_ "creator_list_filter_save_as"}}</button>
+										<button class="slds-button slds-button_brand save-change">{{_ "creator_list_filter_save"}}</button>
 									</div>
 									<div class="slds-filters__body">
 										<ol class="slds-list_vertical slds-list_vertical-space">
@@ -157,7 +157,7 @@
 												</div>
 											</li>
 										</ol>
-										<h3 class="slds-text-body_small slds-m-vertical_x-small">Matching all these filters</h3>
+										<h3 class="slds-text-body_small slds-m-vertical_x-small">{{_ "creator_list_matching_all_filters"}}</h3>
 										<ol class="slds-list_vertical slds-list_vertical-space">
 											{{#each filter_items}}
 											<li class="slds-item slds-hint-parent filter-item">
@@ -167,7 +167,7 @@
 														{{#if this.field}}
 															<p class="slds-text-body_small">{{this.field}}</p>
 														{{else}}
-															<p class="slds-text-body_small">New Filter</p>
+															<p class="slds-text-body_small">{{_ "creator_list_new_filter"}}</p>
 														{{/if}}
 														<p>{{this.operation}} {{this.value}}</p>
 													</button>
@@ -180,8 +180,8 @@
 										</ol>
 									</div>
 									<div class="slds-filters__footer slds-grid slds-shrink-none">
-										<button class="slds-button_reset slds-text-link add-filter" href="javascript:void(0);">Add Filter</button>
-										<button class="slds-button_reset slds-text-link slds-col_bump-left remove-all-filters" href="javascript:void(0);">Remove All</button>
+										<button class="slds-button_reset slds-text-link add-filter" href="javascript:void(0);">{{_ "creator_list_add_filter"}}</button>
+										<button class="slds-button_reset slds-text-link slds-col_bump-left remove-all-filters" href="javascript:void(0);">{{_ "creator_list_remove_all_filters"}}</button>
 									</div>
 								</div>
 							</div>
