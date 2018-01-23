@@ -39,7 +39,7 @@
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="chart"}}
 							</button>
 
-							<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-filter" title="Filters">
+							<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-filter {{#if isFilterOpen}}slds-is-selected{{else}}slds-not-selected{{/if}}" title="Filters">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
 							</button>
 
