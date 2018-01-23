@@ -18,6 +18,7 @@
 	"creator_list_add_filter": "添加筛选器",
 	"creator_list_remove_all_filters": "全部删除",
 	"creator_list_matching_all_filters": "匹配所有筛选器",
+	"creator_list_view_controls": "列表视图控制",
 
 	"creator_filter_option_field": "字段",
 	"creator_filter_option_operation": "运算符",
