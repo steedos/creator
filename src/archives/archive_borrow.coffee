@@ -76,21 +76,21 @@ Creator.Objects.archive_borrow =
 			type:"textarea"
 			label:"备注"
 			is_wide:true
-		status:
-			type:"select"
-			label:"状态"
-			options: [
-				{label: "未审批", value: "未审批"},
-				{label: "已审批", value: "已审批"},
-				{label: "续借审批中", value: "续借审批中"},
-				{label: "续借已审批", value: "续借已审批"},
-				{label: "已移交审批", value: "已移交审批"},
-				{label: "移交审批完成", value: "移交审批完成"},
-				{label: "已结单", value: "已结单"}
-				]
-			defaultValue:"未审批"
-			sortable:true
-			omit:true
+		# status:
+		# 	type:"select"
+		# 	label:"状态"
+		# 	options: [
+		# 		{label: "未审批", value: "未审批"},
+		# 		{label: "已审批", value: "已审批"},
+		# 		{label: "续借审批中", value: "续借审批中"},
+		# 		{label: "续借已审批", value: "续借已审批"},
+		# 		{label: "已移交审批", value: "已移交审批"},
+		# 		{label: "移交审批完成", value: "移交审批完成"},
+		# 		{label: "已结单", value: "已结单"}
+		# 		]
+		# 	defaultValue:"未审批"
+		# 	sortable:true
+		# 	omit:true
 		relate_record:
 			type:"lookup"
 			label:"题名"
@@ -115,9 +115,16 @@ Creator.Objects.archive_borrow =
 				{label:"逾期",value:"逾期"}
 				]
 			sortable:true
-		is_approved:
-			type:"boolean"
-			defaultValue:false
+		state:
+			type:"select"
+			label:"状态"
+			options:[
+				{label:"草稿",value:"draft"},
+				{label:"审批中",value:"pending"},
+				{label:"已核准",value:"approved"},
+				{label:"已驳回",value:"rejected"}
+			]
+			defaultValue:"draft"
 			omit:true
 		#我的借阅记录是可以被删除的，不过是假删除
 		is_deleted:
@@ -134,12 +141,12 @@ Creator.Objects.archive_borrow =
 		mine:
 			label:"我的借阅记录"
 			filter_scope: "mine"
-			filters: [["is_approved", "$eq", true],["is_deleted", "$eq", false]]
-			columns:["borrow_name","relate_record","is_approved","end_date"]
-		approving:
-			label:"审批中"
+			filters: [["state", "$eq", "approved"],["is_deleted", "$eq", false]]
+			columns:["borrow_name","relate_record","state","end_date"]
+		draft:
+			label:"草稿"
 			filter_scope: "mine"
-			filters: [["is_approved", "$eq", false]]
+			filters: [["state", "$eq", "draft"]]
 			columns:["borrow_name","created","end_date","created_by","owner"]
 	triggers:
 		"before.insert.server.default": 
@@ -151,7 +158,7 @@ Creator.Objects.archive_borrow =
 				doc.created = now
 				doc.owner = userId
 				doc.is_deleted = false
-				doc.is_approved = false
+				doc.state = "draft"
 				doc.year = now.getFullYear().toString()
 				return true
 		"after.insert.server.default": 
@@ -165,7 +172,7 @@ Creator.Objects.archive_borrow =
 			on: "client"
 			when: "after.insert"
 			todo: (userId, doc)->
-				toastr.success("借阅成功")
+				swal("借阅成功")
 	permission_set:
 		user:
 			allowCreate: true
@@ -222,7 +229,7 @@ Creator.Objects.archive_borrow =
 					start_date = now
 					end_date =new Date(now.getTime()+7*24*3600*1000)
 					Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
-						Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{start_date:start_date,end_date:end_date,is_approved:false}},
+						Creator.Collections["archive_borrow"].update({_id:SelectedId},{$set:{start_date:start_date,end_date:end_date,state:"draft"}},
 							(error,result)->
 								console.log error
 								if !error
@@ -243,13 +250,15 @@ Creator.Objects.archive_borrow =
 			todo:(object_name, record_id, fields)->
 				if Session.get("list_view_id") =="mine"
 					now = new Date()
-					object_borrow = Creator.Collections["archive_borrow"].findOne({_id:record_id},{fields:{is_approved:1,end_date:1}})
-					if object_borrow.is_approved
+					object_borrow = Creator.Collections["archive_borrow"].findOne({_id:record_id},{fields:{state:1,end_date:1,relate_record:1}})
+					if object_borrow.state == "approved"
 						if (object_borrow.end_date - now) >0
-							Meteor.call("view_main_doc",record_id,
+							Meteor.call("view_main_doc",object_borrow.relate_record,
 								(error,result) ->
-								if result
-									window.location = "/api/files/files/#{result}?download=true"
+									if result
+										window.location = "/api/files/files/#{result}?download=true"
+									else
+										swal("未找到原文")
 							)
 						else
 							swal("已到归还日期，不能查看原文")
