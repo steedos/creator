@@ -72,7 +72,6 @@ Template.creator_report.helpers
 		return Template.instance().is_edit_scope?.get()
 
 	isFilterDirty: ()->
-		console.log "isFilterDirty--help"
 		return Template.instance().filter_dirty_count?.get() > 1
 	
 	relatedObject: ()->
@@ -80,6 +79,9 @@ Template.creator_report.helpers
 		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
 		objectName = reportObject.object_name
 		return Creator.getObject(objectName)
+	
+	isFilterOpen: ()->
+		return Template.instance().is_filter_open?.get()
 
 
 Template.creator_report.events
@@ -178,6 +180,11 @@ Template.creator_report.events
 		filter_items = Session.get("filter_items")
 		filter_items.splice(index, 1)
 		Session.set("filter_items", filter_items)
+
+	'click .btn-toggle-filter': (event, template)->
+		isFilterOpen = template.is_filter_open.get()
+		template.is_filter_open.set(!isFilterOpen)
+
 
 
 renderTabularReport = (reportObject, spaceId)->
@@ -455,6 +462,7 @@ Template.creator_report.onCreated ->
 	this.filter_dirty_count = new ReactiveVar(0)
 	this.filter_items_for_cancel = new ReactiveVar()
 	this.filter_scope_for_cancel = new ReactiveVar()
+	this.is_filter_open = new ReactiveVar(false)
 
 	# this.autorun (c)->
 	# 	record_id = Session.get "record_id"

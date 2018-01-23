@@ -35,19 +35,19 @@
 						</div>
 						<div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom_xx-small">
 							
-							<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="Charts">
+							<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-chart" title="Charts">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="chart"}}
 							</button>
 
-							<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="Filters">
+							<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-filter" title="Filters">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
 							</button>
 
-							<button class="slds-button slds-button_icon slds-m-left_xx-small slds-button_icon-border-filled" title="Refresh">
+							<button class="slds-button slds-button_icon slds-m-left_xx-small slds-button_icon-border-filled btn-refresh" title="Refresh">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="refresh"}}
 							</button>
 
-							<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true" title="List View Controls">
+							<button class="slds-button slds-button_icon slds-button_icon-more btn-settings" aria-haspopup="true" title="List View Controls">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="settings"}}
 							</button>
 							<div class="slds-button-group" role="group">
@@ -89,7 +89,7 @@
 					</div>
 				</div>
 
-				<div class="pageBody filterOpen">
+				<div class="pageBody {{#if isFilterOpen}}filterOpen{{else}}filterClosed{{/if}}">
 			        <div class="scrollarea">
 			        	<div class="innerStacking">
 				        	<div class="eclair-container">
@@ -100,7 +100,7 @@
 				            </div>
 				        </div>
 					</div>
-					<div class="sidebar filterOpen filter-list-container" data-aura-rendered-by="474:0">
+					<div class="sidebar {{#if isFilterOpen}}filterOpen{{else}}filterClosed{{/if}} filter-list-container" data-aura-rendered-by="474:0">
 						<div data-aura-rendered-by="477:0" class="reportsReportSidebar" data-aura-class="reportsReportSidebar">
 							<div class="stackingPanel fadeIn" data-aura-rendered-by="478:0">
 								<div class="filterPanelContainer reportsFilterPanel" data-aura-rendered-by="481:0" data-aura-class="reportsFilterPanel">
@@ -115,7 +115,7 @@
 											<button class="slds-button slds-button_brand btn-filter-apply {{#unless isFilterDirty}}hidden{{/unless}}" type="button" title="Click to apply changes">
 												Apply
 											</button>
-											<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-small removeFilter {{#if isFilterDirty}}hidden{{/if}}">
+											<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-small btn-toggle-filter {{#if isFilterDirty}}hidden{{/if}}">
 												{{> steedos_icon class="slds-button__icon slds-button__icon_hint" source="utility-sprite" name="forward"}}
 											</button>
 										</div>
