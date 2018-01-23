@@ -40,6 +40,7 @@ Creator.Objects.archive_destroy =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+				doc.destroy_state = "未销毁"
 	permission_set:
 		user:
 			allowCreate: false
@@ -63,14 +64,14 @@ Creator.Objects.archive_destroy =
 			todo:(object_name, record_id, fields)->
 				state = Creator.Collections["archive_destroy"].findOne({_id:record_id}).destroy_state
 				if state == "已销毁"					
-					alert("已执行过销毁")
+					swal("已执行过销毁")
 					return
 				else
 					space = Session.get("spaceId")
 					Meteor.call("archive_destroy",record_id,space,
 						(error,result) ->
 							if !result[0]
-								alert("请先添加档案至此销毁单")
+								swal("请先添加档案至此销毁单")
 								return
 							else
 								text = "共销毁"+result[0]+"条,"+"成功"+result[1]+"条"

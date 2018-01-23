@@ -49,6 +49,16 @@ baseObject用于定义所有对象适用的基础fields, triggers, indexes. list
 - select: 下拉框，联合options属性，生成下拉框的内容
 - boolean：Checkbox
 - currency: 金额
+- 实例：
+	- 在archive_records对象里，字段archive_destroy_id类型为master_detail
+		- archive_destroy_id:
+				type:"master_detail"
+				label:"销毁单"
+				filters:[["destroy_state", "$eq", "未销毁"]]
+				depend_on:["destroy_state"]
+				reference_to:"archive_destroy"
+				group:"销毁"
+		- 备注：上述实例中，使用了filters字段级过滤，其中depend_on必须有，最终得到“archive_destroy”表中，destroy_state值为“未销毁”的记录。
 
 ### fields 属性
 - name: 字段名

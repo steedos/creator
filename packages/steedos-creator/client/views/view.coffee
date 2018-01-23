@@ -279,7 +279,7 @@ Template.creator_view.helpers
 
 Template.creator_view.events
 
-	'click .list-action-custom': (event, template) ->
+	'click .record-action-custom': (event, template) ->
 		id = Creator.getObjectRecord()._id
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)

@@ -60,13 +60,13 @@ Creator.Objects.qhd_informations =
 
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false 
-			readonly_fields: ["score"]
+			viewAllRecords: false
+			#fields:["score","title"] 
 		admin:
 			allowCreate: true
 			allowDelete: true

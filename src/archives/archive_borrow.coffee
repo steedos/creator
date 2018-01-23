@@ -188,7 +188,7 @@ Creator.Objects.archive_borrow =
 			on: "list"
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_borrow"].length == 0
-					alert("请先选择要归还的借阅单")
+					swal("请先选择要归还的借阅单")
 					return
 				if Session.get("list_view_id") =="mine"
 					Creator.TabularSelectedIds?["archive_borrow"].forEach (SelectedId)->
@@ -199,14 +199,14 @@ Creator.Objects.archive_borrow =
 									recordId = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_record
 									Creator.Collections["archive_records"].update({_id:recordId},{$set:{is_borrowed:false,modified:new Date(),modified_by:Meteor.userId()}})
 									#Creator.Collections["archive_borrow"].update(
-									alert("归还成功，欢迎再次借阅")
+									swal("归还成功，欢迎再次借阅")
 									Meteor.call("archive_new_audit",recordId,"归还档案","成功",Session.get("spaceId"))
 								else
-									alert("归还失败，请再次操作")
+									swal("归还失败，请再次操作")
 									Meteor.call("archive_new_audit",recordId,"归还档案","失败",Session.get("spaceId"))
 								)
 				else
-					alert("请在我的借阅视图下执行操作")
+					swal("请在我的借阅视图下执行操作")
 
 
 		renew:
@@ -215,7 +215,7 @@ Creator.Objects.archive_borrow =
 			on: "list"
 			todo:()->
 				if Creator.TabularSelectedIds?["archive_borrow"].length == 0
-					alert("请先选择要续借的借阅单")
+					swal("请先选择要续借的借阅单")
 					return
 				if Session.get("list_view_id") =="mine"
 					now = new Date()
@@ -228,14 +228,14 @@ Creator.Objects.archive_borrow =
 								if !error
 									recordId = Creator.Collections["archive_borrow"].findOne({_id:SelectedId}).relate_record
 									#Creator.Collections["archive_borrow"].update(
-									alert("续借成功")
+									swal("续借成功")
 									Meteor.call("archive_new_audit",recordId,"续借档案","成功",Session.get("spaceId"))
 								else
-									alert("续借失败")
+									swal("续借失败")
 									Meteor.call("archive_new_audit",recordId,"续借档案","失败",Session.get("spaceId"))
 								)
 				else
-					alert("请在我的借阅视图下执行操作")
+					swal("请在我的借阅视图下执行操作")
 		view:
 			label:"查看原文"
 			visible:true
@@ -252,8 +252,8 @@ Creator.Objects.archive_borrow =
 									window.location = "/api/files/files/#{result}?download=true"
 							)
 						else
-							alert("已到归还日期，不能查看原文")
+							swal("已到归还日期，不能查看原文")
 					else
-						alert("审核通过之后才可查看原文")
+						swal("审核通过之后才可查看原文")
 				else
-					alert("请在我的借阅视图下执行操作")
+					swal("请在我的借阅视图下执行操作")
