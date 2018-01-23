@@ -85,7 +85,7 @@ Creator.Objects.archive_records =
 			label:"类别号"
 			defaultValue: ""
 			reference_to: "archive_classification"
-			required:true
+			#required:true
 			group:"档号"
 
 		organizational_structure:

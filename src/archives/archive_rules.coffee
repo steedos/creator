@@ -17,7 +17,7 @@ Creator.Objects.archive_rules =
 			label:"所属分类"
 			reference_to:"archive_classification"
 		keywords:
-			type:"text"
+			type:"[text]"
 			label:"关键词"
 			is_wide:true
 	permission_set:
