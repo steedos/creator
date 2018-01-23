@@ -236,7 +236,7 @@ if Meteor.isClient
 
 							list.push related
 
-		if Creator.Objects[object_name]?.enable_files
+		if Creator.Objects[object_name]?.enable_files and _.indexOf(related_object_names, "cms_files") > -1
 			file_object_name = "cms_files"
 			file_tabular_name = "creator_" + file_object_name
 			file_related_field_name = "parent"

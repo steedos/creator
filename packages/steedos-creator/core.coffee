@@ -146,6 +146,13 @@ Creator.getRelatedObjects = (object_name)->
 							related_object_names.push related_object_name
 					else
 						related_object_names.push related_object_name
+	
+	if Creator.getObject("archive_records").enable_files
+		if permission_related_objects
+			if _.indexOf(permission_related_objects, "cms_files") > -1
+				related_object_names.push "cms_files"
+		else
+			related_object_names.push "cms_files"
 
 	return related_object_names
 
