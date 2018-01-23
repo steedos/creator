@@ -106,35 +106,18 @@
 								<div class="filterPanelContainer reportsFilterPanel" data-aura-rendered-by="481:0" data-aura-class="reportsFilterPanel">
 									<div class="panelHeader" data-aura-rendered-by="482:0">
 										<div class="centered-header" data-aura-rendered-by="483:0">
-											<button class="slds-button slds-button--neutral cancelButton hidden uiButton" aria-live="off" type="button" title="Click to cancel changes"
-											 data-aura-rendered-by="486:0" data-aura-class="uiButton">
-												<!--render facet: 487:0-->
-												<span class="cancelButtonLabel label bBody truncate" dir="ltr" data-aura-rendered-by="489:0">Cancel</span>
-												<!--render facet: 491:0-->
+											<button class="slds-button slds-button_neutral btn-filter-cancel {{#unless isFilterDirty}}hidden{{/unless}}" type="button" title="Click to cancel changes">
+												Cancel
 											</button>
 										</div>
-										<h2 class="panelTitle centered-header" data-aura-rendered-by="492:0">Filters</h2>
-										<div class="centered-header" data-aura-rendered-by="494:0">
-											<button class="slds-button slds-button--neutral applyButton hidden uiButton--default uiButton--brand uiButton" aria-live="off"
-											 type="button" title="Click to apply changes" data-aura-class="uiButton--default uiButton--brand uiButton" data-aura-rendered-by="497:0">
-												<!--render facet: 498:0-->
-												<span class="applyButtonLabel label bBody truncate" dir="ltr" data-aura-rendered-by="500:0">Apply</span>
-												<!--render facet: 502:0-->
+										<h2 class="panelTitle centered-header {{#if isFilterDirty}}hidden{{/if}}">Filters</h2>
+										<div class="centered-header">
+											<button class="slds-button slds-button_brand btn-filter-apply {{#unless isFilterDirty}}hidden{{/unless}}" type="button" title="Click to apply changes">
+												Apply
 											</button>
-											<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-small removeFilter">
+											<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-small removeFilter {{#if isFilterDirty}}hidden{{/if}}">
 												{{> steedos_icon class="slds-button__icon slds-button__icon_hint" source="utility-sprite" name="forward"}}
 											</button>
-											<!-- <a class="close" href="javascript:void(0);" data-aura-rendered-by="503:0">
-												<span class="slds-icon_container slds-icon-utility-back slds-button__icon forceIcon" data-aura-rendered-by="508:0"
-												 data-aura-class="forceIcon">
-													<span data-aura-rendered-by="511:0" class="lightningPrimitiveIcon" data-aura-class="lightningPrimitiveIcon">
-														<svg class="slds-icon slds-iconmmmmxx-small" focusable="false" aria-hidden="true" data-key="back">
-															<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/_slds/icons/v7.31.0/utility-sprite/svg/symbols.svg#back"></use>
-														</svg>
-													</span>
-													<span class="slds-assistive-text" data-aura-rendered-by="513:0">Close</span>
-												</span>
-											</a> -->
 										</div>
 									</div>
 									<div class="vert-scroller" data-aura-rendered-by="515:0">
@@ -156,10 +139,7 @@
 															</div>
 														</div>
 													</a>
-													<!--render facet: 16:820;a-->
-													<!--render facet: 17:820;a-->
 												</div>
-												<!--render facet: 18:820;a-->
 											</li>
 											<!-- <li class="filterCardContainer editable reportsFilterCard" data-filtercmp="filterStandardDateWidget" title="All time"
 											 data-aura-rendered-by="25:820;a" data-aura-class="reportsFilterCard" id="25:820;a">

@@ -56,7 +56,6 @@ Template.creator_report.helpers
 		return Session.get("filter_items")
 
 	filterItem: ()->
-		debugger
 		index = Template.instance().filter_index?.get()
 		filter_items = Session.get("filter_items")
 		if index > -1 and filter_items
@@ -64,6 +63,10 @@ Template.creator_report.helpers
 
 	isEditScope: ()->
 		return Template.instance().is_edit_scope?.get()
+
+	isFilterDirty: ()->
+		console.log "isFilterDirty--help"
+		return Template.instance().filter_dirty_count?.get() > 1
 
 Template.creator_report.events
 
@@ -136,6 +139,31 @@ Template.creator_report.events
 			template.filter_index.set(index)
 			template.filter_PLeft.set("#{left}px")
 			template.filter_PTop.set("#{top}px")
+	
+	'click .btn-filter-cancel': (event, template)->
+		filter_items = template.filter_items_for_cancel.get()
+		filter_scope = template.filter_scope_for_cancel.get()
+		Session.set("filter_items", filter_items)
+		Session.set("filter_scope", filter_scope)
+		Meteor.defer ->
+			template.filter_dirty_count.set(1)
+	
+	'click .btn-filter-apply': (event, template)->
+		filter_items = Session.get("filter_items")
+		filter_scope = Session.get("filter_scope")
+		template.filter_items_for_cancel.set(filter_items)
+		template.filter_scope_for_cancel.set(filter_scope)
+		Meteor.defer ->
+			template.filter_dirty_count.set(1)
+			renderReport()
+
+	'click .removeFilter': (event, template)->
+		index = $(event.currentTarget).closest(".filter-item").index() - 1
+		if index < 0
+			index = 0
+		filter_items = Session.get("filter_items")
+		filter_items.splice(index, 1)
+		Session.set("filter_items", filter_items)
 
 
 renderTabularReport = (reportObject, spaceId)->
@@ -322,6 +350,24 @@ renderMatrixReport = (reportObject, spaceId)->
 			alternateDataFields: false
 		return
 
+renderReport = (reportObject)->
+	console.log "renderReport:", reportObject
+	unless reportObject
+		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
+	spaceId = Session.get("spaceId")
+	filter_items = Tracker.nonreactive ()->
+		return Session.get("filter_items")
+	filter_scope = Tracker.nonreactive ()->
+		return Session.get("filter_scope")
+	reportObject.filters = filter_items
+	reportObject.filter_scope = filter_scope
+	switch reportObject.report_type
+		when 'tabular'
+			renderTabularReport(reportObject, spaceId)
+		when 'summary'
+			renderSummaryReport(reportObject, spaceId)
+		when 'matrix'
+			renderMatrixReport(reportObject, spaceId)
 
 Template.creator_report.onRendered ->
 	DevExpress.localization.locale("zh")
@@ -332,19 +378,58 @@ Template.creator_report.onRendered ->
 		record_id = Session.get "record_id"
 		unless record_id
 			return
+		console.log "autorun ready0"
 		if Creator.subs["CreatorRecord"].ready()
-			c.stop()
+			console.log "autorun ready1"
+			# c.stop()
 			reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
 			unless reportObject
 				return
-			switch reportObject.report_type
-				when 'tabular'
-					renderTabularReport(reportObject, spaceId)
-				when 'summary'
-					renderSummaryReport(reportObject, spaceId)
-				when 'matrix'
-					renderMatrixReport(reportObject, spaceId)
+			filter_items = reportObject.filters || []
+			filter_scope = reportObject.filter_scope
+			Session.set("filter_items", filter_items)
+			Session.set("filter_scope", filter_scope)
+			renderReport(reportObject) 
+	
+	# this.autorun (c)->
+	# 	spaceId = Session.get("spaceId")
+	# 	unless spaceId
+	# 		return
+	# 	record_id = Session.get "record_id"
+	# 	unless record_id
+	# 		return
+	# 	if Creator.subs["CreatorRecord"].ready()
+	# 		console.log "start render"
+	# 		filter_items = Tracker.nonreactive ()->
+	# 			return Session.get("filter_items")
+	# 		filter_scope = Tracker.nonreactive ()->
+	# 			return Session.get("filter_scope")
+	# 		isFilterChanged = Session.get("filter_changed")
+	# 		# reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+	# 		# # reportObject = Tracker.nonreactive ()->
+	# 		# # 	return Creator.Reports[record_id] or Creator.getObjectRecord()
+	# 		# switch reportObject.report_type
+	# 		# 	when 'tabular'
+	# 		# 		renderTabularReport(reportObject, spaceId)
+	# 		# 	when 'summary'
+	# 		# 		renderSummaryReport(reportObject, spaceId)
+	# 		# 	when 'matrix'
+	# 		# 		renderMatrixReport(reportObject, spaceId)
 
+	this.autorun (c)->
+		if Creator.subs["CreatorRecord"].ready()
+			console.log "set dirty"
+			filter_items = Session.get("filter_items")
+			filter_scope = Session.get("filter_scope")
+			if filter_items and filter_scope
+				console.log "set dirty2"
+				debugger
+				filter_dirty_count = Tracker.nonreactive ()->
+					return Template.instance().filter_dirty_count.get()
+				if filter_dirty_count == 0
+					Template.instance().filter_items_for_cancel.set(filter_items)
+					Template.instance().filter_scope_for_cancel.set(filter_scope)
+				Template.instance().filter_dirty_count.set(filter_dirty_count+1)
 
 Template.creator_report.onCreated ->
 	Session.set("show_filter_option", true)
@@ -353,18 +438,21 @@ Template.creator_report.onCreated ->
 	this.filter_PLeft = new ReactiveVar("-1000px")
 	this.filter_index = new ReactiveVar()
 	this.is_edit_scope = new ReactiveVar()
+	this.filter_dirty_count = new ReactiveVar(0)
+	this.filter_items_for_cancel = new ReactiveVar()
+	this.filter_scope_for_cancel = new ReactiveVar()
 
-	this.autorun (c)->
-		record_id = Session.get "record_id"
-		unless record_id
-			return
-		if Creator.subs["CreatorRecord"].ready()
-			c.stop()
-			reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
-			unless reportObject
-				return
-			objectName = reportObject.object_name
-			filter_items = reportObject.filters || []
-			filter_scope = reportObject.filter_scope
-			Session.set("filter_items", filter_items)
-			Session.set("filter_scope", filter_scope)
+	# this.autorun (c)->
+	# 	record_id = Session.get "record_id"
+	# 	unless record_id
+	# 		return
+	# 	if Creator.subs["CreatorRecord"].ready()
+	# 		c.stop()
+	# 		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+	# 		unless reportObject
+	# 			return
+	# 		objectName = reportObject.object_name
+	# 		filter_items = reportObject.filters || []
+	# 		filter_scope = reportObject.filter_scope
+	# 		Session.set("filter_items", filter_items)
+	# 		Session.set("filter_scope", filter_scope)
