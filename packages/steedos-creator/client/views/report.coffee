@@ -61,12 +61,26 @@ Template.creator_report.helpers
 		if index > -1 and filter_items
 			return filter_items[index]
 
+	filterScope: ()->
+		scope = Session.get("filter_scope")
+		if scope == "space"
+			return "All"
+		else if scope == "mine"
+			return "My"
+
 	isEditScope: ()->
 		return Template.instance().is_edit_scope?.get()
 
 	isFilterDirty: ()->
 		console.log "isFilterDirty--help"
 		return Template.instance().filter_dirty_count?.get() > 1
+	
+	relatedObject: ()->
+		record_id = Session.get "record_id"
+		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+		objectName = reportObject.object_name
+		return Creator.getObject(objectName)
+
 
 Template.creator_report.events
 

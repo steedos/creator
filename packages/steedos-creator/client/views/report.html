@@ -134,28 +134,12 @@
 																<span class="field" data-aura-rendered-by="10:820;a">Show Me&nbsp;</span>
 															</div>
 															<div class="filterCardBody" data-aura-rendered-by="13:820;a">
-																<!--render facet: 14:820;a-->
-																<span class="uiOutputText" data-aura-rendered-by="21:820;a" data-aura-class="uiOutputText">All accounts</span>
+																<span class="uiOutputText" data-aura-rendered-by="21:820;a" data-aura-class="uiOutputText">{{filterScope}} {{_ relatedObject.label}}</span>
 															</div>
 														</div>
 													</a>
 												</div>
 											</li>
-											<!-- <li class="filterCardContainer editable reportsFilterCard" data-filtercmp="filterStandardDateWidget" title="All time"
-											 data-aura-rendered-by="25:820;a" data-aura-class="reportsFilterCard" id="25:820;a">
-												<div data-aura-rendered-by="26:820;a">
-													<a class="filterCardEditor" href="javascript:void(0);" data-aura-rendered-by="28:820;a">
-														<div class="filterCard" data-aura-rendered-by="29:820;a">
-															<div class="header" data-aura-rendered-by="30:820;a">
-																<span class="field" data-aura-rendered-by="31:820;a">Created Date&nbsp;</span>
-															</div>
-															<div class="filterCardBody" data-aura-rendered-by="34:820;a">
-																<span class="uiOutputText" data-aura-rendered-by="42:820;a" data-aura-class="uiOutputText">All time</span>
-															</div>
-														</div>
-													</a>
-												</div>
-											</li> -->
 											{{#each filterItems}}
 												<li class="filterCardContainer editable reportsFilterCard filter-item">
 													<a class="filterCardEditor filter-option-item" href="javascript:void(0);">
