@@ -110,21 +110,27 @@ Template.creator_view.helpers
 	schemaFields: ()->
 		schema = Creator.getSchema(Session.get("object_name"))._schema
 		firstLevelKeys = Creator.getSchema(Session.get("object_name"))._firstLevelSchemaKeys
-
+		permission_fields = Creator.getFields()
+		
 		fieldGroups = []
 		fieldsForGroup = []
 
 		grouplessFields = []
 		grouplessFields = getFieldsWithNoGroup(schema)
 		grouplessFields = getFieldsInFirstLevel(firstLevelKeys, grouplessFields)
-		grouplessFields = getFieldsWithoutOmit(schema, grouplessFields)
+		if permission_fields
+			grouplessFields = _.intersection(permission_fields, grouplessFields)
+		# grouplessFields = getFieldsWithoutOmit(schema, grouplessFields)
 		grouplessFields = getFieldsForReorder(schema, grouplessFields)
 
 		fieldGroupNames = getSortedFieldGroupNames(schema)
 		_.each fieldGroupNames, (fieldGroupName) ->
 			fieldsForGroup = getFieldsForGroup(schema, fieldGroupName)
 			fieldsForGroup = getFieldsInFirstLevel(firstLevelKeys, fieldsForGroup)
-			fieldsForGroup = getFieldsWithoutOmit(schema, fieldsForGroup)
+			if permission_fields
+				fieldsForGroup = _.intersection(permission_fields, fieldsForGroup)
+
+			# fieldsForGroup = getFieldsWithoutOmit(schema, fieldsForGroup)
 			fieldsForGroup = getFieldsForReorder(schema, fieldsForGroup)
 			fieldGroups.push
 				name: fieldGroupName
@@ -232,12 +238,11 @@ Template.creator_view.helpers
 		return Session.get("detail_info_visible")
 
 	actions: ()->
-		obj = Creator.getObject()
-		object_name = obj.name
+		actions = Creator.getActions()
+		permissions = Creator.getPermissions()
+		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		permissions = obj.permissions.get()
-		actions = _.values(obj.actions) 
-		# actions = _.where(actions, {on: "record", visible: true})
+
 		actions = _.filter actions, (action)->
 			if action.on == "record"
 				if action.only_list_item
@@ -251,11 +256,11 @@ Template.creator_view.helpers
 		return actions
 
 	moreActions: ()->
-		obj = Creator.getObject()
-		object_name = obj.name
+		actions = Creator.getActions()
+		permissions = Creator.getPermissions()
+		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		permissions = obj.permissions.get()
-		actions = _.values(obj.actions) 
+
 		actions = _.filter actions, (action)->
 			if action.on == "record_more"
 				if action.only_list_item

@@ -211,29 +211,30 @@ Creator.initListViews = (object_name)->
 if Meteor.isClient
 	Creator.getRelatedList = (object_name, record_id)->
 		list = []
+		related_object_names = Creator.getRelatedObjects(object_name)
 
 		_.each Creator.Objects, (related_object, related_object_name)->
+			if _.indexOf(related_object_names, related_object_name) > -1
+				_.each related_object.fields, (related_field, related_field_name)->
+					if related_field.type=="master_detail" and related_field.reference_to and related_field.reference_to == object_name
+						tabular_name = "creator_" + related_object_name
+						if Tabular.tablesByName[tabular_name]
+							columns = ["name"]
+							if related_object.list_views?.default?.columns
+								columns = related_object.list_views.default.columns
+							columns = _.without(columns, related_field_name)
+							Tabular.tablesByName[tabular_name].options?.columns = Creator.getTabularColumns(related_object_name, columns, true);
 
-			_.each related_object.fields, (related_field, related_field_name)->
-				if related_field.type=="master_detail" and related_field.reference_to and related_field.reference_to == object_name
-					tabular_name = "creator_" + related_object_name
-					if Tabular.tablesByName[tabular_name]
-						columns = ["name"]
-						if related_object.list_views?.default?.columns
-							columns = related_object.list_views.default.columns
-						columns = _.without(columns, related_field_name)
-						Tabular.tablesByName[tabular_name].options?.columns = Creator.getTabularColumns(related_object_name, columns, true);
+							if /\w+\.\$\.\w+/g.test(related_field_name)
+								# object类型带子属性的related_field_name要去掉中间的美元符号，否则显示不出字段值
+								related_field_name = related_field_name.replace(/\$\./,"")
+							related =
+								object_name: related_object_name
+								columns: columns
+								tabular_table: Tabular.tablesByName[tabular_name]
+								related_field_name: related_field_name
 
-						if /\w+\.\$\.\w+/g.test(related_field_name)
-							# object类型带子属性的related_field_name要去掉中间的美元符号，否则显示不出字段值
-							related_field_name = related_field_name.replace(/\$\./,"")
-						related =
-							object_name: related_object_name
-							columns: columns
-							tabular_table: Tabular.tablesByName[tabular_name]
-							related_field_name: related_field_name
-
-						list.push related
+							list.push related
 
 		if Creator.Objects[object_name]?.enable_files
 			file_object_name = "cms_files"
@@ -268,19 +269,6 @@ if Meteor.isClient
 
 
 		return list
-
-
-
-Creator.getListViews = (object_name)->
-	if !object_name 
-		object_name = Session.get("object_name")
-
-	object = Creator.getObject(object_name)
-	list_views = []
-	_.each object.list_views, (item, item_name)->
-		if item_name != "default"
-			list_views.push item
-	return list_views
 
 
 Creator.getListView = (object_name, list_view_id)->

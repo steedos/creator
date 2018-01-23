@@ -12,7 +12,7 @@ if Meteor.isServer
 
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
 		permissions = {}
-		psets = Creator.getCollection("permission_set").find({users: userId}).fetch()
+		psets = Creator.getCollection("permission_set").find({users: userId, sapce: spaceId}).fetch()
 		object = Creator.getObject(object_name)
 		if Creator.isSpaceAdmin(spaceId, userId)
 			permissions = _.clone(object.permission_set.admin)
@@ -93,9 +93,10 @@ if Meteor.isServer
 
 
 if Meteor.isClient
-
+	Creator.isloadingPermissions = new ReactiveVar(true)
 	Tracker.autorun ->
-		if Session.get("spaceId")
+		if Session.get("spaceId") and Creator.isloadingPermissions
+			Creator.isloadingPermissions.set(true)
 			Meteor.call "creator.object_permissions", Session.get("spaceId"), (error, result)->
 				if error
 					console.log error
@@ -130,5 +131,10 @@ if Meteor.isClient
 								fs.autoform.readonly = true
 								fs.autoform.disabled = true
 
+						if object_name == "archive_records"
+							console.log permissions
+
 					_.each result.assigned_apps, (app_name)->
 						Creator.Apps[app_name]?.visible = true
+
+				Creator.isloadingPermissions.set(false)

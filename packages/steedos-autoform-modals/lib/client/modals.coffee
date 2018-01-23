@@ -313,6 +313,7 @@ helpers =
 		if cmCollection
 			schema = collectionObj(cmCollection).simpleSchema()._schema
 			firstLevelKeys = collectionObj(cmCollection).simpleSchema()._firstLevelSchemaKeys
+			permission_fields = Creator.getFields()
 			if Session.get 'cmFields'
 				firstLevelKeys = [Session.get('cmFields')]
 			if Session.get 'cmOmitFields'
@@ -334,6 +335,8 @@ helpers =
 			grouplessFields = []
 			grouplessFields = getFieldsWithNoGroup(schema)
 			grouplessFields = getFieldsInFirstLevel(firstLevelKeys, grouplessFields)
+			if permission_fields
+				grouplessFields = _.intersection(permission_fields, grouplessFields)
 			grouplessFields = getFieldsWithoutOmit(schema, grouplessFields)
 			grouplessFields = getFieldsForReorder(schema, grouplessFields)
 
@@ -341,6 +344,8 @@ helpers =
 			_.each fieldGroupNames, (fieldGroupName) ->
 				fieldsForGroup = getFieldsForGroup(schema, fieldGroupName)
 				fieldsForGroup = getFieldsInFirstLevel(firstLevelKeys, fieldsForGroup)
+				if permission_fields
+					fieldsForGroup = _.intersection(permission_fields, fieldsForGroup)
 				fieldsForGroup = getFieldsWithoutOmit(schema, fieldsForGroup)
 				fieldsForGroup = getFieldsForReorder(schema, fieldsForGroup)
 				fieldGroups.push

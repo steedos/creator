@@ -137,9 +137,8 @@ Template.creator_list.helpers
 		return Session.get("action_record_id")
 
 	actions: ()->
-		obj = Creator.getObject()
-		actions = _.values(obj.actions) 
-		# actions = _.where(actions, {on: "list", visible: true})
+		actions = Creator.getActions()
+
 		actions = _.filter actions, (action)->
 			if action.on == "list"
 				if typeof action.visible == "function"
