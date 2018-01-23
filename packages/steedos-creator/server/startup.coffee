@@ -1,10 +1,17 @@
 Meteor.startup ->
+	mongoose = Npm.require('mongoose')
+	mongoose.connect(process.env.MONGO_URL)
+	Schema = mongoose.Schema
 	_.each Creator.Collections, (value, key, list)->
 		if not Creator.Objects[key]?.enable_api
 			return
 
 		if API
 			console.log key
+
+			collectionSchema = new Schema({})
+
+			collectionModel = mongoose.model(key, collectionSchema)
 
 			API.addCollection Creator.Collections[key],
 				excludedEndpoints: []
@@ -21,13 +28,25 @@ Meteor.startup ->
 
 							permissions = Creator.getObjectPermissions(@spaceId, @userId, key)
 							if permissions.viewAllRecords
-									selector = {space: @spaceId}
-									entities = collection.find(selector).fetch()
-									if entities
-										{status: 'success', data: entities}
+									if _.isEmpty @queryParams
+										selector = {space: @spaceId}
+										entities = collection.find(selector).fetch()
+										if entities
+											{status: 'success', data: entities}
+										else
+											statusCode: 404
+											body: {status: 'fail', message: 'Unable to retrieve items from collection'}
 									else
-										statusCode: 404
-										body: {status: 'fail', message: 'Unable to retrieve items from collection'}
+										getList = (req, model, place_hold, cb) ->
+												SteedosOdata.list(req, model, {})
+												.then (result)->
+													cb(null, {status: 'success', data: result.entity.value})
+												.catch (err)->
+													cb(null, {statusCode: 404, body: {status: 'fail', message: 'Unable to retrieve items from collection'}})
+
+										wrappedGetList = Meteor.wrapAsync(getList)
+										# 因为typeof collectionModel === 'function'会被认为是callback所以添加一个占位参数
+										wrappedGetList(@request, collectionModel, {})
 							else
 								statusCode: 400
 								body: {status: 'fail', message: 'Action not permitted'}

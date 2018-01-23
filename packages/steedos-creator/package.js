@@ -13,7 +13,8 @@ Npm.depends({
 	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
-	"xml2js": "0.4.19"
+	"xml2js": "0.4.19",
+	mongoose: '5.0.1'
 });
 
 Package.onUse(function(api) {
@@ -89,6 +90,7 @@ Package.onUse(function(api) {
 	api.use('steedos:datatables-extensions@0.0.1');
 
 	api.use('steedos:api@0.0.1');
+	api.use('steedos:odata@0.0.1');
 
 	api.use('tap:i18n@1.7.0');
 
@@ -115,7 +117,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/permission_set.coffee');
 	api.addFiles('models/permission_objects.coffee');
 
-    api.addFiles('models/space_object.coffee');
+	api.addFiles('models/space_object.coffee');
 
 	api.addFiles('models/app.coffee');
 	api.addFiles('models/space.coffee');
@@ -130,7 +132,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/reports.coffee');
 	api.addFiles('models/tasks.coffee');
 
-    api.addFiles('models/settings.coffee');
+	api.addFiles('models/settings.coffee');
 
 	api.addFiles('server/methods/object_options.coffee', 'server');
 	api.addFiles('server/methods/object_permissions.coffee', 'server');
