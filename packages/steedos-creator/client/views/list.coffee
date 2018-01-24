@@ -190,6 +190,18 @@ Template.creator_list.helpers
 		unless Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 			return "disabled"
 
+	is_filter_changed: ()->
+		list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+		if list_view_obj
+			original_filter_scope = list_view_obj.filter_scope
+			original_filter_items = list_view_obj.filters
+			current_filter_scope = Session.get("filter_scope")
+			current_filter_items = Session.get("filter_items")
+			if original_filter_scope == current_filter_scope and JSON.stringify(original_filter_items) == JSON.stringify(current_filter_items)
+				return false
+			else
+				return true
+
 Template.creator_list.events
 	# 'click .table-creator tr': (event) ->
 	# 	dataTable = $(event.target).closest('table').DataTable();

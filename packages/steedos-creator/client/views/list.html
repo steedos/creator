@@ -140,13 +140,16 @@
 							<div class="slds-form slds-form_stacked slds-grow slds-scrollable_y slds-grid slds-grid_vertical">
 								<div class="slds-filters">
 									<div class="slds-filters__header slds-grid slds-has-divider_bottom-space">
-										<!-- <h2 class="slds-align-middle slds-text-heading_small">Filter</h2>
-										<button class="slds-button slds-button_icon slds-col_bump-left slds-button_icon slds-button_icon-small close-filter-panel" title="Close Filter Panel">
-											{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="forward"}}
-										</button> -->
-										<button class="slds-button slds-button_neutral cancel-change">{{_ "creator_list_filter_cancel"}}</button>
-										<button class="slds-button slds-button_neutral filters-save-as">{{_ "creator_list_filter_save_as"}}</button>
-										<button class="slds-button slds-button_brand save-change">{{_ "creator_list_filter_save"}}</button>
+										{{#unless is_filter_changed}}
+											<h2 class="slds-align-middle slds-text-heading_small">{{_ "creator_list_filter"}}</h2>
+											<button class="slds-button slds-button_icon slds-col_bump-left slds-button_icon slds-button_icon-small close-filter-panel" title="Close Filter Panel">
+												{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="forward"}}
+											</button>
+										{{else}}
+											<button class="slds-button slds-button_neutral cancel-change">{{_ "creator_list_filter_cancel"}}</button>
+											<button class="slds-button slds-button_neutral filters-save-as">{{_ "creator_list_filter_save_as"}}</button>
+											<button class="slds-button slds-button_brand save-change">{{_ "creator_list_filter_save"}}</button>
+										{{/unless}}
 									</div>
 									<div class="slds-filters__body">
 										<ol class="slds-list_vertical slds-list_vertical-space">

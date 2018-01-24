@@ -1,5 +1,6 @@
 {
 	"Steedos Creator": "Creator",
+
 	"list_view_recent": "Recent",
 	"list_view_all": "All",
 	"list_view_mine": "Mine",
@@ -10,6 +11,7 @@
 	"creator_list_new_list_view": "New",
 	"creator_list_delete_list_view": "Delete",
 	"creator_list_select_fields": "Select Fields to Display",
+	"creator_list_filter": "Filter",
 	"creator_list_filter_cancel": "Cancel",
 	"creator_list_filter_save_as": "Save as",
 	"creator_list_filter_save": "Save",
