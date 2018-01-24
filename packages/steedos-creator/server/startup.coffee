@@ -40,7 +40,7 @@ Meteor.startup ->
 										getList = (req, model, place_hold, cb) ->
 												SteedosOdata.list(req, model, {})
 												.then (result)->
-													cb(null, {status: 'success', data: result.entity.value})
+													cb(null, {status: 'success', data: result.entity.value, count: result.entity['@odata.count']})
 												.catch (err)->
 													cb(null, {statusCode: 404, body: {status: 'fail', message: 'Unable to retrieve items from collection'}})
 
