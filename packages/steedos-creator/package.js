@@ -92,6 +92,8 @@ Package.onUse(function(api) {
 	api.use('steedos:api@0.0.1');
 	api.use('steedos:odata@0.0.1');
 
+	api.use('steedos:logger@0.0.2');
+
 	api.use('tap:i18n@1.7.0');
 
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
@@ -142,7 +144,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/report_data.coffee', 'server');
 	api.addFiles('server/methods/user_tabular_settings.coffee', 'server');
 
-	api.addFiles('server/methods/object_xml2js.coffee', 'server');
+	api.addFiles('server/methods/object_export2xml.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
 	api.addFiles('server/publications/related_object.coffee', 'server');
