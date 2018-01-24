@@ -641,7 +641,7 @@ Creator.Objects.archive_records =
 			filter_scope: "space"
 			filters: [["is_received", "$eq", false]]
 		received:
-			label:"已接收"
+			label:"已接收" 
 			filter_scope:"space"
 			filters:[["is_received", "$eq", true]]
 			columns:["year","title","received","received_by","borrowed_by"]
@@ -676,6 +676,8 @@ Creator.Objects.archive_records =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+			actions:["borrow"]
+			list_views:["default","recent","all","borrow"]
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -699,23 +701,26 @@ Creator.Objects.archive_records =
 				month = doc.document_date.getMonth()
 				day = doc.document_date.getDate()
 				destroy_date = new Date(year,month,day)
-				# doc.archives_identifier = ' '
-				# doc.fonds_name = ' '
-				# doc.archival_category_code = 'WS'
-				# doc.fonds_constituting_unit_name = ' '
-				# doc.aggregation_level = '文件'
-				# doc.file_number = ' '
-				# doc.classification_number = ' '
-				# doc.item_number = ' '
-				# doc.document_sequence_number = ' '
-				# doc.descriptor = ' '
-				# doc.keyword = ' '
-				# doc.abstract = ' '
-				# doc.start_date = ' '
-				# doc.closing_date = ' '
-				# doc.precedence = ' '
-				# doc.applicant_name = ' '
-				# doc.applicant_organization_name = ' '
+				rules = Creator.Collections["archive_rules"].find({},{fields:{keywords:1}}).fetch()
+				rules_keywords = _.pluck rules, "keywords"
+				i = 0
+				while i < rules_keywords.length
+					is_matched = true
+					j = 0
+					arrs = rules_keywords[i]
+					while j < arrs.length
+						if doc.title.indexOf(arrs[j])<0
+							is_matched = false
+							break;
+						j++
+					if is_matched
+						match_rule = rules_keywords[i]
+						rule_id = rules[i]._id
+						break;
+					i++
+				console.log rule_id
+				if rule_id
+					doc.category_code = Creator.Collections["archive_rules"].findOne({_id:rule_id}).classification 
 
 				return true
 		"after.update.server.default":
