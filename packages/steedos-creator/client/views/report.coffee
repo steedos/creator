@@ -349,7 +349,7 @@ renderMatrixReport = (reportObject, spaceId)->
 						caption = "总额 #{caption}"
 						break
 					when "count"
-						caption = "计数 #{caption}"
+						caption = "计数"
 						break
 			reportFields.push 
 				caption: caption
