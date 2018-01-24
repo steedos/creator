@@ -89,6 +89,14 @@ Creator.Objects.reports =
 			label: "是否分组统计"
 			type: "boolean"
 			defaultValue: false
+		grouping:
+			label: "显示小计"
+			type: "boolean"
+			defaultValue: true
+		totaling:
+			label: "显示总计"
+			type: "boolean"
+			defaultValue: true
 
 	list_views:
 		default:

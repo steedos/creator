@@ -358,6 +358,13 @@ renderMatrixReport = (reportObject, spaceId)->
 				summaryType: value.operation
 				area: 'data'
 
+		grouping = reportObject.grouping
+		if reportObject.grouping == undefined
+			grouping = true
+		totaling = reportObject.totaling
+		if reportObject.totaling == undefined
+			totaling = true
+
 		pivotGridChart = $('#pivotgrid-chart').dxChart(
 			commonSeriesSettings: type: 'bar'
 			tooltip:
@@ -369,13 +376,11 @@ renderMatrixReport = (reportObject, spaceId)->
 			allowSortingBySummary: true
 			allowFiltering: true
 			showBorders: true
-			showColumnGrandTotals: true
-			showRowGrandTotals: true
-			showRowTotals: true
-			showColumnTotals: true
-			fieldChooser:
-				enabled: true
-				height: 600
+			showColumnGrandTotals: totaling
+			showRowGrandTotals: totaling
+			showRowTotals: grouping
+			showColumnTotals: grouping
+			fieldChooser: false
 			dataSource:
 				fields: reportFields
 				store: reportData).dxPivotGrid('instance')
