@@ -1,7 +1,7 @@
 Creator.Objects.archive_rules = 
 	name: "archive_rules"
 	icon: "timeslot"
-	label: "分类规则"
+	label: "规则"
 	enable_search: false
 	fields:
 		fieldname:
