@@ -9,7 +9,7 @@ Meteor.startup ->
 		if API
 			console.log key
 
-			collectionSchema = new Schema({})
+			collectionSchema = new Schema Creator.getObjectOdataSchema(Creator.Objects[key])
 
 			collectionModel = mongoose.model(key, collectionSchema)
 
