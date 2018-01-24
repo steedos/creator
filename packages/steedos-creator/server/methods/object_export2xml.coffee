@@ -1,12 +1,9 @@
 xml2js = Npm.require 'xml2js'
-fs = Npm.require('fs')
-path = Npm.require('path')
-mkdirp = Npm.require('mkdirp')
+fs = Npm.require 'fs'
+path = Npm.require 'path'
+mkdirp = Npm.require 'mkdirp'
 
 logger = new Logger 'Export_TO_XML'
-
-# 每次同步的条数
-limit_num = 10
 
 _writeXmlFile = (jsonObj,object_name) ->
 	# 转xml
@@ -16,7 +13,7 @@ _writeXmlFile = (jsonObj,object_name) ->
 	# 转为buffer
 	stream = new Buffer xml
 
-	# 存储到服务器文件夹
+	# 根据当天时间的年月日作为存储路径
 	now = new Date
 	year = now.getFullYear()
 	month = now.getMonth() + 1
@@ -24,7 +21,7 @@ _writeXmlFile = (jsonObj,object_name) ->
 
 	# 文件路径
 	filePath = path.join(__meteor_bootstrap__.serverDir,'../../../export/' + year + '/' + month + '/' + day + '/' + object_name )
-	fileName = jsonObj._id + ".xml"
+	fileName = jsonObj?._id + ".xml"
 	fileAddress = path.join filePath, fileName
 
 	if !fs.existsSync filePath
@@ -33,8 +30,7 @@ _writeXmlFile = (jsonObj,object_name) ->
 	# 写入文件
 	fs.writeFile fileAddress, stream, (err) ->
 		if err
-			console.log err
-			logger.error "写入xml文件失败",err
+			logger.error "#{jsonObj._id}写入xml文件失败",err
 
 
 # 整理Fields的json数据
@@ -52,8 +48,8 @@ _mixFieldsData = (obj,object_name) ->
 		jsonObj[field_name] = obj[field_name] || ""
 
 	mixReference = (field,field_name)->
-		db.reference = Creator.Collections[field?.reference_to]
-		referenceObj = db.reference.findOne(_id:obj[field_name],{name:1})
+		ref_collection = Creator.Collections[field?.reference_to]
+		referenceObj = ref_collection.findOne(_id:obj[field_name],{name:1})
 		if referenceObj
 			if referenceObj?.name
 				mixObj = {
