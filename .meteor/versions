@@ -2,6 +2,7 @@ accounts-base@1.3.4
 accounts-password@1.4.0
 accounts-ui@1.1.9
 accounts-ui-unstyled@1.2.1
+ajduke:bootstrap-tagsinput@0.7.1
 aldeed:autoform@5.8.1
 aldeed:autoform-bs-datetimepicker@1.0.7
 aldeed:autoform-select2@1.0.5
@@ -190,3 +191,4 @@ url@1.1.0
 vazco:universe-selectize@0.1.23
 webapp@1.3.19
 webapp-hashing@1.0.9
+yogiben:autoform-tags@0.2.0
