@@ -336,8 +336,21 @@ renderMatrixReport = (reportObject, spaceId)->
 			caption = value.label
 			unless caption
 				caption = valueField.label
-			unless caption
-				caption = objectName + "_" + valueFieldKey
+				unless caption
+					caption = objectName + "_" + valueFieldKey
+				switch value.operation
+					when "max"
+						caption = "最大值 #{caption}"
+						break
+					when "min"
+						caption = "最小值 #{caption}"
+						break
+					when "sum"
+						caption = "总额 #{caption}"
+						break
+					when "count"
+						caption = "计数 #{caption}"
+						break
 			reportFields.push 
 				caption: caption
 				dataField: valueFieldKey

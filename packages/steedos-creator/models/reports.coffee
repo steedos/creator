@@ -29,7 +29,7 @@ Creator.Objects.reports =
 			type: "select"
 			defaultValue: "space"
 			options: [
-				{label: "工作区", value: "space"},
+				{label: "所有", value: "space"},
 				{label: "与我相关", value: "mine"}
 			]
 		filters: 
