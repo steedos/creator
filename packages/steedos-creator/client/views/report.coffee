@@ -253,11 +253,16 @@ renderSummaryReport = (reportObject, spaceId)->
 		totalSummaryItems = []
 		groupSummaryItems = []
 		
-		defaultCounterSum = 
-			column: "_id"
-			summaryType: "count"
-		groupSummaryItems.push defaultCounterSum
-		totalSummaryItems.push defaultCounterSum
+		counting = reportObject.counting
+		if reportObject.counting == undefined
+			counting = true
+
+		if counting
+			defaultCounterSum = 
+				column: "_id"
+				summaryType: "count"
+			groupSummaryItems.push defaultCounterSum
+			totalSummaryItems.push defaultCounterSum
 		
 		grouping = reportObject.grouping
 		if reportObject.grouping == undefined
@@ -369,12 +374,17 @@ renderMatrixReport = (reportObject, spaceId)->
 				summaryType: operation
 				area: 'data'
 
-		defaultCounterSum = 
-			caption: "计数"
-			dataField: "_id"
-			summaryType: "count"
-			area: 'data'
-		reportFields.push defaultCounterSum
+		counting = reportObject.counting
+		if reportObject.counting == undefined
+			counting = true
+
+		if counting
+			defaultCounterSum = 
+				caption: "计数"
+				dataField: "_id"
+				summaryType: "count"
+				area: 'data'
+			reportFields.push defaultCounterSum
 
 		grouping = reportObject.grouping
 		if reportObject.grouping == undefined

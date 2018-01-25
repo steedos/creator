@@ -73,6 +73,10 @@ Creator.Objects.reports =
 			label: "显示总计"
 			type: "boolean"
 			defaultValue: true
+		counting:
+			label: "显示记录计数"
+			type: "boolean"
+			defaultValue: true
 
 	list_views:
 		default:
