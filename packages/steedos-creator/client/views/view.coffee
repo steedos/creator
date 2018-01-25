@@ -120,7 +120,7 @@ Template.creator_view.helpers
 		grouplessFields = getFieldsInFirstLevel(firstLevelKeys, grouplessFields)
 		if permission_fields
 			grouplessFields = _.intersection(permission_fields, grouplessFields)
-		# grouplessFields = getFieldsWithoutOmit(schema, grouplessFields)
+		grouplessFields = getFieldsWithoutOmit(schema, grouplessFields)
 		grouplessFields = getFieldsForReorder(schema, grouplessFields)
 
 		fieldGroupNames = getSortedFieldGroupNames(schema)
@@ -129,8 +129,7 @@ Template.creator_view.helpers
 			fieldsForGroup = getFieldsInFirstLevel(firstLevelKeys, fieldsForGroup)
 			if permission_fields
 				fieldsForGroup = _.intersection(permission_fields, fieldsForGroup)
-
-			# fieldsForGroup = getFieldsWithoutOmit(schema, fieldsForGroup)
+			fieldsForGroup = getFieldsWithoutOmit(schema, fieldsForGroup)
 			fieldsForGroup = getFieldsForReorder(schema, fieldsForGroup)
 			fieldGroups.push
 				name: fieldGroupName

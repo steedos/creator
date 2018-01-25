@@ -439,7 +439,9 @@ Template.creator_list.events
 	'click .cancel-change': (event, template)->
 		list_view_id = Session.get("list_view_id")
 		filters = Creator.Collections.object_listviews.findOne(list_view_id).filters || []
+		filter_scope = Creator.Collections.object_listviews.findOne(list_view_id).filter_scope
 		Session.set("filter_items", filters)
+		Session.set("filter_scope", filter_scope)
 
 	'click .save-change': (event, template)->
 		list_view_id = Session.get("list_view_id")

@@ -144,23 +144,25 @@ Creator.initListViews = (object_name)->
 			self = this
 
 			Tracker.nonreactive ->
-				object_name = Session.get("object_name")
-				list_view_id = Session.get("list_view_id")
-				setting = Creator.Collections.settings.findOne({object_name: object_name, record_id: "object_listviews"})
-				column_width = setting?.settings[list_view_id]?.column_width
-		
-				if !column_width
-					$(self).css("width", "100%")
-				else
-					checkbox_col_width = $("th:first", $(self)).outerWidth()
-					action_col_width = $("th:last", $(self)).outerWidth()
+				# 仅对list视图的tabular进行表格宽度设置
+				if $(self).closest(".list-table-container").length
+					object_name = Session.get("object_name")
+					list_view_id = Session.get("list_view_id")
+					setting = Creator.Collections.settings.findOne({object_name: object_name, record_id: "object_listviews"})
+					column_width = setting?.settings[list_view_id]?.column_width
+			
+					if !column_width
+						$(self).css("width", "100%")
+					else
+						checkbox_col_width = $("th:first", $(self)).outerWidth()
+						action_col_width = $("th:last", $(self)).outerWidth()
 
-					sum_width = checkbox_col_width + action_col_width
-					_.each column_width, (width, field) ->
-						width = parseInt(width)
-						sum_width += width
-					
-					$(self).css({"width": "#{sum_width}px", "min-width": "#{sum_width}px"})
+						sum_width = checkbox_col_width + action_col_width
+						_.each column_width, (width, field) ->
+							width = parseInt(width)
+							sum_width += width
+						
+						$(self).css({"width": "#{sum_width}px", "min-width": "#{sum_width}px"})
 
 			# 当数据库数据变化时会重新生成datatable，需要重新把勾选框状态保持住
 			Tracker.nonreactive ->
