@@ -1,7 +1,7 @@
 Creator.baseObject = 
 	fields: 
 		owner:
-			label:"作者"
+			label:"所有者"
 			type: "lookup"
 			reference_to: "users"
 			omit: true
@@ -11,6 +11,7 @@ Creator.baseObject =
 			type: "text"
 			omit: true
 			index: true
+			hidden: true
 		created:
 			type: "datetime"
 			label:"提交日期"
@@ -23,22 +24,21 @@ Creator.baseObject =
 			omit: true
 			index: true
 		modified:
-			label:"最后修改时间"
+			label:"修改时间"
 			type: "datetime"
 			omit: true
 			sortable: true
 			index: true
 		modified_by:
+			label:"修改人"
 			type: "lookup"
 			reference_to: "users"
-			omit: true
-		last_activity: 
-			type: "datetime"
 			omit: true
 		is_deleted:
 			type: "boolean"
 			omit: true
 			index: true
+			hidden: true
 
 	permission_set:
 		none: 
