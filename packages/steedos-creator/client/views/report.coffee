@@ -222,7 +222,7 @@ renderSummaryReport = (reportObject, spaceId)->
 	if _.isEmpty objectFields
 		return
 	filterValueFields = reportObject.values
-	filterFields = _.union reportObject.columns, reportObject.groups, filterValueFields
+	filterFields = _.union reportObject.columns, reportObject.rows, filterValueFields
 	filterFields = _.without filterFields, null, undefined
 	filter_scope = reportObject.filter_scope || "space"
 	filters = reportObject.filters
@@ -241,7 +241,7 @@ renderSummaryReport = (reportObject, spaceId)->
 		unless reportColumns
 			reportColumns = []
 		reportData = result
-		_.each reportObject.groups, (group, index)->
+		_.each reportObject.rows, (group, index)->
 			groupFieldKey = group.replace(/\./g,"_")
 			groupField = objectFields[group.split(".")[0]]
 			reportColumns.push 
@@ -266,7 +266,7 @@ renderSummaryReport = (reportObject, spaceId)->
 		if reportObject.totaling == undefined
 			totaling = true
 
-		grouping = if grouping then reportObject.groups?.length else false
+		grouping = if grouping then reportObject.rows?.length else false
 		_.each reportObject.values, (value)->
 			# unless value.field
 			# 	return
