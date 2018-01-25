@@ -26,7 +26,6 @@ Meteor.startup ->
 	Creator.subs["CreatorActionRecord"] = new SubsManager()
 	Tracker.autorun (c)->
 		if Session.get("action_object_name") and Session.get("action_record_id")
-			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), ()->
-					Session.set 'cmDoc', Creator.Collections[Session.get("action_object_name")].findOne(Session.get("action_record_id"))
+			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id")
 
 

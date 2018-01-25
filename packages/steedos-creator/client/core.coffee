@@ -26,7 +26,11 @@ Creator.editObject = (object_name,record_id)->
 	Session.set('action_object_name',object_name)
 	Session.set("action_record_id",record_id)
 	Session.set("action_fields",undefined)
-	$(".creator-edit").click()
+	Meteor.call "object_record", object_name, record_id, (error, result)->
+		if result
+			Session.set 'cmDoc', result
+			$(".btn.creator-edit").click()
+
 if Meteor.isClient
 	# 定义全局变量以Session.get("object_name")为key记录其选中的记录id集合
 	Creator.TabularSelectedIds = {}
