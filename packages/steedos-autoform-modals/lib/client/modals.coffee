@@ -313,7 +313,8 @@ helpers =
 		if cmCollection
 			schema = collectionObj(cmCollection).simpleSchema()._schema
 			firstLevelKeys = collectionObj(cmCollection).simpleSchema()._firstLevelSchemaKeys
-			permission_fields = Creator.getFields()
+			object_name = cmCollection.replace(/Creator.Collections./, "")
+			permission_fields = Creator.getFields(object_name)
 			if Session.get 'cmFields'
 				firstLevelKeys = [Session.get('cmFields')]
 			if Session.get 'cmOmitFields'
