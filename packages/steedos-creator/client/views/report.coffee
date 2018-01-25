@@ -221,8 +221,7 @@ renderSummaryReport = (reportObject, spaceId)->
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		return
-	filterValueFields = reportObject.values?.map (item, index)->
-		return item.field
+	filterValueFields = reportObject.values
 	filterFields = _.union reportObject.columns, reportObject.groups, filterValueFields
 	filterFields = _.without filterFields, null, undefined
 	filter_scope = reportObject.filter_scope || "space"
@@ -254,24 +253,41 @@ renderSummaryReport = (reportObject, spaceId)->
 		totalSummaryItems = []
 		groupSummaryItems = []
 		
+		defaultCounterSum = 
+			column: "_id"
+			summaryType: "count"
+		groupSummaryItems.push defaultCounterSum
+		totalSummaryItems.push defaultCounterSum
+		
+		grouping = reportObject.grouping
+		if reportObject.grouping == undefined
+			grouping = true
+		totaling = reportObject.totaling
+		if reportObject.totaling == undefined
+			totaling = true
+
+		grouping = if grouping then reportObject.groups?.length else false
 		_.each reportObject.values, (value)->
-			unless value.field
-				return
-			unless value.operation
-				return
-			valueFieldKey = value.field.replace(/\./g,"_")
-			# valueField = objectFields[value.field.split(".")[0]]
+			# unless value.field
+			# 	return
+			# unless value.operation
+			# 	return
+			valueFieldKey = value.replace(/\./g,"_")
+			valueField = objectFields[value.split(".")[0]]
+			operation = "count"
+			# 数值类型就定为sum统计，否则默认为计数统计
+			if valueField.type == "number"
+				operation = "sum"
 			summaryItem = 
 				column: valueFieldKey
-				summaryType: value.operation
-				displayFormat: value.label
-			if ["max","min"].indexOf(value.operation) > -1
+				summaryType: operation
+				# displayFormat: value.label
+			# sum统计统一设置为在分组统计中按列对齐，其他比如计数统计向左对齐
+			if ["sum"].indexOf(operation) > -1
 				summaryItem.alignByColumn = true
-			else if ["sum"].indexOf(value.operation) > -1
-				summaryItem.showInGroupFooter = true
-			if value.grouping
+			if grouping
 				groupSummaryItems.push summaryItem
-			else
+			if totaling
 				totalSummaryItems.push summaryItem
 		
 		unless _.isEmpty totalSummaryItems
@@ -282,7 +298,7 @@ renderSummaryReport = (reportObject, spaceId)->
 		pivotGrid = $('#pivotgrid').dxDataGrid(
 			dataSource: reportData
 			paging: false
-			columns: reportColumns,
+			columns: reportColumns
 			summary: reportSummary).dxDataGrid('instance')
 		return
 
@@ -291,8 +307,7 @@ renderMatrixReport = (reportObject, spaceId)->
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		return
-	filterValueFields = reportObject.values?.map (item, index)->
-		return item.field
+	filterValueFields = reportObject.values
 	filterFields = _.union reportObject.columns, reportObject.rows, filterValueFields
 	filterFields = _.without filterFields, null, undefined
 	filter_scope = reportObject.filter_scope || "space"
@@ -327,36 +342,39 @@ renderMatrixReport = (reportObject, spaceId)->
 				dataField: columnFieldKey
 				area: 'column'
 		_.each reportObject.values, (value)->
-			unless value.field
-				return
-			unless value.operation
-				return
-			valueFieldKey = value.field.replace(/\./g,"_")
-			valueField = objectFields[value.field.split(".")[0]]
-			caption = value.label
+			# unless value.field
+			# 	return
+			# unless value.operation
+			# 	return
+			valueFieldKey = value.replace(/\./g,"_")
+			valueField = objectFields[value.split(".")[0]]
+			operation = "count"
+			# 数值类型就定为sum统计，否则默认为计数统计
+			if valueField.type == "number"
+				operation = "sum"
+			caption = valueField.label
 			unless caption
-				caption = valueField.label
-				unless caption
-					caption = objectName + "_" + valueFieldKey
-				switch value.operation
-					when "max"
-						caption = "最大值 #{caption}"
-						break
-					when "min"
-						caption = "最小值 #{caption}"
-						break
-					when "sum"
-						caption = "总额 #{caption}"
-						break
-					when "count"
-						caption = "计数"
-						break
+				caption = objectName + "_" + valueFieldKey
+			switch operation
+				when "sum"
+					caption = "总和 #{caption}"
+					break
+				when "count"
+					caption = "计数 #{caption}"
+					break
 			reportFields.push 
 				caption: caption
 				dataField: valueFieldKey
 				# dataType: valueField.type
-				summaryType: value.operation
+				summaryType: operation
 				area: 'data'
+
+		defaultCounterSum = 
+			caption: "计数"
+			dataField: "_id"
+			summaryType: "count"
+			area: 'data'
+		reportFields.push defaultCounterSum
 
 		grouping = reportObject.grouping
 		if reportObject.grouping == undefined
@@ -390,7 +408,6 @@ renderMatrixReport = (reportObject, spaceId)->
 		return
 
 renderReport = (reportObject)->
-	console.log "renderReport:", reportObject
 	unless reportObject
 		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
 	spaceId = Session.get("spaceId")
@@ -417,9 +434,7 @@ Template.creator_report.onRendered ->
 		record_id = Session.get "record_id"
 		unless record_id
 			return
-		console.log "autorun ready0"
 		if Creator.subs["CreatorRecord"].ready()
-			console.log "autorun ready1"
 			# c.stop()
 			reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
 			unless reportObject
@@ -429,40 +444,12 @@ Template.creator_report.onRendered ->
 			Session.set("filter_items", filter_items)
 			Session.set("filter_scope", filter_scope)
 			renderReport(reportObject) 
-	
-	# this.autorun (c)->
-	# 	spaceId = Session.get("spaceId")
-	# 	unless spaceId
-	# 		return
-	# 	record_id = Session.get "record_id"
-	# 	unless record_id
-	# 		return
-	# 	if Creator.subs["CreatorRecord"].ready()
-	# 		console.log "start render"
-	# 		filter_items = Tracker.nonreactive ()->
-	# 			return Session.get("filter_items")
-	# 		filter_scope = Tracker.nonreactive ()->
-	# 			return Session.get("filter_scope")
-	# 		isFilterChanged = Session.get("filter_changed")
-	# 		# reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
-	# 		# # reportObject = Tracker.nonreactive ()->
-	# 		# # 	return Creator.Reports[record_id] or Creator.getObjectRecord()
-	# 		# switch reportObject.report_type
-	# 		# 	when 'tabular'
-	# 		# 		renderTabularReport(reportObject, spaceId)
-	# 		# 	when 'summary'
-	# 		# 		renderSummaryReport(reportObject, spaceId)
-	# 		# 	when 'matrix'
-	# 		# 		renderMatrixReport(reportObject, spaceId)
 
 	this.autorun (c)->
 		if Creator.subs["CreatorRecord"].ready()
-			console.log "set dirty"
 			filter_items = Session.get("filter_items")
 			filter_scope = Session.get("filter_scope")
 			if filter_items and filter_scope
-				console.log "set dirty2"
-				debugger
 				filter_dirty_count = Tracker.nonreactive ()->
 					return Template.instance().filter_dirty_count.get()
 				if filter_dirty_count == 0
@@ -481,18 +468,3 @@ Template.creator_report.onCreated ->
 	this.filter_items_for_cancel = new ReactiveVar()
 	this.filter_scope_for_cancel = new ReactiveVar()
 	this.is_filter_open = new ReactiveVar(false)
-
-	# this.autorun (c)->
-	# 	record_id = Session.get "record_id"
-	# 	unless record_id
-	# 		return
-	# 	if Creator.subs["CreatorRecord"].ready()
-	# 		c.stop()
-	# 		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
-	# 		unless reportObject
-	# 			return
-	# 		objectName = reportObject.object_name
-	# 		filter_items = reportObject.filters || []
-	# 		filter_scope = reportObject.filter_scope
-	# 		Session.set("filter_items", filter_items)
-	# 		Session.set("filter_scope", filter_scope)

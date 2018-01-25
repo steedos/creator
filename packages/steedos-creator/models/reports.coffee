@@ -67,28 +67,31 @@ Creator.Objects.reports =
 			type: "[text]"
 		values: 
 			label: "统计"
-			type: [Object]
-			blackbox: true
-		"values.$.label":
-			label: "标题"
-			type: "text"
-		"values.$.field":
-			label: "字段名"
-			type: "text"
-		"values.$.operation":
-			label: "统计类型"
-			type: "select"
-			defaultValue: "count"
-			options: [
-				{label: "计数", value: "count"},
-				{label: "最大值", value: "max"},
-				{label: "最小值", value: "min"},
-				{label: "汇总", value: "sum"}
-			]
-		"values.$.grouping":
-			label: "是否分组统计"
-			type: "boolean"
-			defaultValue: false
+			type: "[text]"
+		# values: 
+		# 	label: "统计"
+		# 	type: [Object]
+		# 	blackbox: true
+		# "values.$.label":
+		# 	label: "标题"
+		# 	type: "text"
+		# "values.$.field":
+		# 	label: "字段名"
+		# 	type: "text"
+		# "values.$.operation":
+		# 	label: "统计类型"
+		# 	type: "select"
+		# 	defaultValue: "count"
+		# 	options: [
+		# 		{label: "计数", value: "count"},
+		# 		{label: "最大值", value: "max"},
+		# 		{label: "最小值", value: "min"},
+		# 		{label: "汇总", value: "sum"}
+		# 	]
+		# "values.$.grouping":
+		# 	label: "是否分组统计"
+		# 	type: "boolean"
+		# 	defaultValue: false
 		grouping:
 			label: "显示小计"
 			type: "boolean"
