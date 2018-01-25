@@ -14,12 +14,12 @@ Creator.baseObject =
 			hidden: true
 		created:
 			type: "datetime"
-			label:"提交日期"
+			label:"创建日期"
 			omit: true
 			sortable: true
 		created_by:
 			type: "lookup"
-			label:"提交人"
+			label:"创建人"
 			reference_to: "users"
 			omit: true
 			index: true
