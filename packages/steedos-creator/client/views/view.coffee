@@ -243,17 +243,20 @@ Template.creator_view.helpers
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
 
-		actions = _.filter actions, (action)->
-			if action.on == "record"
-				if action.only_list_item
-					return false
-				if typeof action.visible == "function"
-					return action.visible(object_name, record_id, permissions)
+		if permissions.actions
+			return actions
+		else	
+			actions = _.filter actions, (action)->
+				if action.on == "record"
+					if action.only_list_item
+						return false
+					if typeof action.visible == "function"
+						return action.visible(object_name, record_id, permissions)
+					else
+						return action.visible
 				else
-					return action.visible
-			else
-				return false
-		return actions
+					return false
+			return actions
 
 	moreActions: ()->
 		actions = Creator.getActions()

@@ -138,16 +138,21 @@ Template.creator_list.helpers
 
 	actions: ()->
 		actions = Creator.getActions()
+		permissions = Creator.getPermissions()
 
-		actions = _.filter actions, (action)->
-			if action.on == "list"
-				if typeof action.visible == "function"
-					return action.visible()
+		# 如果是在权限中设置了action，就不需要判断action的visible属性
+		if permissions.actions
+			return actions
+		else
+			actions = _.filter actions, (action)->
+				if action.on == "list"
+					if typeof action.visible == "function"
+						return action.visible()
+					else
+						return action.visible
 				else
-					return action.visible
-			else
-				return false
-		return actions
+					return false
+			return actions
 
 	left: ()->
 		return Template.instance().filter_PLeft?.get()

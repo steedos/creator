@@ -1,6 +1,6 @@
 if Meteor.isServer
 
-	Creator.getPermissions = (spaceId, userId)->
+	Creator.getAllPermissions = (spaceId, userId)->
 		permissions = 
 			objects: {}
 			assigned_apps: []
@@ -21,10 +21,13 @@ if Meteor.isServer
 		permissions = {}
 		psets = Creator.getCollection("permission_set").find({users: userId, sapce: spaceId}).fetch()
 		object = Creator.getObject(object_name)
-		if Creator.isSpaceAdmin(spaceId, userId)
+		if !userId
 			permissions = _.clone(object.permission_set.admin)
 		else
-			permissions = _.clone(object.permission_set.user)
+			if Creator.isSpaceAdmin(spaceId, userId)
+				permissions = _.clone(object.permission_set.admin)
+			else
+				permissions = _.clone(object.permission_set.user)
 
 		if psets.length>=0
 			set_ids = _.pluck psets, "_id"
@@ -96,7 +99,7 @@ if Meteor.isServer
 	Meteor.methods
 		# Calculate Permissions on Server
 		"creator.object_permissions": (spaceId)->
-			return Creator.getPermissions(spaceId, this.userId)
+			return Creator.getAllPermissions(spaceId, this.userId)
 
 
 if Meteor.isClient

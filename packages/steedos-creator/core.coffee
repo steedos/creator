@@ -67,13 +67,14 @@ Creator.getObjectRecord = (object_name, record_id)->
 		return collection.findOne(record_id)
 
 
-Creator.getPermissions = (object_name)->
-	if !object_name and Meteor.isClient
-		object_name = Session.get("object_name")
-
-	obj = Creator.getObject(object_name)
-	return obj.permissions.get()
-
+Creator.getPermissions = (object_name, spaceId, userId)->
+	if Meteor.isClient
+		if !object_name
+			object_name = Session.get("object_name")
+		obj = Creator.getObject(object_name)
+		return obj.permissions.get()
+	else if Meteor.isServer
+		Creator.getObjectPermissions(spaceId, userId, object_name)
 Creator.getRecordPermissions = (object_name, record, userId)->
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
@@ -103,10 +104,10 @@ Creator.isSpaceAdmin = (spaceId, userId)->
 			spaceId = Session.get("spaceId")
 		if !userId
 			userId = Meteor.userId()
-	if Meteor.userId()
-		space = Creator.getObject("spaces")?.db?.findOne(spaceId)
-		if space?.admins
-			return space.admins.indexOf(userId) >= 0
+	
+	space = Creator.getObject("spaces")?.db?.findOne(spaceId)
+	if space?.admins
+		return space.admins.indexOf(userId) >= 0
 
 Creator.evaluateFormula = (formular, context)->
 
@@ -130,12 +131,17 @@ Creator.evaluateFilters = (filters, context)->
 	console.log("evaluateFilters-->selector", selector)
 	return selector
 
-Creator.getRelatedObjects = (object_name)->
-	if !object_name and Meteor.isClient
-		object_name = Session.get("object_name")
+Creator.getRelatedObjects = (object_name, spaceId, userId)->
+	if Meteor.isClient
+		if !object_name
+			object_name = Session.get("object_name")
+		if !spaceId
+			spaceId = Session.get("spaceId")
+		if !userId
+			userId = Meteor.userId()
 	
 	related_object_names = []
-	permissions = Creator.getPermissions(object_name)
+	permissions = Creator.getPermissions(object_name, spaceId, userId)
 	permission_related_objects = permissions.related_objects
 
 	_.each Creator.Objects, (related_object, related_object_name)->
