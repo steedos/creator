@@ -206,3 +206,16 @@ Creator.getFields = (object_name)->
 
 Creator.isloading = ()->
 	return Creator.isloadingPermissions.get()
+
+if Meteor.isServer
+	Creator.getAllRelatedObjects = (object_name)->
+		related_object_names = []
+		_.each Creator.Objects, (related_object, related_object_name)->
+			_.each related_object.fields, (related_field, related_field_name)->
+				if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
+					related_object_names.push related_object_name
+
+		if Creator.getObject(object_name).enable_files
+			related_object_names.push "cms_files"
+		
+		return related_object_names
