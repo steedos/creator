@@ -14,7 +14,7 @@ Template.report_settings.helpers
 
 Template.report_settings.events 
 
-	'click .btn-save': (event, template)->
+	'click .btn-settings-apply': (event, template)->
 		Session.set("report_settings",{
 			grouping: template.$(".cbx-grouping").is(":checked")
 			totaling: template.$(".cbx-totaling").is(":checked")
