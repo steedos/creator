@@ -124,7 +124,7 @@ Creator.Export2xml = (objName) ->
 	# 查找对象数据
 	collection = Creator.Collections[objName]
 # 测试数据
-	recordList = collection.find({_id:"54pvEyFaANHHYb6Tc"}).fetch()
+	recordList = collection.find({}).fetch()
 
 	recordList.forEach (recordObj)->
 		jsonObj = {}
