@@ -193,6 +193,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/report.coffee', 'client');
 	api.addFiles('client/views/report.less', 'client');
 
+	api.addFiles('client/views/report_settings.html', 'client');
+	api.addFiles('client/views/report_settings.coffee', 'client');
+	api.addFiles('client/views/report_settings.less', 'client');
+
 	api.addFiles('client/views/table_cell.html', 'client');
 	api.addFiles('client/views/table_cell.coffee', 'client');
 	api.addFiles('client/views/table_cell.less', 'client');
