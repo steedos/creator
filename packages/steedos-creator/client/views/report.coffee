@@ -257,11 +257,8 @@ renderSummaryReport = (reportObject, spaceId)->
 		groupSummaryItems = []
 		
 		counting = reportObject.counting
-		console.log "renderSummaryReport.counting:", counting
 		if reportObject.counting == undefined
-			console.log "renderSummaryReport.counting:xxx"
 			counting = true
-		console.log "renderSummaryReport.counting2:", counting
 
 		if counting
 			defaultCounterSum = 
@@ -352,6 +349,19 @@ renderMatrixReport = (reportObject, spaceId)->
 				width: 100
 				dataField: columnFieldKey
 				area: 'column'
+		
+		counting = reportObject.counting
+		if reportObject.counting == undefined
+			counting = true
+
+		if counting
+			defaultCounterSum = 
+				caption: "计数"
+				dataField: "_id"
+				summaryType: "count"
+				area: 'data'
+			reportFields.push defaultCounterSum
+		
 		_.each reportObject.values, (value)->
 			# unless value.field
 			# 	return
@@ -379,18 +389,6 @@ renderMatrixReport = (reportObject, spaceId)->
 				# dataType: valueField.type
 				summaryType: operation
 				area: 'data'
-
-		counting = reportObject.counting
-		if reportObject.counting == undefined
-			counting = true
-
-		if counting
-			defaultCounterSum = 
-				caption: "计数"
-				dataField: "_id"
-				summaryType: "count"
-				area: 'data'
-			reportFields.push defaultCounterSum
 
 		grouping = reportObject.grouping
 		if reportObject.grouping == undefined
