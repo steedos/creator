@@ -124,7 +124,7 @@ Template.creator_report.events
 	'click .filter-option-item': (event, template)->
 		template.is_edit_scope.set(false)
 
-		index = $(event.currentTarget).closest(".filter-item").index() - 1
+		index = $(event.currentTarget).closest(".filter-item").index()
 		if index < 0
 			index = 0
 
@@ -174,7 +174,7 @@ Template.creator_report.events
 			renderReport()
 
 	'click .removeFilter': (event, template)->
-		index = $(event.currentTarget).closest(".filter-item").index() - 1
+		index = $(event.currentTarget).closest(".filter-item").index()
 		if index < 0
 			index = 0
 		filter_items = Session.get("filter_items")
@@ -187,6 +187,16 @@ Template.creator_report.events
 
 	'click .btn-settings': (event, template)->
 		Modal.show("report_settings")
+
+	'click .add-filter': (event, template)->
+		filter_items = Session.get("filter_items")
+		filter_items.push({})
+		Session.set("filter_items", filter_items)
+		Meteor.defer ->
+			template.$(".filter-option-item:last").click()
+
+	'click .remove-all-filters': (event, template)->
+		Session.set("filter_items", [])
 
 
 

@@ -90,15 +90,15 @@
 				</div>
 
 				<div class="pageBody {{#if isFilterOpen}}filterOpen{{else}}filterClosed{{/if}}">
-			        <div class="scrollarea">
-			        	<div class="innerStacking">
-				        	<div class="eclair-container">
-				            	<div id="pivotgrid-chart"></div>
-				            </div>
-				           	<div class="reportsDataGrid">
-				            	<div id="pivotgrid"></div>
-				            </div>
-				        </div>
+					<div class="scrollarea">
+						<div class="innerStacking">
+							<div class="eclair-container">
+								<div id="pivotgrid-chart"></div>
+							</div>
+						   	<div class="reportsDataGrid">
+								<div id="pivotgrid"></div>
+							</div>
+						</div>
 					</div>
 					<div class="sidebar {{#if isFilterOpen}}filterOpen{{else}}filterClosed{{/if}} filter-list-container">
 						<div class="reportsReportSidebar" data-aura-class="reportsReportSidebar">
@@ -137,12 +137,20 @@
 													</a>
 												</div>
 											</li>
+										</ul>
+										<ul class="editableFilters">
 											{{#each filterItems}}
 												<li class="filterCardContainer editable reportsFilterCard filter-item">
 													<a class="filterCardEditor filter-option-item" href="javascript:void(0);">
 														<div class="filterCard">
 															<div class="header">
-																<span class="field">{{this.field}}</span>
+																<span class="field">
+																	{{#if this.field}}
+																		{{this.field}}
+																	{{else}}
+																		{{_ "creator_list_new_filter"}}
+																	{{/if}}
+																</span>
 															</div>
 															<div class="filterCardBody">{{this.operation}}&nbsp;
 																<span class="uiOutputText" data-aura-class="uiOutputText">{{this.value}}</span>
@@ -155,25 +163,10 @@
 												</li>
 											{{/each}}
 										</ul>
-									</div>
-								</div>
-							</div>
-							<div class="stackingPanel fadeOut">
-								<div class="reportsFeedPanel" data-aura-class="reportsFeedPanel">
-									<div class="panelHeader">
-										<h2 class="panelTitle">Chatter</h2>
-										<a class="close centered-header" href="javascript:void(0);">
-											<span class="slds-icon_container slds-icon-utility-back slds-button__icon forceIcon" data-aura-class="forceIcon">
-												<span class="lightningPrimitiveIcon" data-aura-class="lightningPrimitiveIcon">
-													<svg class="slds-icon slds-icon--xx-small" focusable="false" aria-hidden="true" data-key="back">
-														<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/_slds/icons/v7.31.0/utility-sprite/svg/symbols.svg#back"></use>
-													</svg>
-												</span>
-												<span class="slds-assistive-text">Close</span>
-											</span>
-										</a>
-									</div>
-									<div class="vert-scroller">
+										<div class="slds-filters__footer slds-grid slds-shrink-none">
+											<button class="slds-button_reset slds-text-link add-filter" href="javascript:void(0);">{{_ "creator_list_add_filter"}}</button>
+											<button class="slds-button_reset slds-text-link slds-col_bump-left remove-all-filters" href="javascript:void(0);">{{_ "creator_list_remove_all_filters"}}</button>
+										</div>
 									</div>
 								</div>
 							</div>
