@@ -90,7 +90,6 @@ Package.onUse(function(api) {
 	api.use('steedos:datatables-extensions@0.0.1');
 
 	api.use('steedos:api@0.0.1');
-	api.use('steedos:odata@0.0.1');
 
 	api.use('steedos:logger@0.0.2');
 
