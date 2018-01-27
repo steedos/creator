@@ -363,78 +363,78 @@ Template.creator_list.events
 		$(".btn-filter-list").removeClass("slds-is-selected")
 		$(".filter-list-container").addClass("slds-hide")
 
-	'click .filter-scope': (event, template)->
-		template.is_edit_scope.set(true)
+	# 'click .filter-scope': (event, template)->
+	# 	template.is_edit_scope.set(true)
 
-		left = $(event.currentTarget).closest(".filter-list-container").offset().left
-		top = $(event.currentTarget).closest(".slds-item").offset().top
+	# 	left = $(event.currentTarget).closest(".filter-list-container").offset().left
+	# 	top = $(event.currentTarget).closest(".slds-item").offset().top
 
-		offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
-		offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
-		contentHeight = $(event.currentTarget).closest(".slds-item").height()
+	# 	offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
+	# 	offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
+	# 	contentHeight = $(event.currentTarget).closest(".slds-item").height()
 
-		# 弹出框的高度和宽度写死
-		left = left - offsetLeft - 400 - 6
-		top = top - offsetTop - 170/2 + contentHeight/2
+	# 	# 弹出框的高度和宽度写死
+	# 	left = left - offsetLeft - 400 - 6
+	# 	top = top - offsetTop - 170/2 + contentHeight/2
 
-		Session.set("show_filter_option", false)
-		Tracker.afterFlush ->
-			Session.set("show_filter_option", true)
-			template.filter_PLeft.set("#{left}px")
-			template.filter_PTop.set("#{top}px")
+	# 	Session.set("show_filter_option", false)
+	# 	Tracker.afterFlush ->
+	# 		Session.set("show_filter_option", true)
+	# 		template.filter_PLeft.set("#{left}px")
+	# 		template.filter_PTop.set("#{top}px")
 
-	'click .filter-option-item': (event, template)->
-		template.is_edit_scope.set(false)
+	# 'click .filter-option-item': (event, template)->
+	# 	template.is_edit_scope.set(false)
 
-		index = $(event.currentTarget).closest(".filter-item").index()
+	# 	index = $(event.currentTarget).closest(".filter-item").index()
 
-		left = $(event.currentTarget).closest(".filter-list-container").offset().left
-		top = $(event.currentTarget).closest(".slds-item").offset().top
-		contentHeight = $(event.currentTarget).closest(".slds-item").height()
+	# 	left = $(event.currentTarget).closest(".filter-list-container").offset().left
+	# 	top = $(event.currentTarget).closest("li").offset().top
+	# 	contentHeight = $(event.currentTarget).closest("li").height()
 
-		offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
-		offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
+	# 	offsetLeft = $(event.currentTarget).closest(".slds-template__container").offset().left
+	# 	offsetTop = $(event.currentTarget).closest(".slds-template__container").offset().top
 
-		# 弹出框的高度和宽度写死
-		left = left - offsetLeft - 400 - 6
-		top = top - offsetTop - 336/2 + contentHeight/2
+	# 	# 弹出框的高度和宽度写死
+	# 	left = left - offsetLeft - 400 - 6
+	# 	top = top - offsetTop - 336/2 + contentHeight/2
 
-		# 计算弹出框是否超出屏幕底部，导致出现滚动条，如果超出，调整top位置
-		# 计算方式：屏幕高度 - 弹出框的绝对定位 - 弹出框的高度 - 弹出框父容器position:relative的offsetTop - 弹出框距离屏幕底部10px
-		# 如果计算得出值小于0，则调整top，相应上调超出的高度
-		windowHeight = $(window).height()
-		windowOffset = $(window).height() - top - 336 - offsetTop - 10
+	# 	# 计算弹出框是否超出屏幕底部，导致出现滚动条，如果超出，调整top位置
+	# 	# 计算方式：屏幕高度 - 弹出框的绝对定位 - 弹出框的高度 - 弹出框父容器position:relative的offsetTop - 弹出框距离屏幕底部10px
+	# 	# 如果计算得出值小于0，则调整top，相应上调超出的高度
+	# 	windowHeight = $(window).height()
+	# 	windowOffset = $(window).height() - top - 336 - offsetTop - 10
 
-		if windowOffset < 0
-			top = top + windowOffset
+	# 	if windowOffset < 0
+	# 		top = top + windowOffset
 
-		Session.set("show_filter_option", false)
+	# 	Session.set("show_filter_option", false)
 
-		Tracker.afterFlush ->
-			Session.set("show_filter_option", true)
-			template.filter_index.set(index)
-			template.filter_PLeft.set("#{left}px")
-			template.filter_PTop.set("#{top}px")
+	# 	Tracker.afterFlush ->
+	# 		Session.set("show_filter_option", true)
+	# 		template.filter_index.set(index)
+	# 		template.filter_PLeft.set("#{left}px")
+	# 		template.filter_PTop.set("#{top}px")
 	
 	'click .add-list-view': (event, template)->
 		$(".btn-add-list-view").click()
 
-	'click .add-filter': (event, template)->
-		filter_items = Session.get("filter_items")
-		filter_items.push({})
-		Session.set("filter_items", filter_items)
-		setTimeout ->
-			template.$(".filter-option-item:last").click()
-		, 1
+	# 'click .add-filter': (event, template)->
+	# 	filter_items = Session.get("filter_items")
+	# 	filter_items.push({})
+	# 	Session.set("filter_items", filter_items)
+	# 	setTimeout ->
+	# 		template.$(".filter-option-item:last").click()
+	# 	, 1
 
-	'click .remove-all-filters': (event, template)->
-		Session.set("filter_items", [])
+	# 'click .remove-all-filters': (event, template)->
+	# 	Session.set("filter_items", [])
 
-	'click .remove-filter': (event, template)->
-		index = $(event.currentTarget).closest(".filter-item").index()
-		filter_items = Session.get("filter_items")
-		filter_items.splice(index, 1)
-		Session.set("filter_items", filter_items)
+	# 'click .remove-filter': (event, template)->
+	# 	index = $(event.currentTarget).closest(".filter-item").index()
+	# 	filter_items = Session.get("filter_items")
+	# 	filter_items.splice(index, 1)
+	# 	Session.set("filter_items", filter_items)
 
 	'click .cancel-change': (event, template)->
 		list_view_id = Session.get("list_view_id")

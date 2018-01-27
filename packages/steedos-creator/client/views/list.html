@@ -1,7 +1,7 @@
 <template name="creator_list">
 	<div class="steedos-brand-band slds-brand-band_medium slds-template_bottom-magnet">
 		<div class="slds-template__container">
-			<div class="test-listViewManager slds-grid slds-grid--vertical">
+			<div class="test-listViewManager slds-grid slds-grid--vertical filter-list-wraper">
 				<div class="slds-page-header--object-home slds-page-header_joined slds-page-header_bleed slds-page-header slds-shrink-none test-headerRegion forceListViewManagerHeader">
 					<div class="slds-grid">
 						<div class="slds-col slds-has-flexi-truncate">
@@ -151,7 +151,10 @@
 											<button class="slds-button slds-button_brand save-change">{{_ "creator_list_filter_save"}}</button>
 										{{/unless}}
 									</div>
-									<div class="slds-filters__body">
+									<div class="vert-scroller">
+										{{> filter_option_list}}
+									</div>
+									<!-- <div class="slds-filters__body">
 										<ol class="slds-list_vertical slds-list_vertical-space">
 											<li class="slds-item slds-hint-parent">
 												<div class="slds-filters__item slds-grid slds-grid_vertical-align-center">
@@ -188,16 +191,18 @@
 									<div class="slds-filters__footer slds-grid slds-shrink-none">
 										<button class="slds-button_reset slds-text-link add-filter" href="javascript:void(0);">{{_ "creator_list_add_filter"}}</button>
 										<button class="slds-button_reset slds-text-link slds-col_bump-left remove-all-filters" href="javascript:void(0);">{{_ "creator_list_remove_all_filters"}}</button>
-									</div>
+									</div> -->
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			{{#if show_filter_option}}
+			<div class="filter-option-box">
+			</div>
+			<!-- {{#if show_filter_option}}
 				{{> filter_option top=top left=left index=index filter_item=filter_item is_edit_scope=is_edit_scope}}
-			{{/if}}
+			{{/if}} -->
 		</div>
 	</div>
 	{{#afModal formId="addListView" class="btn btn-primary btn-add-list-view hidden" collection="Creator.Collections.object_listviews" operation="insert" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="List View"}} {{_ "Create"}} {{/afModal}}

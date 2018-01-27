@@ -206,6 +206,8 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/table_checkbox.coffee', 'client');
 	api.addFiles('client/views/table_checkbox.less', 'client');
 
+	api.addFiles('client/views/filter_option_list.html', 'client');
+	api.addFiles('client/views/filter_option_list.coffee', 'client');
 	api.addFiles('client/views/filter_option.html', 'client');
 	api.addFiles('client/views/filter_option.coffee', 'client');
 	api.addFiles('client/views/filter_option.less', 'client');
