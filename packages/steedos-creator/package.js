@@ -14,7 +14,7 @@ Npm.depends({
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
 	"xml2js": "0.4.19",
-	mongoose: '5.0.1'
+	'odata-v4-mongodb': '0.1.12'
 });
 
 Package.onUse(function(api) {

@@ -2,6 +2,7 @@ Meteor.startup ->
 	mongoose = Npm.require('mongoose')
 	mongoose.connect(process.env.MONGO_URL)
 	Schema = mongoose.Schema
+	odataV4Mongodb = Npm.require('odata-v4-mongodb')
 	_.each Creator.Collections, (value, key, list)->
 		if not Creator.Objects[key]?.enable_api
 			return
@@ -37,16 +38,26 @@ Meteor.startup ->
 											statusCode: 404
 											body: {status: 'fail', message: 'Unable to retrieve items from collection'}
 									else
-										getList = (req, model, place_hold, cb) ->
-												SteedosOdata.list(req, model, {})
-												.then (result)->
-													cb(null, {status: 'success', data: result.entity.value, count: result.entity['@odata.count']})
-												.catch (err)->
-													cb(null, {statusCode: 404, body: {status: 'fail', message: 'Unable to retrieve items from collection'}})
+										# getList = (req, model, place_hold, cb) ->
+										# 		SteedosOdata.list(req, model, {})
+										# 		.then (result)->
+										# 			cb(null, {status: 'success', data: result.entity.value, count: result.entity['@odata.count']})
+										# 		.catch (err)->
+										# 			console.log err
+										# 			cb(null, {statusCode: 404, body: {status: 'fail', message: 'Unable to retrieve items from collection'}})
 
-										wrappedGetList = Meteor.wrapAsync(getList)
-										# 因为typeof collectionModel === 'function'会被认为是callback所以添加一个占位参数
-										wrappedGetList(@request, collectionModel, {})
+										# wrappedGetList = Meteor.wrapAsync(getList)
+										# # 因为typeof collectionModel === 'function'会被认为是callback所以添加一个占位参数
+										# wrappedGetList(@request, collectionModel, {})
+										console.log @queryParams
+										cursor = collection.find(odataV4Mongodb.createFilter(@queryParams.$filter),{})
+										entities = cursor.fetch()
+										scannedCount = cursor.count
+										if entities
+											{status: 'success', data: entities, count: scannedCount}
+										else
+											statusCode: 404
+											body: {status: 'fail', message: 'Unable to retrieve items from collection'}
 							else
 								statusCode: 400
 								body: {status: 'fail', message: 'Action not permitted'}
