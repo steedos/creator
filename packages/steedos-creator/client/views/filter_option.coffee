@@ -83,10 +83,8 @@ Template.filter_option.helpers
 
 Template.filter_option.events 
 	'click .save-filter': (event, template) ->
-		debugger
 		filter = AutoForm.getFormValues("filter-option").insertDoc
 		index = this.index
-		console.log "click .save-filter,filter,index:", filter, index
 		filter_items = Session.get("filter_items")
 		filter_items[index] = filter
 
@@ -98,7 +96,6 @@ Template.filter_option.events
 	'click .save-scope': (event, template) ->
 		filter_scope = $("input[name='choose-filter-scope']:checked").val()
 		Session.set("filter_scope", filter_scope)
-		# template.$(".uiPanel--default").remove()
 		Meteor.defer ->
 			Blaze.remove(template.view)
 
@@ -114,10 +111,3 @@ Template.filter_option.events
 				type = obj.autoform.type || "text"
 		Session.set "schema_field", field
 		Session.set "schema_type", type
-
-# Template.filter_option.onCreated ->
-# 	console.log "Template.filter_option.onCreated"
-
-
-# Template.filter_option.onDestroyed ->
-# 	console.log "Template.filter_option.onDestroyed"

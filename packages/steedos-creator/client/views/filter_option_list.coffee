@@ -10,10 +10,7 @@ Template.filter_option_list.helpers
 			return "My"
 	
 	relatedObject: ()->
-		debugger
 		object_name = Template.instance().data?.object_name
-		unless object_name
-			object_name = Session.get("object_name")
 		return Creator.getObject(object_name)
 
 Template.filter_option_list.events 
@@ -32,8 +29,6 @@ Template.filter_option_list.events
 			Blaze.remove template.optionbox
 		Meteor.defer ->
 			object_name = template.data?.object_name
-			unless object_name
-				object_name = Session.get("object_name")
 			data = 
 				top: "#{top}px"
 				left: "#{left}px"
@@ -73,8 +68,6 @@ Template.filter_option_list.events
 			if index > -1 and filter_items
 				filterItem = filter_items[index]
 			object_name = template.data?.object_name
-			unless object_name
-				object_name = Session.get("object_name")
 			data = 
 				top: "#{top}px"
 				left: "#{left}px"
@@ -105,6 +98,8 @@ Template.filter_option_list.events
 
 Template.filter_option_list.onCreated ->
 	self = this
+	unless this.data?.object_name
+		this.data.object_name = Session.get("object_name")
 	self.destroyOptionbox = ()->
 		if self.optionbox and !self.optionbox.isDestroyed and $(self.optionbox.firstNode()).find(event.target).length == 0
 			Blaze.remove self.optionbox
