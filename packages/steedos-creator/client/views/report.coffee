@@ -40,27 +40,6 @@ Template.creator_report.helpers
 				return false
 		return actions
 
-	showFilterOption: ()->
-		return Session.get("show_filter_option")
-
-	filterLeft: ()->
-		return Template.instance().filter_PLeft?.get()
-
-	filterTop: ()->
-		return Template.instance().filter_PTop?.get()
-
-	filterIndex: ()->
-		return Template.instance().filter_index?.get()
-
-	filterItem: ()->
-		index = Template.instance().filter_index?.get()
-		filter_items = Session.get("filter_items")
-		if index > -1 and filter_items
-			return filter_items[index]
-
-	isEditScope: ()->
-		return Session.get("is_edit_scope")
-
 	isFilterDirty: ()->
 		return Template.instance().filter_dirty_count?.get() > 1
 	
@@ -397,12 +376,6 @@ Template.creator_report.onRendered ->
 				Template.instance().filter_dirty_count.set(filter_dirty_count+1)
 
 Template.creator_report.onCreated ->
-	Session.set("show_filter_option", true)
-
-	this.filter_PTop = new ReactiveVar("-1000px")
-	this.filter_PLeft = new ReactiveVar("-1000px")
-	this.filter_index = new ReactiveVar()
-	# this.is_edit_scope = new ReactiveVar()
 	this.filter_dirty_count = new ReactiveVar(0)
 	this.filter_items_for_cancel = new ReactiveVar()
 	this.filter_scope_for_cancel = new ReactiveVar()
