@@ -64,9 +64,9 @@ if Meteor.isDevelopment
 				type: "lookup"
 				optionsFunction: ()->
 					_options = []
-					_.keys(Creator.Objects).forEach (k)->
-						_options.push {label: k, value: k}
-					return _options;
+					_.forEach Creator.Objects, (o, k)->
+						_options.push {label: o.label, value: k}
+					return _options
 				group: "options function test"
 				defaultIcon: "entity"
 			options_fun:
