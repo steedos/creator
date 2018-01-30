@@ -1,9 +1,9 @@
 Package.describe({
 
-    name: 'steedos:creator',
-    version: '0.0.3',
-    summary: 'Steedos Creator',
-    git: ''
+	name: 'steedos:creator',
+	version: '0.0.3',
+	summary: 'Steedos Creator',
+	git: ''
 });
 
 Npm.depends({
@@ -14,7 +14,8 @@ Npm.depends({
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
 	"xml2js": "0.4.19",
-	'odata-v4-mongodb': '0.1.12'
+	'odata-v4-parser': "git+https://github.com/steedos/odata-v4-parser#master",
+	'odata-v4-mongodb': "git+https://github.com/steedos/odata-v4-mongodb#master",
 });
 
 Package.onUse(function(api) {
@@ -215,4 +216,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/select_fields.html', 'client');
 	api.addFiles('client/views/select_fields.coffee', 'client');
 	api.addFiles('client/views/select_fields.less', 'client');
+
+	api.addFiles('client/views/custom_data_source.html', 'client');
+	api.addFiles('client/views/custom_data_source.coffee', 'client');
+	api.addFiles('client/views/odata_service.html', 'client');
+	api.addFiles('client/views/odata_service.coffee', 'client');
 });

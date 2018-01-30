@@ -1,5 +1,6 @@
 Meteor.startup ->
-	odataV4Mongodb = Npm.require('odata-v4-mongodb')
+
+	odataV4Mongodb = Npm.require 'odata-v4-mongodb'
 
 	optionsParser = (options)->
 		parsedOpt = {}
@@ -62,6 +63,7 @@ Meteor.startup ->
 											statusCode: 404
 											body: {status: 'fail', message: 'Unable to retrieve items from collection'}
 									else
+										console.log @queryParams
 										createFilter = odataV4Mongodb.createFilter(@queryParams.$filter)
 										# 强制增加過濾掉件space: @spaceId
 										createFilter.space = @spaceId
