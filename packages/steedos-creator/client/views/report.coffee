@@ -199,7 +199,7 @@ renderSummaryReport = (reportObject, reportData)->
 		columns: reportColumns
 		summary: reportSummary).dxDataGrid('instance')
 
-renderMatrixReport = (reportObject, reportData)->
+renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -286,7 +286,9 @@ renderMatrixReport = (reportObject, reportData)->
 		adaptiveLayout: 
 			width: 450
 	).dxChart('instance')
-	pivotGrid = $('#pivotgrid').dxPivotGrid(
+	if isOnlyForChart
+		$('#pivotgrid').hide()
+	pivotGrid = $('#pivotgrid').show().dxPivotGrid(
 		paging: false
 		allowSortingBySummary: true
 		allowFiltering: true
@@ -335,8 +337,8 @@ renderReport = (reportObject)->
 			when 'tabular'
 				renderTabularReport.bind(self)(reportObject, result)
 			when 'summary'
+				renderMatrixReport.bind(self)(reportObject, result, true)
 				renderSummaryReport.bind(self)(reportObject, result)
-				# renderMatrixReport.bind(self)(reportObject, result)
 			when 'matrix'
 				renderMatrixReport.bind(self)(reportObject, result)
 
