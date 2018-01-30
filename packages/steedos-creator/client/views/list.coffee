@@ -226,6 +226,12 @@ Template.creator_list.events
 
 	'click .table-cell-edit': (event, template) ->
 		field = this.field_name
+
+		if this.field.depend_on && _.isArray(this.field.depend_on)
+			field = _.clone(this.field.depend_on)
+			field.push(this.field_name)
+			field = field.join(",")
+
 		objectName = Session.get("object_name")
 		collection_name = Creator.getObject(objectName).label
 		dataTable = $(event.currentTarget).closest('table').DataTable()
@@ -347,6 +353,7 @@ Template.creator_list.events
 				return obj
 		filter_items = _.compact(filter_items)
 		Session.set "list_view_visible", false
+		console.log 'click .save-change,filter_items:', filter_items
 		Meteor.call "update_filters", list_view_id, filter_items, filter_scope, (error, result) ->
 			Session.set "list_view_visible", true
 			if error 

@@ -64,12 +64,14 @@ Template.steedosLookups.onCreated(function () {
 	var fieldSchema = AutoForm.getSchemaForField(template.data.name);
 
 	var filtersMethod = null;
+	var optionsFunction = null;
 
 	if(fieldSchema){
 		filtersMethod = fieldSchema.filtersMethod;
+		optionsFunction = fieldSchema.optionsFunction
 	}
 
-    template.uniSelectize = new UniSelectize(template.data, template, filtersMethod);
+    template.uniSelectize = new UniSelectize(template.data, template, filtersMethod, optionsFunction);
 });
 
 Template.steedosLookups.onRendered(function () {
@@ -110,7 +112,14 @@ Template.steedosLookups.onRendered(function () {
 
 			Tracker.nonreactive(_getOptions)
 		} else {
-			var options = data.options;
+			var optionsFunction = template.uniSelectize.optionsFunction;
+
+			var _values = AutoForm.getFormValues("cmForm").insertDoc
+
+			if(_.isFunction(optionsFunction)){
+				options = optionsFunction(_values)
+			}
+
 			template.uniSelectize.setItems(options, value);
 		}
 	});
@@ -317,7 +326,10 @@ Template.steedosLookups.helpers({
 	},
 
 	selectedReferenceIcon: function () {
-		return Template.instance().uniSelectize.selectedReference.get().icon
+		var selectedReference = Template.instance().uniSelectize.selectedReference.get();
+		if(selectedReference){
+			return selectedReference.icon
+		}
 	},
 
 	selectedReferenceObject: function () {
@@ -331,7 +343,7 @@ Template.steedosLookups.helpers({
 	},
 
 	getIcon: function (icon) {
-		return icon || 'link'
+		return this.icon || icon || Template.instance().uniSelectize.defaultIcon.get() || 'link'
 	},
 
 	showObjectSwitche: function () {
@@ -362,7 +374,13 @@ Template.steedosLookups.events({
 
         template.uniSelectize.inputFocus(template);
 
-        template.uniSelectize.getOptionsFromMethod();
+		var _values = AutoForm.getFormValues("cmForm").insertDoc
+
+		if(template.uniSelectize.optionsFunction){
+			template.uniSelectize.addItems(template.uniSelectize.optionsFunction(_values))
+		}else{
+			template.uniSelectize.getOptionsFromMethod();
+		}
     },
     'keydown input.js-universeSelectizeInput': function (e, template) {
         var uniSelectize = template.uniSelectize;
@@ -476,6 +494,12 @@ Template.steedosLookups.events({
 		if($el.prop("readonly")){
 			return
 		}
+		//
+		// var _values = AutoForm.getFormValues("cmForm").insertDoc
+		//
+		// if(template.uniSelectize.optionsFunction){
+		// 	template.uniSelectize.setItems(template.uniSelectize.optionsFunction(_values))
+		// }
 
         template.uniSelectize.open.set(true);
 
@@ -540,6 +564,8 @@ Template.steedosLookups.events({
         template.uniSelectize.checkDisabled();
 
         template.uniSelectize.unselectItem(this.value, false);
+
+		template.uniSelectize.itemsAutorun()
 
         if(!template.uniSelectize.multiple){
 			template.uniSelectize.getOptionsFromMethod();

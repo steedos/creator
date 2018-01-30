@@ -1,7 +1,7 @@
 Package.describe({
 
 	name: 'steedos:creator',
-	version: '0.0.3',
+	version: '0.0.4',
 	summary: 'Steedos Creator',
 	git: ''
 });
@@ -133,7 +133,7 @@ Package.onUse(function(api) {
 
 	api.addFiles('models/reports.coffee');
 	api.addFiles('models/tasks.coffee');
-
+	api.addFiles('models/queue_import.coffee');
 	api.addFiles('models/settings.coffee');
 
 	api.addFiles('server/methods/object_options.coffee', 'server');
@@ -145,6 +145,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/user_tabular_settings.coffee', 'server');
 	api.addFiles('server/methods/object_record.coffee', 'server');
 	api.addFiles('server/methods/object_export2xml.coffee', 'server');
+	api.addFiles('server/methods/object_import_jobs.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
 	api.addFiles('server/publications/related_object.coffee', 'server');

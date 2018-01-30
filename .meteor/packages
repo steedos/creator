@@ -90,14 +90,20 @@ keepnox:perfect-scrollbar
 steedos:ionicons@0.1.7
 
 steedos:sso
-
+steedos:app-crm
+steedos:app-informations
+steedos:app-admin
+steedos:app-archive
+steedos:app-cms
+steedos:app-workflow
+steedos:app-example
 steedos:creator
 natestrauser:select2
 meteorhacks:unblock@1.1.0
 
 steedos:lightning-design-system
 
-# steedos:cms
+steedos:cms
 
 # steedos:qhd-records
 
@@ -105,3 +111,4 @@ steedos:api
 yogiben:autoform-tags
 
 steedos:logger@0.0.2
+

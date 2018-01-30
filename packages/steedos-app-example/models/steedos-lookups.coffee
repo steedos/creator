@@ -3,6 +3,7 @@ if Meteor.isDevelopment
 		name: "steedosLookups"
 		label: "steedosLookups"
 		icon: "forecasts"
+		enable_files: true
 		fields:
 			name:
 				label: "名称"
@@ -59,10 +60,35 @@ if Meteor.isDevelopment
 				required: true
 				is_wide:true
 				group: "默认值为公式：当前用户主部门"
+			CObject:
+				type: "lookup"
+				optionsFunction: ()->
+					_options = []
+					_.forEach Creator.Objects, (o, k)->
+						_options.push {label: o.label, value: k, icon: o.icon}
+					return _options
+				group: "options function test"
+				defaultIcon: "entity"
+			options_fun:
+				type: "lookup"
+				multiple: true
+				depend_on: ["CObject"]
+				defaultIcon: "service_contract"
+				optionsFunction: (values)->
+					_options = []
+					_object = Creator.getObject(values.CObject)
+					fields = _object.fields
+					icon = _object.icon
+
+					_.forEach fields, (f, k)->
+						_options.push {label: f.label || k, value: k, icon: icon}
+
+					return _options
+				group: "options function test"
 
 		list_views:
 			default:
-				columns: ["name", "customer_id", "customer_ids", "object_switche_ids", "boolean"]
+				columns: ["name", "customer_id", "customer_ids", "object_switche_ids", "boolean", "CObject", "options_fun"]
 			recent:
 				filter_scope: "space"
 			all:
