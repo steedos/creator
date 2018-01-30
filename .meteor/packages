@@ -92,18 +92,11 @@ steedos:ionicons@0.1.7
 steedos:sso
 steedos:app-crm
 steedos:app-informations
-steedos:app-admin
-steedos:app-archive
-steedos:app-cms
-steedos:app-workflow
-steedos:app-example
 steedos:creator
 natestrauser:select2
 meteorhacks:unblock@1.1.0
 
 steedos:lightning-design-system
-
-steedos:cms
 
 # steedos:qhd-records
 
