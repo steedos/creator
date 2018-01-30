@@ -85,7 +85,7 @@ if Meteor.isDevelopment
 
 		list_views:
 			default:
-				columns: ["name", "customer_id", "customer_ids", "object_switche_ids", "boolean"]
+				columns: ["name", "customer_id", "customer_ids", "object_switche_ids", "boolean", "CObject", "options_fun"]
 			recent:
 				filter_scope: "space"
 			all:
