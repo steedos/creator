@@ -100,6 +100,9 @@ Template.creator_report.events
 	'click .btn-settings': (event, template)->
 		Modal.show("report_settings", {report_settings: template.report_settings})
 
+	'click .btn-refresh': (event, template)->
+		renderReport.bind(template)()
+
 
 renderTabularReport = (reportObject, reportData)->
 	objectName = reportObject.object_name
