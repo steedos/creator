@@ -1,7 +1,7 @@
 Package.describe({
 
 	name: 'steedos:creator',
-	version: '0.0.4',
+	version: '0.0.5',
 	summary: 'Steedos Creator',
 	git: ''
 });
@@ -63,6 +63,7 @@ Package.onUse(function(api) {
 	api.use('simple:json-routes@2.1.0');
 	api.use('steedos:fullcalendar@3.4.0_1');
 	api.use('steedos:autoform-lookup@0.3.10');
+	api.use('steedos:filesize@0.0.1');
 
 	api.use('natestrauser:select2@4.0.3');
 	api.use('aldeed:autoform-select2@1.0.5')
@@ -167,11 +168,23 @@ Package.onUse(function(api) {
 	api.addFiles('client/layout/creator_app_list_modal.html', 'client');
 	api.addFiles('client/layout/creator_app_list_modal.coffee', 'client');
 	api.addFiles('client/layout/creator_app_list_modal.less', 'client');
+	api.addFiles('client/mobile/mobile_layout.html', 'client');
+	api.addFiles('client/mobile/mobile_layout.coffee', 'client');
+	api.addFiles('client/mobile/home.html', 'client');
+	api.addFiles('client/mobile/home.coffee', 'client');
+	api.addFiles('client/mobile/home.less', 'client');
+	api.addFiles('client/mobile/object_menu.html', 'client');
+	api.addFiles('client/mobile/object_menu.coffee', 'client');
+	api.addFiles('client/mobile/object_menu.less', 'client');
+	api.addFiles('client/mobile/mobile_template.less', 'client');
+
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
 	api.addFiles('client/subscribe.coffee', 'client');
 
+	api.addFiles('client/animate.css', 'client');
+	api.addFiles('client/animate.js', 'client');
 	api.addFiles('client/colResizable-1.6.js', 'client');
 	api.addFiles('client/jquery.ba-resize.js', 'client');
 
