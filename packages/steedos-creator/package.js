@@ -13,9 +13,7 @@ Npm.depends({
 	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
-	"xml2js": "0.4.19",
-	'odata-v4-parser': "git+https://github.com/steedos/odata-v4-parser#master",
-	'odata-v4-mongodb': "git+https://github.com/steedos/odata-v4-mongodb#master",
+	"xml2js": "0.4.19"
 });
 
 Package.onUse(function(api) {
@@ -90,8 +88,6 @@ Package.onUse(function(api) {
 	api.use('steedos:lightning-design-system@0.0.1');
 	api.use('steedos:datatables-extensions@0.0.1');
 
-	api.use('steedos:api@0.0.1');
-
 	api.use('steedos:logger@0.0.2');
 
 	api.use('tap:i18n@1.7.0');
@@ -154,8 +150,6 @@ Package.onUse(function(api) {
 	api.addFiles('server/publications/user_tabular_settings.coffee', 'server');
 
 	api.addFiles('server/routes/s3.coffee', 'server');
-
-	api.addFiles('server/startup.coffee', 'server');
 
 	api.addFiles('client/layout/layout.html', 'client');
 	api.addFiles('client/layout/layout.less', 'client');
