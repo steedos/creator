@@ -3,7 +3,7 @@ FlowRouter.route '/',
 		if !Meteor.userId()
 			FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
 		else
-			FlowRouter.go '/app/qhd_informations'
+			FlowRouter.go '/app/qhd_informations/qhd_informations/list'
 
 
 # Meteor.startup ->
