@@ -15,6 +15,7 @@ subscribe_object_listviews = (context, redirect)->
 set_sessions = (context, redirect)->
 	Session.set("app_id", context.params.app_id)
 	Session.set("object_name", context.params.object_name)
+	Session.set("record_id", context.params.record_id)
 
 initLayout = ()->
 	if Steedos.isMobile() and (!$(".wrapper").length or !$("#home_menu").length)
@@ -75,9 +76,19 @@ objectRoutes.route '/:list_view_id/list',
 		object_name = FlowRouter.getParam("object_name")
 		list_view_id = FlowRouter.getParam("list_view_id")
 		data = {app_id: app_id, object_name: object_name, list_view_id: list_view_id}
-		if Steedos.isMobile()
+		if Steedos.isMobile() and $("#mobile_list_#{object_name}").length == 0
 			Meteor.defer ->
 				Blaze.renderWithData(Template.mobileList, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+
+objectRoutes.route '/view/:record_id',
+	action: (params, queryParams)->
+		app_id = FlowRouter.getParam("app_id")
+		object_name = FlowRouter.getParam("object_name")
+		record_id = FlowRouter.getParam("record_id")
+		data = {app_id: app_id, object_name: object_name, record_id: record_id}
+		if Steedos.isMobile()
+			Meteor.defer ->
+				Blaze.renderWithData(Template.mobileView, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 
 FlowRouter.route '/app/:app_id/:object_name/list',
 	triggersEnter: [ checkUserSigned, initLayout ],
