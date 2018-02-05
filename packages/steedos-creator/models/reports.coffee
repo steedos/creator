@@ -16,8 +16,8 @@ Creator.Objects.reports =
 			type: "select"
 			defaultValue: "tabular"
 			options: [
-				{label: "列表", value: "tabular"},
-				{label: "汇总", value: "summary"},
+				{label: "表格", value: "tabular"},
+				{label: "摘要", value: "summary"},
 				{label: "矩阵", value: "matrix"}
 			]
 		object_name: 
@@ -66,6 +66,11 @@ Creator.Objects.reports =
 		values: 
 			label: "统计"
 			type: "[text]"
+		options:
+			blackbox: true
+		# column_width: 
+		# 	label: "排序"
+		# 	type: "object"
 		grouping:
 			label: "显示小计"
 			type: "boolean"
@@ -106,24 +111,3 @@ Creator.Objects.reports =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true 
-	actions: 
-		save:
-			label: "保存"
-			visible: (object_name, record_id, record_permissions)->
-				report = Creator.Collections[object_name].findOne record_id
-				if report.owner == Meteor.userId()
-					return true
-				else
-					return Creator.isSpaceAdmin()
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				filters = Session.get("filter_items")
-				filter_scope = Session.get("filter_scope")
-				report_settings = Template.creator_report.getReportSettings()
-				Creator.getCollection(object_name).update({_id: record_id},{$set:{
-					filters: filters
-					filter_scope: filter_scope
-					grouping: report_settings.grouping
-					totaling: report_settings.totaling
-					counting: report_settings.counting
-				}})

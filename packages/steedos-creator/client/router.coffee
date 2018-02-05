@@ -1,10 +1,27 @@
+@urlQuery = new Array()
+
 checkUserSigned = (context, redirect) ->
 	if !Meteor.userId()
 		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
+	else
+		currentPath = FlowRouter.current().path
+		if currentPath != urlQuery[urlQuery.length - 1]
+			urlQuery.push currentPath
+
+subscribe_object_listviews = (context, redirect)->
+	Tracker.autorun ()->
+		Creator.subs["Creator"]?.subscribe "object_listviews", context.params.object_name
+
+set_sessions = (context, redirect)->
+	Session.set("app_id", context.params.app_id)
+	Session.set("object_name", context.params.object_name)
+	Session.set("record_id", context.params.record_id)
 
 initLayout = ()->
-	if !$(".wrapper").length
-		BlazeLayout.render Creator.getLayout()
+	if Steedos.isMobile() and (!$(".wrapper").length or !$("#home_menu").length)
+		BlazeLayout.render Creator.getLayout(),
+			main: "homeMenu"
+
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
@@ -23,34 +40,21 @@ FlowRouter.route '/app',
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
-		if $(".content-wrapper .home-menu.mobile-template-container").length == 0
-			Meteor.defer ->
-				Blaze.renderWithData(Template.homeMenu, {}, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+		return
 
 FlowRouter.route '/app/:app_id',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
-		if Steedos.isMobile() and $(".content-wrapper .object-menu.mobile-template-container").length == 0
-			Meteor.defer ->
-				Blaze.renderWithData(Template.objectMenu, {}, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+		if Steedos.isMobile() 
+			if $(".content-wrapper #object_menu").length == 0
+				app_id = FlowRouter.getParam("app_id")
+				data = {app_id: app_id}
+				Meteor.defer ->
+					Blaze.renderWithData(Template.objectMenu, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			Session.set("app_id", FlowRouter.getParam("app_id"))
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_app_home"
-
-FlowRouter.route '/app/:app_id/:object_name/list',
-	triggersEnter: [ checkUserSigned ],
-	action: (params, queryParams)->
-		if Session.get("object_name") != FlowRouter.getParam("object_name")
-			Session.set("list_view_id", null)
-		Session.set("app_id", FlowRouter.getParam("app_id"))
-		Session.set("object_name", FlowRouter.getParam("object_name"))
-		Session.set("list_view_visible", false)
-		Tracker.afterFlush ()->
-			Session.set("list_view_visible", true)
-		BlazeLayout.render Creator.getLayout(),
-			main: "creator_list"
-
 
 FlowRouter.route '/app/:app_id/reports/view/:record_id',
 	triggersEnter: [ checkUserSigned ],
@@ -64,14 +68,54 @@ FlowRouter.route '/app/:app_id/reports/view/:record_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_report"
 
-FlowRouter.route '/app/:app_id/:object_name/view/:record_id',
-	triggersEnter: [ checkUserSigned ],
+objectRoutes = FlowRouter.group
+	prefix: '/app/:app_id/:object_name',
+	name: 'objectRoutes',
+	triggersEnter: [checkUserSigned, set_sessions, initLayout]
+
+objectRoutes.route '/list/switch',
 	action: (params, queryParams)->
+		if Steedos.isMobile() and $(".content-wrapper #list_switch").length == 0
+			app_id = FlowRouter.getParam("app_id")
+			object_name = FlowRouter.getParam("object_name")
+			data = {app_id: app_id, object_name: object_name}
+			Meteor.defer ->
+				Blaze.renderWithData(Template.listSwitch, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+
+objectRoutes.route '/:list_view_id/list',
+	action: (params, queryParams)->
+		app_id = FlowRouter.getParam("app_id")
+		object_name = FlowRouter.getParam("object_name")
+		list_view_id = FlowRouter.getParam("list_view_id")
+		data = {app_id: app_id, object_name: object_name, list_view_id: list_view_id}
+		if Steedos.isMobile() and $("#mobile_list_#{object_name}").length == 0
+			Meteor.defer ->
+				Blaze.renderWithData(Template.mobileList, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+
+objectRoutes.route '/view/:record_id',
+	action: (params, queryParams)->
+		app_id = FlowRouter.getParam("app_id")
+		object_name = FlowRouter.getParam("object_name")
+		record_id = FlowRouter.getParam("record_id")
+		data = {app_id: app_id, object_name: object_name, record_id: record_id}
+		if Steedos.isMobile()
+			Meteor.defer ->
+				Blaze.renderWithData(Template.mobileView, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+		else
+			Session.set("detail_info_visible", true)
+			Meteor.call "object_recent_viewed", FlowRouter.getParam("object_name"), FlowRouter.getParam("record_id")
+			BlazeLayout.render Creator.getLayout(),
+				main: "creator_view"
+
+FlowRouter.route '/app/:app_id/:object_name/list',
+	triggersEnter: [ checkUserSigned, initLayout ],
+	action: (params, queryParams)->
+		if Session.get("object_name") != FlowRouter.getParam("object_name")
+			Session.set("list_view_id", null)
 		Session.set("app_id", FlowRouter.getParam("app_id"))
 		Session.set("object_name", FlowRouter.getParam("object_name"))
-		Session.set("record_id", FlowRouter.getParam("record_id"))
-		Session.set("detail_info_visible", true)
-		# Session.set("cmDoc", Creator.getObjectRecord())
-		Meteor.call "object_recent_viewed", FlowRouter.getParam("object_name"), FlowRouter.getParam("record_id")
+		Session.set("list_view_visible", false)
+		Tracker.afterFlush ()->
+			Session.set("list_view_visible", true)
 		BlazeLayout.render Creator.getLayout(),
-			main: "creator_view"
+			main: "creator_list"

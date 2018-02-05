@@ -32,6 +32,9 @@ Template.creator_table_cell.helpers
 
 		_field = this.field
 
+		if !_field
+			return
+
 		reference_to = this.field?.reference_to
 
 		if _.isFunction(reference_to)
@@ -95,7 +98,7 @@ Template.creator_table_cell.helpers
 			else if _field.type == "filesize"
 				val = formatFileSize(val)
 
-			if this.field_name == this_name_field_key
+			if this.parent_view != 'record_details' && this.field_name == this_name_field_key
 				href = Creator.getObjectUrl(this.object_name, this._id)
 
 			data.push({value: val, href: href})

@@ -1,9 +1,9 @@
 Package.describe({
 
-    name: 'steedos:creator',
-    version: '0.0.5',
-    summary: 'Steedos Creator',
-    git: ''
+	name: 'steedos:creator',
+	version: '0.0.5',
+	summary: 'Steedos Creator',
+	git: ''
 });
 
 Npm.depends({
@@ -13,8 +13,7 @@ Npm.depends({
 	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
-	"xml2js": "0.4.19",
-	'odata-v4-mongodb': '0.1.12'
+	"xml2js": "0.4.19"
 });
 
 Package.onUse(function(api) {
@@ -90,8 +89,6 @@ Package.onUse(function(api) {
 	api.use('steedos:lightning-design-system@0.0.1');
 	api.use('steedos:datatables-extensions@0.0.1');
 
-	api.use('steedos:api@0.0.1');
-
 	api.use('steedos:logger@0.0.2');
 
 	api.use('tap:i18n@1.7.0');
@@ -146,16 +143,16 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/object_record.coffee', 'server');
 	api.addFiles('server/methods/object_export2xml.coffee', 'server');
 	api.addFiles('server/methods/object_import_jobs.coffee', 'server');
+	api.addFiles('server/methods/related_objects_records.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
 	api.addFiles('server/publications/related_object.coffee', 'server');
 	api.addFiles('server/publications/object_tabular.coffee', 'server');
 	api.addFiles('server/publications/object_listviews.coffee', 'server');
 	api.addFiles('server/publications/user_tabular_settings.coffee', 'server');
+	api.addFiles('server/publications/related_objects_records.coffee', 'server');
 
 	api.addFiles('server/routes/s3.coffee', 'server');
-
-	api.addFiles('server/startup.coffee', 'server');
 
 	api.addFiles('client/layout/layout.html', 'client');
 	api.addFiles('client/layout/layout.less', 'client');
@@ -182,14 +179,24 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/object_menu.coffee', 'client');
 	api.addFiles('client/mobile/object_menu.less', 'client');
 	api.addFiles('client/mobile/mobile_template.less', 'client');
-	
+	api.addFiles('client/mobile/mobile_list.html', 'client');
+	api.addFiles('client/mobile/mobile_list.less', 'client');
+	api.addFiles('client/mobile/mobile_list.coffee', 'client');
+	api.addFiles('client/mobile/list_switch.html', 'client');
+	api.addFiles('client/mobile/list_switch.less', 'client');
+	api.addFiles('client/mobile/list_switch.coffee', 'client');
+	api.addFiles('client/mobile/mobile_view.html', 'client');
+	api.addFiles('client/mobile/mobile_view.less', 'client');
+	api.addFiles('client/mobile/mobile_view.coffee', 'client');
+
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
 	api.addFiles('client/subscribe.coffee', 'client');
-	
+
 	api.addFiles('client/animate.css', 'client');
 	api.addFiles('client/animate.js', 'client');
+	api.addFiles('client/common_style.less', 'client');
 	api.addFiles('client/colResizable-1.6.js', 'client');
 	api.addFiles('client/jquery.ba-resize.js', 'client');
 
@@ -229,4 +236,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/select_fields.html', 'client');
 	api.addFiles('client/views/select_fields.coffee', 'client');
 	api.addFiles('client/views/select_fields.less', 'client');
+
+	api.addFiles('client/views/custom_data_source.html', 'client');
+	api.addFiles('client/views/custom_data_source.coffee', 'client');
+	api.addFiles('client/views/odata_service.html', 'client');
+	api.addFiles('client/views/odata_service.coffee', 'client');
 });
