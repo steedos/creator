@@ -123,8 +123,53 @@ Template.creator_report.events
 	'click .btn-toggle-designer': (event, template)->
 		isOpen = !template.is_designer_open.get()
 		template.is_designer_open.set(isOpen)
-		Meteor.defer ->
-			renderReport.bind(template)()
+		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
+		# 这里isOpen为false时要重写option，且每个子属性都不能省略，比如不能直接把fieldPanel设置为false，因为反复切换设计模式时会出现异常
+		switch reportObject.report_type
+			when 'tabular'
+				if isOpen
+					option = 
+						allowColumnReordering: true
+						allowColumnResizing: true
+				else
+					option = 
+						allowColumnReordering: false
+						allowColumnResizing: false
+				template.dataGridInstance.option(option)
+			when 'summary'
+				if isOpen
+					option = 
+						allowColumnReordering: true
+						allowColumnResizing: true
+						groupPanel:
+							visible: true
+				else
+					option = 
+						allowColumnReordering: false
+						allowColumnResizing: false
+						groupPanel:
+							visible: false
+				template.dataGridInstance.option(option)
+			when 'matrix'
+				if isOpen
+					option = 
+						fieldPanel:
+							showColumnFields: true
+							showDataFields: true
+							showFilterFields:false
+							showRowFields: true
+							allowFieldDragging: true
+							visible: true
+				else
+					option = 
+						fieldPanel:
+							showColumnFields: true
+							showDataFields: true
+							showFilterFields:false
+							showRowFields: true
+							allowFieldDragging: true
+							visible: false
+				template.pivotGridInstance.option(option)
 
 	'click .record-action-save': (event, template)->
 		record_id = Session.get "record_id"
@@ -135,6 +180,7 @@ Template.creator_report.events
 		rows = []
 		values = []
 		sort = []
+		column_width = []
 		report_settings = template.report_settings.get()
 		report = Creator.getObjectRecord()
 		debugger
@@ -151,8 +197,11 @@ Template.creator_report.events
 				values = report.values
 				fields = _.sortBy(fields,"sortIndex")
 				_.each fields, (n,i)->
+					fieldKey = n.dataField.replace(/\*%\*/g,".")
 					if n.sortOrder
-						sort.push [n.dataField.replace(/\*%\*/g,"."),n.sortOrder]
+						sort.push [fieldKey,n.sortOrder]
+					if n.width
+						column_width.push [fieldKey,n.width]
 			when 'summary'
 				fields = template.dataGridInstance.getVisibleColumns()
 				columns = _.where(fields,{"groupIndex":undefined})
@@ -169,8 +218,11 @@ Template.creator_report.events
 				values = report.values
 				fields = _.sortBy(fields,"sortIndex")
 				_.each fields, (n,i)->
+					fieldKey = n.dataField.replace(/\*%\*/g,".")
 					if n.sortOrder
-						sort.push [n.dataField.replace(/\*%\*/g,"."),n.sortOrder]
+						sort.push [fieldKey,n.sortOrder]
+					if n.width
+						column_width.push [fieldKey,n.width]
 			when 'matrix'
 				fields = template.pivotGridInstance.getDataSource()._fields
 				# 这里之所以要去掉带groupInterval属性的字段，是因为带这个属性的字段都是自动生成的子字段
@@ -193,8 +245,11 @@ Template.creator_report.events
 				values = values.map (n)-> return n.replace(/\*%\*/g,".")
 				fields = _.sortBy(fields,"sortIndex")
 				_.each fields, (n,i)->
+					fieldKey = n.dataField.replace(/\*%\*/g,".")
 					if n.sortOrder
-						sort.push [n.dataField.replace(/\*%\*/g,"."),n.sortOrder]
+						sort.push [fieldKey,n.sortOrder]
+					if n.width
+						column_width.push [fieldKey,n.width]
 			else
 				columns = report.columns
 				rows = report.rows
@@ -202,10 +257,11 @@ Template.creator_report.events
 
 
 				
-		console.log "sort:", sort
-		console.log "sort.json.stringify:", JSON.stringify(sort)
 		options = {}
 		options.sort = sort
+		options.column_width = column_width
+		console.log "options:", options
+		console.log "options.json.stringify:", JSON.stringify(options)
 		Creator.getCollection(objectName).update({_id: record_id},{$set:{
 			filters: filters
 			filter_scope: filter_scope
@@ -226,6 +282,7 @@ renderTabularReport = (reportObject, reportData)->
 	if _.isEmpty objectFields
 		return
 	sorts = _.object(reportObject.options?.sort)
+	columnWidths = _.object(reportObject.options?.column_width)
 	reportColumns = reportObject.columns?.map (item, index)->
 		itemFieldKey = item.replace(/\./g,"*%*")
 		fieldFirstKey = item.split(".")[0]
@@ -236,6 +293,8 @@ renderTabularReport = (reportObject, reportData)->
 		}
 		if sorts[item]
 			field.sortOrder = sorts[item]
+		if columnWidths[item]
+			field.width = columnWidths[item]
 		return field
 	unless reportColumns
 		reportColumns = []
@@ -261,6 +320,8 @@ renderTabularReport = (reportObject, reportData)->
 	console.log "renderTabularReport.reportSummary:", reportSummary
 
 	dxOptions = 
+		sorting: 
+			mode: "multiple"
 		columnAutoWidth: true
 		"export":
 			enabled: true
@@ -269,16 +330,6 @@ renderTabularReport = (reportObject, reportData)->
 		paging: false
 		columns: reportColumns
 		summary: reportSummary
-	isDesignerOpen = self.is_designer_open.get()
-	if isDesignerOpen
-		_.extend dxOptions,
-			allowColumnReordering: true
-			allowColumnResizing: true
-	else
-		# 这里要重写为false，且不能省略，原因是设置为true后切换isDesignerOpen时需要重置为false
-		_.extend dxOptions,
-			allowColumnReordering: false
-			allowColumnResizing: false
 	
 	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
 
@@ -291,6 +342,7 @@ renderSummaryReport = (reportObject, reportData)->
 	if _.isEmpty objectFields
 		return
 	sorts = _.object(reportObject.options?.sort)
+	columnWidths = _.object(reportObject.options?.column_width)
 	reportColumns = reportObject.columns?.map (item, index)->
 		itemFieldKey = item.replace(/\./g,"*%*")
 		fieldFirstKey = item.split(".")[0]
@@ -301,6 +353,8 @@ renderSummaryReport = (reportObject, reportData)->
 		}
 		if sorts[item]
 			field.sortOrder = sorts[item]
+		if columnWidths[item]
+			field.width = columnWidths[item]
 		return field
 	unless reportColumns
 		reportColumns = []
@@ -315,6 +369,8 @@ renderSummaryReport = (reportObject, reportData)->
 		}
 		if sorts[group]
 			field.sortOrder = sorts[group]
+		if columnWidths[group]
+			field.width = columnWidths[group]
 		reportColumns.push field
 
 	reportSummary = {}
@@ -371,6 +427,8 @@ renderSummaryReport = (reportObject, reportData)->
 
 	console.log "renderSummaryReport.reportColumns:", reportColumns
 	dxOptions = 
+		sorting: 
+			mode: "multiple"
 		columnAutoWidth: true
 		"export":
 			enabled: true
@@ -379,19 +437,6 @@ renderSummaryReport = (reportObject, reportData)->
 		paging: false
 		columns: reportColumns
 		summary: reportSummary
-	isDesignerOpen = self.is_designer_open.get()
-	if isDesignerOpen
-		_.extend dxOptions,
-			allowColumnReordering: true
-			allowColumnResizing: true
-			groupPanel:
-				visible: true
-	else
-		# 这里要重写为false，且不能省略，原因是设置为true后切换isDesignerOpen时需要重置为false
-		_.extend dxOptions,
-			allowColumnReordering: false
-			allowColumnResizing: false
-			groupPanel:false
 
 	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
 
@@ -404,39 +449,46 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 	if _.isEmpty objectFields
 		return
 	sorts = _.object(reportObject.options?.sort)
+	columnWidths = _.object(reportObject.options?.column_width)
 	reportFields = []
 	_.each reportObject.rows, (row)->
-		rowFieldKey = row.replace(/\./g,"*%*")
-		fieldFirstKey = row.split(".")[0]
-		rowField = objectFields[fieldFirstKey]
-		caption = rowField.label
-		unless caption
-			caption = objectName + "_" + rowFieldKey
-		field = {
-			caption: caption
-			width: 100
-			dataField: rowFieldKey
-			area: 'row'
-		}
-		if sorts[row]
-			field.sortOrder = sorts[row]
-		reportFields.push field
+		if row != "_id"
+			rowFieldKey = row.replace(/\./g,"*%*")
+			fieldFirstKey = row.split(".")[0]
+			rowField = objectFields[fieldFirstKey]
+			caption = rowField.label
+			unless caption
+				caption = objectName + "_" + rowFieldKey
+			field = {
+				caption: caption
+				width: 100
+				dataField: rowFieldKey
+				area: 'row'
+			}
+			if sorts[row]
+				field.sortOrder = sorts[row]
+			if columnWidths[row]
+				field.width = columnWidths[row]
+			reportFields.push field
 	_.each reportObject.columns, (column)->
-		columnFieldKey = column.replace(/\./g,"*%*")
-		fieldFirstKey = column.split(".")[0]
-		columnField = objectFields[fieldFirstKey]
-		caption = columnField.label
-		unless caption
-			caption = objectName + "_" + columnFieldKey
-		field = {
-			caption: caption
-			width: 100
-			dataField: columnFieldKey
-			area: 'column'
-		}
-		if sorts[column]
-			field.sortOrder = sorts[column]
-		reportFields.push field
+		if column != "_id"
+			columnFieldKey = column.replace(/\./g,"*%*")
+			fieldFirstKey = column.split(".")[0]
+			columnField = objectFields[fieldFirstKey]
+			caption = columnField.label
+			unless caption
+				caption = objectName + "_" + columnFieldKey
+			field = {
+				caption: caption
+				width: 100
+				dataField: columnFieldKey
+				area: 'column'
+			}
+			if sorts[column]
+				field.sortOrder = sorts[column]
+			if columnWidths[column]
+				field.width = columnWidths[column]
+			reportFields.push field
 	
 	counting = reportObject.counting
 	if reportObject.counting == undefined
@@ -497,7 +549,9 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 		adaptiveLayout: 
 			width: 450
 	).dxChart('instance')
-	dxOptions= 
+	dxOptions = 
+		sorting: 
+			mode: "multiple"
 		paging: false
 		allowSortingBySummary: true
 		allowSorting: true
@@ -513,20 +567,6 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 		dataSource:
 			fields: reportFields
 			store: reportData
-	isDesignerOpen = self.is_designer_open.get()
-	if isDesignerOpen
-		_.extend dxOptions,
-			fieldPanel:
-				showColumnFields: true
-				showDataFields: true
-				showFilterFields:false
-				showRowFields: true
-				allowFieldDragging: true
-				visible: true
-	else
-		# 这里要重写为false，且不能省略，原因是设置为true后切换isDesignerOpen时需要重置为false
-		_.extend dxOptions,
-			fieldPanel: false
 	pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
 	pivotGrid.bindChart pivotGridChart,
 		dataFieldsDisplayMode: 'splitPanes'
@@ -573,7 +613,7 @@ renderReport = (reportObject)->
 		if error
 			console.error('report_data method error:', error)
 			return
-		
+		console.log "report_data:", result
 		switch reportObject.report_type
 			when 'tabular'
 				renderTabularReport.bind(self)(reportObject, result)
