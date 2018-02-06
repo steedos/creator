@@ -124,6 +124,7 @@ Template.creator_report.events
 		isOpen = !template.is_designer_open.get()
 		template.is_designer_open.set(isOpen)
 		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
+		# 这里isOpen为false时要重写option，且每个子属性都不能省略，比如不能直接把fieldPanel设置为false，因为反复切换设计模式时会出现异常
 		switch reportObject.report_type
 			when 'tabular'
 				if isOpen
