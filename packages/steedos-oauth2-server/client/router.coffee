@@ -1,4 +1,9 @@
-FlowRouter.route '/steedos/meteor_oauth2',
+FlowRouter.route '/oauth2',
 	action: (params, queryParams)->
-		BlazeLayout.render 'loginLayout',
-			main: "loginAuthorize"
+		if !Meteor.userId()
+			BlazeLayout.render 'loginLayout',
+				main: "atForm"
+		else
+			BlazeLayout.render 'loginLayout',
+				main: "loginAuthorize"
+	

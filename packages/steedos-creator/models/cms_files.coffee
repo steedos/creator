@@ -3,10 +3,13 @@ Creator.Objects.cms_files =
 	label: "文件"
 	icon: "drafts"
 	enable_search: true
+	enable_api: true
 	fields:
 		name: 
 			label: "名称"
 			type: "text"
+			searchable:true
+			index:true
 		description: 
 			label: "描述"
 			type: "textarea"

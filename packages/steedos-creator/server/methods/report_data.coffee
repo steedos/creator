@@ -1,6 +1,5 @@
 Meteor.methods
 	'report_data': (options)->
-		console.log "report_data,options:", options
 		check(options, Object)
 		space = options.space
 		fields = options.fields
@@ -30,41 +29,15 @@ Meteor.methods
 
 		if filters and filters.length > 0
 			filters = _.map filters, (obj)->
-				query = {}
-				if obj.operation == "EQUALS"
-					query[obj.field] = 
-						$eq: obj.value
-				else if obj.operation == "NOT_EQUAL"
-					query[obj.field] = 
-						$ne: obj.value
-				else if obj.operation == "LESS_THAN"
-					query[obj.field] = 
-						$lt: obj.value
-				else if obj.operation == "GREATER_THAN"
-					query[obj.field] = 
-						$gt: obj.value
-				else if obj.operation == "LESS_OR_EQUAL"
-					query[obj.field] = 
-						$lte: obj.value
-				else if obj.operation == "GREATER_OR_EQUAL"
-					query[obj.field] = 
-						$gte: obj.value
-				else if obj.operation == "CONTAINS"
-					reg = new RegExp(obj.value, "i")
-					query[obj.field] = 
-						$regex: reg
-				else if obj.operation == "NOT_CONTAIN"
-					reg = new RegExp("^((?!" + obj.value + ").)*$", "i")
-					query[obj.field] = 
-						$regex: reg
-				else if obj.operation == "STARTS_WITH"
-					reg = new RegExp("^" + obj.value, "i")
-					query[obj.field] = 
-						$regex: reg
-				return query
+				return [obj.field, obj.operation, obj.value]
+			
+			filters = Creator.formatFiltersToMongo(filters)
 			selector["$and"] = filters
 
-		result = Creator.getCollection(object_name).find(selector, fields: filterFields).fetch()
+		cursor = Creator.getCollection(object_name).find(selector, fields: filterFields)
+		if cursor.count() > 1000
+			return []
+		result = cursor.fetch()
 		if compoundFields.length
 			result = result.map (item,index)->
 				_.each compoundFields, (compoundFieldItem, index)->
@@ -83,8 +56,9 @@ Meteor.methods
 						item[itemKey] = _.findWhere(options, {value: itemValue})?.label or itemValue
 					else
 						item[itemKey] = itemValue
+					unless item[itemKey]
+						item[itemKey] = "--"
 				return item
-			console.log "result:", result
 			return result
 		else
 			return result

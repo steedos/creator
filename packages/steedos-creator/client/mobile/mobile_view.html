@@ -5,7 +5,9 @@
 				<div class="bLeft mobile-view-back">
 					<i class="ion ion-android-arrow-back"></i>
 				</div>
-				<div class="bRight"></div>
+				<div class="bRight action-manage">
+					<i class="ion ion-gear-a"></i>
+				</div>
 				<div class="bBody">
 					MobileView
 				</div>
@@ -20,10 +22,10 @@
 						</div>
 						<div class="fieldWrapper">
 							<h1 class="primaryField highlightsH1 dark">
-								秦皇岛股份有限公司
+								{{record_name}}
 							</h1>
 							<h2 class="secondaryFields">
-								庄建国
+								
 							</h2>
 						</div>
 					</div>
@@ -116,7 +118,7 @@
 					</div>
 					<div class="related-object-card info-card-container">
 						{{#each related_objects}}
-							<div class="slds-card slds-card_boundary forceBaseCard forceCard forceRelatedListCard">
+							<a class="slds-card slds-card_boundary forceBaseCard forceCard forceRelatedListCard" href="{{related_object_url this.object_name}}">
 								<div class="slds-card__header slds-grid">
 									<header class="slds-media slds-media--center slds-has-flexi-truncate">
 										<div class="slds-media__figure">
@@ -133,11 +135,25 @@
 										</div>
 									</header>
 								</div>
-							</div>
+							</a>
 						{{/each}}
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	<div>
+		<div class="weui-mask view-action-mask" style="display: none;opacity: 0"></div>
+		<div class="weui-actionsheet view-action-actionsheet" >
+			<div class="weui-actionsheet__menu">
+				{{#each actions}}
+					<div class="weui-actionsheet__cell view-action">{{this.label}}</div>
+				{{/each}}
+			</div>
+			<div class="weui-actionsheet__action">
+				<div class="weui-actionsheet__cell actionsheet-cancel">{{_ "Cancel"}}</div>
+			</div>
+		</div>
+	</div>
+	{{#afModal formId="editRecord" class="btn btn-primary btn-edit-record hidden" collection=collection operation="update" dialogClass="modal-lg modal-body-zoom.includes" collectionName=collectionName}} {{_ "Edit"}} {{/afModal}}
 </template>

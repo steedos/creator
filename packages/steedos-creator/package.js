@@ -77,7 +77,7 @@ Package.onUse(function(api) {
 	api.use('steedos:sso@0.0.4')
 	api.use('steedos:adminlte@2.3.12_3');
 	api.use('steedos:base@0.0.73');
-	api.use('steedos:accounts@0.0.27');
+	api.use('steedos:accounts@0.0.29');
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:autoform@0.0.1');
@@ -154,6 +154,8 @@ Package.onUse(function(api) {
 
 	api.addFiles('server/routes/s3.coffee', 'server');
 
+	api.addFiles('client/views/_helpers.coffee', 'client');
+
 	api.addFiles('client/layout/layout.html', 'client');
 	api.addFiles('client/layout/layout.less', 'client');
 	api.addFiles('client/layout/layout.coffee', 'client');
@@ -188,6 +190,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/mobile_view.html', 'client');
 	api.addFiles('client/mobile/mobile_view.less', 'client');
 	api.addFiles('client/mobile/mobile_view.coffee', 'client');
+	api.addFiles('client/mobile/related_object_list.html', 'client');
+	api.addFiles('client/mobile/related_object_list.less', 'client');
+	api.addFiles('client/mobile/related_object_list.coffee', 'client');
 
 
 	api.addFiles('client/core.coffee', 'client');
@@ -200,7 +205,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/colResizable-1.6.js', 'client');
 	api.addFiles('client/jquery.ba-resize.js', 'client');
 
-	api.addFiles('client/views/_helpers.coffee', 'client');
+	api.addFiles('client/views/grid.html', 'client');
+	api.addFiles('client/views/grid.coffee', 'client');
+	api.addFiles('client/views/grid.less', 'client');
 	api.addFiles('client/views/list.html', 'client');
 	api.addFiles('client/views/list.coffee', 'client');
 	api.addFiles('client/views/list.less', 'client');
@@ -241,4 +248,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/custom_data_source.coffee', 'client');
 	api.addFiles('client/views/odata_service.html', 'client');
 	api.addFiles('client/views/odata_service.coffee', 'client');
+
+
+	api.addFiles('client/theme.less', 'client');
 });

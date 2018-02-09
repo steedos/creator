@@ -19,11 +19,21 @@ Template.mobileView.onRendered ->
 		if object_name and record_id and spaceId
 			related_objects = Creator.getRelatedList(object_name, record_id)
 			_.each related_objects, (obj) ->
-				Creator.subs["Creator"].subscribe "related_objects_records", obj.object_name, obj.related_field_name, record_id, spaceId
+				Creator.subs["Creator"].subscribe "related_objects_records", object_name, obj.object_name, obj.related_field_name, record_id, spaceId
+
+Template.mobileView.helpers Creator.helpers
 
 Template.mobileView.helpers
 	record_id: ()->
 		return Template.instance().data.record_id
+
+	record_name: ()->
+		object_name = Template.instance().data.object_name
+		record_id = Template.instance().data.record_id
+		record = Creator.getObjectRecord(object_name, record_id)
+		name_field_key = Creator.getObject(object_name).NAME_FIELD_KEY
+		if record and name_field_key
+			return record[name_field_key]
 
 	showForm: ()->
 		object_name = Template.instance().data.object_name
@@ -113,27 +123,56 @@ Template.mobileView.helpers
 		record_id = Template.instance().data.record_id
 		return Creator.getRelatedList(object_name, record_id)
 
-	related_records_counts: (object_name, related_field_name)->
+	related_records_counts: (related_object_name, related_field_name)->
+		object_name = Template.instance().data.object_name
 		record_id = Template.instance().data.record_id
 		spaceId = Steedos.spaceId()
 		userId = Meteor.userId()
-		if object_name == "cfs.files.filerecord"
+		if related_object_name == "cfs.files.filerecord"
 			selector = {"metadata.space": spaceId}
 		else
 			selector = {space: spaceId}
 		
-		if object_name == "cms_files"
+		if related_object_name == "cms_files"
 			# 附件的关联搜索条件是定死的
 			selector["parent.o"] = object_name
 			selector["parent.ids"] = [record_id]
 		else
 			selector[related_field_name] = record_id
 
-		permissions = Creator.getPermissions(object_name, spaceId, userId)
+		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
 		if !permissions.viewAllRecords and permissions.allowRead
 			selector.owner = userId
 
-		return Creator.Collections[object_name].find().count()
+		return Creator.Collections[related_object_name].find(selector).count()
+
+	related_object_url: (related_object_name)->
+		app_id = Template.instance().data.app_id
+		object_name = Template.instance().data.object_name
+		record_id = Template.instance().data.record_id
+		Creator.getRelatedObjectUrl(object_name, app_id, record_id, related_object_name)
+
+	collection: ()->
+		object_name = Template.instance().data.object_name
+		return "Creator.Collections." + object_name
+
+	actions: ()->
+		record_id = Template.instance().data.record_id
+		object_name = Template.instance().data.object_name
+		actions = Creator.getActions(object_name)
+		permissions = Creator.getPermissions(object_name)
+
+		actions = _.filter actions, (action)->
+			if action.on == "record" or action.on == "record_more"
+				if action.only_list_item
+					return false
+				if typeof action.visible == "function"
+					return action.visible(object_name, record_id, permissions)
+				else
+					return action.visible
+			else
+				return false
+		return actions
 
 Template.mobileView.events
 	'click .mobile-view-back': (event, template)->
@@ -158,3 +197,45 @@ Template.mobileView.events
 		width = template.$(".indicator-bar").width()
 		template.$(".indicator-bar").css({"transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, #{width}, 0, 0, 1)"})
 		template.$(".scroller").css({"transform": "translate3d(-50%, 0px, 0px)"})
+
+	'click .action-manage': (event, template)->
+		template.$(".view-action-mask").css({"opacity": "1", "display": "block"})
+		template.$(".view-action-actionsheet").addClass("weui-actionsheet_toggle")
+
+	'click .weui-actionsheet__cell': (event, template)->
+		template.$(".view-action-mask").css({"opacity": "0", "display": "none"})
+		template.$(".view-action-actionsheet").removeClass("weui-actionsheet_toggle")
+
+	'click .view-action-mask': (event, template)->
+		template.$(".view-action-mask").css({"opacity": "0", "display": "none"})
+		template.$(".view-action-actionsheet").removeClass("weui-actionsheet_toggle")
+
+	'click .view-action': (event, template)->
+		record_id = Template.instance().data.record_id
+		object_name = Template.instance().data.object_name
+		object = Creator.getObject(object_name)
+		if this.name == "standard_delete"
+			Session.set "reload_dxlist", false
+			swal
+				title: "删除#{object.label}"
+				text: "<div class='delete-creator-warning'>是否确定要删除此#{object.label}？</div>"
+				html: true
+				showCancelButton:true
+				confirmButtonText: t('Delete')
+				cancelButtonText: t('Cancel')
+				(option) ->
+					if option
+						Creator.Collections[object_name].remove {_id: record_id}, (error, result) ->
+							if error
+								toastr.error error.reason
+							else
+								Session.set "reload_dxlist", true
+								toastr.success "删除成功"
+								template.$(".mobile-view-back").click()
+		else
+			Creator.executeAction object_name, this, record_id
+
+AutoForm.hooks editRecord:
+	onSuccess: (formType, result)->
+		console.log "editRecord onsuccess"
+		Session.set("reload_dxlist", true)

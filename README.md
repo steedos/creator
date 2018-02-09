@@ -32,7 +32,7 @@ baseObject用于定义所有对象适用的基础fields, triggers, indexes. list
 - name: 唯一的object name
 - label: 显示名
 - icon：图标，参见 https://www.lightningdesignsystem.com/icons ， Standard Icons 部分
-- enable_search: 启用全局搜索，只搜索name字段
+- enable_search: 启用全局搜索，只搜索searchable的字段
 - enable_files: 启用上传附件功能
 - enable_chatter: 启用讨论功能
 - enable_tasks: 启用任务功能
@@ -80,6 +80,7 @@ baseObject用于定义所有对象适用的基础fields, triggers, indexes. list
 - hidden: 隐藏，在列表和表单中都不显示
 - blackbox: 告知schema忽略此字段的类型验证
 - allowedValues: 可选项范围
+- seachable: 可搜索
 
 ### permissions 权限
 Object权限分以下类型
@@ -176,3 +177,17 @@ Creator支持多租户的环境，并自动生成多租户相关的代码。
 - 用户必须先选择工作区才能开始操作，也就是Session.get("spaceId")不为空
 - 新增记录时，自动加上space字段
 - 查询列表时，自动加上space字段
+
+
+### filters 过滤器
+flters 用于配置视图的默认过滤条件
+- 支持的操作符
+	- "=": 等于
+	- "<>": 不等于
+	- ">": 大于
+	- ">=": 大于等于
+	- "<": 小于
+	- "<=": 小于等于
+	- "startswith": 以...开始
+	- "contains": 包含...
+	- "notcontains": 不包含...

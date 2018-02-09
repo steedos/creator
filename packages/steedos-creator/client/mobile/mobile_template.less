@@ -32,6 +32,7 @@
                     line-height: 44px;
                     color: #fff;
                     height: 100%;
+                    text-align: left;
                 }
                 .bBody {
                     height: 100%;
@@ -48,6 +49,7 @@
                     line-height: 44px;
                     color: #fff;
                     height: 100%;
+                    text-align: right;
                 }
             }
         }
@@ -59,6 +61,36 @@
             width: 100%;
             overflow: auto;
             background-color: rgb(243, 242, 242);
+
+            a:hover, a:focus {
+                text-decoration: none !important;
+            }
+
+            .dx-list {
+                background: #fff;
+                .dx-list-item {
+                    &.dx-state-active {
+                        background: transparent;
+                    }
+                    .dx-item-content.dx-list-item-content {
+                        padding: 0;
+                        .weui-cell {
+                            padding: 10px 10px;
+                            .weui-cell__hd {
+                                margin-right: 10px;
+                            }
+                        }
+                    }
+                }
+            }
         }
     } 
+}
+
+@media screen and (max-width: 767px) {
+    .sweet-alert h2 {
+        font-weight: normal;
+        font-size: 22px;
+        margin: 0px; 
+    }
 }

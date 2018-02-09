@@ -62,6 +62,9 @@ Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 	else
 		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/list/switch")
 
+Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_name) ->
+	return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/list")
+
 Creator.getCollection = (object_name)->
 	if !object_name
 		object_name = Session.get("object_name")
@@ -138,6 +141,65 @@ Creator.evaluateFilters = (filters, context)->
 			selector[name] = {}
 			selector[name][action] = value
 	console.log("evaluateFilters-->selector", selector)
+	return selector
+
+# "=", "<>", ">", ">=", "<", "<=", "startswith", "contains", "notcontains".
+Creator.formatFiltersToMongo = (filters)->
+	unless filters.length
+		return
+	selector = []
+	_.each filters, (filter)->
+		field = filter[0]
+		option = filter[1]
+		value = filter[2]
+		sub_selector = {}
+		sub_selector[field] = {}
+		if option == "="
+			sub_selector[field]["$eq"] = value
+		else if option == "<>"
+			sub_selector[field]["$ne"] = value
+		else if option == ">"
+			sub_selector[field]["$gt"] = value
+		else if option == ">="
+			sub_selector[field]["$gte"] = value
+		else if option == "<"
+			sub_selector[field]["$lt"] = value
+		else if option == "<="
+			sub_selector[field]["$lte"] = value
+		else if option == "startswith"
+			reg = new RegExp("^" + value, "i")
+			sub_selector[field]["$regex"] = reg
+		else if option == "contains"
+			reg = new RegExp(value, "i")
+			sub_selector[field]["$regex"] = reg
+		else if option == "notcontains"
+			reg = new RegExp("^((?!" + value + ").)*$", "i")
+			sub_selector[field]["$regex"] = reg
+		selector.push sub_selector
+	return selector
+
+Creator.formatFiltersToDev = (filters)->
+	unless filters.length
+		return
+	selector = []
+	_.each filters, (filter)->
+		field = filter[0]
+		option = filter[1]
+		value = filter[2]
+		sub_selector = []
+		if _.isArray(value) == true and option == "="
+			_.each value, (v)->
+				sub_selector.push [field, "=", v], "and"
+
+			if sub_selector[sub_selector.length - 1] == "and"
+				sub_selector.pop()
+			selector.push sub_selector
+		else
+			selector.push filter, "and"
+	
+	if selector[selector.length - 1] == "and"
+		selector.pop()
+
 	return selector
 
 Creator.getRelatedObjects = (object_name, spaceId, userId)->

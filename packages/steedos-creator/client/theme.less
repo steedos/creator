@@ -1,0 +1,54 @@
+body {
+	background-size: cover;
+}
+
+.steedos.fixed.skin-blue-light {
+	.slds-context-bar {
+		z-index: 1000;
+	    height: 50px;
+		color: white;
+	    box-shadow: rgba(0, 0, 0, 0.3) 0 1px 9px, rgba(255, 255, 255, 0.2) 0 -1px 0 inset;
+	    -webkit-transition: all 1s ease-in-out 0.5s;
+	    transition: all 1s ease-in-out 0.5s;
+	    border-bottom: 1px solid #000;
+	    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	    background: rgba(22, 84, 150, 0.84);
+
+		.slds-context-bar__icon-action {
+			color: white;
+		}
+		.steedos-creator-global-search {
+			color: rgb(22, 50, 92);
+			.slds-lookup__search-input {
+				width: 280px;
+			}
+		}
+	}
+
+	.slds-page-header {
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	.slds-context-bar__item:not(.slds-no-hover):hover:after {
+		background: rgba(255, 255, 255, 0.75);
+	}
+
+	.slds-context-bar__label-action:focus, .slds-context-bar__label-action:focus:hover {
+		text-decoration: none;
+	}
+
+}
+
+
+.slds-icon-waffle [class*="slds-r"] {
+	background-color: white;
+}
+
+
+@keyframes bkAnim {
+  50% {
+    background-color: rgba(33, 146, 190, 0.3); }
+  100% {
+    background-color: rgba(33, 146, 190, 0.1); } 
+}
