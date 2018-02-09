@@ -111,6 +111,7 @@ Template.creator_grid.onRendered ->
 				caption: ""
 				dataField: "_id"
 				width: 80
+				allowSorting: false
 				cellTemplate: (container, options) ->
 					container.css("overflow", "visible")
 					record_permissions = Creator.getRecordPermissions object_name, options.data, Meteor.userId()
