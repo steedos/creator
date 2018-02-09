@@ -110,12 +110,21 @@ Template.creator_grid.onRendered ->
 			showColumns.push
 				caption: ""
 				dataField: "_id"
-				width: 80
+				width: 60
 				allowSorting: false
 				cellTemplate: (container, options) ->
 					container.css("overflow", "visible")
 					record_permissions = Creator.getRecordPermissions object_name, options.data, Meteor.userId()
 					container.html(Blaze.toHTMLWithData Template.creator_table_actions, {_id: options.data._id, object_name: object_name, record_permissions: record_permissions, is_related: false}, container)
+			showColumns.splice 0, 0, 
+				caption: ""
+				dataField: "_id"
+				width: 80
+				allowSorting: false
+				headerCellTemplate: (container) ->
+					container.html(Blaze.toHTMLWithData Template.creator_table_checkbox, {_id: "#", object_name: object_name}, container)
+				cellTemplate: (container, options) ->
+					container.html(Blaze.toHTMLWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: object_name}, container)
 
 			dxOptions = 
 				dataSource: 
