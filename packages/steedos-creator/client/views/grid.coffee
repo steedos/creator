@@ -321,12 +321,30 @@ Template.creator_grid.events
 		object = Creator.getObject(objectName)
 		action = object.actions[actionKey]
 		collection_name = object.label
-		Session.set("action_fields", undefined)
-		Session.set("action_collection", "Creator.Collections.#{objectName}")
-		Session.set("action_collection_name", collection_name)
-		Session.set("action_record_title", template.$(".grid-item-link-"+ recordId).attr("title"))
-		Session.set("action_save_and_insert", true)
-		Creator.executeAction objectName, action, recordId
+		if action.todo == "standard_delete"
+			action_record_title = template.$(".grid-item-link-"+ recordId).attr("title")
+			swal
+				title: "删除#{object.label}"
+				text: "<div class='delete-creator-warning'>是否确定要删除此#{object.label}？</div>"
+				html: true
+				showCancelButton:true
+				confirmButtonText: t('Delete')
+				cancelButtonText: t('Cancel')
+				(option) ->
+					if option
+						Creator.Collections[objectName].remove {_id: recordId}, (error, result) ->
+							if error
+								toastr.error error.reason
+							else
+								info = object.label + "\"#{action_record_title}\"" + "已删除"
+								toastr.success info
+								dxDataGridInstance.refresh()
+		else
+			Session.set("action_fields", undefined)
+			Session.set("action_collection", "Creator.Collections.#{objectName}")
+			Session.set("action_collection_name", collection_name)
+			Session.set("action_save_and_insert", true)
+			Creator.executeAction objectName, action, recordId
 
 	'click .table-cell-edit': (event, template) ->
 		field = this.field_name
@@ -516,10 +534,6 @@ Template.creator_grid.onCreated ->
 		onSuccess: (formType,result)->
 			dxDataGridInstance.refresh()
 	,true
-	AutoForm.hooks creatorDeleteForm:
-		onSuccess: (formType,result)->
-			dxDataGridInstance.refresh()
-	,true
 
 Template.creator_grid.onDestroyed ->
 	object_name = Session.get("object_name")
@@ -532,8 +546,5 @@ Template.creator_grid.onDestroyed ->
 			
 	,true
 	AutoForm.hooks creatorEditForm:
-		onSuccess: undefined
-	,true
-	AutoForm.hooks creatorDeleteForm:
 		onSuccess: undefined
 	,true
