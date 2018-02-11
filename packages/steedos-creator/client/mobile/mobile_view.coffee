@@ -235,6 +235,9 @@ Template.mobileView.events
 		else
 			Creator.executeAction object_name, this, record_id
 
+	'click .group-section-control': (event, template)->
+		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
+
 AutoForm.hooks editRecord:
 	onSuccess: (formType, result)->
 		console.log "editRecord onsuccess"
