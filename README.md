@@ -193,3 +193,6 @@ flters 用于配置视图的默认过滤条件
 	- "startswith": 以...开始
 	- "contains": 包含...
 	- "notcontains": 不包含...
+
+- 实例
+	[["is_received", "=", true],["destroy_date","<=",new Date()],["is_destroyed", "=", false]]
