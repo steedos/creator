@@ -177,9 +177,9 @@ Template.mobileView.helpers
 Template.mobileView.events
 	'click .mobile-view-back': (event, template)->
 		lastUrl = urlQuery[urlQuery.length - 2]
+		urlQuery.pop()
 		template.$(".mobile-view").animateCss "fadeOutRight", ->
 			Blaze.remove(template.view)         
-			urlQuery.pop()
 			if lastUrl
 				FlowRouter.go lastUrl
 			else
