@@ -20,11 +20,11 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	grid_settings = Creator.Collections.settings.findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns)
 	return columns.map (n,i)->
+		field = object.fields[n]
 		columnItem = 
 			cssClass: "slds-cell-edit"
 			dataField: n
 			cellTemplate: (container, options) ->
-				field = object.fields[n]
 				field_name = n
 				if /\w+\.\$\.\w+/g.test(field_name)
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
@@ -47,6 +47,9 @@ _columns = (object_name, columns, list_view_id, is_related)->
 			_.each column_sort_settings, (sort)->
 				if sort[0] == n
 					columnItem.sortOrder = sort[1]
+		
+		unless field.sortable
+			columnItem.allowSorting = false
 		return columnItem
 
 _defaultWidth = (columns)->
