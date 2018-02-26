@@ -78,10 +78,13 @@ Creator.Objects.reports =
 				_object = Creator.getObject(values.object_name)
 				fields = _object?.fields
 				icon = _object?.icon
-
 				_.forEach fields, (f, k)->
 					_options.push {label: f.label || k, value: k, icon: icon}
-
+					if f.reference_to
+						r_object = Creator.getObject(f.reference_to)
+						if r_object
+							_.forEach r_object.fields, (f2, k2)->
+								_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
 				return _options
 		rows: 
 			label: "行"
@@ -97,6 +100,11 @@ Creator.Objects.reports =
 
 				_.forEach fields, (f, k)->
 					_options.push {label: f.label || k, value: k, icon: icon}
+					if f.reference_to
+						r_object = Creator.getObject(f.reference_to)
+						if r_object
+							_.forEach r_object.fields, (f2, k2)->
+								_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
 
 				return _options
 		values: 
