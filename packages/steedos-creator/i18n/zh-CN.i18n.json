@@ -50,8 +50,5 @@
 	"creator_home_apps": "工作台",
 	"creator_detail_info": "详细信息",
 	"creator_detail_related": "相关",
-	"creator_new": "新建",
-
-	"creator_object_select_field_label": "选项名称",
-	"creator_object_select_field_value": "选项值"
+	"creator_new": "新建"
 }
