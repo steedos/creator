@@ -49,5 +49,8 @@
 	"creator_home_apps": "Apps",
 	"creator_detail_info": "DETAILS",
 	"creator_detail_related": "RELATED",
-	"creator_new": "New"
+	"creator_new": "New",
+	
+	"creator_object_select_field_label": "Option Label",
+	"creator_object_select_field_value": "Option Value"
 }
