@@ -374,8 +374,8 @@ Creator.getObjectLookupFieldOptions = (object_name, is_deep)->
 		_options.push {label: f.label || k, value: k, icon: icon}
 		if is_deep
 			if f.type == "select"
-				_options.push {label: "#{f.label || k}=>#{t 'Label'}", value: "#{k}.label", icon: icon}
-				_options.push {label: "#{f.label || k}=>#{t 'Value'}", value: "#{k}.value", icon: icon}
+				_options.push {label: "#{f.label || k}=>#{t 'creator_object_select_field_label'}", value: "#{k}.label", icon: icon}
+				_options.push {label: "#{f.label || k}=>#{t 'creator_object_select_field_value'}", value: "#{k}.value", icon: icon}
 			else if f.reference_to
 				r_object = Creator.getObject(f.reference_to)
 				if r_object
