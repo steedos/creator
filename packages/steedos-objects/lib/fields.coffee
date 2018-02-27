@@ -59,7 +59,7 @@ Creator.getObjectSchema = (obj) ->
 
 			fs.autoform.dependOn = field.depend_on
 
-			fs.filtersMethod = Creator.evaluateFilters
+			fs.filtersFunction = Creator.evaluateFilters
 
 			if field.reference_to
 
@@ -220,10 +220,3 @@ Creator.getFieldDisplayValue = (object_name, field_name, field_value)->
 		html = moment(this.val).format('YYYY-MM-DD')
 
 	return html
-
-Creator.getObjectOdataSchema = (obj) ->
-	schema = {}
-	_.each Creator.getObjectSchema(obj), (val, key)->
-		schema[key] = _.pick(val, 'type')
-
-	return schema

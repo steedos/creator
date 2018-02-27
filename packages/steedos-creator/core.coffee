@@ -1,13 +1,11 @@
 Creator.Apps = {}
-Creator.Objects = {}
-Creator.Collections = {}
 Creator.Reports = {}
 Creator.subs = {}
 
 
 Meteor.startup ->
 
-	SimpleSchema.extendOptions({filtersMethod: Match.Optional(Function)})
+	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Function)})
 	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Function)})
 
 	_.each Creator.Objects, (obj, object_name)->
@@ -31,12 +29,6 @@ Meteor.startup ->
 # else
 # 	app._id = app_id
 # 	db.apps.update({_id: app_id}, app)
-
-Creator.getObject = (object_name)->
-	if !object_name
-		object_name = Session.get("object_name")
-	if object_name
-		return Creator.objectsByName[object_name]
 
 Creator.getTable = (object_name)->
 	return Tabular.tablesByName["creator_" + object_name]
@@ -62,12 +54,6 @@ Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 
 Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_name) ->
 	return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/grid")
-
-Creator.getCollection = (object_name)->
-	if !object_name
-		object_name = Session.get("object_name")
-	if object_name
-		return Creator.Collections[object_name]
 
 Creator.getObjectRecord = (object_name, record_id)->
 	if !record_id
@@ -107,17 +93,6 @@ Creator.getApp = (app_id)->
 		app_id = Session.get("app_id")
 	app = Creator.Apps[app_id]
 	return app
-
-Creator.isSpaceAdmin = (spaceId, userId)->
-	if Meteor.isClient
-		if !spaceId 
-			spaceId = Session.get("spaceId")
-		if !userId
-			userId = Meteor.userId()
-	
-	space = Creator.getObject("spaces")?.db?.findOne(spaceId)
-	if space?.admins
-		return space.admins.indexOf(userId) >= 0
 
 Creator.evaluateFormula = (formular, context)->
 
