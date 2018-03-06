@@ -69,13 +69,18 @@ _actionItems = (object_name, record_id, record_permissions)->
 	# 		$(".tabular-col-actions.#{objectColName}").hide()
 	return actions
 
-_fields = (object_name)->
+_fields = (object_name, list_view_id)->
 	object = Creator.getObject(object_name)
 	name_field_key = object.NAME_FIELD_KEY
 	fields = [name_field_key]
-	if object.list_views?.default?.columns
-		fields = object.list_views.default.columns
-	fields = fields.map (n,i)->
+	if object.list_views
+		if object.list_views[list_view_id]?.columns
+			fields = object.list_views[list_view_id].columns
+		else
+			if object.list_views?.default?.columns
+				fields = object.list_views.default.columns
+
+	fields = fields.map (n)->
 		if object.fields[n]?.type and !object.fields[n].hidden
 			return n.split(".")[0]
 		else
@@ -128,6 +133,8 @@ _columns = (object_name, columns, list_view_id, is_related)->
 			width = column_width_settings[n]
 			if width
 				columnItem.width = width
+			else
+				columnItem.width = defaultWidth
 		else
 			columnItem.width = defaultWidth
 
@@ -151,8 +158,12 @@ Template.creator_grid.onRendered ->
 		is_related = self.data.is_related
 		object_name = Session.get("object_name")
 		creator_obj = Creator.getObject(object_name)
+
+		if !creator_obj
+			return
+
 		related_object_name = Session.get("related_object_name")
-		name_field_key = Creator.getObject(object_name).NAME_FIELD_KEY
+		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
 		if is_related
 			list_view_id = "recent"
@@ -175,7 +186,7 @@ Template.creator_grid.onRendered ->
 					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
 
 				if settingColumns
-					defaultColumns = _fields(curObjectName)
+					defaultColumns = _fields(curObjectName, list_view_id)
 					selectColumns = _.intersection(settingColumns, defaultColumns)
 					selectColumns = _.union(selectColumns, defaultColumns)
 				else
@@ -275,6 +286,9 @@ Template.creator_grid.onRendered ->
 							request.headers['X-User-Id'] = Meteor.userId()
 							request.headers['X-Space-Id'] = Steedos.spaceId()
 							request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
+						errorHandler: (error) ->
+							if error.httpStatus == 404
+								error.message = t "creator_odata_api_not_found"
 					select: selectColumns
 					filter: filter
 					expand: expand_fields
@@ -368,28 +382,31 @@ Template.creator_grid.onCreated ->
 		onSuccess: (formType,result)->
 			dxDataGridInstance.refresh().done (result)->
 				Creator.remainCheckboxState(dxDataGridInstance.$element())
-	,true
+	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->
 			dxDataGridInstance.refresh().done (result)->
 				Creator.remainCheckboxState(dxDataGridInstance.$element())
-	,true
+	,false
 	AutoForm.hooks creatorCellEditForm:
 		onSuccess: (formType,result)->
 			dxDataGridInstance.refresh().done (result)->
 				Creator.remainCheckboxState(dxDataGridInstance.$element())
-	,true
+	,false
 
 Template.creator_grid.onDestroyed ->
 	#离开界面时，清除hooks为空函数
 	AutoForm.hooks creatorAddForm:
-		onSuccess: undefined
+		onSuccess: ()->
+			$('#afModal').modal 'hide'
 	,true
 	AutoForm.hooks creatorEditForm:
-		onSuccess: undefined
+		onSuccess: ()->
+			$('#afModal').modal 'hide'
 	,true
 	AutoForm.hooks creatorCellEditForm:
-		onSuccess: undefined
+		onSuccess: ()->
+			$('#afModal').modal 'hide'
 	,true
 
 
