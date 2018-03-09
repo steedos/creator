@@ -21,6 +21,8 @@ Creator.Objects.objects =
 		icon: 
 			label: "Icon"
 			type: "text"
+		is_enable:
+			type: "boolean"
 		description: 
 			label: "Description"
 			type: "text"
@@ -43,7 +45,7 @@ Creator.Objects.objects =
 
 	list_views:
 		default:
-			columns: ["name", "label", "icon", "description", "modified"]
+			columns: ["name", "label", "icon", "is_enable", "description", "modified"]
 		all:
 			filter_scope: "space"
 

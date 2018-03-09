@@ -39,6 +39,8 @@ Creator.Objects.object_actions =
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
+		is_enable:
+			type: "boolean"
 		visible:
 			type: "boolean"
 		on:
@@ -58,7 +60,7 @@ Creator.Objects.object_actions =
 
 	list_views:
 		default:
-			columns: ["name", "label", "object", "on", "visible", "modified"]
+			columns: ["name", "label", "object", "on", "visible", "is_enable", "modified"]
 		all:
 			filter_scope: "space"
 
