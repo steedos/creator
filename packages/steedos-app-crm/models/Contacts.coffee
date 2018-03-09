@@ -4,6 +4,7 @@ Creator.Objects.contacts =
 	icon: "contact"
 	enable_files: true
 	enable_search: true
+	enable_notes: true
 	enable_api: true
 	fields:
 		name: 
@@ -19,9 +20,6 @@ Creator.Objects.contacts =
 			label: "客户"
 			type: "master_detail"
 			reference_to: "accounts"
-		birthdate: 
-			label: "生日"
-			type: "date"
 		title:
 			label: "职务"
 			type: "text"
@@ -44,6 +42,9 @@ Creator.Objects.contacts =
 			label: "其他电话"
 			type: "text"
 			group: "联系方式"
+		birthdate: 
+			label: "生日"
+			type: "date"
 		description: 
 			label: "描述"
 			type: "textarea"

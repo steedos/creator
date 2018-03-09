@@ -5,10 +5,13 @@ _itemClick = (e, curObjectName)->
 	record_permissions = Creator.getRecordPermissions curObjectName, record, Meteor.userId()
 	actions = _actionItems(curObjectName, record._id, record_permissions)
 
-	actionSheetItems = _.map actions, (action)->
-		return {text: action.label, record: record, action: action, object_name: curObjectName}
-
-	actionSheet = $(".action-sheet").dxActionSheet({
+	if actions.length
+		actionSheetItems = _.map actions, (action)->
+			return {text: action.label, record: record, action: action, object_name: curObjectName}
+	else
+		actionSheetItems = [{text: t("creator_list_no_actions_tip")}]
+	
+	actionSheetOption = 
 		dataSource: actionSheetItems
 		showTitle: false
 		usePopover: true
@@ -45,7 +48,12 @@ _itemClick = (e, curObjectName)->
 				Session.set("action_save_and_insert", true)
 				Creator.executeAction objectName, action, recordId
 				console.log("actionSheet.onItemClick", value)
-	}).dxActionSheet("instance");
+
+	unless actions.length
+		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
+			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"
+
+	actionSheet = $(".action-sheet").dxActionSheet(actionSheetOption).dxActionSheet("instance")
 	
 	actionSheet.option("target", e.event.target);
 	actionSheet.option("visible", true);
@@ -154,6 +162,14 @@ _defaultWidth = (columns)->
 	content_width = $(".gridContainer").width() - 46 - 60
 	return content_width/column_counts
 
+_depandOnFields = (object_name, columns)->
+	fields = Creator.getObject(object_name).fields
+	depandOnFields = []
+	_.each columns, (column)->
+		if fields[column].depend_on
+			depandOnFields = _.union(fields[column].depend_on)
+	return depandOnFields
+
 Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
@@ -205,7 +221,8 @@ Template.creator_grid.onRendered ->
 
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
-			
+			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
+
 			expand_fields = _expandFields(curObjectName, selectColumns)
 			showColumns.push
 				dataField: "_id_actions"
