@@ -8,8 +8,9 @@ Meteor.startup ->
 	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Function)})
 	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Function)})
 
-	_.each Creator.Objects, (obj, object_name)->
-		Creator.loadObjects obj, object_name
+	if Meteor.isServer
+		_.each Creator.Objects, (obj, object_name)->
+			Creator.loadObjects obj, object_name
 
 	# Creator.initApps()
 
@@ -28,6 +29,28 @@ Meteor.startup ->
 Creator.loadObjects = (obj, object_name)->
 	if !object_name
 		object_name = obj.name
+
+	if !obj.list_views
+		obj.list_views = {
+			default: {
+				columns: ["name"]
+			}
+			all: {
+				filter_scope: "space"
+			}
+		}
+
+	if !obj.list_views.default
+		obj.list_views.default = {
+			columns: ["name"]
+		}
+
+	if !obj.list_views.all
+		obj.list_views.all = {
+			filter_scope: "space"
+		}
+
+	Creator.convertTODOToFunction(obj)
 	new Creator.Object(obj);
 
 	Creator.initTriggers(object_name)
@@ -263,7 +286,7 @@ Creator.getFields = (object_name, spaceId, userId)->
 	firstLevelKeys = Creator.getSchema(object_name)._firstLevelSchemaKeys
 	permission_fields =  Creator.getPermissions(object_name, spaceId, userId).fields
 
-	return permission_fields || []
+	return permission_fields
 
 Creator.isloading = ()->
 	return Creator.isLoadingSpace.get()

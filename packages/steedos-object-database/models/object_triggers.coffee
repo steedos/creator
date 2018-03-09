@@ -20,7 +20,7 @@ _syncToObject = (doc) ->
 	})
 
 isRepeatedName = (doc, name)->
-	other = Creator.getCollection("object_triggers").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name})
+	other = Creator.getCollection("object_triggers").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false

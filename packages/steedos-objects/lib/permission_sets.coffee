@@ -7,7 +7,8 @@ if Meteor.isServer
 		psets = Creator.getCollection("permission_set").find({users: userId}).fetch()
 		permissions.assigned_apps = _.pluck psets, "assigned_apps"
 		_.each Creator.objectsByName, (object, object_name)->
-			permissions.objects[object_name] = Creator.getObjectPermissions(spaceId, userId, object_name)
+			permissions.objects[object_name] = Creator.Objects[object_name]
+			permissions.objects[object_name]["permissions"] = Creator.getObjectPermissions(spaceId, userId, object_name)
 		return permissions
 
 	unionPlus = (array,other)->
