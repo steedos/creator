@@ -6,11 +6,15 @@ Template.listSwitch.helpers Creator.helpers
 
 Template.listSwitch.helpers
 	list_views: ()->
-		object_name = this.object_name
+		object_name = Template.instance().data.object_name
 		return Creator.getListViews(object_name)
 
+	object_label: ()->
+		object_name = Template.instance().data.object_name
+		return Creator.getObject(object_name).label
+
 	custom_list_views: ()->
-		object_name = this.object_name
+		object_name = Template.instance().data.object_name
 		return Creator.Collections.object_listviews.find({object_name: object_name}).fetch()
 
 	getListViewUrl: (list_view_id)->
@@ -21,9 +25,9 @@ Template.listSwitch.helpers
 Template.listSwitch.events
 	'click .list-switch-back': (event, template)->
 		lastUrl = urlQuery[urlQuery.length - 2]
+		urlQuery.pop()
 		template.$("#list_switch").animateCss "fadeOutRight", ->
 			Blaze.remove(template.view)
-			urlQuery.pop()
 			if lastUrl
 				FlowRouter.go lastUrl
 			else

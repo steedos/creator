@@ -1,24 +1,15 @@
-@Creator = {}
-
 Creator.Apps = {}
-Creator.Objects = {}
-Creator.Collections = {}
 Creator.Reports = {}
 Creator.subs = {}
 
 
 Meteor.startup ->
 
-	SimpleSchema.extendOptions({filtersMethod: Match.Optional(Function)})
+	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Function)})
 	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Function)})
 
 	_.each Creator.Objects, (obj, object_name)->
-		new Creator.Object(obj);
-
-		Creator.initTriggers(object_name)
-		Creator.initListViews(object_name)
-		if Meteor.isServer
-			Creator.initPermissions(object_name)
+		Creator.loadObjects obj, object_name
 
 	# Creator.initApps()
 
@@ -34,11 +25,16 @@ Meteor.startup ->
 # 	app._id = app_id
 # 	db.apps.update({_id: app_id}, app)
 
-Creator.getObject = (object_name)->
+Creator.loadObjects = (obj, object_name)->
 	if !object_name
-		object_name = Session.get("object_name")
-	if object_name
-		return Creator.objectsByName[object_name]
+		object_name = obj.name
+	new Creator.Object(obj);
+
+	Creator.initTriggers(object_name)
+	Creator.initListViews(object_name)
+	if Meteor.isServer
+		Creator.initPermissions(object_name)
+
 
 Creator.getTable = (object_name)->
 	return Tabular.tablesByName["creator_" + object_name]
@@ -54,7 +50,7 @@ Creator.getObjectUrl = (object_name, record_id, app_id) ->
 	if record_id
 		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/view/" + record_id)
 	else
-		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/list")
+		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/grid")
 
 Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id
@@ -63,13 +59,7 @@ Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 		return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/list/switch")
 
 Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_name) ->
-	return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/list")
-
-Creator.getCollection = (object_name)->
-	if !object_name
-		object_name = Session.get("object_name")
-	if object_name
-		return Creator.Collections[object_name]
+	return Steedos.absoluteUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/grid")
 
 Creator.getObjectRecord = (object_name, record_id)->
 	if !record_id
@@ -84,6 +74,8 @@ Creator.getPermissions = (object_name, spaceId, userId)->
 		if !object_name
 			object_name = Session.get("object_name")
 		obj = Creator.getObject(object_name)
+		if !obj
+			return
 		return obj.permissions.get()
 	else if Meteor.isServer
 		Creator.getObjectPermissions(spaceId, userId, object_name)
@@ -110,38 +102,6 @@ Creator.getApp = (app_id)->
 	app = Creator.Apps[app_id]
 	return app
 
-Creator.isSpaceAdmin = (spaceId, userId)->
-	if Meteor.isClient
-		if !spaceId 
-			spaceId = Session.get("spaceId")
-		if !userId
-			userId = Meteor.userId()
-	
-	space = Creator.getObject("spaces")?.db?.findOne(spaceId)
-	if space?.admins
-		return space.admins.indexOf(userId) >= 0
-
-Creator.evaluateFormula = (formular, context)->
-
-	if !_.isString(formular)
-		return formular
-
-	if FormulaEngine.checkFormula(formular)
-		return FormulaEngine.run(formular, context)
-
-	return formular				
-
-Creator.evaluateFilters = (filters, context)->
-	selector = {}
-	_.each filters, (filter)->
-		if filter?.length == 3
-			name = filter[0]
-			action = filter[1]
-			value = Creator.evaluateFormula(filter[2], context)
-			selector[name] = {}
-			selector[name][action] = value
-	console.log("evaluateFilters-->selector", selector)
-	return selector
 
 # "=", "<>", ">", ">=", "<", "<=", "startswith", "contains", "notcontains".
 Creator.formatFiltersToMongo = (filters)->
@@ -151,7 +111,7 @@ Creator.formatFiltersToMongo = (filters)->
 	_.each filters, (filter)->
 		field = filter[0]
 		option = filter[1]
-		value = filter[2]
+		value = Creator.evaluateFormula(filter[2])
 		sub_selector = {}
 		sub_selector[field] = {}
 		if option == "="
@@ -185,7 +145,7 @@ Creator.formatFiltersToDev = (filters)->
 	_.each filters, (filter)->
 		field = filter[0]
 		option = filter[1]
-		value = filter[2]
+		value = Creator.evaluateFormula(filter[2])
 		sub_selector = []
 		if _.isArray(value) == true and option == "="
 			_.each value, (v)->
@@ -195,7 +155,7 @@ Creator.formatFiltersToDev = (filters)->
 				sub_selector.pop()
 			selector.push sub_selector
 		else
-			selector.push filter, "and"
+			selector.push [field, option, value], "and"
 	
 	if selector[selector.length - 1] == "and"
 		selector.pop()
@@ -213,6 +173,12 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 	
 	related_object_names = []
 	permissions = Creator.getPermissions(object_name, spaceId, userId)
+
+	_object = Creator.getObject(object_name)
+
+	if !_object
+		return related_object_names
+
 	permission_related_objects = permissions.related_objects
 
 	_.each Creator.Objects, (related_object, related_object_name)->
@@ -224,7 +190,7 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 					else
 						related_object_names.push related_object_name
 	
-	if Creator.getObject(object_name).enable_files
+	if _object.enable_files
 		if permission_related_objects
 			if _.indexOf(permission_related_objects, "cms_files") > -1
 				related_object_names.push "cms_files"
@@ -243,9 +209,13 @@ Creator.getActions = (object_name, spaceId, userId)->
 			userId = Meteor.userId()
 
 	obj = Creator.getObject(object_name)
+
+	if !obj
+		return
+
 	permissions = Creator.getPermissions(object_name, spaceId, userId)
 	permission_actions = permissions.actions
-	actions = _.values(obj.actions) 
+	actions = _.sortBy(_.values(obj.actions) , 'sort');
 
 	if permission_actions
 		actions = _.filter actions, (action)->
@@ -262,8 +232,13 @@ Creator.getListViews = (object_name, spaceId, userId)->
 		if !userId
 			userId = Meteor.userId()
 
-	permission_list_views = Creator.getPermissions(object_name, spaceId, userId).list_views
 	object = Creator.getObject(object_name)
+
+	if !object
+		return
+
+	permission_list_views = Creator.getPermissions(object_name, spaceId, userId).list_views
+
 	list_views = []
 
 	_.each object.list_views, (item, item_name)->
@@ -288,10 +263,10 @@ Creator.getFields = (object_name, spaceId, userId)->
 	firstLevelKeys = Creator.getSchema(object_name)._firstLevelSchemaKeys
 	permission_fields =  Creator.getPermissions(object_name, spaceId, userId).fields
 
-	return permission_fields
+	return permission_fields || []
 
 Creator.isloading = ()->
-	return Creator.isloadingPermissions.get()
+	return Creator.isLoadingSpace.get()
 
 # 计算fields相关函数
 # START

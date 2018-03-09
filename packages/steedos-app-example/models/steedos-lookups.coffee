@@ -19,23 +19,23 @@ if Meteor.isDevelopment
 			customer_id:
 				label: "客户(单选)"
 				type: "lookup"
-				reference_to: "companies"
+				reference_to: "accounts"
 			customer_ids:
 				label: "客户(多选)"
 				type: "lookup"
-				reference_to: "companies"
+				reference_to: "accounts"
 				multiple: true
-#			object_switche_id:
-#				label: "客户/用户(单选)"
-#				type: "lookup"
-#				reference_to: ["companies", "users"]
-#				group: "可选择对象测试区"
-#			object_switche_ids:
-#				label: "客户/用户(多选)"
-#				type: "lookup"
-#				reference_to: ["companies", "users"]
-#				multiple: true
-#				group: "可选择对象测试区"
+			# object_switche_id:
+			# 	label: "客户/用户(单选)"
+			# 	type: "lookup"
+			# 	reference_to: ["archive_retention"]
+			# 	group: "可选择对象测试区"
+			# object_switche_ids:
+			# 	label: "客户/用户(多选)"
+			# 	type: "lookup"
+			# 	reference_to: ["archive_retention"]
+			# 	multiple: true
+			# 	group: "可选择对象测试区"
 #			site:
 #				type: "lookup"
 #				reference_to: "cms_sites"
@@ -43,7 +43,7 @@ if Meteor.isDevelopment
 #			category:
 #				type: "lookup"
 #				reference_to: "cms_categories"
-#				filters: [["site", "$eq", "{site}"]]  # {site} 必须要在depend_on数组中
+#				filters: [["site", "=", "{site}"]]  # {site} 必须要在depend_on数组中
 #				depend_on: ["site"]
 #				group: "filters测试区",
 #			archives_files_clerical:
@@ -87,9 +87,15 @@ if Meteor.isDevelopment
 					return _options
 				group: "options function test"
 
+			number_test:
+				type: 'number'
+				precision: 11
+				scale: 2
+			currency_test:
+				type: 'currency'
 		list_views:
 			default:
-				columns: ["name", "customer_id", "customer_ids", "object_switche_ids", "boolean", "CObject", "options_fun"]
+				columns: ["name", "number_test", "customer_id", "customer_ids","object_switche_id" ,"object_switche_ids", "boolean", "CObject", "options_fun"]
 			recent:
 				filter_scope: "space"
 			all:

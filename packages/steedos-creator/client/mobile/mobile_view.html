@@ -9,7 +9,7 @@
 					<i class="ion ion-gear-a"></i>
 				</div>
 				<div class="bBody">
-					MobileView
+					
 				</div>
 			</div>
 		</header>
@@ -36,12 +36,12 @@
 					<ul class="nav-container">
 						<li class="item" data-index="0">
 							<a role="tab" class="select-detail selected" aria-selected="true" tabindex="0">
-								<span class="">详细信息</span>
+								<span class="">{{_ "creator_detail_info"}}</span>
 							</a>
 						</li>
 						<li class="item" data-index="1">
 							<a role="tab" class="select-related" aria-selected="false" tabindex="-1">
-								<span class="">相关</span>
+								<span class="">{{_ "creator_detail_related"}}</span>
 							</a>
 						</li>
 					</ul>
@@ -117,7 +117,7 @@
 						{{/if}}
 					</div>
 					<div class="related-object-card info-card-container">
-						{{#each related_objects}}
+						{{#each related_lists}}
 							<a class="slds-card slds-card_boundary forceBaseCard forceCard forceRelatedListCard" href="{{related_object_url this.object_name}}">
 								<div class="slds-card__header slds-grid">
 									<header class="slds-media slds-media--center slds-has-flexi-truncate">
@@ -149,11 +149,17 @@
 				{{#each actions}}
 					<div class="weui-actionsheet__cell view-action">{{this.label}}</div>
 				{{/each}}
+				{{#each related_lists}}
+					{{#if allowCreate this.object_name}}
+						<div class="weui-actionsheet__cell add-related-record">{{_ "creator_new"}}{{object_label this.object_name}}</div>
+					{{/if}}
+				{{/each}}
 			</div>
 			<div class="weui-actionsheet__action">
 				<div class="weui-actionsheet__cell actionsheet-cancel">{{_ "Cancel"}}</div>
 			</div>
 		</div>
 	</div>
-	{{#afModal formId="editRecord" class="btn btn-primary btn-edit-record hidden" collection=collection operation="update" dialogClass="modal-lg modal-body-zoom.includes" collectionName=collectionName}} {{_ "Edit"}} {{/afModal}}
+	{{#CreatorAfModal formId="addRelatedRecord" class="btn btn-primary btn-add-related-record hidden" collection=collection operation="insert" dialogClass="modal-lg modal-body-zoom.includes" collectionName=collectionName}} {{_ "Create"}} {{/CreatorAfModal}}
+	{{#CreatorAfModal formId="editRecord" class="btn btn-primary btn-edit-record hidden" collection=collection operation="update" dialogClass="modal-lg modal-body-zoom.includes" collectionName=collectionName}} {{_ "Edit"}} {{/CreatorAfModal}}
 </template>

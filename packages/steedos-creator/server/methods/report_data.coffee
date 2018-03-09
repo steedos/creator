@@ -28,14 +28,9 @@ Meteor.methods
 			selector.owner = userId
 
 		if filters and filters.length > 0
-			filters = _.map filters, (obj)->
-				return [obj.field, obj.operation, obj.value]
-			
-			filters = Creator.formatFiltersToMongo(filters)
 			selector["$and"] = filters
-
 		cursor = Creator.getCollection(object_name).find(selector, fields: filterFields)
-		if cursor.count() > 1000
+		if cursor.count() > 10000
 			return []
 		result = cursor.fetch()
 		if compoundFields.length

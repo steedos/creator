@@ -46,8 +46,8 @@ Package.onUse(function(api) {
 	api.use('kadira:blaze-layout@2.3.0');
 	api.use('kadira:flow-router@2.10.1');
 
-	api.use('aldeed:autoform-bs-datetimepicker@1.0.7');
-	api.use('tsega:bootstrap3-datetimepicker@=3.1.3_3');
+	api.use('steedos:autoform-bs-datetimepicker@1.0.6');
+	api.use('tsega:bootstrap3-datetimepicker@4.17.37');
 	api.use('steedos:autoform-bs-minicolors@1.0.0');
 
 	api.use('meteorhacks:ssr@2.2.0');
@@ -77,11 +77,11 @@ Package.onUse(function(api) {
 	api.use('steedos:sso@0.0.4')
 	api.use('steedos:adminlte@2.3.12_3');
 	api.use('steedos:base@0.0.73');
-	api.use('steedos:accounts@0.0.29');
+	api.use('steedos:accounts@0.0.31');
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:autoform@0.0.1');
-	api.use('steedos:autoform-modals@0.3.9_6');
+	api.use('steedos:creator-autoform-modals@0.0.1');
 	api.use('raix:push@3.0.2');
 
 	// api.use('steedos:autoform-bs-datetimepicker');
@@ -97,26 +97,20 @@ Package.onUse(function(api) {
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
 
+	api.use('steedos:objects');
+
 	api.addFiles('core.coffee');
 
-	api.addFiles('lib/object.coffee');
-	api.addFiles('lib/fields.coffee');
-	api.addFiles('lib/triggers.coffee');
 	api.addFiles('lib/actions.coffee');
-	api.addFiles('lib/permission_sets.coffee');
 	api.addFiles('lib/listviews.coffee');
 	api.addFiles('lib/apps.coffee');
-	api.addFiles('lib/eval.js');
-	api.addFiles('lib/formula_engine.coffee');
+	// api.addFiles('lib/eval.js');
+	// api.addFiles('lib/formula_engine.coffee');
 
-	api.addFiles('models/base.coffee');
-	api.addFiles('models/object.coffee');
 	api.addFiles('models/object_recent_viewed.coffee');
 	api.addFiles('models/object_listviews.coffee');
 	api.addFiles('models/permission_set.coffee');
 	api.addFiles('models/permission_objects.coffee');
-
-	api.addFiles('models/space_object.coffee');
 
 	api.addFiles('models/app.coffee');
 	api.addFiles('models/space.coffee');
@@ -133,8 +127,9 @@ Package.onUse(function(api) {
 	api.addFiles('models/queue_import.coffee');
 	api.addFiles('models/settings.coffee');
 
+	api.addFiles('server/methods/bootstrap.coffee', 'server');
+
 	api.addFiles('server/methods/object_options.coffee', 'server');
-	api.addFiles('server/methods/object_permissions.coffee', 'server');
 	api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
 	api.addFiles('server/methods/object_recent_record.coffee', 'server');
 	api.addFiles('server/methods/object_listviews_options.coffee', 'server');
@@ -146,7 +141,6 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/related_objects_records.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
-	api.addFiles('server/publications/related_object.coffee', 'server');
 	api.addFiles('server/publications/object_tabular.coffee', 'server');
 	api.addFiles('server/publications/object_listviews.coffee', 'server');
 	api.addFiles('server/publications/user_tabular_settings.coffee', 'server');
@@ -198,6 +192,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
 	api.addFiles('client/subscribe.coffee', 'client');
+	api.addFiles('client/bootstrap.coffee', 'client');
 
 	api.addFiles('client/animate.css', 'client');
 	api.addFiles('client/animate.js', 'client');
@@ -205,6 +200,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/colResizable-1.6.js', 'client');
 	api.addFiles('client/jquery.ba-resize.js', 'client');
 
+	api.addFiles('client/views/list_wrapper.html', 'client');
+	api.addFiles('client/views/list_wrapper.coffee', 'client');
+	api.addFiles('client/views/list_wrapper.less', 'client');
 	api.addFiles('client/views/grid.html', 'client');
 	api.addFiles('client/views/grid.coffee', 'client');
 	api.addFiles('client/views/grid.less', 'client');
@@ -239,6 +237,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/filter_option.html', 'client');
 	api.addFiles('client/views/filter_option.coffee', 'client');
 	api.addFiles('client/views/filter_option.less', 'client');
+
+	api.addFiles('client/views/related_object_list.html', 'client');
+	api.addFiles('client/views/related_object_list.coffee', 'client');
+	api.addFiles('client/views/related_object_list.less', 'client');
 
 	api.addFiles('client/views/select_fields.html', 'client');
 	api.addFiles('client/views/select_fields.coffee', 'client');

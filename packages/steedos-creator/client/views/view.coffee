@@ -84,7 +84,7 @@ Template.creator_view.helpers
 
 	record_name: ()->
 		record = Creator.getObjectRecord()
-		name_field_key = Creator.getObject().NAME_FIELD_KEY
+		name_field_key = Creator.getObject()?.NAME_FIELD_KEY
 		if record and name_field_key
 			return record[name_field_key]
 
@@ -131,10 +131,10 @@ Template.creator_view.helpers
 				selector = {"metadata.space": Session.get("spaceId")}
 			else
 				selector = {space: Session.get("spaceId")}
-			if object_name == "cms_files"
+			if object_name == "cms_files" || object_name == "tasks"
 				# 附件的关联搜索条件是定死的
-				selector["parent.o"] = Session.get "object_name"
-				selector["parent.ids"] = [record_id]
+				selector["#{related_field_name}.o"] = Session.get "object_name"
+				selector["#{related_field_name}.ids"] = [record_id]
 			else
 				selector[related_field_name] = record_id
 			permissions = Creator.getPermissions(object_name)
@@ -163,6 +163,9 @@ Template.creator_view.helpers
 		permissions = Creator.getPermissions()
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
+
+		if !actions
+			return
 
 		if permissions.actions
 			return actions
@@ -199,6 +202,13 @@ Template.creator_view.helpers
 	
 	isFileDetail: ()->
 		return "cms_files" == Session.get "object_name"
+
+	related_object_url: ()->
+		object_name = Session.get "object_name"
+		record_id = Session.get "record_id"
+		app_id = Session.get "app_id"
+		related_object_name = this.object_name
+		return Creator.getRelatedObjectUrl(object_name, app_id, record_id, related_object_name)
 
 
 Template.creator_view.events
@@ -322,7 +332,7 @@ Template.creator_view.events
 			Session.set 'cmDoc', doc
 
 			Meteor.defer ()->
-				$(".btn.creator-cell-edit").click()
+				$(".btn.creator-edit").click()
 
 	'change .input-file-upload': (event, template)->
 		parent = event.currentTarget.dataset?.parent

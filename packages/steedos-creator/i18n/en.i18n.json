@@ -1,6 +1,8 @@
 {
 	"Steedos Creator": "Creator",
 
+	"Refresh": "Refresh",
+
 	"list_view_recent": "Recent",
 	"list_view_all": "All",
 	"list_view_mine": "Mine",
@@ -44,5 +46,12 @@
 	"creator_view_related_objects": "RELATED",
 	"creator_view_details": "DETAILS",
 
-	"creator_actions_upload_file": "Upload"
+	"creator_actions_upload_file": "Upload",
+
+	"creator_home_apps": "Apps",
+	"creator_detail_info": "DETAILS",
+	"creator_detail_related": "RELATED",
+	"creator_new": "New",
+
+	"creator_odata_api_not_found": "Sorry, the resource you are trying to access does not exist or you do not have permission to access it!"
 }

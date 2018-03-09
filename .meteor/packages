@@ -30,14 +30,14 @@ fortawesome:fontawesome
 tap:i18n
 
 raix:push
-
+steedos:cors
 aldeed:tabular
 aldeed:collection2
 aldeed:simple-schema
 aldeed:autoform
-aldeed:autoform-bs-datetimepicker
-tsega:bootstrap3-datetimepicker@=3.1.3_3
-steedos:autoform-modals
+steedos:autoform-bs-datetimepicker
+tsega:bootstrap3-datetimepicker@4.17.37
+steedos:creator-autoform-modals
 steedos:autoform-bs-minicolors
 steedos:autoform-file
 steedos:devexpress
@@ -62,6 +62,7 @@ steedos:smsqueue@0.0.1
 steedos:useraccounts-core
 steedos:useraccounts-bootstrap
 steedos:useraccounts-flow-routing
+steedos:accounts-t9n
 
 steedos:ui
 
@@ -90,6 +91,7 @@ keepnox:perfect-scrollbar
 
 steedos:ionicons@0.1.7
 
+steedos:objects
 steedos:sso
 # steedos:app-crm
 steedos:app-informations
@@ -112,3 +114,7 @@ steedos:odata
 yogiben:autoform-tags
 
 steedos:logger@0.0.2
+
+steedos:oauth2-server@0.0.1
+
+steedos:object-database

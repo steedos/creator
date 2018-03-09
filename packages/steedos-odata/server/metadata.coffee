@@ -75,8 +75,11 @@ Meteor.startup ->
 					reference_to.forEach (r)->
 						reference_obj = Creator.objectsByName[r]
 						if reference_obj
+							_name = field_name.toUpperCase()
+							if _.isArray(field.reference_to)
+								_name = field_name.toUpperCase() + "." + reference_obj.name.toUpperCase()
 							navigationProperty.push {
-								name: field_name.toUpperCase(),
+								name: _name,
 	#							type: "Collection(" + _NAMESPACE + "." + reference_obj.name + ")",
 								type: _NAMESPACE + "." + reference_obj.name
 								partner: _object.name #TODO
@@ -89,7 +92,7 @@ Meteor.startup ->
 								]
 							}
 						else
-							console.error "reference to '#{r}' invalid."
+							console.warn "reference to '#{r}' invalid."
 
 			entitie.property = property
 			entitie.navigationProperty = navigationProperty
@@ -127,12 +130,9 @@ Meteor.startup ->
 
 	SteedosOdataAPI.addRoute('', {authRequired: SteedosOData.AUTHREQUIRED}, {
 		get: ()->
-			console.log("****************************///////atomPub.svc///////********************")
-			console.log @request.headers
 			context = SteedosOData.getMetaDataPath(@urlParams?.spaceId)
 			serviceDocument  = ServiceDocument.processMetadataJson(getObjectsOdataSchema(), {context: context});
 			body = serviceDocument.document()
-			console.log(body)
 			return {
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',
@@ -144,7 +144,6 @@ Meteor.startup ->
 
 	SteedosOdataAPI.addRoute(SteedosOData.METADATA_PATH, {authRequired: SteedosOData.AUTHREQUIRED}, {
 		get: ()->
-			console.log("****************************//////atomPub.svc/$metadata////////********************")
 			serviceMetadata = ServiceMetadata.processMetadataJson(getObjectsOdataSchema())
 			body = serviceMetadata.document()
 			return {

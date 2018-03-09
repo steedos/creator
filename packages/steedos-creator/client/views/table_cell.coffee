@@ -44,38 +44,56 @@ Template.creator_table_cell.helpers
 
 		if reference_to && !_.isEmpty(val)
 
-			if _.isArray(reference_to) && _.isObject(val)
-				reference_to = val.o
-				val = val.ids
-
-			if !_.isArray(val)
-				val = if val then [val] else []
-			try
-
-				reference_to_object = Creator.getObject(reference_to)
-
-				reference_to_object_name_field_key = reference_to_object.NAME_FIELD_KEY
-
-				reference_to_fields = {_id: 1}
-				reference_to_fields[reference_to_object_name_field_key] = 1
-
-				reference_to_sort = {}
-				reference_to_sort[reference_to_object_name_field_key] = -1
-
-
-				values = Creator.Collections[reference_to].find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort})
-				values.forEach (v)->
+			if this.agreement == "odata"
+				if !_.isArray(val)
+					val = if val then [val] else []
+				
+				_.each val, (v)->
+					reference_to = v["reference_to.o"] || reference_to
+					reference_to_object_name_field_key = Creator.getObject(reference_to).NAME_FIELD_KEY
 					href = Creator.getObjectUrl(reference_to, v._id)
-					data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href}
-			catch e
-				console.error(reference_to, e)
-				return
+					data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
+				
+			else
+				if _.isArray(reference_to) && _.isObject(val)
+					reference_to = val.o
+					val = val.ids
+
+				if !_.isArray(val)
+					val = if val then [val] else []
+				try
+
+					reference_to_object = Creator.getObject(reference_to)
+
+					reference_to_object_name_field_key = reference_to_object.NAME_FIELD_KEY
+
+					reference_to_fields = {_id: 1}
+					reference_to_fields[reference_to_object_name_field_key] = 1
+
+					reference_to_sort = {}
+					reference_to_sort[reference_to_object_name_field_key] = -1
+
+
+					values = Creator.Collections[reference_to].find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort})
+					values.forEach (v)->
+						href = Creator.getObjectUrl(reference_to, v._id)
+						data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
+				catch e
+					console.error(reference_to, e)
+					return
 		else
 			if (val instanceof Date)
-				if _field.type == "datetime"
-					val = moment(this.val).format('YYYY-MM-DD H:mm')
-				else if _field.type == "date"
-					val = moment(this.val).format('YYYY-MM-DD')
+				if this.agreement == "odata"
+					if _field.type == "datetime"
+						utcOffset = moment().utcOffset() / 60
+						val = moment(this.val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
+					else if _field.type == "date"
+						val = moment(this.val).add(utcOffset, "hours").format('YYYY-MM-DD')
+				else
+					if _field.type == "datetime"
+						val = moment(this.val).format('YYYY-MM-DD H:mm')
+					else if _field.type == "date"
+						val = moment(this.val).format('YYYY-MM-DD')
 			else if (this.val == null)
 				val = ""
 			else if _field.type == "boolean"
@@ -99,11 +117,13 @@ Template.creator_table_cell.helpers
 							val = selectedOptions.getProperty("label")
 			else if _field.type == "filesize"
 				val = formatFileSize(val)
+			else if _field.type == "number" && val
+				val = Number(val).toFixed(_field.scale)
 
 			if this.parent_view != 'record_details' && this.field_name == this_name_field_key
 				href = Creator.getObjectUrl(this.object_name, this._id)
 
-			data.push({value: val, href: href})
+			data.push({value: val, href: href, id: this._id})
 
 		return data;
 

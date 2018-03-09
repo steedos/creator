@@ -1,76 +1,6 @@
-### TO DO LIST
-	1.支持$in操作符，实现recent视图
-	$eq, $ne, $lt, $gt, $lte, $gte
-###
-
-initFilter = (list_view_id, object_name)->
-	userId = Meteor.userId()
-	spaceId = Session.get("spaceId")
-	custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
-	selector = []
-	if custom_list_view
-		filter_scope = custom_list_view.filter_scope
-		filters = custom_list_view.filters
-		if filter_scope == "mine"
-			selector.push ["owner", "=", Meteor.userId()]
-		else if filter_scope == "space"
-			selector.push ["space", "=", Steedos.spaceId()]
-
-		if filters and filters.length > 0
-			selector.push "and"
-			filters = _.map filters, (obj)->
-				return [obj.field, obj.operation, obj.value]
-			
-			filters = Creator.formatFiltersToDev(filters)
-			_.each filters, (filter)->
-				selector.push filter
-	else
-		if spaceId and userId
-			list_view = Creator.getListView(object_name, list_view_id)
-			if list_view.filter_scope == "spacex"
-				selector.push ["space", "=", null], "or", ["space", "=", space]
-			else if object_name == "users"
-				selector.push ["_id", "=", userId]
-			else if object_name == "spaces"
-				selector.push ["_id", "=", spaceId]
-			else
-				selector.push ["space", "=", spaceId]
-
-			if list_view_id == "recent"
-				viewed = Creator.Collections.object_recent_viewed.find({object_name: object_name}).fetch()
-				record_ids = _.pluck(viewed, "record_id")
-				record_ids = _.uniq(record_ids)
-				record_ids = record_ids.join(",or,").split(",")
-				id_selector = _.map record_ids, (_id)->
-					if _id != "or"
-						return ["_id", "=", _id]
-					else
-						return _id
-				selector.push "and", id_selector
-
-			# $eq, $ne, $lt, $gt, $lte, $gte
-			# [["is_received", "$eq", true],["destroy_date","$lte",new Date()],["is_destroyed", "$eq", false]]
-			if list_view.filters
-				filters = Creator.formatFiltersToDev(list_view.filters)
-				if filters and filters.length > 0
-					selector.push "and"
-					_.each filters, (filter)->
-						selector.push filter
-
-				if list_view.filter_scope == "mine"
-					selector.push "and", ["owner", "=", userId]
-			else
-				permissions = Creator.getPermissions(object_name)
-				if permissions.viewAllRecords
-					if list_view.filter_scope == "mine"
-						selector.push "and", ["owner", "=", userId]
-				else if permissions.allowRead
-					selector.push "and", ["owner", "=", userId]
-	return selector
-
 displayListGrid = (object_name, app_id, list_view_id, name_field_key, icon)->
 	url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-	filter = initFilter(list_view_id, object_name)
+	filter = Creator.getODataFilter(list_view_id, object_name)
 	DevExpress.ui.setTemplateEngine("underscore");
 	self.$("#gridContainer").dxList({
 		dataSource: {
@@ -93,7 +23,7 @@ displayListGrid = (object_name, app_id, list_view_id, name_field_key, icon)->
 			],
 			filter: filter
 		},
-		height: "auto"
+		height: "100%"
 		searchEnabled: true
 		searchExpr: name_field_key,
 		pageLoadMode: "scrollBottom"
@@ -157,13 +87,16 @@ Template.mobileList.helpers
 	allowCreate: ()->
 		object_name = Template.instance().data.object_name
 		return Creator.getPermissions(object_name).allowCreate
+
+	listName: ()->
+		return Template.instance().data.list_view_id
 	
 Template.mobileList.events
 	'click .mobile-list-back': (event, template)->
 		lastUrl = urlQuery[urlQuery.length - 2]
+		urlQuery.pop()
 		template.$(".mobile-list").animateCss "fadeOutRight", ->
 			Blaze.remove(template.view)         
-			urlQuery.pop()
 			if lastUrl
 				FlowRouter.go lastUrl
 			else

@@ -93,16 +93,21 @@ objectRoutes.route '/:list_view_id/list',
 			Meteor.defer ->
 				Blaze.renderWithData(Template.mobileList, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 
-objectRoutes.route '/:record_id/:related_object_name/list',
+objectRoutes.route '/:record_id/:related_object_name/grid',
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		object_name = FlowRouter.getParam("object_name")
 		record_id = FlowRouter.getParam("record_id")
 		related_object_name = FlowRouter.getParam("related_object_name")
 		data = {app_id: app_id, object_name: object_name, record_id: record_id, related_object_name: related_object_name}
-		if Steedos.isMobile() and $("#related_object_list_#{related_object_name}").length == 0
-			Meteor.defer ->
-				Blaze.renderWithData(Template.relatedObjectList, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+		if Steedos.isMobile()
+			if $("#related_object_list_#{related_object_name}").length == 0
+				Meteor.defer ->
+					Blaze.renderWithData(Template.relatedObjectList, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+		else
+			Session.set 'related_object_name', related_object_name
+			BlazeLayout.render Creator.getLayout(),
+				main: "related_object_list"
 
 objectRoutes.route '/view/:record_id',
 	action: (params, queryParams)->
@@ -120,20 +125,20 @@ objectRoutes.route '/view/:record_id',
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_view"
 
-FlowRouter.route '/app/:app_id/:object_name/list',
-	triggersEnter: [ checkUserSigned, initLayout ],
-	action: (params, queryParams)->
-		if Session.get("object_name") != FlowRouter.getParam("object_name")
-			Session.set("list_view_id", null)
-		Session.set("app_id", FlowRouter.getParam("app_id"))
-		Session.set("object_name", FlowRouter.getParam("object_name"))
-		Session.set("list_view_visible", false)
-		Tracker.afterFlush ()->
-			Session.set("list_view_visible", true)
-		BlazeLayout.render Creator.getLayout(),
-			main: "creator_list"
+# FlowRouter.route '/app/:app_id/:object_name/list',
+# 	triggersEnter: [ checkUserSigned, initLayout ],
+# 	action: (params, queryParams)->
+# 		if Session.get("object_name") != FlowRouter.getParam("object_name")
+# 			Session.set("list_view_id", null)
+# 		Session.set("app_id", FlowRouter.getParam("app_id"))
+# 		Session.set("object_name", FlowRouter.getParam("object_name"))
+# 		Session.set("list_view_visible", false)
+# 		Tracker.afterFlush ()->
+# 			Session.set("list_view_visible", true)
+# 		BlazeLayout.render Creator.getLayout(),
+# 			main: "creator_list"
 
-FlowRouter.route '/app/:app_id/:object_name/grid',
+FlowRouter.route '/app/:app_id/:object_name/:template/',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
@@ -143,5 +148,6 @@ FlowRouter.route '/app/:app_id/:object_name/grid',
 		Session.set("list_view_visible", false)
 		Tracker.afterFlush ()->
 			Session.set("list_view_visible", true)
+		
 		BlazeLayout.render Creator.getLayout(),
-			main: "creator_grid"
+			main: "creator_list_wrapper"

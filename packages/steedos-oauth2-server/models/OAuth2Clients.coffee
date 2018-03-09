@@ -18,17 +18,22 @@ Creator.Objects.OAuth2Clients =
 			label:"回调URL"
 			is_wide:true
 			required:true
+		clientId:
+			type:"text"
+			label:"客户端ID"
+			is_wide:true
+			required:true
+			readonly:true
+			defaultValue: ()->
+				return Random.id()
 		clientSecret:
 			type:"text"
 			label:"Secret"
 			is_wide:true
 			required:true
-		spaceId:
-			type:"lookup"
-			label:"工作区"
-			reference_to: "spaces"
-			is_wide:true
-			required:true
+			readonly:true
+			defaultValue: ()->
+				return Random.secret()
 		
 	list_views:
 		default:
@@ -40,7 +45,9 @@ Creator.Objects.OAuth2Clients =
 	# 	"before.insert.server.default":
 	# 		on: "server"
 	# 		when: "before.insert"
-	# 		todo: (userId, doc)-> return true
+	# 		todo: (userId, doc)->
+				
+	# 		return true
 					
 	permission_set:
 		user:

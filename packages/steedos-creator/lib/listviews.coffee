@@ -34,9 +34,12 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 		if field?.type and !field.hidden
 			col = {}
 			col.data = field_name
+
+			title = field.label || TAPi18n.__(obj.schema.label(field_name))
+
 			col.sTitle = "<a class='slds-th__action slds-text-link_reset' href='javascript:void(0);' role='button' tabindex='-1' aria-label='#{field_name}'>
 							<span class='slds-assistive-text'>Sort by: </span>
-							<span class='slds-truncate' title='Name'>" +  field.label + "</span>
+							<span class='slds-truncate' title='" + title + "'>" +  title + "</span>
 							<div class='slds-icon_container'>
 								<svg class='slds-icon slds-icon_x-small slds-icon-text-default slds-is-sortable__icon' aria-hidden='true'>
 									<use xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#arrowdown'>
@@ -96,14 +99,14 @@ Creator.getTabularColumns = (object_name, columns, is_related) ->
 
 	unless is_related
 		checkbox_col = 
-			title: '<div class="slds-th__action"></div>'
+			title: ''
 			data: "_id"
 			width: '20px'
 			className: "slds-cell-edit cellContainer tabular-col-checkbox #{objectColName}"
 			orderable: false
 			createdCell: (node, cellData, rowData) ->
-				$(node).attr("data-label", "Checkbox")
-				$(node).html(Blaze.toHTMLWithData Template.creator_table_checkbox, {_id: cellData, object_name: object_name}, node)
+				$(node).attr("data-label", "Checkbox").empty()
+				Blaze.renderWithData Template.creator_table_checkbox, {_id: cellData, object_name: object_name}, node
 		cols.splice(0, 0, checkbox_col)
 	
 	return cols
@@ -153,7 +156,8 @@ Creator.initListViews = (object_name)->
 		headerCallback: ( thead, data, start, end, display )->
 			firstTh = $(thead).find('th').eq(0)
 			if firstTh.hasClass("tabular-col-checkbox")
-				firstTh.css("width","32px").html(Blaze.toHTMLWithData Template.creator_table_checkbox, {_id: "#", object_name: object_name})
+				firstTh.css("width","32px").empty()
+				Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: object_name}, firstTh[0]
 
 		drawCallback:(settings)->
 			self = this
@@ -181,36 +185,13 @@ Creator.initListViews = (object_name)->
 
 			# 当数据库数据变化时会重新生成datatable，需要重新把勾选框状态保持住
 			Tracker.nonreactive ->
-				checkboxAll = self.find(".select-all")
-				unless checkboxAll.length
-					return
-				currentDataset = checkboxAll[0]?.dataset
-				currentObjectName = currentDataset.objectName
-
-				selectedIds = Creator.TabularSelectedIds[currentObjectName]
-				unless selectedIds
-					return
-
-				checkboxs = self.find(".select-one")
-				checkboxs.each (index,item)->
-					checked = selectedIds.indexOf(item.dataset.id) > -1
-					$(item).prop("checked",checked)
-
-				selectedLength = selectedIds.length
-				if selectedLength > 0 and checkboxs.length != selectedLength
-					checkboxAll.prop("indeterminate",true)
-				else
-					checkboxAll.prop("indeterminate",false)
-					if selectedLength == 0
-						checkboxAll.prop("checked",false)
-					else if selectedLength == checkboxs.length
-						checkboxAll.prop("checked",true)
+				Creator.remainCheckboxState(self)
 
 		dom: "tp"
 		extraFields: extra_columns
 		lengthChange: false
 		ordering: true
-		pageLength: 20
+		pageLength: 50
 		info: false
 		searching: true
 		autoWidth: false
@@ -285,13 +266,25 @@ if Meteor.isClient
 				list.push file_related
 
 		if Creator.Objects[object_name]?.enable_tasks
-			task_related =
-				object_name: "tasks"
-				columns: ["name", "end_date", "assigned_to"]
-				tabular_table: Tabular.tablesByName["creator_tasks"]
-				related_field_name: "related_to"
+			task_object_name = "tasks"
+			task_tabular_name = "creator_" + task_object_name
+			task_related_field_name = "related_to"
+			task_related_object = Creator.Objects[task_object_name]
+			
+			if Tabular.tablesByName[task_tabular_name]
+				columns = ["name"]
+				if task_related_object.list_views?.default?.columns
+					columns = task_related_object.list_views.default.columns
+				columns = _.without(columns, task_related_field_name)
+				Tabular.tablesByName[task_tabular_name].options?.columns = Creator.getTabularColumns(task_object_name, columns, true);
 
-			list.push task_related
+				task_related =
+					object_name: task_object_name
+					columns: columns
+					tabular_table: Tabular.tablesByName[task_tabular_name]
+					related_field_name: task_related_field_name
+
+				list.push task_related
 
 
 		return list
@@ -299,6 +292,8 @@ if Meteor.isClient
 
 Creator.getListView = (object_name, list_view_id)->
 	object = Creator.getObject(object_name)
+	if !object
+		return
 	custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
 	if object.list_views
 		if object.list_views[list_view_id]
@@ -315,6 +310,6 @@ Creator.getListView = (object_name, list_view_id)->
 			view_ids = _.without(view_ids, "default")
 			list_view = object.list_views[view_ids[0]]
 		Creator.getTable(object_name)?.options.columns = Creator.getTabularColumns(object_name, list_view.columns);
-		Creator.getTable(object_name)?.options.language.zeroRecords = t("list_view_no_records")
+		Creator.getTable(object_name)?.options.language?.zeroRecords = t("list_view_no_records")
 		Creator.getTable(object_name)?.options.order = Creator.getTabularOrder(object_name, list_view_id, list_view.columns)
 	return list_view
