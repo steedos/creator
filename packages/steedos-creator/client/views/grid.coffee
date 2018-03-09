@@ -263,12 +263,16 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
+			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
+				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
+			else
+				pageSize = 10
 			dxOptions = 
 				paging: 
-					pageSize: 50
+					pageSize: pageSize
 				pager: 
 					showPageSizeSelector: true,
-					allowedPageSizes: [25, 50, 100],
+					allowedPageSizes: [10,25, 50, 100],
 					showInfo: false,
 					showNavigationButtons: true
 				showColumnLines: false
@@ -322,7 +326,8 @@ Template.creator_grid.onRendered ->
 
 				onContentReady: (e)->
 					self.data.total.set dxDataGridInstance.totalCount()
-
+					current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
+					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 
 Template.creator_grid.helpers Creator.helpers
