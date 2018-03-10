@@ -109,11 +109,12 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 	permissions = _.clone(Creator.getPermissions(object_name))
 
 	if record
-		if !permissions.modifyAllRecords and (record.owner != userId)
+		isOwner = record.owner == userId || record.owner?._id == userId
+		if !permissions.modifyAllRecords and !isOwner
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 
-		if !permissions.viewAllRecords and (record.owner != userId)
+		if !permissions.viewAllRecords and !isOwner
 			permissions.allowRead = false
 
 	return permissions
@@ -240,9 +241,9 @@ Creator.getActions = (object_name, spaceId, userId)->
 	permission_actions = permissions.actions
 	actions = _.sortBy(_.values(obj.actions) , 'sort');
 
-	if permission_actions
-		actions = _.filter actions, (action)->
-			return _.indexOf(permission_actions, action.name) > -1
+	# if permission_actions
+	actions = _.filter actions, (action)->
+		return _.indexOf(permission_actions, action.name) > -1
 	
 	return actions
 
