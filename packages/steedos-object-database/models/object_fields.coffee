@@ -109,6 +109,9 @@ Creator.Objects.object_fields =
 				return _options
 			multiple: true
 
+		options:
+			type: "textarea"
+
 	list_views:
 		default:
 			columns: ["name", "object", "label", "type", "multiple", "required", "omit", "group", "description", "modified"]

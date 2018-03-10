@@ -8,7 +8,7 @@ Meteor.startup ()->
 	_removeServerObjects = (document)->
 		Creator.removeObject(document.name)
 
-	Creator.getCollection("objects").find().observe {
+	Creator.getCollection("objects").find({is_enable: true}).observe {
 		added: (newDocument)->
 			_changeServerObjects newDocument
 		changed: (newDocument, oldDocument)->

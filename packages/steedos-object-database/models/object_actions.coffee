@@ -1,5 +1,5 @@
 _syncToObject = (doc) ->
-	object_actions = Creator.getCollection("object_actions").find({object: doc.object}, {
+	object_actions = Creator.getCollection("object_actions").find({object: doc.object, is_enable: true}, {
 		fields: {
 			created: 0,
 			modified: 0,
