@@ -31,14 +31,7 @@ Creator.loadObjects = (obj, object_name)->
 		object_name = obj.name
 
 	if !obj.list_views
-		obj.list_views = {
-			default: {
-				columns: ["name"]
-			}
-			all: {
-				filter_scope: "space"
-			}
-		}
+		obj.list_views = {}
 
 	if !obj.list_views.default
 		obj.list_views.default = {
@@ -51,6 +44,7 @@ Creator.loadObjects = (obj, object_name)->
 		}
 
 	Creator.convertTODOToFunction(obj)
+	Creator.convertFieldsOptions(obj)
 	new Creator.Object(obj);
 
 	Creator.initTriggers(object_name)
