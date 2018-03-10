@@ -3,18 +3,43 @@ Meteor.startup ()->
 		_.forEach object.triggers, (trigger, key)->
 
 			if (Meteor.isServer && trigger.on == "server") || (Meteor.isClient && trigger.on == "client")
-				_todo = trigger.todo
-				if _todo && _.isString(_todo)
+				_todo_from_code = trigger?._todo
+				_todo_from_db = trigger.todo
+				if _todo_from_code && _.isString(_todo_from_code)
+					trigger.todo = Creator.eval("(#{_todo_from_code})")
+
+				if _todo_from_db && _.isString(_todo_from_db)
 					#只有update时， fieldNames, modifier, options 才有值
 					#TODO 控制可使用的变量，尤其是Collection
-					trigger.todo = Creator.eval("(function(userId, doc, fieldNames, modifier, options){#{_todo}})")
+					trigger.todo = Creator.eval("(function(userId, doc, fieldNames, modifier, options){#{_todo_from_db}})")
+
+			if Meteor.isServer && trigger.on == "client"
+				_todo = trigger.todo
+				if _todo && _.isFunction(_todo)
+					trigger._todo = _todo.toString()
 
 		if Meteor.isClient
 			_.forEach object.actions, (action, key)->
-				_todo = action?.todo
-				if _todo && _.isString(_todo)
+				_todo_from_code = action?._todo
+				_todo_from_db = action?.todo
+				if _todo_from_code && _.isString(_todo_from_code)
 					#TODO 控制可使用的变量
-					action.todo = Creator.eval("(function(){#{_todo}})")
+					try
+						action.todo = Creator.eval("(#{_todo_from_code})")
+					catch error
+						console.error "todo_from_code", _todo_from_code
+				if _todo_from_db && _.isString(_todo_from_db)
+					#TODO 控制可使用的变量
+					try
+						action.todo = Creator.eval("(function(){#{_todo_from_db}})")
+					catch error
+						console.error "todo_from_db", _todo_from_db
+		else
+			_.forEach object.actions, (action, key)->
+				_todo = action?.todo
+				if _todo && _.isFunction(_todo)
+					#TODO 控制可使用的变量
+					action._todo = _todo.toString()
 
 		_.forEach object.fields, (field, key)->
 			if field.options && _.isString(field.options)
