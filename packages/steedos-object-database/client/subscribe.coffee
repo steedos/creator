@@ -14,7 +14,7 @@ subs_objects = new SubsManager()
 #					filter_scope: "space"
 #				}
 #			}
-#			Creator.convertTODOToFunction(doc)
+#			Creator.convertObject(doc)
 #			Creator.Objects[doc.name] = doc
 #			Creator.loadObjects doc
 
@@ -32,7 +32,7 @@ _changeClientObjects = (document)->
 					filter_scope: "space"
 				}
 			}
-			Creator.convertTODOToFunction(document)
+			Creator.convertObject(document)
 			Creator.Objects[document.name] = document
 			Creator.loadObjects document
 			#TODO 更新object permissions

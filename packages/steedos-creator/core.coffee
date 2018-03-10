@@ -5,8 +5,8 @@ Creator.subs = {}
 
 Meteor.startup ->
 
-	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Function)})
-	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Function)})
+	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Match.OneOf(Function, String))})
+	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
 
 	if Meteor.isServer
 		_.each Creator.Objects, (obj, object_name)->
@@ -43,8 +43,7 @@ Creator.loadObjects = (obj, object_name)->
 			filter_scope: "space"
 		}
 
-	Creator.convertTODOToFunction(obj)
-	Creator.convertFieldsOptions(obj)
+	Creator.convertObject(obj)
 	new Creator.Object(obj);
 
 	Creator.initTriggers(object_name)

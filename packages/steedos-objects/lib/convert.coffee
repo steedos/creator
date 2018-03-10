@@ -1,5 +1,5 @@
 Meteor.startup ()->
-	Creator.convertTODOToFunction = (object)->
+	Creator.convertObject = (object)->
 		_.forEach object.triggers, (trigger, key)->
 
 			if (Meteor.isServer && trigger.on == "server") || (Meteor.isClient && trigger.on == "client")
@@ -18,7 +18,6 @@ Meteor.startup ()->
 						#TODO 控制可使用的变量
 						Creator.evalInContext(_todo, this)
 
-	Creator.convertFieldsOptions = (object)->
 		_.forEach object.fields, (field, key)->
 			if field.options && _.isString(field.options)
 				try
@@ -32,4 +31,29 @@ Meteor.startup ()->
 					field.options = _options
 				catch error
 					console.error "Creator.convertFieldsOptions", field.options, error
+
+			if Meteor.isServer
+
+				optionsFunction = field.optionsFunction
+				reference_to = field.reference_to
+
+				if optionsFunction && _.isFunction(optionsFunction)
+					field._optionsFunction = optionsFunction.toString()
+
+				if reference_to && _.isFunction(reference_to)
+					field._reference_to = reference_to.toString()
+			else
+
+				optionsFunction = field._optionsFunction
+				reference_to = field._reference_to
+
+				if optionsFunction && _.isString(optionsFunction)
+
+					field.optionsFunction = ()->
+						Creator.evalInContext("(#{optionsFunction})()", this)
+
+				if reference_to && _.isString(reference_to)
+					field.reference_to = ()->
+						Creator.evalInContext("(#{reference_to})()", this)
+
 
