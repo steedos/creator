@@ -114,6 +114,13 @@ if Meteor.isServer
 					else
 						permissions.readonly_fields = po.readonly_fields
 
+		if object.is_view
+			permissions.allowCreate = false
+			permissions.allowEdit = false
+			permissions.allowDelete = false
+			permissions.modifyAllRecords = false
+			permissions.actions = []
+
 		if object_name == "contacts"
 			console.log "permissions:", permissions
 		return permissions

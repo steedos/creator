@@ -21,6 +21,8 @@ Creator.Objects.objects =
 		icon: 
 			label: "Icon"
 			type: "text"
+		is_view:
+			type: 'boolean'
 		is_enable:
 			type: "boolean"
 		description: 

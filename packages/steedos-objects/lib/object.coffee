@@ -10,6 +10,7 @@ Creator.Object = (options)->
 	self.label = options.label
 	self.icon = options.icon
 	self.description = options.description
+	self.is_view = options.is_view
 	if !_.isBoolean(options.is_enable)  || options.is_enable == true
 		self.is_enable = true
 	else
@@ -111,7 +112,7 @@ Creator.Object = (options)->
 
 	schema = Creator.getObjectSchema(self)
 	self.schema = new SimpleSchema(schema)
-	if self.name != "users" and self.name != "cfs.files.filerecord"
+	if self.name != "users" and self.name != "cfs.files.filerecord" && !self.is_view
 		if Meteor.isClient
 			Creator.Collections[self.name].attachSchema(self.schema, {replace: true})
 		else
