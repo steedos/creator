@@ -28,7 +28,7 @@ Creator.Objects.notes =
 
 	list_views:
 		default:
-			columns: ["name", "owner", "created"]
+			columns: ["name", "created_by", "created"]
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
