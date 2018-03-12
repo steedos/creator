@@ -83,6 +83,9 @@ Meteor.startup ()->
 			else
 				defaultValue = field._defaultValue
 				if defaultValue && _.isString(defaultValue)
-					field.defaultValue = Creator.eval("(#{defaultValue})")
+					try
+						field.defaultValue = Creator.eval("(#{defaultValue})")
+					catch error
+						console.error "convert error #{object.name} -> #{field.name}", error
 
 

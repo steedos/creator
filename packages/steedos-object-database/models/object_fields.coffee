@@ -31,9 +31,6 @@ Creator.Objects.object_fields =
 	icon: "orders"
 	enable_api: true
 	fields:
-		object:
-			type: "master_detail"
-			reference_to: "objects"
 		name:
 			type: "text"
 			searchable: true
@@ -42,9 +39,9 @@ Creator.Objects.object_fields =
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
-		description:
-			label: "Description"
-			type: "text"
+		object:
+			type: "master_detail"
+			reference_to: "objects"
 		type:
 			type: "select"
 			required: true
@@ -60,6 +57,18 @@ Creator.Objects.object_fields =
 				currency: "金额"
 				lookup: "相关表"
 				master_detail: "主表/子表"
+
+		group:
+			type: "text"
+			is_wide: true
+
+		defaultValue:
+			type: "text"
+
+		allowedValues:
+			type: "text"
+			multiple: true
+
 		multiple:
 			type: "boolean"
 
@@ -78,17 +87,19 @@ Creator.Objects.object_fields =
 		omit:
 			type: "boolean"
 
-		group:
-			type: "text"
-
 		index:
 			type: "boolean"
 
 		sortable:
 			type: "boolean"
 
-		allowedValues:
-			type: "text"
+		reference_to: #在服务端处理此字段值，如果小于2个，则存储为字符串，否则存储为数组
+			type: "lookup"
+			optionsFunction: ()->
+				_options = []
+				_.forEach Creator.Objects, (o, k)->
+					_options.push {label: o.label, value: k, icon: o.icon}
+				return _options
 			multiple: true
 
 		rows:
@@ -100,17 +111,14 @@ Creator.Objects.object_fields =
 		scale:
 			type: "number"
 
-		reference_to: #在服务端处理此字段值，如果小于2个，则存储为字符串，否则存储为数组
-			type: "lookup"
-			optionsFunction: ()->
-				_options = []
-				_.forEach Creator.Objects, (o, k)->
-					_options.push {label: o.label, value: k, icon: o.icon}
-				return _options
-			multiple: true
-
 		options:
 			type: "textarea"
+			is_wide: true
+
+		description:
+			label: "Description"
+			type: "text"
+			is_wide: true
 
 	list_views:
 		default:
