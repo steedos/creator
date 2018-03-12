@@ -10,6 +10,10 @@ Creator.Object = (options)->
 	self.label = options.label
 	self.icon = options.icon
 	self.description = options.description
+	if !_.isBoolean(options.is_enable)  || options.is_enable == true
+		self.is_enable = true
+	else
+		self.is_enable = false
 	self.enable_search = options.enable_search
 	self.enable_files = options.enable_files
 	self.enable_tasks = options.enable_tasks
