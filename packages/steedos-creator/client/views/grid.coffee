@@ -47,7 +47,6 @@ _itemClick = (e, curObjectName)->
 				Session.set("action_collection_name", collectionName)
 				Session.set("action_save_and_insert", true)
 				Creator.executeAction objectName, action, recordId
-				console.log("actionSheet.onItemClick", value)
 
 	unless actions.length
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
@@ -61,7 +60,6 @@ _itemClick = (e, curObjectName)->
 _actionItems = (object_name, record_id, record_permissions)->
 	obj = Creator.getObject(object_name)
 	actions = Creator.getActions(object_name)
-	console.log "_actionItem,actions1:", actions
 	actions = _.filter actions, (action)->
 		if action.on == "record" or action.on == "record_more"
 			if action.only_detail
@@ -263,6 +261,7 @@ Template.creator_grid.onRendered ->
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			else
 				pageSize = 10
+				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
@@ -324,8 +323,11 @@ Template.creator_grid.onRendered ->
 					self.data.total.set dxDataGridInstance.totalCount()
 					current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
-
+			dxDataGridInstance.pageSize(pageSize)
+			window.dxDataGridInstance = dxDataGridInstance
+			
 Template.creator_grid.helpers Creator.helpers
 
 Template.creator_grid.events
