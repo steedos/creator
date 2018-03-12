@@ -122,5 +122,7 @@ Creator.Objects.objects =
 
 				#drop collection
 				console.log "drop collection", doc.name
-				Creator.getCollection(doc.name).rawCollection().drop (err, client)->
-					Creator.removeCollection(doc.name)
+				Creator.getCollection(doc.name)._collection.dropCollection()
+#
+#				Creator.getCollection(doc.name).rawCollection().drop (err, client)->
+#					Creator.removeCollection(doc.name)
