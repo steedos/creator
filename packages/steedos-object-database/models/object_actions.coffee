@@ -25,7 +25,7 @@ isRepeatedName = (doc, name)->
 	return false
 Creator.Objects.object_actions =
 	name: "object_actions"
-	label: "Actions"
+	label: "操作"
 	icon: "marketing_actions"
 	fields:
 		object:

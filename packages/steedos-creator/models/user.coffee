@@ -1,6 +1,6 @@
 Creator.Objects.users = 
 	name: "users"
-	label: "Users"
+	label: "用户"
 	icon: "user"
 	enable_api: true
 	fields:

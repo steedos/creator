@@ -1,6 +1,6 @@
 Creator.Objects.spaces = 
 	name: "spaces"
-	label: "Spaces"
+	label: "工作区"
 	icon: "groups"
 	fields:
 		name: 

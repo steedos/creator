@@ -27,7 +27,7 @@ isRepeatedName = (doc, name)->
 
 Creator.Objects.object_triggers =
 	name: "object_triggers"
-	label: "Triggers"
+	label: "触发器"
 	icon: "asset_relationship"
 	fields:
 		name:

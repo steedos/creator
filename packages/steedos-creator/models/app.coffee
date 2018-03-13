@@ -1,6 +1,6 @@
 Creator.Objects.apps = 
 	name: "apps"
-	label: "Apps"
+	label: "应用"
 	icon: "apps"
 	fields:
 		name: 

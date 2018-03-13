@@ -46,14 +46,13 @@ Creator.Objects.contracts =
 
 	list_views:
 		default:
-			columns: ["name", "customer_id", "amount", "signed_date", "company_signed_id"]
+			columns: ["name", "amount", "signed_date", "customer", "owner"]
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
 		all:
 			label: "所有合同"
 			filter_scope: "space"
-			columns: ["name", "description", "modified", "owner"]
 		mine:
 			label: "我的合同"
 			filter_scope: "mine"

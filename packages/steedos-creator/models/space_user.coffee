@@ -1,6 +1,6 @@
 Creator.Objects.space_users = 
 	name: "space_users"
-	label: "Space Users"
+	label: "人员"
 	icon: "user"
 	enable_search: true
 	fields:

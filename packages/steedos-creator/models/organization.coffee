@@ -1,6 +1,6 @@
 Creator.Objects.organizations = 
 	name: "organizations"
-	label: "Organizations"
+	label: "部门"
 	icon: "groups"
 	enable_search: true
 	fields:
