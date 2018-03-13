@@ -150,9 +150,9 @@ Meteor.startup ->
 				statusCode: 404
 				body: {status: 'fail', message: 'Collection not found'}
 
-			permissions = Creator.getObjectPermissions(@spaceId, @userId, key)
+			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowCreate
-				@bodyParams.space = @spaceId
+				@bodyParams.space = @urlParams.spaceId
 				entityId = collection.insert @bodyParams
 				entity = collection.findOne entityId
 				if entity
