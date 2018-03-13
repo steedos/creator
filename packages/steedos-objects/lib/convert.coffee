@@ -55,6 +55,20 @@ Meteor.startup ()->
 				catch error
 					console.error "Creator.convertFieldsOptions", field.options, error
 
+			
+			
+			if Meteor.isServer
+				_hidden = field.hidden
+				if _hidden && _.isFunction(_hidden)
+					field._hidden = _hidden.toString()
+			else
+				_hidden = field._hidden
+				if _hidden && _.isString(_hidden)
+					try
+						field.hidden = Creator.eval("(#{_hidden})")
+					catch error
+						console.error "convert field -> hidden error", _hidden, error
+
 			if Meteor.isServer
 
 				optionsFunction = field.optionsFunction
