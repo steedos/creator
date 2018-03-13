@@ -59,7 +59,7 @@ Creator.Objects.object_actions =
 
 	list_views:
 		default:
-			columns: ["name", "label", "object", "on", "visible", "is_enable", "modified"]
+			columns: ["name", "label", "object", "on", "is_enable", "modified"]
 		all:
 			filter_scope: "space"
 
