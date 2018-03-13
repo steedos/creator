@@ -32,7 +32,7 @@ Creator.Objects.space_users =
 			multiple: true
 			defaultValue: []
 		manager:
-			type: "master_detail"
+			type: "lookup"
 			reference_to: "users"
 		sort_no:
 			type: "number"
