@@ -34,12 +34,24 @@ Meteor.startup ()->
 						action.todo = Creator.eval("(function(){#{_todo_from_db}})")
 					catch error
 						console.error "todo_from_db", _todo_from_db
+
+				_visible = action?._visible
+				if _visible
+					try
+						action.visible = Creator.eval("(#{_visible})")
+					catch error
+						console.error "action.visible to function error: ", error, _visible
 		else
 			_.forEach object.actions, (action, key)->
 				_todo = action?.todo
 				if _todo && _.isFunction(_todo)
 					#TODO 控制可使用的变量
 					action._todo = _todo.toString()
+
+				_visible = action?.visible
+
+				if _visible && _.isFunction(_visible)
+					action._visible = _visible.toString()
 
 		_.forEach object.fields, (field, key)->
 			if field.options && _.isString(field.options)
@@ -54,6 +66,20 @@ Meteor.startup ()->
 					field.options = _options
 				catch error
 					console.error "Creator.convertFieldsOptions", field.options, error
+
+			
+			
+			if Meteor.isServer
+				_hidden = field.hidden
+				if _hidden && _.isFunction(_hidden)
+					field._hidden = _hidden.toString()
+			else
+				_hidden = field._hidden
+				if _hidden && _.isString(_hidden)
+					try
+						field.hidden = Creator.eval("(#{_hidden})")
+					catch error
+						console.error "convert field -> hidden error", _hidden, error
 
 			if Meteor.isServer
 

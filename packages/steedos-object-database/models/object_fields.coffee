@@ -27,7 +27,6 @@ isRepeatedName = (doc, name)->
 
 Creator.Objects.object_fields =
 	name: "object_fields"
-	label: "字段"
 	icon: "orders"
 	enable_api: true
 	fields:
