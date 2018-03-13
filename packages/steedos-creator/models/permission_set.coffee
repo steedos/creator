@@ -4,14 +4,17 @@ Creator.Objects.permission_set =
 	icon: "user"
 	fields: 
 		name:
+			label: "名称"
 			type: "text",
 			searchable:true
 			index:true
 		users:
+			label: "用户"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
 		assigned_apps:
+			label: "授权应用"
 			type: "lookup"
 			reference_to: "apps"
 			multiple: true

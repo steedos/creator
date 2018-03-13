@@ -4,7 +4,7 @@ Creator.Objects.apps =
 	icon: "apps"
 	fields:
 		name: 
-			label: "Name"
+			label: "名称"
 			type: "text"
 			defaultValue: ""
 			description: ""
@@ -13,6 +13,7 @@ Creator.Objects.apps =
 			searchable:true
 			index:true
 		objects:
+			label: "对象"
 			type: "[text]"
 	list_views:
 		default:

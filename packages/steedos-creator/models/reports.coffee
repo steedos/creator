@@ -59,7 +59,7 @@ Creator.Objects.reports =
 				{label: "与我相关", value: "mine"}
 			]
 		filters: 
-			label: "过虑条件"
+			label: "过滤条件"
 			type: [Object]
 			omit: true
 		"filters.$.field": 

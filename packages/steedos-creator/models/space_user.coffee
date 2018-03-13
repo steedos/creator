@@ -5,7 +5,7 @@ Creator.Objects.space_users =
 	enable_search: true
 	fields:
 		name: 
-			label: "Name"
+			label: "名称"
 			type: "text"
 			defaultValue: ""
 			description: ""
