@@ -260,9 +260,9 @@ Meteor.startup ->
 				statusCode: 404
 				body: {status: 'fail', message: 'Collection not found'}
 
-			permissions = Creator.getObjectPermissions(@spaceId, @userId, key)
+			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowDelete
-					selector = {_id: @urlParams.id, space: @spaceId}
+					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
 					if collection.remove selector
 						{status: 'success', message: 'Item removed'}
 					else
