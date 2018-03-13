@@ -32,6 +32,7 @@
 	"object_fields_scale": "小数位数",
 	"object_fields_options": "选择项",
 	"object_fields_description": "描述",
+	"object_fields_searchable": "可搜索",
 
 
 	"object_triggers": "触发器",

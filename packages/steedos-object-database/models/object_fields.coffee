@@ -89,6 +89,9 @@ Creator.Objects.object_fields =
 		index:
 			type: "boolean"
 
+		searchable:
+			type: "boolean"
+
 		sortable:
 			type: "boolean"
 
@@ -100,6 +103,7 @@ Creator.Objects.object_fields =
 					_options.push {label: o.label, value: k, icon: o.icon}
 				return _options
 			multiple: true
+			is_wide: true
 
 		rows:
 			type: "number"
@@ -121,7 +125,7 @@ Creator.Objects.object_fields =
 
 	list_views:
 		default:
-			columns: ["name", "object", "label", "type", "multiple", "required", "omit", "group", "description", "modified"]
+			columns: ["name", "object", "label", "type", "multiple", "required", "omit", "group", "searchable", "index", "description", "modified"]
 		all:
 			filter_scope: "space"
 
