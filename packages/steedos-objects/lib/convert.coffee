@@ -70,16 +70,16 @@ Meteor.startup ()->
 			
 			
 			if Meteor.isServer
-				_hidden = field.hidden
-				if _hidden && _.isFunction(_hidden)
-					field._hidden = _hidden.toString()
+				_type = field.type
+				if _type && _.isFunction(_type) && _type != Object && _type != String && _type != Number && _type != Boolean && !_.isArray(_type) 
+					field._type = _type.toString()
 			else
-				_hidden = field._hidden
-				if _hidden && _.isString(_hidden)
+				_type = field._type
+				if _type && _.isString(_type)
 					try
-						field.hidden = Creator.eval("(#{_hidden})")
+						field.type = Creator.eval("(#{_type})")
 					catch error
-						console.error "convert field -> hidden error", _hidden, error
+						console.error "convert field -> type error", field, error
 
 			if Meteor.isServer
 
