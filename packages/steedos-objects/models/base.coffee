@@ -4,7 +4,7 @@ Creator.baseObject =
 			label:"所有者"
 			type: "lookup"
 			reference_to: "users"
-			omit: true
+			hidden: true
 			sortable: true
 			index: true
 			defaultValue: "{{userId}}"
