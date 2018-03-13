@@ -126,9 +126,6 @@ Creator.Objects.reports =
 	list_views:
 		default:
 			columns: ["name", "report_type", "object_name"]
-		recent:
-			label: "最近查看"
-			filter_scope: "space"
 		all:
 			label: "所有报表"
 			filter_scope: "space"
