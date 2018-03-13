@@ -1,6 +1,6 @@
 Creator.isLoadingSpace = new ReactiveVar(true)
 
-Creator.bootstrap = ()->
+Creator.bootstrap = (callback)->
 	Creator.isLoadingSpace.set(true)
 	spaceId = Steedos.getSpaceId()
 	unless spaceId
@@ -28,7 +28,7 @@ Creator.bootstrap = ()->
 						fs = object.schema._schema[field_name]
 						if !fs.autoform
 							fs.autoform = {}
-						if _.indexOf(permissions.fields, field_name)>=0
+						if _.indexOf(permissions.fields, field_name) >= 0
 							field.hidden = false
 							field.omit = false
 							fs.autoform.omit = false
@@ -51,8 +51,12 @@ Creator.bootstrap = ()->
 			_.each result.assigned_apps, (app_name)->
 				Creator.Apps[app_name]?.visible = true
 
+		if _.isFunction(callback)
+			callback()
+
 		Creator.isLoadingSpace.set(false)
 
 Meteor.startup ->
 	Tracker.autorun ->
-		Creator.bootstrap()
+		Creator.bootstrap ()->
+			Creator.objects_initialized.set(true)
