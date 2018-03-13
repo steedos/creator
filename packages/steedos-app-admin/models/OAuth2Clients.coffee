@@ -1,7 +1,7 @@
 Creator.Objects.OAuth2Clients = 
 	name: "OAuth2Clients"
 	icon: "entity"
-	label: "OAuth2配置"
+	label: "连接的应用程序"
 	enable_search: false
 	# db: Package["steedos:oauth2-server"]?.oAuth2Server?.collections?.clients
 	fields: 
