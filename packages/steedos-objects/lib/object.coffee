@@ -1,5 +1,7 @@
 
 Creator.objectsByName = {}   # 此对象只能在确保所有Object初始化完成后调用， 否则获取到的object不全
+if Meteor.isClient
+	Creator.objects_initialized = new ReactiveVar(false)
 
 Creator.Object = (options)->
 	self = this
@@ -158,6 +160,6 @@ if Meteor.isClient
 
 	Meteor.startup ->
 		Tracker.autorun ->
-			if Session.get("steedos-locale")
+			if Session.get("steedos-locale") && Creator.objects_initialized.get()
 				_.each Creator.objectsByName, (object, object_name)->
 					object.i18n()
