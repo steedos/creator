@@ -179,9 +179,9 @@ Meteor.startup ->
 				statusCode: 404
 				body: {status: 'fail', message: 'Collection not found'}
 
-			permissions = Creator.getObjectPermissions(@spaceId, @userId, key)
+			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowCreate
-					@bodyParams.space = @spaceId
+					@bodyParams.space = @urlParams.spaceId
 					entityId = collection.insert @bodyParams
 					entity = collection.findOne entityId
 					if entity
@@ -195,6 +195,7 @@ Meteor.startup ->
 				body: {status: 'fail', message: 'Action not permitted'}
 		get:()->
 			key = @urlParams.object_name
+			console.log "@urlParams====",@urlParams
 			if not Creator.objectsByName[key]?.enable_api
 				return {
 					statusCode: 404
@@ -206,10 +207,12 @@ Meteor.startup ->
 				statusCode: 404
 				body: {status: 'fail', message: 'Collection not found'}
 
-			permissions = Creator.getObjectPermissions(@spaceId, @userId, key)
+			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
+			console.log "permisssion=====",permissions
 			if permissions.allowRead
-					selector = {_id: @urlParams.id, space: @spaceId}
+					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
 					entity = collection.findOne selector
+					console.log "entity====",entity
 					if entity
 						{status: 'success', value: entity}
 					else
@@ -219,6 +222,7 @@ Meteor.startup ->
 				statusCode: 400
 				body: {status: 'fail', message: 'Action not permitted'}
 		put:()->
+			console.log "33333"
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
 				return {
@@ -231,12 +235,12 @@ Meteor.startup ->
 				statusCode: 404
 				body: {status: 'fail', message: 'Collection not found'}
 
-			permissions = Creator.getObjectPermissions(@spaceId, @userId, key)
+			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowEdit
-					selector = {_id: @urlParams.id, space: @spaceId}
+					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
 					entityIsUpdated = collection.update selector, $set: @bodyParams
 					if entityIsUpdated
-						entity = collection.findOne @urlParams.id
+						entity = collection.findOne @urlParams._id
 						{status: 'success', value: entity}
 					else
 						statusCode: 404
