@@ -20,7 +20,7 @@ _syncToObject = (doc) ->
 	})
 
 isRepeatedName = (doc, name)->
-	other = Creator.getCollection("object_fields").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name})
+	other = Creator.getCollection("object_fields").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false
@@ -31,9 +31,6 @@ Creator.Objects.object_fields =
 	icon: "orders"
 	enable_api: true
 	fields:
-		object:
-			type: "master_detail"
-			reference_to: "objects"
 		name:
 			type: "text"
 			searchable: true
@@ -42,9 +39,9 @@ Creator.Objects.object_fields =
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
-		description:
-			label: "Description"
-			type: "text"
+		object:
+			type: "master_detail"
+			reference_to: "objects"
 		type:
 			type: "select"
 			required: true
@@ -60,6 +57,18 @@ Creator.Objects.object_fields =
 				currency: "金额"
 				lookup: "相关表"
 				master_detail: "主表/子表"
+
+		group:
+			type: "text"
+			is_wide: true
+
+		defaultValue:
+			type: "text"
+
+		allowedValues:
+			type: "text"
+			multiple: true
+
 		multiple:
 			type: "boolean"
 
@@ -78,17 +87,19 @@ Creator.Objects.object_fields =
 		omit:
 			type: "boolean"
 
-		group:
-			type: "text"
-
 		index:
 			type: "boolean"
 
 		sortable:
 			type: "boolean"
 
-		allowedValues:
-			type: "text"
+		reference_to: #在服务端处理此字段值，如果小于2个，则存储为字符串，否则存储为数组
+			type: "lookup"
+			optionsFunction: ()->
+				_options = []
+				_.forEach Creator.Objects, (o, k)->
+					_options.push {label: o.label, value: k, icon: o.icon}
+				return _options
 			multiple: true
 
 		rows:
@@ -100,14 +111,14 @@ Creator.Objects.object_fields =
 		scale:
 			type: "number"
 
-		reference_to: #在服务端处理此字段值，如果小于2个，则存储为字符串，否则存储为数组
-			type: "lookup"
-			optionsFunction: ()->
-				_options = []
-				_.forEach Creator.Objects, (o, k)->
-					_options.push {label: o.label, value: k, icon: o.icon}
-				return _options
-			multiple: true
+		options:
+			type: "textarea"
+			is_wide: true
+
+		description:
+			label: "Description"
+			type: "text"
+			is_wide: true
 
 	list_views:
 		default:
@@ -157,10 +168,25 @@ Creator.Objects.object_fields =
 				if modifier?.$set?.name && isRepeatedName(doc, modifier.$set.name)
 					throw new Meteor.Error 500, "对象名称不能重复"
 
+				if modifier?.$set?.reference_to && modifier.$set.reference_to.length == 1
+					_reference_to = modifier.$set.reference_to[0]
+
+				object = Creator.getCollection("objects").findOne({_id: doc.object}, {fields: {name: 1, label: 1}})
+
+				if object
+
+					object_documents = Creator.getCollection(object.name).find()
+					if modifier?.$set?.reference_to && doc.reference_to != _reference_to && object_documents.count() > 0
+						throw new Meteor.Error 500, "对象#{object.label}中已经有记录，不能修改reference_to字段"
+
 		"before.insert.server.object_fields":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+
+				if doc.reference_to?.length == 1
+					doc.reference_to = doc.reference_to[0]
+
 				if isRepeatedName(doc)
 					throw new Meteor.Error 500, "对象名称不能重复"
 

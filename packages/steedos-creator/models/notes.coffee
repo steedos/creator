@@ -1,7 +1,7 @@
 Creator.Objects.notes = 
 	name: "notes"
 	label: "备忘"
-	icon: "messaging_conversation"
+	icon: "note"
 	fields:
 		name: 
 			label: "标题"
@@ -28,7 +28,7 @@ Creator.Objects.notes =
 
 	list_views:
 		default:
-			columns: ["name", "owner", "created"]
+			columns: ["name", "created_by", "created"]
 		recent:
 			label: "最近查看"
 			filter_scope: "space"

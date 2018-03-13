@@ -31,6 +31,8 @@ Meteor.startup ->
 			# console.log 'navigationProperty: ', navigationProperty
 			field = obj.fields[navigationProperty]
 			if field and (field.type is 'lookup' or field.type is 'master_detail')
+				if _.isFunction(field.reference_to)
+					field.reference_to = field.reference_to()
 				if field.reference_to
 					queryOptions = visitorParser(include)
 					if _.isString field.reference_to
@@ -85,7 +87,7 @@ Meteor.startup ->
 
 			# console.log '@spaceId, @userId, key: ', @urlParams.spaceId, @userId, key
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
-			# console.log 'permissions: ', permissions
+			console.log 'permissions==========: ', permissions
 			if permissions.viewAllRecords or (permissions.allowRead and @userId)
 				# console.log 'queryParams: ', @queryParams
 				# console.log 'urlParams: ', @urlParams
@@ -109,6 +111,7 @@ Meteor.startup ->
 				entities = []
 				if @queryParams.$top isnt '0'
 					# console.log visitorParser(createQuery)
+					console.log "createQuery.query", createQuery.query
 					entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 				scannedCount = collection.find(createQuery.query).count()
 

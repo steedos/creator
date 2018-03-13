@@ -47,7 +47,6 @@ _itemClick = (e, curObjectName)->
 				Session.set("action_collection_name", collectionName)
 				Session.set("action_save_and_insert", true)
 				Creator.executeAction objectName, action, recordId
-				console.log("actionSheet.onItemClick", value)
 
 	unless actions.length
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
@@ -66,15 +65,13 @@ _actionItems = (object_name, record_id, record_permissions)->
 			if action.only_detail
 				return false
 			if typeof action.visible == "function"
+				console.log "action.visible,function:", object_name, record_id, record_permissions
 				return action.visible(object_name, record_id, record_permissions)
 			else
 				return action.visible
 		else
 			return false
-	# if _.isEmpty(actions)
-	# 	Meteor.defer ()->
-	# 		objectColName = "tabular-col-#{object_name.replace(/\./g,'_')}"
-	# 		$(".tabular-col-actions.#{objectColName}").hide()
+	console.log "_actionItem,actions2:", actions
 	return actions
 
 _fields = (object_name, list_view_id)->
@@ -105,6 +102,9 @@ _expandFields = (object_name, columns)->
 	_.each columns, (n)->
 		if fields[n].type == "master_detail" || fields[n].type == "lookup"
 			ref = fields[n].reference_to
+			if _.isFunction(ref)
+				ref = ref()
+
 			if !_.isArray(ref)
 				ref = [ref]
 				
@@ -238,10 +238,7 @@ Template.creator_grid.onRendered ->
 								<a class="rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger" aria-haspopup="true" role="button" title="" href="javascript:void(0);" data-toggle="dropdown">
 									<span class="slds-icon_container slds-icon-utility-down">
 										<span class="lightningPrimitiveIcon">
-											<svg class="slds-icon slds-icon-text-default slds-icon--xx-small" focusable="false" aria-hidden="true" data-key="down">
-												<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#down">
-												</use>
-											</svg>
+											#{Blaze.toHTMLWithData Template.steedos_button_icon, {class: "slds-icon slds-icon-text-default slds-icon--xx-small", source: "utility-sprite", name:"down"}}
 										</span>
 										<span class="slds-assistive-text" data-aura-rendered-by="15534:0">显示更多信息</span>
 									</span>
@@ -260,12 +257,17 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
+			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
+				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
+			else
+				pageSize = 10
+				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 			dxOptions = 
 				paging: 
-					pageSize: 50
+					pageSize: pageSize
 				pager: 
 					showPageSizeSelector: true,
-					allowedPageSizes: [25, 50, 100],
+					allowedPageSizes: [10,25, 50, 100],
 					showInfo: false,
 					showNavigationButtons: true
 				showColumnLines: false
@@ -319,9 +321,13 @@ Template.creator_grid.onRendered ->
 
 				onContentReady: (e)->
 					self.data.total.set dxDataGridInstance.totalCount()
-
+					current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
+					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
-
+			dxDataGridInstance.pageSize(pageSize)
+			window.dxDataGridInstance = dxDataGridInstance
+			
 Template.creator_grid.helpers Creator.helpers
 
 Template.creator_grid.events

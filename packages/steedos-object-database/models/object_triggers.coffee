@@ -1,5 +1,5 @@
 _syncToObject = (doc) ->
-	object_triggers = Creator.getCollection("object_triggers").find({object: doc.object}, {
+	object_triggers = Creator.getCollection("object_triggers").find({object: doc.object, is_enable: true}, {
 		fields: {
 			created: 0,
 			modified: 0,
@@ -20,7 +20,7 @@ _syncToObject = (doc) ->
 	})
 
 isRepeatedName = (doc, name)->
-	other = Creator.getCollection("object_triggers").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name})
+	other = Creator.getCollection("object_triggers").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false
@@ -60,6 +60,8 @@ Creator.Objects.object_triggers =
 					{label: "删除记录之前", value: "before.remove", icon: "asset_relationship"}
 					{label: "删除记录之后", value: "after.remove", icon: "asset_relationship"}
 				]
+		is_enable:
+			type: "boolean"
 		todo:
 			label: "执行的脚本"
 			type: "textarea"
@@ -68,25 +70,25 @@ Creator.Objects.object_triggers =
 
 	list_views:
 		default:
-			columns: ["name", "label", "object", "on", "when"]
+			columns: ["name", "label", "object", "on", "when", "is_enable"]
 		all:
 			filter_scope: "space"
 
-		permission_set:
-			user:
-				allowCreate: false
-				allowDelete: false
-				allowEdit: false
-				allowRead: false
-				modifyAllRecords: false
-				viewAllRecords: false
-			admin:
-				allowCreate: true
-				allowDelete: true
-				allowEdit: true
-				allowRead: true
-				modifyAllRecords: true
-				viewAllRecords: true
+	permission_set:
+		user:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
+			viewAllRecords: false
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true
 
 	triggers:
 		"after.insert.server.object_triggers":

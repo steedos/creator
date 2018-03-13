@@ -131,7 +131,7 @@ Template.creator_view.helpers
 				selector = {"metadata.space": Session.get("spaceId")}
 			else
 				selector = {space: Session.get("spaceId")}
-			if object_name == "cms_files" || object_name == "tasks"
+			if object_name == "cms_files" || object_name == "tasks" || object_name == "notes"
 				# 附件的关联搜索条件是定死的
 				selector["#{related_field_name}.o"] = Session.get "object_name"
 				selector["#{related_field_name}.ids"] = [record_id]
@@ -160,40 +160,36 @@ Template.creator_view.helpers
 
 	actions: ()->
 		actions = Creator.getActions()
-		permissions = Creator.getPermissions()
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-
-		if !actions
-			return
-
-		if permissions.actions
-			return actions
-		else	
-			actions = _.filter actions, (action)->
-				if action.on == "record"
-					if action.only_list_item
-						return false
-					if typeof action.visible == "function"
-						return action.visible(object_name, record_id, permissions)
-					else
-						return action.visible
-				else
+		record = Creator.getCollection(object_name).findOne(record_id)
+		userId = Meteor.userId()
+		record_permissions = Creator.getRecordPermissions object_name, record, userId
+		actions = _.filter actions, (action)->
+			if action.on == "record"
+				if action.only_list_item
 					return false
-			return actions
+				if typeof action.visible == "function"
+					return action.visible(object_name, record_id, record_permissions)
+				else
+					return action.visible
+			else
+				return false
+		return actions
 
 	moreActions: ()->
 		actions = Creator.getActions()
-		permissions = Creator.getPermissions()
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-
+		record = Creator.getCollection(object_name).findOne(record_id)
+		userId = Meteor.userId()
+		record_permissions = Creator.getRecordPermissions object_name, record, userId
 		actions = _.filter actions, (action)->
 			if action.on == "record_more"
 				if action.only_list_item
 					return false
 				if typeof action.visible == "function"
-					return action.visible(object_name, record_id, permissions)
+					return action.visible(object_name, record_id, record_permissions)
 				else
 					return action.visible
 			else
@@ -286,7 +282,7 @@ Template.creator_view.events
 				relatedKey = related_obj.related_field_name
 
 		if relatedKey
-			Session.set 'cmDoc', {"#{relatedKey}": relatedValue}
+			Session.set 'cmDoc', {"#{relatedKey}": {o: Session.get("object_name"), ids: [relatedValue]}}
 
 		Session.set("action_fields", undefined)
 		Session.set("action_collection", collection)
