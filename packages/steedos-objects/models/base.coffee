@@ -72,7 +72,7 @@ Creator.baseObject =
 				doc.created = new Date();
 				doc.modified = new Date();
 				if userId
-					doc.owner = userId
+					# doc.owner = userId
 					doc.created_by = userId;
 					doc.modified_by = userId;
 
