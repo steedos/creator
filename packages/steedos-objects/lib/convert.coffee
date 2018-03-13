@@ -67,6 +67,20 @@ Meteor.startup ()->
 				catch error
 					console.error "Creator.convertFieldsOptions", field.options, error
 
+			
+			
+			if Meteor.isServer
+				_type = field.type
+				if _type && _.isFunction(_type) && _type != Object && _type != String && _type != Number && _type != Boolean && !_.isArray(_type) 
+					field._type = _type.toString()
+			else
+				_type = field._type
+				if _type && _.isString(_type)
+					try
+						field.type = Creator.eval("(#{_type})")
+					catch error
+						console.error "convert field -> type error", field, error
+
 			if Meteor.isServer
 
 				optionsFunction = field.optionsFunction
