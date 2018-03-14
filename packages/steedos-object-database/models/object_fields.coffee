@@ -95,6 +95,17 @@ Creator.Objects.object_fields =
 		sortable:
 			type: "boolean"
 
+		rows:
+			type: "currency"
+
+		precision:
+			type: "currency"
+			defaultValue: 18
+
+		scale:
+			type: "currency"
+			defaultValue: 2
+
 		reference_to: #在服务端处理此字段值，如果小于2个，则存储为字符串，否则存储为数组
 			type: "lookup"
 			optionsFunction: ()->
@@ -104,15 +115,6 @@ Creator.Objects.object_fields =
 				return _options
 			multiple: true
 			is_wide: true
-
-		rows:
-			type: "number"
-
-		precision:
-			type: "number"
-
-		scale:
-			type: "number"
 
 		options:
 			type: "textarea"
