@@ -21,7 +21,6 @@ Meteor.startup ->
 			list_views = Creator.Objects[Session.get("object_name")].list_views
 			list_views_byname = Creator.getObject(Session.get("object_name")).list_views
 			object_listViews.forEach (listview)->
-				console.log "chagne listview", listview
 				_list_view = Creator.convertListView(list_views.default?.columns, listview, listview.name)
 				_key = listview._id
 				if listview.is_default
