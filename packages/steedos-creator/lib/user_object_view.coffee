@@ -2,8 +2,9 @@ Creator.getUserObjectsListViews = (userId, spaceId, objects)->
 	listViews = {}
 
 	_.forEach objects, (o, key)->
-		listViews[key] = Creator.getUserObjectListViews userId, spaceId, key
-
+		list_view = Creator.getUserObjectListViews userId, spaceId, key
+		if !_.isEmpty(list_view)
+			listViews[key] = list_view
 	return listViews
 
 
