@@ -49,7 +49,7 @@ Creator.Objects.permission_objects =
 				_object = Creator.getObject(values.object_name)
 				list_views = _object.list_views
 				_.forEach list_views, (f, k)->
-					_options.push {label: f.label || k, value: k}
+					_options.push {label: f.label || f.name || k, value: f._id}
 				return _options
 		actions:
 			type: "lookup"
