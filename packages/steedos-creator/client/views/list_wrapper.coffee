@@ -52,7 +52,10 @@ Template.creator_list_wrapper.helpers
 		return list_view
 	
 	list_view_label: (item)->
-		return item.label || item.name 
+		if item
+			return item.label || item.name 
+		else
+			return ""
 
 	actions: ()->
 		actions = Creator.getActions()

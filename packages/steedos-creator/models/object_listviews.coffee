@@ -54,6 +54,11 @@ Creator.Objects.object_listviews =
 		filter_logic:
 			type: String
 			omit: true
+
+		is_default:
+			type: "boolean"
+			omit: true
+			defaultValue: false
 	
 	triggers:
 		"before.insert.cilent.object_listviews": 
