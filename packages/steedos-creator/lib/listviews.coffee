@@ -268,6 +268,9 @@ if Meteor.isClient
 		return list
 
 
+///
+	取出list_view_id对应的视图，如果不存在或者没有权限，就返回第一个视图
+///
 Creator.getListView = (object_name, list_view_id)->
 	object = Creator.getObject(object_name)
 	if !object
