@@ -8,7 +8,7 @@ Creator.Objects.object_listviews =
 			type: "text"
 			searchable:true
 			index:true
-			# required: true
+			required: true
 		object_name: 
 			label: "对象名称"
 			type: "text"
