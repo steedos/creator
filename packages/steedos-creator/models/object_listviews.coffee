@@ -96,7 +96,7 @@ Creator.Objects.object_listviews =
 					throw new Meteor.Error 403, "can only remove own list view"
 
 				if doc.is_default
-					throw new Meteor.Error 403, "can only remove default list view"
+					throw new Meteor.Error 403, "can not remove default list view"
 				
 	list_views:
 		default:
