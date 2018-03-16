@@ -7,9 +7,11 @@ body {
 }
 
 .steedos.fixed.skin-blue-light {
-	.content-wrapper {
-		background: transparent;
-		top: 90px;
+	@media (min-width: 768px) {
+		.content-wrapper {
+			background: transparent;
+			top: 90px;
+		}
 	}
 	.slds-global-header_container {
 		z-index: 1000;
