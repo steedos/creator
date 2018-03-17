@@ -29,7 +29,9 @@ Meteor.startup ->
 			# console.log 'include: ', include
 			navigationProperty = include.navigationProperty
 			# console.log 'navigationProperty: ', navigationProperty
-			field = obj.fields[navigationProperty]
+			realFieldName = navigationProperty.split('_expand')[0]
+
+			field = obj.fields[realFieldName]
 			if field and (field.type is 'lookup' or field.type is 'master_detail')
 				if _.isFunction(field.reference_to)
 					field.reference_to = field.reference_to()
@@ -38,31 +40,31 @@ Meteor.startup ->
 					if _.isString field.reference_to
 						referenceToCollection = Creator.Collections[field.reference_to]
 						_.each entities, (entity, idx)->
-							if entity[navigationProperty]
+							if entity[realFieldName]
 								if field.multiple
-									originalData = _.clone(entity[navigationProperty])
-									multiQuery = _.extend {_id: {$in: entity[navigationProperty]}}, include.query
+									originalData = _.clone(entity[realFieldName])
+									multiQuery = _.extend {_id: {$in: entity[realFieldName]}}, include.query
 									entities[idx][navigationProperty] = referenceToCollection.find(multiQuery, queryOptions).fetch()
 									if !entities[idx][navigationProperty].length
 										entities[idx][navigationProperty] = originalData
 								else
-									singleQuery = _.extend {_id: entity[navigationProperty]}, include.query
+									singleQuery = _.extend {_id: entity[realFieldName]}, include.query
 
 									# 特殊处理在相关表中没有找到数据的情况，返回原数据
 									entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions) || entities[idx][navigationProperty]
 
 					if _.isArray field.reference_to
 						_.each entities, (entity, idx)->
-							if entity[navigationProperty]?.ids
-								referenceToCollection = Creator.Collections[entity[navigationProperty].o]
+							if entity[realFieldName]?.ids
+								referenceToCollection = Creator.Collections[entity[realFieldName].o]
 								if referenceToCollection
 									if field.multiple
-										multiQuery = _.extend {_id: {$in: entity[navigationProperty].ids}}, include.query
+										multiQuery = _.extend {_id: {$in: entity[realFieldName].ids}}, include.query
 										entities[idx][navigationProperty] = _.map referenceToCollection.find(multiQuery, queryOptions).fetch(), (o)->
 											o['reference_to.o'] = referenceToCollection._name
 											return o
 									else
-										singleQuery = _.extend {_id: entity[navigationProperty].ids[0]}, include.query
+										singleQuery = _.extend {_id: entity[realFieldName].ids[0]}, include.query
 										entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions)
 										entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
 
