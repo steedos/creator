@@ -197,11 +197,19 @@ Template.creator_grid.onRendered ->
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
-				url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
-				filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
+				if list_view_id == "recent"
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
+					filter = undefined
+				else
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
+					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
 			else
-				url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-				filter = Creator.getODataFilter(list_view_id, object_name)
+				if list_view_id == "recent"
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
+					filter = undefined
+				else
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+					filter = Creator.getODataFilter(list_view_id, object_name)
 			
 			curObjectName = if is_related then related_object_name else object_name
 
@@ -264,6 +272,9 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
+			console.log "selectColumns", selectColumns
+			console.log "filter", filter
+			console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			else
@@ -290,19 +301,20 @@ Template.creator_grid.onRendered ->
 						columns = gridState.columns
 						column_width = {}
 						sort = []
-						columns = _.sortBy(_.values(columns), "visibleIndex")
-						_.each columns, (column_obj)->
-							if column_obj.width
-								column_width[column_obj.dataField] = column_obj.width
-							if column_obj.sortOrder
-								sort.push [column_obj.dataField, column_obj.sortOrder]
-						
-						Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
-							(error, result)->
-								if error
-									console.log error
-								else
-									console.log "grid_settings success"
+						if columns and columns.length
+							columns = _.sortBy(_.values(columns), "visibleIndex")
+							_.each columns, (column_obj)->
+								if column_obj.width
+									column_width[column_obj.dataField] = column_obj.width
+								if column_obj.sortOrder
+									sort.push [column_obj.dataField, column_obj.sortOrder]
+							
+							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
+								(error, result)->
+									if error
+										console.log error
+									else
+										console.log "grid_settings success"
 				}
 				dataSource: 
 					store: 
