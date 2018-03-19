@@ -111,6 +111,8 @@ _expandFields = (object_name, columns)->
 				
 			ref = _.map ref, (o)->
 				return Creator.getObject(o).NAME_FIELD_KEY
+
+			ref = _.compact(ref)
 			
 			ref = ref.join(",")
 			expand_fields.push(n + "($select=" + ref + ")")
