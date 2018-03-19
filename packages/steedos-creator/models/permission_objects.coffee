@@ -97,7 +97,8 @@ Creator.Objects.permission_objects =
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
 				_options = []
-				related_object_names = Creator.getRelatedObjectNames(values.object_name)
+				related_objects = Creator.getObject(values.object_name).related_objects
+				related_object_names = _.uniq(_.pluck(related_objects, "object_name"))
 				_.forEach related_object_names, (i)->
 					_object = Creator.getObject(i)
 					_options.push {label: _object.label || i, value: i, icon: _object.icon}
@@ -108,6 +109,19 @@ Creator.Objects.permission_objects =
 			columns: ["name", "permission_set_id", "object_name", "allowCreate", "allowDelete", "allowEdit", "allowRead", "modifyAllRecords", "viewAllRecords"]
 		all:
 			filter_scope: "space"
+
+	triggers:
+		"before.insert.server.process": 
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				Creator.processPermissions doc
+				
+		"before.update.server.process": 
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				Creator.processPermissions modifier.$set
 
 	permission_set:
 		user:

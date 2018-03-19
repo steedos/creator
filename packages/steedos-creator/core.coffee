@@ -138,6 +138,21 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	return permissions
 
+Creator.processPermissions = (po)->
+	if po.allowCreate
+		po.allowRead = true
+	if po.allowEdit
+		po.allowRead = true
+	if po.allowDelete
+		po.allowEdit = true
+		po.allowRead = true
+	if po.viewAllRecords
+		po.allowRead = true
+	if po.modifyAllRecords
+		po.allowRead = true
+		po.allowEdit = true
+		po.allowDelete = true
+		po.viewAllRecords = true
 
 Creator.getApp = (app_id)->
 	if !app_id
@@ -308,9 +323,16 @@ Creator.isloading = ()->
 
 # 计算fields相关函数
 # START
+Creator.getHiddenFields = (schema)->
+	fields = _.map(schema, (field, fieldName) ->
+		return field.autoform and field.autoform.type == "hidden" and fieldName
+	)
+	fields = _.compact(fields)
+	return fields
+
 Creator.getFieldsWithNoGroup = (schema)->
 	fields = _.map(schema, (field, fieldName) ->
-  		return (!field.autoform or !field.autoform.group) and fieldName
+  		return (!field.autoform or !field.autoform.group) and (!field.autoform or field.autoform.type != "hidden") and fieldName
 	)
 	fields = _.compact(fields)
 	return fields
@@ -325,7 +347,7 @@ Creator.getSortedFieldGroupNames = (schema)->
 
 Creator.getFieldsForGroup = (schema, groupName) ->
   	fields = _.map(schema, (field, fieldName) ->
-    	return field.autoform and field.autoform.group == groupName and fieldName
+    	return field.autoform and field.autoform.group == groupName and field.autoform.type != "hidden" and fieldName
   	)
   	fields = _.compact(fields)
   	return fields
@@ -351,7 +373,7 @@ Creator.getFieldsInFirstLevel = (firstLevelKeys, keys) ->
 	keys = _.compact(keys)
 	return keys
 
-Creator.getFieldsForReorder = (schema, keys) ->
+Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 	fields = []
 	i = 0
 	while i < keys.length
@@ -369,22 +391,26 @@ Creator.getFieldsForReorder = (schema, keys) ->
 			if value.autoform?.is_wide
 				is_wide_2 = true
 
-		if is_wide_1
+		if isSingle
 			fields.push keys.slice(i, i+1)
 			i += 1
-		else if !is_wide_1 and is_wide_2
-			childKeys = keys.slice(i, i+1)
-			childKeys.push undefined
-			fields.push childKeys
-			i += 1
-		else if !is_wide_1 and !is_wide_2
-			childKeys = keys.slice(i, i+1)
-			if keys[i+1]
-				childKeys.push keys[i+1]
-			else
+		else
+			if is_wide_1
+				fields.push keys.slice(i, i+1)
+				i += 1
+			else if !is_wide_1 and is_wide_2
+				childKeys = keys.slice(i, i+1)
 				childKeys.push undefined
-			fields.push childKeys
-			i += 2
+				fields.push childKeys
+				i += 1
+			else if !is_wide_1 and !is_wide_2
+				childKeys = keys.slice(i, i+1)
+				if keys[i+1]
+					childKeys.push keys[i+1]
+				else
+					childKeys.push undefined
+				fields.push childKeys
+				i += 2
 	
 	return fields
 
