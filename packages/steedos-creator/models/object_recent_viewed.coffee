@@ -23,15 +23,15 @@ Creator.Objects.object_recent_viewed =
 			allowCreate: false
 			allowDelete: false
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false 
 		admin:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true
 
 	list_views:

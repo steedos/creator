@@ -185,7 +185,7 @@ Meteor.startup ->
 					body  = setErrorMessage(404,collection,key)
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,get)
+				body  = setErrorMessage(403,collection,key,"get")
 		post: ()->
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
@@ -217,10 +217,10 @@ Meteor.startup ->
 					{body: body, headers: headers}
 				else
 					statusCode: 404
-					body = setErrorMessage(404,collection,key,post)
+					body = setErrorMessage(404,collection,key,'post')
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,post)
+				body  = setErrorMessage(403,collection,key,'post')
 	})
 	SteedosOdataAPI.addRoute(':object_name/recent', {authRequired: true, spaceRequired: false}, {
 		get:()->
@@ -316,10 +316,10 @@ Meteor.startup ->
 					{body: body, headers: headers}
 				else
 					statusCode: 404
-					body = setErrorMessage(404,collection,key,post)
+					body = setErrorMessage(404,collection,key,'post')
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,post)
+				body  = setErrorMessage(403,collection,key,'post')
 		get:()->
 			console.log "@urlParams", @urlParams
 
@@ -435,7 +435,7 @@ Meteor.startup ->
 						body  = setErrorMessage(404,collection,key)
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,put)
+				body  = setErrorMessage(403,collection,key,'put')
 		delete:()->
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
