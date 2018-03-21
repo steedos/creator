@@ -237,12 +237,14 @@ Meteor.startup ->
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowRead
 				recent_view_collection = Creator.Collections["object_recent_viewed"]
-				recent_view_selector = {object_name:key,created_by:@userId}
+				recent_view_selector = {"record.o":key,created_by:@userId}
 				recent_view_options = {}
 				recent_view_options.sort = {created: -1}
-				recent_view_options.fields = {record_id:1}
+				recent_view_options.fields = {record:1}
 				recent_view_records = recent_view_collection.find(recent_view_selector,recent_view_options).fetch()
-				recent_view_records_ids = _.pluck(recent_view_records,'record_id')
+				recent_view_records_ids = _.pluck(recent_view_records,'record')
+				recent_view_records_ids = recent_view_records_ids.getProperty("ids")
+				recent_view_records_ids = _.flatten(recent_view_records_ids)
 				recent_view_records_ids = _.uniq(recent_view_records_ids)
 				qs = querystring.unescape(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()

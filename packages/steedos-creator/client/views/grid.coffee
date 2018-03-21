@@ -424,8 +424,13 @@ Template.creator_grid.events
 Template.creator_grid.onCreated ->
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
-			dxDataGridInstance.refresh().done (result)->
-				Creator.remainCheckboxState(dxDataGridInstance.$element())
+			# dxDataGridInstance.refresh().done (result)->
+			# 	Creator.remainCheckboxState(dxDataGridInstance.$element())
+			app_id = Session.get "app_id"
+			object_name = Session.get "object_name"
+			record_id = result._id
+			url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+			FlowRouter.go url
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->
