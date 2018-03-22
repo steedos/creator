@@ -57,8 +57,11 @@ Meteor.methods
 		async_recent_aggregate(this.userId, records)
 
 		records.forEach (item)->
-
+			console.log item
 			record_object = Creator.getObject(item.object_name)
+
+			if !record_object
+				return
 
 			record_object_collection = Creator.getCollection(item.object_name)
 

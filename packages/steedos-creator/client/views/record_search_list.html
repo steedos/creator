@@ -1,0 +1,30 @@
+<template name="record_search_list">
+	<div class="slds-brand-band record-search-template">
+		<div class="slds-grid record-search-container">
+			<div class="navContainer slds-scrollable--y slds-p-vertical--x-small">
+				<div class="scrollerWrapper slds-navigation-list--vertical slds-navigation-list--vertical-inverse forceSearchScopesList">
+					<h1 class="slds-text-title--caps slds-text-color--weak slds-p-left--medium slds-p-vertical--medium">
+						搜索结果
+					</h1>
+					<div>
+						<ul class="scopesListSection slds-has-block-links--space">
+						{{#each sidebar_list}}
+							<li class="slds-is-active selected">
+								<a href="" class="slds-navigation-list--vertical__action slds-text-link--reset scopesItem">
+									{{this}}
+								</a>
+							</li>
+						{{/each}}
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="result-wrapper">
+				{{#each sidebar_list}}
+					<div>{{calc_result_ids this}}</div>
+					{{> search_result_list object_name=this record_ids=(calc_result_ids this)}}
+				{{/each}}
+			</div>
+		</div>
+	</div>
+</template>
