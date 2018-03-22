@@ -24,16 +24,18 @@
 					</div>
 				</div>
 			</div>
-			<div class="result-wrapper">
-				{{#if show_grid}}
-					{{#if select_object}}
-						{{> search_result_list object_name=(select_object) record_ids=(calc_result_ids select_object)}}
-					{{else}}
-						{{#each sidebar_list}}
-							{{> search_result_list object_name=this record_ids=(calc_result_ids this)}}
-						{{/each}}	
+			<div class="result-wrapper slds-template__content">
+				<div class="slds-grid slds-grid--vertical slds-m-bottom_small">
+					{{#if show_grid}}
+						{{#if select_object}}
+							{{> search_result_list object_name=(select_object) record_ids=(calc_result_ids select_object)}}
+						{{else}}
+							{{#each sidebar_list}}
+								{{> search_result_list object_name=this record_ids=(calc_result_ids this)}}
+							{{/each}}	
+						{{/if}}
 					{{/if}}
-				{{/if}}
+				</div>
 			</div>
 		</div>
 	</div>
