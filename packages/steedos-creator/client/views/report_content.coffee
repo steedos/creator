@@ -21,7 +21,7 @@ renderChart = (grid, self)->
 		unless reportObject
 			return
 		if reportObject?.report_type == "summary"
-			gridData = self.dataGridInstance.get().getDataSource().store()._array
+			gridData = self.dataGridInstance.get()?.getDataSource().store()._array
 			if gridData
 				renderMatrixReport.bind(self)(reportObject, gridData, true)
 				grid = self.pivotGridInstance.get()
@@ -232,6 +232,17 @@ renderSummaryReport = (reportObject, reportData)->
 
 	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
 
+	if groupSummaryItems.length || totalSummaryItems.length
+		if reportObject.charting
+			self.is_chart_open.set(true)
+		else
+			self.is_chart_open.set(false)
+		self.is_chart_disabled.set(false)
+	else
+		self.is_chart_open.set(false)
+		self.is_chart_disabled.set(true)
+		$('#pivotgrid-chart').hide()
+
 	this.dataGridInstance?.set datagrid
 
 renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
@@ -385,8 +396,11 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 		$('#pivotgrid').hide()
 	
 	if _.where(reportFields,{area:"data"}).length
-		if reportObject.charting
-			self.is_chart_open.set(true)
+		unless isOnlyForChart
+			if reportObject.charting
+				self.is_chart_open.set(true)
+			else
+				self.is_chart_open.set(false)
 		self.is_chart_disabled.set(false)
 	else
 		self.is_chart_open.set(false)
@@ -436,7 +450,6 @@ renderReport = (reportObject)->
 			when 'tabular'
 				renderTabularReport.bind(self)(reportObject, result)
 			when 'summary'
-				# renderMatrixReport.bind(self)(reportObject, result, true)
 				renderSummaryReport.bind(self)(reportObject, result)
 			when 'matrix'
 				renderMatrixReport.bind(self)(reportObject, result)
@@ -467,8 +480,8 @@ Template.creator_report_content.onRendered ->
 			if reportObject.report_type == "tabular"
 				self.is_chart_open.set false
 				self.is_chart_disabled.set true
-			else
-				self.is_chart_open.set reportObject.charting
+			# else
+			# 	self.is_chart_open.set reportObject.charting
 			renderReport.bind(self)(reportObject)
 	
 	this.autorun (c)->
