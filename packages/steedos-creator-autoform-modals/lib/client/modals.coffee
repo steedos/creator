@@ -217,7 +217,8 @@ helpers =
 		Session.get('cmFormId') or defaultFormId
 	cmAutoformType: () ->
 		# cmAutoformType会影响传递给method的参数
-		# return undefined
+		if Session.get 'cmUseOdataApi'
+			return undefined
 		if Session.get 'cmMeteorMethod'
 			if Session.get("cmOperation") == "insert"
 				return 'method'
@@ -385,6 +386,7 @@ Template.CreatorAfModal.events
 		Session.set 'cmModalContentClass', t.data.contentClass
 		Session.set 'cmShowRemoveButton', t.data.showRemoveButton or false
 		Session.set 'cmSaveAndInsert', t.data.saveAndInsert
+		Session.set 'cmUseOdataApi', t.data.useOdataApi
 		cmOnSuccessCallback = t.data.onSuccess
 
 		if not _.contains registeredAutoFormHooks, t.data.formId
@@ -418,19 +420,21 @@ Template.CreatorAfModal.events
 										trigger.todo.apply({object_name: object_name},[userId, result])
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
-					cmCollection = Session.get 'cmCollection'
-					object_name = getObjectName(cmCollection)
+					self = this
 					url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 				
 					if Session.get("cmOperation") == "insert"
 						data = insertDoc
-
-					console.log data
-
 					delete data._object_name
 
-					console.log 'onSubmit.....'
-					
+					# console.log "begin......", data
+					if triggers
+						if Session.get("cmOperation") == "insert"
+							_.each triggers, (trigger, key)->
+								if trigger.on == "client" and (trigger.when == "before.insert" or trigger.when == "after.insert")
+									trigger.todo.apply({object_name: object_name},[userId, data])
+					# console.log "end......", data
+
 					$.ajax
 						type: 'post'
 						url: url
@@ -440,12 +444,12 @@ Template.CreatorAfModal.events
 							request.setRequestHeader 'X-User-Id', Meteor.userId()
 							request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
 						success: (data) ->
-							console.log data
-							console.log data.value
+							_id = data.value[0]._id
+							# console.log _id
+							self.done(null, {_id: _id})
 						error: (jqXHR, textStatus, errorThrown) ->
-							console.log(errorThrown);
-
-					this.done();
+							# console.log(errorThrown);
+							self.done(new Error(errorThrown))
 					
 					return false
 
