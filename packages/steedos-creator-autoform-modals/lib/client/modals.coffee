@@ -421,22 +421,32 @@ Template.CreatorAfModal.events
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
 					self = this
-					url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 				
 					if Session.get("cmOperation") == "insert"
+						url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 						data = insertDoc
-					delete data._object_name
+						type = "post"
+						delete data._object_name
+					if Session.get("cmOperation") == "update"
+						_id = Session.get("cmDoc")._id
+						url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{_id}"
+						data = updateDoc
+						type = "put"
 
-					# console.log "begin......", data
+					console.log "begin......", data
 					if triggers
 						if Session.get("cmOperation") == "insert"
 							_.each triggers, (trigger, key)->
 								if trigger.on == "client" and (trigger.when == "before.insert" or trigger.when == "after.insert")
 									trigger.todo.apply({object_name: object_name},[userId, data])
+						if Session.get("cmOperation") == "update"
+							_.each triggers, (trigger, key)->
+								if trigger.on == "client" and (trigger.when == "before.update" or trigger.when == "after.update")
+									trigger.todo.apply({object_name: object_name},[userId, data])
 					# console.log "end......", data
 
 					$.ajax
-						type: 'post'
+						type: type
 						url: url
 						data: data
 						dataType: 'json'
@@ -444,7 +454,10 @@ Template.CreatorAfModal.events
 							request.setRequestHeader 'X-User-Id', Meteor.userId()
 							request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
 						success: (data) ->
-							_id = data.value[0]._id
+							if Session.get("cmOperation") == "insert"
+								_id = data.value[0]._id
+							else if Session.get("cmOperation") == "update"
+								_id = data._id
 							# console.log _id
 							self.done(null, {_id: _id})
 						error: (jqXHR, textStatus, errorThrown) ->

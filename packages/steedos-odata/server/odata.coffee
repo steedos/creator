@@ -422,7 +422,7 @@ Meteor.startup ->
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowEdit
 					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
-					entityIsUpdated = collection.update selector, $set: @bodyParams
+					entityIsUpdated = collection.update selector, @bodyParams
 					if entityIsUpdated
 						entity = collection.findOne @urlParams._id
 						entities = []
