@@ -508,7 +508,7 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 				pivotGridDataSource = e.component.getDataSource()
 				rowPathLength = e.cell.rowPath.length
 				rowPathName = e.cell.rowPath[rowPathLength - 1]
-				popupTitle = (if rowPathName then rowPathName else '所有') + ' 详细数据'
+				popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
 				drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
 				salesPopup.option 'title', popupTitle
 				salesPopup.show()
