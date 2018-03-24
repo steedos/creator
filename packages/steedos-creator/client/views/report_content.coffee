@@ -496,12 +496,12 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 						dataField: gridFieldItem.dataField
 						caption: gridFieldItem.caption
 					}
-				$('<div />').addClass('drill-down').dxDataGrid(
+				$('<div />').addClass('drill-down-content').dxDataGrid(
 					width: 560
 					height: 300
 					columns: drillDownColumns).appendTo contentElement
 			onShowing: ->
-				$('.drill-down').dxDataGrid('instance').option 'dataSource', drillDownDataSource
+				$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
 		).dxPopup('instance')
 		dxOptions.onCellClick = (e)->
 			if e.area == 'data'
