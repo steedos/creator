@@ -187,6 +187,8 @@ renderTabularReport = (reportObject, reportData)->
 	# 注意这里如果totalItems为空时要赋给空数组，否则第二次执行dxDataGrid函数时，原来不为空的值会保留下来
 	reportSummary.totalItems = totalSummaryItems
 	
+	_.every reportColumns, (n)->
+		n.sortingMethod = Creator.sortingMethod
 
 	dxOptions = 
 		showColumnLines: false
@@ -315,6 +317,10 @@ renderSummaryReport = (reportObject, reportData)->
 	# 注意这里如果totalItems/groupItems为空时要赋给空数组，否则第二次执行dxDataGrid函数时，原来不为空的值会保留下来
 	reportSummary.totalItems = totalSummaryItems
 	reportSummary.groupItems = groupSummaryItems
+
+	_.every reportColumns, (n)->
+		n.sortingMethod = Creator.sortingMethod
+
 	dxOptions = 
 		columnResizingMode: "widget"
 		sorting: 
@@ -490,6 +496,7 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 			height: 400
 			contentTemplate: (contentElement) ->
 				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
+				drillDownFields = _.without drillDownFields, null, undefined
 				drillDownColumns = []
 				gridFields = self.pivotGridInstance.get().getDataSource()._fields
 				drillDownFields.forEach (n)->
