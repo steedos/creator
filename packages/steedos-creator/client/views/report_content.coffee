@@ -495,6 +495,7 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 					drillDownColumns.push {
 						dataField: gridFieldItem.dataField
 						caption: gridFieldItem.caption
+						sortingMethod: Creator.sortingMethod
 					}
 				$('<div />').addClass('drill-down-content').dxDataGrid(
 					width: 560
