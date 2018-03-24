@@ -439,6 +439,17 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 				# dataType: valueField.type
 				summaryType: operation
 				area: 'data'
+	_.each reportObject.fields, (item)->
+		itemFieldKey = item.replace(/\./g,"*%*")
+		if item != "_id" and !_.findWhere(reportFields,{dataField: itemFieldKey})
+			fieldFirstKey = item.split(".")[0]
+			itemField = objectFields[fieldFirstKey]
+			caption = getFieldLabel itemField, item
+			field = {
+				caption: caption
+				dataField: itemFieldKey
+			}
+			reportFields.push field
 
 	grouping = reportObject.grouping
 	if reportObject.grouping == undefined
@@ -474,22 +485,33 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 			width: 600
 			height: 400
 			contentTemplate: (contentElement) ->
+				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
+				drillDownColumns = []
+				gridFields = self.pivotGridInstance.get().getDataSource()._fields
+				drillDownFields.forEach (n)->
+					if n == "_id"
+						return
+					gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
+					drillDownColumns.push {
+						dataField: gridFieldItem.dataField
+						caption: gridFieldItem.caption
+					}
 				$('<div />').addClass('drill-down').dxDataGrid(
 					width: 560
 					height: 300
-					columns: ["space*%*name","created","name","email"]).appendTo contentElement
+					columns: drillDownColumns).appendTo contentElement
 			onShowing: ->
 				$('.drill-down').dxDataGrid('instance').option 'dataSource', drillDownDataSource
 		).dxPopup('instance')
 		dxOptions.onCellClick = (e)->
-			# if e.area == 'data'
-			# 	pivotGridDataSource = e.component.getDataSource()
-			# 	rowPathLength = e.cell.rowPath.length
-			# 	rowPathName = e.cell.rowPath[rowPathLength - 1]
-			# 	popupTitle = (if rowPathName then rowPathName else 'Total') + ' Drill Down Data'
-			# 	drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
-			# 	salesPopup.option 'title', popupTitle
-			# 	salesPopup.show()
+			if e.area == 'data'
+				pivotGridDataSource = e.component.getDataSource()
+				rowPathLength = e.cell.rowPath.length
+				rowPathName = e.cell.rowPath[rowPathLength - 1]
+				popupTitle = (if rowPathName then rowPathName else '所有') + ' 详细数据'
+				drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
+				salesPopup.option 'title', popupTitle
+				salesPopup.show()
 	pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
 	
 	if isOnlyForChart
@@ -527,7 +549,7 @@ renderReport = (reportObject)->
 	reportObject.counting = report_settings.counting
 	
 	objectName = reportObject.object_name
-	filterFields = _.union reportObject.columns, reportObject.rows, reportObject.values
+	filterFields = _.union reportObject.columns, reportObject.rows, reportObject.values, reportObject.fields
 	filterFields = _.without filterFields, null, undefined
 	filter_scope = reportObject.filter_scope || "space"
 	filters = reportObject.filters
@@ -580,10 +602,6 @@ Template.creator_report_content.onRendered ->
 			if reportObject.report_type == "tabular"
 				self.is_chart_open.set false
 				self.is_chart_disabled.set true
-			# else if reportObject.report_type == "summary" and pivotGridChart
-			# 	pivotGridChart.dispose()
-			# 	self.pivotGridInstance.get()?.dispose()
-			# 	self.pivotGridInstance.set(null)
 			renderReport.bind(self)(reportObject)
 	
 	this.autorun (c)->
