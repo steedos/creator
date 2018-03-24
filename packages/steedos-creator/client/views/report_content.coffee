@@ -490,6 +490,7 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 			height: 400
 			contentTemplate: (contentElement) ->
 				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
+				drillDownFields = _.without drillDownFields, null, undefined
 				drillDownColumns = []
 				gridFields = self.pivotGridInstance.get().getDataSource()._fields
 				drillDownFields.forEach (n)->
