@@ -577,11 +577,13 @@ renderReport = (reportObject)->
 			when 'tabular'
 				renderTabularReport.bind(self)(reportObject, result)
 			when 'summary'
+				# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
+				self.pivotGridInstance?.get()?.dispose()
 				renderSummaryReport.bind(self)(reportObject, result)
 			when 'matrix'
-				renderMatrixReport.bind(self)(reportObject, result)
 				# 报表类型从summary转变成matrix时，需要把原来summary报表清除
 				self.dataGridInstance?.get()?.dispose()
+				renderMatrixReport.bind(self)(reportObject, result)
 
 
 Template.creator_report_content.onRendered ->
