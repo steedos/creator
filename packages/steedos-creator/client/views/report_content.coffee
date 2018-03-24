@@ -458,6 +458,9 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 	if reportObject.totaling == undefined
 		totaling = true
 	
+	_.every reportFields, (n)->
+		n.sortingMethod = Creator.sortingMethod.bind({key:"value"})
+
 	dxOptions = 
 		columnResizingMode: "widget"
 		sorting: 
@@ -479,6 +482,7 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 		dataSource:
 			fields: reportFields
 			store: reportData
+
 	unless isOnlyForChart
 		drillDownDataSource = {}
 		salesPopup = $('#drill-down-popup').dxPopup(
