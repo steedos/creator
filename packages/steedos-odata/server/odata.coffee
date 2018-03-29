@@ -47,8 +47,6 @@ Meteor.startup ->
 									entities[idx][navigationProperty] = referenceToCollection.find(multiQuery, queryOptions).fetch()
 									if !entities[idx][navigationProperty].length
 										entities[idx][navigationProperty] = originalData
-									#排序
-									entities[idx][navigationProperty] = Creator.getOrderlySetByIds(entities[idx][navigationProperty], originalData)
 								else
 									singleQuery = _.extend {_id: entity[realFieldName]}, include.query
 
@@ -61,13 +59,10 @@ Meteor.startup ->
 								referenceToCollection = Creator.Collections[entity[realFieldName].o]
 								if referenceToCollection
 									if field.multiple
-										_ids = _.clone(entity[realFieldName].ids)
 										multiQuery = _.extend {_id: {$in: entity[realFieldName].ids}}, include.query
 										entities[idx][navigationProperty] = _.map referenceToCollection.find(multiQuery, queryOptions).fetch(), (o)->
 											o['reference_to.o'] = referenceToCollection._name
 											return o
-										#排序
-										entities[idx][navigationProperty] = Creator.getOrderlySetByIds(entities[idx][navigationProperty], _ids)
 									else
 										singleQuery = _.extend {_id: entity[realFieldName].ids[0]}, include.query
 										entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions)
@@ -150,36 +145,12 @@ Meteor.startup ->
 
 				if key is 'cfs.files.filerecord'
 					createQuery.query['metadata.space'] = @urlParams.spaceId
-				else if key is 'spaces'
-					createQuery.query._id = @urlParams.spaceId
 				else
 					createQuery.query.space = @urlParams.spaceId
 
-				if Creator.isCommonSpace(@urlParams.spaceId) && Creator.isSpaceAdmin(@urlParams.spaceId, @userId)
-					delete createQuery.query.space
-
-				if not createQuery.sort or !_.size(createQuery.sort)
-					createQuery.sort = { modified: -1 }
-				if createQuery.limit
-					limit = createQuery.limit
-					if Steedos.isLegalVersion(@urlParams.spaceId,"workflow.enterprise") and limit>100000
-						createQuery.limit = 100000
-					else if Steedos.isLegalVersion(@urlParams.spaceId,"workflow.professional") and limit>10000 and !Steedos.isLegalVersion(@urlParams.spaceId,"workflow.enterprise")
-						createQuery.limit = 10000
-					else if Steedos.isLegalVersion(@urlParams.spaceId,"workflow.standard") and limit>1000 and !Steedos.isLegalVersion(@urlParams.spaceId,"workflow.enterprise") and !Steedos.isLegalVersion(@urlParams.spaceId,"workflow.professional")
-							createQuery.limit = 1000
-				else
-					createQuery.limit = 10
-				if createQuery.projection
-					projection = {}
-					_.keys(createQuery.projection).forEach (key)->
-						if _.indexOf(permissions.readable_fields,key)>-1
-							projection[key] = 1
-				if not createQuery.projection or !_.size(createQuery.projection)
-					_.each permissions.readable_fields,(field)->
-						createQuery.projection[field] = 1
 				if not permissions.viewAllRecords
 					createQuery.query.owner = @userId
+
 
 				entities = []
 				if @queryParams.$top isnt '0'
@@ -202,7 +173,7 @@ Meteor.startup ->
 					body  = setErrorMessage(404,collection,key)
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,"get")
+				body  = setErrorMessage(403,collection,key,get)
 		post: ()->
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
@@ -234,74 +205,10 @@ Meteor.startup ->
 					{body: body, headers: headers}
 				else
 					statusCode: 404
-					body = setErrorMessage(404,collection,key,'post')
+					body = setErrorMessage(404,collection,key,post)
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,'post')
-	})
-	SteedosOdataAPI.addRoute(':object_name/recent', {authRequired: true, spaceRequired: false}, {
-		get:()->
-			key = @urlParams.object_name
-			if not Creator.objectsByName[key]?.enable_api
-				statusCode: 401
-				body = setErrorMessage(401)
-				return body
-			collection = Creator.Collections[key]
-			if not collection
-				statusCode: 404
-				body = setErrorMessage(404,collection,key)
-				return body
-			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
-			if permissions.allowRead
-				recent_view_collection = Creator.Collections["object_recent_viewed"]
-				recent_view_selector = {"record.o":key,created_by:@userId}
-				recent_view_options = {}
-				recent_view_options.sort = {created: -1}
-				recent_view_options.fields = {record:1}
-				recent_view_records = recent_view_collection.find(recent_view_selector,recent_view_options).fetch()
-				recent_view_records_ids = _.pluck(recent_view_records,'record')
-				recent_view_records_ids = recent_view_records_ids.getProperty("ids")
-				recent_view_records_ids = _.flatten(recent_view_records_ids)
-				recent_view_records_ids = _.uniq(recent_view_records_ids)
-				qs = querystring.unescape(querystring.stringify(@queryParams))
-				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
-				createQuery.query._id = {$in:recent_view_records_ids}
-				if key is 'cfs.files.filerecord'
-					createQuery.query['metadata.space'] = @urlParams.spaceId
-				else
-					createQuery.query.space = @urlParams.spaceId
-				if not createQuery.limit
-					createQuery.limit = 100
-				if @queryParams.$top isnt '0'
-					entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
-				entities_index = []
-				entities_ids = _.pluck(entities,'_id')
-				sort_entities = []
-				if not createQuery.sort or !_.size(createQuery.sort)
-					_.each recent_view_records_ids ,(recent_view_records_id)->
-						index = _.indexOf(entities_ids,recent_view_records_id)
-						if index>-1
-							sort_entities.push entities[index]
-				else
-					sort_entities = entities
-				if sort_entities
-					dealWithExpand(createQuery, sort_entities, key)
-					body = {}
-					headers = {}
-					body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key)
-				#	body['@odata.nextLink'] = SteedosOData.getODataNextLinkPath(@urlParams.spaceId,key)+"?%24skip="+ 10
-					body['@odata.count'] = sort_entities.length
-					entities_OdataProperties = setOdataProperty(sort_entities,@urlParams.spaceId, key)
-					body['value'] = entities_OdataProperties
-					headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
-					headers['OData-Version'] = SteedosOData.VERSION
-					{body: body, headers: headers}
-				else
-					statusCode: 404
-					body  = setErrorMessage(404,collection,key,'get')
-			else
-				statusCode: 403
-				body  = setErrorMessage(403,collection,key,'get')
+				body  = setErrorMessage(403,collection,key,post)
 	})
 
 	SteedosOdataAPI.addRoute(':object_name/:_id', {authRequired: true, spaceRequired: false}, {
@@ -335,11 +242,12 @@ Meteor.startup ->
 					{body: body, headers: headers}
 				else
 					statusCode: 404
-					body = setErrorMessage(404,collection,key,'post')
+					body = setErrorMessage(404,collection,key,post)
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,'post')
+				body  = setErrorMessage(403,collection,key,post)
 		get:()->
+
 			console.log "@urlParams", @urlParams
 
 			key = @urlParams.object_name
@@ -436,7 +344,7 @@ Meteor.startup ->
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowEdit
 					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
-					entityIsUpdated = collection.update selector, @bodyParams
+					entityIsUpdated = collection.update selector, $set: @bodyParams
 					if entityIsUpdated
 						entity = collection.findOne @urlParams._id
 						entities = []
@@ -454,7 +362,7 @@ Meteor.startup ->
 						body  = setErrorMessage(404,collection,key)
 			else
 				statusCode: 403
-				body  = setErrorMessage(403,collection,key,'put')
+				body  = setErrorMessage(403,collection,key,put)
 		delete:()->
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
@@ -479,7 +387,8 @@ Meteor.startup ->
 				statusCode: 400
 				body: {status: 'fail', message: 'Action not permitted'}
 	})
-	
+
+
 	#TODO remove
 	_.each [], (value, key, list)-> #Creator.Collections
 		if not Creator.objectsByName[key]?.enable_api

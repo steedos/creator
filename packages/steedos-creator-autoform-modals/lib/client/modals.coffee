@@ -21,29 +21,6 @@ collectionObj = (name) ->
 		o[x]
 	, window
 
-oDataOperation = (type, url, data)->
-	self = this
-	$.ajax
-		type: type
-		url: url
-		data: JSON.stringify(data)
-		dataType: 'json'
-		contentType: "application/json"
-		processData: false
-		beforeSend: (request) ->
-			request.setRequestHeader 'X-User-Id', Meteor.userId()
-			request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
-		success: (data) ->
-			if Session.get("cmOperation") == "insert"
-				_id = data.value[0]._id
-			else if Session.get("cmOperation") == "update"
-				_id = data._id
-			# console.log _id
-			self.done(null, {_id: _id})
-		error: (jqXHR, textStatus, errorThrown) ->
-			# console.log(errorThrown);
-			self.done(new Error(errorThrown))
-
 getObjectName = (collectionName)->
 	return collectionName.replace(/Creator.Collections./, "")
 
@@ -75,7 +52,6 @@ getSimpleSchema = (collectionName)->
 				type: "hidden"
 				defaultValue: ->
 					return getObjectName collectionName
-		
 	return new SimpleSchema(final_schema)
 
 
@@ -131,8 +107,7 @@ Template.CreatorAutoformModals.rendered = ->
 			'cmCloseButtonClasses',
 			'cmShowRemoveButton',
 			'cmIsMultipleUpdate',
-			'cmTargetIds',
-			"cmEditSingleField"
+			'cmTargetIds'
 		]
 		delete Session.keys[key] for key in sessionKeys
 
@@ -146,8 +121,7 @@ Template.CreatorAutoformModals.rendered = ->
 		if Session.get 'cmShowAgain'
 			keyPress = Session.get 'cmPressKey'
 			keyPress = '.' + keyPress.replace(/\s+/ig, '.')
-			Meteor.defer ()->
-				$(keyPress).click()
+			$(keyPress).click()
 
 
 Template.CreatorAutoformModals.events
@@ -169,27 +143,23 @@ Template.CreatorAutoformModals.events
 
 	'click button.btn-remove': (event,template)->
 		collection = Session.get 'cmCollection'
-		object_name = getObjectName(cmCollection)
-		url = Meteor.absoluteUrl()
+		operation = Session.get 'cmOperation'
 		_id = Session.get('cmDoc')._id
-		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{_id}"
-		
-		$.ajax
-			type: "delete"
-			url: url
-			dataType: "json"
-			contentType: "application/json"
-			beforeSend: (request) ->
-				request.setRequestHeader('X-User-Id', Meteor.userId())
-				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
-
-			success: (data) ->
+		$("body").addClass("loading")
+		collectionObj(collection).remove _id, (e)->
+			$("body").removeClass("loading")
+			if e
+				console.error e
+				if e.reason
+					toastr?.error?(t(e.reason))
+				else if e.message
+					toastr?.error?(t(error.message))
+				else
+					toastr?.error?('Sorry, this could not be deleted.')
+			else
+				$('#afModal').modal('hide')
 				cmOnSuccessCallback?()
 				toastr?.success?(t("afModal_remove_suc"))
-
-			error: (jqXHR, textStatus, errorThrown) ->
-				console.log(errorThrown)
-
 
 	'click button.btn-update-and-create': (event,template)->
 		formId = Session.get('cmFormId') or defaultFormId
@@ -244,8 +214,6 @@ helpers =
 		Session.get('cmFormId') or defaultFormId
 	cmAutoformType: () ->
 		# cmAutoformType会影响传递给method的参数
-		if Session.get 'cmUseOdataApi'
-			return undefined
 		if Session.get 'cmMeteorMethod'
 			if Session.get("cmOperation") == "insert"
 				return 'method'
@@ -326,11 +294,8 @@ helpers =
 					grouplessFields: [keys]
 				return finalFields
 
-			hiddenFields = Creator.getHiddenFields(schema)
-			
 			fieldGroups = []
 			fieldsForGroup = []
-			isSingle = Session.get "cmEditSingleField"
 
 			grouplessFields = []
 			grouplessFields = Creator.getFieldsWithNoGroup(schema)
@@ -338,7 +303,7 @@ helpers =
 			if permission_fields
 				grouplessFields = _.intersection(permission_fields, grouplessFields)
 			grouplessFields = Creator.getFieldsWithoutOmit(schema, grouplessFields)
-			grouplessFields = Creator.getFieldsForReorder(schema, grouplessFields, isSingle)
+			grouplessFields = Creator.getFieldsForReorder(schema, grouplessFields)
 
 			fieldGroupNames = Creator.getSortedFieldGroupNames(schema)
 			_.each fieldGroupNames, (fieldGroupName) ->
@@ -347,7 +312,7 @@ helpers =
 				if permission_fields
 					fieldsForGroup = _.intersection(permission_fields, fieldsForGroup)
 				fieldsForGroup = Creator.getFieldsWithoutOmit(schema, fieldsForGroup)
-				fieldsForGroup = Creator.getFieldsForReorder(schema, fieldsForGroup, isSingle)
+				fieldsForGroup = Creator.getFieldsForReorder(schema, fieldsForGroup)
 				fieldGroups.push
 					name: fieldGroupName
 					fields: fieldsForGroup
@@ -355,7 +320,6 @@ helpers =
 			finalFields = 
 				grouplessFields: grouplessFields
 				groupFields: fieldGroups
-				hiddenFields: hiddenFields
 
 			return finalFields
 
@@ -364,9 +328,6 @@ helpers =
 			return true
 		else
 			return false
-
-	isSingle: ()->
-		return Session.get("cmEditSingleField")
 	
 Template.CreatorAutoformModals.helpers helpers
 
@@ -391,11 +352,7 @@ Template.CreatorAfModal.events
 		#新增_ids虚拟字段，以实现条记录同时更新
 		fields = t.data.fields
 		if fields and fields.length
-			if fields.split(",").length == 1
-				Session.set "cmEditSingleField", true
 			fields = _.union(fields.split(","),"_ids","_object_name").join(",")
-		else
-			Session.set "cmEditSingleField", false
 
 		Session.set 'cmCollection', t.data.collection
 		Session.set 'cmOperation', t.data.operation
@@ -413,7 +370,6 @@ Template.CreatorAfModal.events
 		Session.set 'cmModalContentClass', t.data.contentClass
 		Session.set 'cmShowRemoveButton', t.data.showRemoveButton or false
 		Session.set 'cmSaveAndInsert', t.data.saveAndInsert
-		Session.set 'cmUseOdataApi', t.data.useOdataApi
 		cmOnSuccessCallback = t.data.onSuccess
 
 		if not _.contains registeredAutoFormHooks, t.data.formId
@@ -446,46 +402,13 @@ Template.CreatorAfModal.events
 									if trigger.on == "client" and trigger.when == "after.update"
 										trigger.todo.apply({object_name: object_name},[userId, result])
 						return result
-				onSubmit: (insertDoc, updateDoc, currentDoc)->
-					self = this
-					urls = []
-
-					if Session.get("cmOperation") == "insert"
-						data = insertDoc
-						type = "post"
-						urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}")
-						delete data._object_name
-					if Session.get("cmOperation") == "update"
-						if Session.get("cmMeteorMethod") == "af_multiple_update"
-							_id = updateDoc["$set"]._ids
-							delete updateDoc["$set"]._ids
-							delete updateDoc["$set"]._object_name
-						else
-							_id = Session.get("cmDoc")._id
-
-						_ids = _id.split(",")
-						_.each _ids, (id)->
-							urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{id}")
-						data = updateDoc
-						type = "put"
-
-					console.log "begin......", data
-					if triggers
-						if Session.get("cmOperation") == "insert"
-							_.each triggers, (trigger, key)->
-								if trigger.on == "client" and (trigger.when == "before.insert" or trigger.when == "after.insert")
-									trigger.todo.apply({object_name: object_name},[userId, data])
-						if Session.get("cmOperation") == "update"
-							_.each triggers, (trigger, key)->
-								if trigger.on == "client" and (trigger.when == "before.update" or trigger.when == "after.update")
-									trigger.todo.apply({object_name: object_name},[userId, data])
-					
-
-					_.each urls, (url)->
-						oDataOperation.call(self, type, url, data)
-
-					return false
-
+				# onSubmit: (insertDoc, updateDoc, currentDoc)->
+				# 	console.log 'insertDoc', insertDoc
+				# 	console.log 'updateDoc', updateDoc
+				# 	console.log 'currentDoc', currentDoc
+				# 	console.log 'onSubmit.....'
+				# 	this.done();
+				# 	return false
 				onSuccess: ->
 					$('#afModal').modal 'hide'
 				

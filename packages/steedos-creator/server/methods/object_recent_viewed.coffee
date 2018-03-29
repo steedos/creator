@@ -1,9 +1,5 @@
 Meteor.methods
-	"object_recent_viewed": (object_name, record_id, spaceId)->
-
-		if !this.userId
-			return null
-
+	"object_recent_viewed": (object_name, record_id)->
 		if object_name == "object_recent_viewed"
 			return
 		if object_name and record_id
@@ -25,11 +21,7 @@ Meteor.methods
 			# 	}, {$set: {record_ids: record_ids}})
 			# else
 			Creator.Collections.object_recent_viewed.insert({
-				record: {
-					o: object_name,
-					ids: [record_id]
-				},
-				space: spaceId,
-				owner: this.userId
+				object_name: object_name
+				record_id: record_id
 			})
 			return

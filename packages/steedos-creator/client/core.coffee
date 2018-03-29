@@ -35,26 +35,6 @@ Creator.editObject = (object_name,record_id)->
 			Session.set 'cmDoc', result
 			$(".btn.creator-edit").click()
 
-Creator.removeRecord = (object_name,record_id,callback)->
-	url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
-	$.ajax
-		type: "delete"
-		url: url
-		dataType: "json"
-		contentType: "application/json"
-		beforeSend: (request) ->
-			request.setRequestHeader('X-User-Id', Meteor.userId())
-			request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
-
-		success: (data) ->
-			if callback and typeof callback == "function"
-				callback()
-			else
-				toastr?.success?(t("afModal_remove_suc"))
-
-		error: (jqXHR, textStatus, errorThrown) ->
-			console.log(errorThrown)
-
 if Meteor.isClient
 	# 定义全局变量以Session.get("object_name")为key记录其选中的记录id集合
 	Creator.TabularSelectedIds = {}
@@ -105,12 +85,11 @@ if Meteor.isClient
 			filters = custom_list_view.filters
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]
-#			else if filter_scope == "space"
-#				selector.push ["space", "=", Steedos.spaceId()]
+			else if filter_scope == "space"
+				selector.push ["space", "=", Steedos.spaceId()]
 
 			if filters and filters.length > 0
-				if selector.length > 0
-					selector.push "and"
+				selector.push "and"
 				filters = _.map filters, (obj)->
 					return [obj.field, obj.operation, obj.value]
 				
@@ -118,62 +97,50 @@ if Meteor.isClient
 				_.each filters, (filter)->
 					selector.push filter
 		else
+			# TODO
 			if spaceId and userId
 				list_view = Creator.getListView(object_name, list_view_id)
 				unless list_view
 					return ["_id", "=", -1]
-#				if list_view.filter_scope == "spacex"
-#					selector.push ["space", "=", null], "or", ["space", "=", spaceId]
-				if object_name == "users"
+				if list_view.filter_scope == "spacex"
+					selector.push ["space", "=", null], "or", ["space", "=", spaceId]
+				else if object_name == "users"
 					selector.push ["_id", "=", userId]
-#				else if object_name == "spaces"
-#					selector.push ["_id", "=", spaceId]
-#				else
-#					selector.push ["space", "=", spaceId]
+				else if object_name == "spaces"
+					selector.push ["_id", "=", spaceId]
+				else
+					selector.push ["space", "=", spaceId]
 
-				# if Creator.getListViewIsRecent(object_name, list_view)
-				# 	viewed = Creator.Collections.object_recent_viewed.find({object_name: object_name}).fetch()
-				# 	record_ids = _.pluck(viewed, "record_id")
-				# 	record_ids = _.uniq(record_ids)
-				# 	record_ids = record_ids.join(",or,").split(",")
-				# 	id_selector = _.map record_ids, (_id)->
-				# 		if _id != "or"
-				# 			return ["_id", "=", _id]
-				# 		else
-				# 			return _id
-				# 	if selector.length > 0
-				# 		selector.push "and"
-				# 	selector.push id_selector
+				if Creator.getListViewIsRecent(object_name, list_view)
+					viewed = Creator.Collections.object_recent_viewed.find({object_name: object_name}).fetch()
+					record_ids = _.pluck(viewed, "record_id")
+					record_ids = _.uniq(record_ids)
+					record_ids = record_ids.join(",or,").split(",")
+					id_selector = _.map record_ids, (_id)->
+						if _id != "or"
+							return ["_id", "=", _id]
+						else
+							return _id
+					selector.push "and", id_selector
 
 				# $eq, $ne, $lt, $gt, $lte, $gte
 				# [["is_received", "$eq", true],["destroy_date","$lte",new Date()],["is_destroyed", "$eq", false]]
 				if list_view.filters
 					filters = Creator.formatFiltersToDev(list_view.filters)
 					if filters and filters.length > 0
-						if selector.length > 0
-							selector.push "and"
+						selector.push "and"
 						_.each filters, (filter)->
-							if object_name != 'spaces' || (filter.length > 0 && filter[0] != "_id")
-								selector.push filter
+							selector.push filter
 
 					if list_view.filter_scope == "mine"
-						if selector.length > 0
-							selector.push "and"
-						selector.push ["owner", "=", userId]
+						selector.push "and", ["owner", "=", userId]
 				else
 					permissions = Creator.getPermissions(object_name)
 					if permissions.viewAllRecords
 						if list_view.filter_scope == "mine"
-							if selector.length > 0
-								selector.push "and"
-							selector.push ["owner", "=", userId]
+							selector.push "and", ["owner", "=", userId]
 					else if permissions.allowRead
-						if selector.length > 0
-							selector.push "and"
-						selector.push ["owner", "=", userId]
-
-		if selector.length == 0
-			return undefined
+						selector.push "and", ["owner", "=", userId]
 		return selector
 
 	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id)->

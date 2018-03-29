@@ -3,7 +3,7 @@ Creator.Objects.cms_files =
 	label: "文件"
 	icon: "drafts"
 	enable_search: true
-	enable_api: false
+	enable_api: true
 	fields:
 		name: 
 			label: "名称"
@@ -73,7 +73,7 @@ Creator.Objects.cms_files =
 				file = Creator.getObjectRecord(object_name,record_id)
 				fileId = file?.versions?[0]
 				if fileId
-					window.location = Steedos.absoluteUrl("/api/files/files/#{fileId}?download=true")
+					window.location = "/api/files/files/#{fileId}?download=true"
 		new_version:
 			label: "上传新版本"
 			visible: true

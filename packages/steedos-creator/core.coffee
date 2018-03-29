@@ -84,7 +84,6 @@ Creator.getObjectRecord = (object_name, record_id)->
 	if collection
 		return collection.findOne(record_id)
 
-# 该函数只在初始化Object时，把相关对象的计算结果保存到Object的related_objects属性中，后续可以直接从related_objects属性中取得计算结果而不用再次调用该函数来计算
 Creator.getObjectRelateds = (object_name)->
 	if Meteor.isClient
 		if !object_name
@@ -139,47 +138,12 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	return permissions
 
-Creator.processPermissions = (po)->
-	if po.allowCreate
-		po.allowRead = true
-	if po.allowEdit
-		po.allowRead = true
-	if po.allowDelete
-		po.allowEdit = true
-		po.allowRead = true
-	if po.viewAllRecords
-		po.allowRead = true
-	if po.modifyAllRecords
-		po.allowRead = true
-		po.allowEdit = true
-		po.allowDelete = true
-		po.viewAllRecords = true
 
 Creator.getApp = (app_id)->
 	if !app_id
 		app_id = Session.get("app_id")
 	app = Creator.Apps[app_id]
 	return app
-
-Creator.getVisibleApps = ()->
-	apps = []
-	_.each Creator.Apps, (v, k)->
-		if v.visible != false
-			apps.push v
-	return apps;
-
-Creator.getVisibleAppsObjects = ()->
-	apps = Creator.getVisibleApps()
-	objects = []
-	_.forEach apps, (app)->
-		objects = objects.concat(app.objects)
-	return _.uniq objects
-
-Creator.getAppsObjects = ()->
-	objects = []
-	_.forEach Creator.Apps, (app)->
-		objects = objects.concat(app.objects)
-	return _.uniq objects
 
 
 # "=", "<>", ">", ">=", "<", "<=", "startswith", "contains", "notcontains".
@@ -342,21 +306,11 @@ Creator.getFields = (object_name, spaceId, userId)->
 Creator.isloading = ()->
 	return Creator.isLoadingSpace.get()
 
-Creator.convertSpecialCharacter = (str)->
-	return str.replace(/([\^\$\(\)\*\+\?\.\\\|\[\]\{\}])/g, "\\$1")
-
 # 计算fields相关函数
 # START
-Creator.getHiddenFields = (schema)->
-	fields = _.map(schema, (field, fieldName) ->
-		return field.autoform and field.autoform.type == "hidden" and !field.autoform.omit and fieldName
-	)
-	fields = _.compact(fields)
-	return fields
-
 Creator.getFieldsWithNoGroup = (schema)->
 	fields = _.map(schema, (field, fieldName) ->
-  		return (!field.autoform or !field.autoform.group) and (!field.autoform or field.autoform.type != "hidden") and fieldName
+  		return (!field.autoform or !field.autoform.group) and fieldName
 	)
 	fields = _.compact(fields)
 	return fields
@@ -371,7 +325,7 @@ Creator.getSortedFieldGroupNames = (schema)->
 
 Creator.getFieldsForGroup = (schema, groupName) ->
   	fields = _.map(schema, (field, fieldName) ->
-    	return field.autoform and field.autoform.group == groupName and field.autoform.type != "hidden" and fieldName
+    	return field.autoform and field.autoform.group == groupName and fieldName
   	)
   	fields = _.compact(fields)
   	return fields
@@ -397,7 +351,7 @@ Creator.getFieldsInFirstLevel = (firstLevelKeys, keys) ->
 	keys = _.compact(keys)
 	return keys
 
-Creator.getFieldsForReorder = (schema, keys, isSingle) ->
+Creator.getFieldsForReorder = (schema, keys) ->
 	fields = []
 	i = 0
 	while i < keys.length
@@ -415,43 +369,24 @@ Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 			if value.autoform?.is_wide
 				is_wide_2 = true
 
-		if isSingle
+		if is_wide_1
 			fields.push keys.slice(i, i+1)
 			i += 1
-		else
-			if is_wide_1
-				fields.push keys.slice(i, i+1)
-				i += 1
-			else if !is_wide_1 and is_wide_2
-				childKeys = keys.slice(i, i+1)
+		else if !is_wide_1 and is_wide_2
+			childKeys = keys.slice(i, i+1)
+			childKeys.push undefined
+			fields.push childKeys
+			i += 1
+		else if !is_wide_1 and !is_wide_2
+			childKeys = keys.slice(i, i+1)
+			if keys[i+1]
+				childKeys.push keys[i+1]
+			else
 				childKeys.push undefined
-				fields.push childKeys
-				i += 1
-			else if !is_wide_1 and !is_wide_2
-				childKeys = keys.slice(i, i+1)
-				if keys[i+1]
-					childKeys.push keys[i+1]
-				else
-					childKeys.push undefined
-				fields.push childKeys
-				i += 2
+			fields.push childKeys
+			i += 2
 	
 	return fields
-
-
-Creator.getDBApps = (space_id)->
-	dbApps = {}
-	Creator.Collections["apps"].find({space: space_id}, {
-		fields: {
-			created: 0,
-			created_by: 0,
-			modified: 0,
-			modified_by: 0
-		}
-	}).forEach (app)->
-		dbApps[app._id] = app
-
-	return dbApps
 
 # END
 

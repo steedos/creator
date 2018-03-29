@@ -25,6 +25,7 @@ _itemClick = (e, curObjectName)->
 			collectionName = object.label
 			name_field_key = object.NAME_FIELD_KEY
 			if action.todo == "standard_delete"
+				console.log value.itemData
 				action_record_title = value.itemData.record[name_field_key]
 				swal
 					title: "删除#{object.label}"
@@ -35,11 +36,13 @@ _itemClick = (e, curObjectName)->
 					cancelButtonText: t('Cancel')
 					(option) ->
 						if option
-							Creator.removeRecord(objectName, recordId, ->
-								info = object.label + "\"#{action_record_title}\"" + "已删除"
-								toastr.success info
-								dxDataGridInstance.refresh()
-							)
+							Creator.Collections[objectName].remove {_id: recordId}, (error, result) ->
+								if error
+									toastr.error error.reason
+								else
+									info = object.label + "\"#{action_record_title}\"" + "已删除"
+									toastr.success info
+									dxDataGridInstance.refresh()
 			else
 				Session.set("action_fields", undefined)
 				Session.set("action_collection", "Creator.Collections.#{objectName}")
@@ -90,10 +93,7 @@ _fields = (object_name, list_view_id)->
 			return n.split(".")[0]
 		else
 			return undefined
-
-	if Creator.isCommonSpace(Session.get("spaceId")) && fields.indexOf("space") < 0
-		fields.push('space')
-
+	
 	fields = _.compact(fields)
 	return fields
 
@@ -101,7 +101,7 @@ _expandFields = (object_name, columns)->
 	expand_fields = []
 	fields = Creator.getObject(object_name).fields
 	_.each columns, (n)->
-		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+		if fields[n].type == "master_detail" || fields[n].type == "lookup"
 			ref = fields[n].reference_to
 			if _.isFunction(ref)
 				ref = ref()
@@ -111,8 +111,6 @@ _expandFields = (object_name, columns)->
 				
 			ref = _.map ref, (o)->
 				return Creator.getObject(o).NAME_FIELD_KEY
-
-			ref = _.compact(ref)
 			
 			ref = ref.join(",")
 			expand_fields.push(n + "($select=" + ref + ")")
@@ -197,19 +195,11 @@ Template.creator_grid.onRendered ->
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
-				if list_view_id == "recent"
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
-					filter = undefined
-				else
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
-					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
+				url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
+				filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
 			else
-				if list_view_id == "recent"
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
-					filter = undefined
-				else
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-					filter = Creator.getODataFilter(list_view_id, object_name)
+				url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+				filter = Creator.getODataFilter(list_view_id, object_name)
 			
 			curObjectName = if is_related then related_object_name else object_name
 
@@ -233,35 +223,35 @@ Template.creator_grid.onRendered ->
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
+			console.log "Template.creator_grid.onRendered=======,showColumns:", showColumns
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
+
 			expand_fields = _expandFields(curObjectName, selectColumns)
-			actions = Creator.getActions(curObjectName)
-			if actions.length
-				showColumns.push
-					dataField: "_id_actions"
-					width: 46
-					allowSorting: false
-					allowReordering: false
-					headerCellTemplate: (container) ->
-						return ""
-					cellTemplate: (container, options) ->
-						htmlText = """
-							<span class="slds-grid slds-grid--align-spread creator-table-actions">
-								<div class="forceVirtualActionMarker forceVirtualAction">
-									<a class="rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger" aria-haspopup="true" role="button" title="" href="javascript:void(0);" data-toggle="dropdown">
-										<span class="slds-icon_container slds-icon-utility-down">
-											<span class="lightningPrimitiveIcon">
-												#{Blaze.toHTMLWithData Template.steedos_button_icon, {class: "slds-icon slds-icon-text-default slds-icon--xx-small", source: "utility-sprite", name:"down"}}
-											</span>
-											<span class="slds-assistive-text" data-aura-rendered-by="15534:0">显示更多信息</span>
+			showColumns.push
+				dataField: "_id_actions"
+				width: 46
+				allowSorting: false
+				allowReordering: false
+				headerCellTemplate: (container) ->
+					return ""
+				cellTemplate: (container, options) ->
+					htmlText = """
+						<span class="slds-grid slds-grid--align-spread creator-table-actions">
+							<div class="forceVirtualActionMarker forceVirtualAction">
+								<a class="rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger" aria-haspopup="true" role="button" title="" href="javascript:void(0);" data-toggle="dropdown">
+									<span class="slds-icon_container slds-icon-utility-down">
+										<span class="lightningPrimitiveIcon">
+											#{Blaze.toHTMLWithData Template.steedos_button_icon, {class: "slds-icon slds-icon-text-default slds-icon--xx-small", source: "utility-sprite", name:"down"}}
 										</span>
-									</a>
-								</div>
-							</span>
-						"""
-						$("<div>").append(htmlText).appendTo(container);
+										<span class="slds-assistive-text" data-aura-rendered-by="15534:0">显示更多信息</span>
+									</span>
+								</a>
+							</div>
+						</span>
+					"""
+					$("<div>").append(htmlText).appendTo(container);
 			showColumns.splice 0, 0, 
 				dataField: "_id_checkbox"
 				width: 60
@@ -272,9 +262,6 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
-			console.log "selectColumns", selectColumns
-			console.log "filter", filter
-			console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			else
@@ -301,20 +288,19 @@ Template.creator_grid.onRendered ->
 						columns = gridState.columns
 						column_width = {}
 						sort = []
-						if columns and columns.length
-							columns = _.sortBy(_.values(columns), "visibleIndex")
-							_.each columns, (column_obj)->
-								if column_obj.width
-									column_width[column_obj.dataField] = column_obj.width
-								if column_obj.sortOrder
-									sort.push [column_obj.dataField, column_obj.sortOrder]
-							
-							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
-								(error, result)->
-									if error
-										console.log error
-									else
-										console.log "grid_settings success"
+						columns = _.sortBy(_.values(columns), "visibleIndex")
+						_.each columns, (column_obj)->
+							if column_obj.width
+								column_width[column_obj.dataField] = column_obj.width
+							if column_obj.sortOrder
+								sort.push [column_obj.dataField, column_obj.sortOrder]
+						
+						Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
+							(error, result)->
+								if error
+									console.log error
+								else
+									console.log "grid_settings success"
 				}
 				dataSource: 
 					store: 
@@ -369,11 +355,13 @@ Template.creator_grid.events
 				cancelButtonText: t('Cancel')
 				(option) ->
 					if option
-						Creator.removeRecord(objectName, recordId, ->
-							info = object.label + "\"#{action_record_title}\"" + "已删除"
-							toastr.success info
-							dxDataGridInstance.refresh()
-						)
+						Creator.Collections[objectName].remove {_id: recordId}, (error, result) ->
+							if error
+								toastr.error error.reason
+							else
+								info = object.label + "\"#{action_record_title}\"" + "已删除"
+								toastr.success info
+								dxDataGridInstance.refresh()
 		else
 			Session.set("action_fields", undefined)
 			Session.set("action_collection", "Creator.Collections.#{objectName}")
@@ -422,13 +410,8 @@ Template.creator_grid.events
 Template.creator_grid.onCreated ->
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
-			# dxDataGridInstance.refresh().done (result)->
-			# 	Creator.remainCheckboxState(dxDataGridInstance.$element())
-			app_id = Session.get "app_id"
-			object_name = Session.get "object_name"
-			record_id = result._id
-			url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
-			FlowRouter.go url
+			dxDataGridInstance.refresh().done (result)->
+				Creator.remainCheckboxState(dxDataGridInstance.$element())
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->

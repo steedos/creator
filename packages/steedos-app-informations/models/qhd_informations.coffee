@@ -76,16 +76,7 @@ Creator.Objects.qhd_informations =
 			allowRead: false
 			modifyAllRecords: false
 			viewAllRecords: false
-			editable_fields:["title","company","content"]
-			list_views:["mine","company"] 
-			readable_fields:["title","company","content",
-				'owner',
-				'created',
-				'created_by',
-				'modified',
-				'modified_by',
-				'space',
-				'is_deleted' ]
+			#fields:["score","title"] 
 		admin:
 			allowCreate: false
 			allowDelete: false
@@ -93,7 +84,6 @@ Creator.Objects.qhd_informations =
 			allowRead: false
 			modifyAllRecords: false
 			viewAllRecords: false
-			list_views:["mine","company"] 
 	triggers:
 		"before.insert.server.calculateScore": 
 			on: "server"

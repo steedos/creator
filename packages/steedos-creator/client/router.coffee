@@ -56,31 +56,17 @@ FlowRouter.route '/app/:app_id',
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_app_home"
 
-FlowRouter.route '/app/:app_id/search/:search_text',
-	triggersEnter: [ checkUserSigned, initLayout ],
-	action: (params, queryParams)->
-		Session.set("app_id", FlowRouter.getParam("app_id"))
-		Session.set("search_text", FlowRouter.getParam("search_text"))
-		BlazeLayout.render Creator.getLayout(),
-			main: "record_search_list"
-
 FlowRouter.route '/app/:app_id/reports/view/:record_id',
-	triggersEnter: [ checkUserSigned, initLayout ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		record_id = FlowRouter.getParam("record_id")
 		object_name = FlowRouter.getParam("object_name")
-		data = {app_id: app_id, record_id: record_id, object_name: object_name}
 		Session.set("app_id", app_id)
 		Session.set("object_name", "reports")
 		Session.set("record_id", record_id)
-		if Steedos.isMobile()
-			if $("#report_view_id").length == 0
-				Meteor.defer ->
-					Blaze.renderWithData(Template.reportView, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
-		else
-			BlazeLayout.render Creator.getLayout(),
-				main: "creator_report"
+		BlazeLayout.render Creator.getLayout(),
+			main: "creator_report"
 
 objectRoutes = FlowRouter.group
 	prefix: '/app/:app_id/:object_name',
@@ -135,8 +121,7 @@ objectRoutes.route '/view/:record_id',
 					Blaze.renderWithData(Template.mobileView, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			Session.set("detail_info_visible", true)
-			ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
-#			Meteor.call "object_recent_viewed", FlowRouter.getParam("object_name"), FlowRouter.getParam("record_id")
+			Meteor.call "object_recent_viewed", FlowRouter.getParam("object_name"), FlowRouter.getParam("record_id")
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_view"
 

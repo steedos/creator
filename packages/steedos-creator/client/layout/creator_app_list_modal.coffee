@@ -2,22 +2,22 @@ Template.creator_app_list_modal.helpers Creator.helpers
 
 Template.creator_app_list_modal.helpers
 	apps: ()->
-		return Creator.getVisibleApps()
+		apps = []
+		_.each Creator.Apps, (v, k)->
+			if v.visible != false
+				apps.push v
+		return apps
 
 	app_objects: ()->
 		objects = []
-		_.each Creator.getVisibleAppsObjects(), (object_name)->
-			app_obj = Creator.getObject(object_name)
-			if app_obj?.is_enable && !app_obj.hidden && app_obj.permissions.get().allowRead
-				objects.push app_obj
+		_.each Creator.objectsByName, (v, k)->
+			if v.permissions.get().allowRead && v.is_enable
+				objects.push v
 		return objects
 
 
 	app_url: ()->
-		if this.url
-			return Steedos.absoluteUrl(this.url + "/")
-		else if this._id
-			return Steedos.absoluteUrl("/app/#{this._id}/");
+		return Steedos.absoluteUrl(this.url + "/")
 
 	object_url: ()->
 		return Creator.getObjectUrl(this.name, null)
