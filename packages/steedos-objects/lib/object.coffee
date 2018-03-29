@@ -15,6 +15,8 @@ Creator.Object = (options)->
 	if !(options.permission_set?.user)
 		options.permission_set.user = {}
 
+	self._id = options._id || options.name
+	self.space = options.space
 	self.name = options.name
 	self.label = options.label
 	self.icon = options.icon
@@ -29,6 +31,7 @@ Creator.Object = (options)->
 	self.enable_tasks = options.enable_tasks
 	self.enable_notes = options.enable_notes
 	self.enable_audit = options.enable_audit
+	self.hidden = options.hidden
 	self.enable_api = (options.enable_api == undefined) or options.enable_api
 
 	if (!options.fields) 
@@ -78,7 +81,7 @@ Creator.Object = (options)->
 	defaultReadableFields = []
 	defaultEditableFields = []
 	_.each self.fields, (field, field_name)->
-		if !(field.omit || field.hidden)
+		if !(field.hidden)    #231 omit字段支持在非编辑页面查看, 因此删除了此处对omit的判断
 			defaultReadableFields.push field_name
 			if !field.readonly
 				defaultEditableFields.push field_name

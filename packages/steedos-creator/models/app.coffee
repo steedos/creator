@@ -12,14 +12,38 @@ Creator.Objects.apps =
 			required: true
 			searchable:true
 			index:true
+		url:
+			type: "url"
+			required: false
+			hidden: true
+		icon:
+			type: "text"
+		icon_slds:
+			type: "text"
 		objects:
 			label: "对象"
-			type: "[text]"
+			type: "lookup"
+			required: true
+			multiple: true
+			optionsFunction: ()->
+				_options = []
+				_.forEach Creator.objectsByName, (o, object_name)->
+					_options.push {label: o.label, value: o.name, icon: o.icon}
+				return _options
+		visible:
+			type: "boolean"
+		sort:
+			type: "number"
+		secret:
+			type: String
+			max: 16
+			min: 16
+			optional: true
 	list_views:
 		default:
 			columns: ["name"]
 		all:
-			filter_scope: "spacex"
+			filter_scope: "space"
 	permission_set:
 		user:
 			allowCreate: false
@@ -29,9 +53,9 @@ Creator.Objects.apps =
 			modifyAllRecords: false
 			viewAllRecords: true 
 		admin:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
+			modifyAllRecords: true
 			viewAllRecords: true 

@@ -3,7 +3,8 @@ Creator.Objects["cfs.files.filerecord"] =
 	label: "文件版本"
 	icon: "drafts"
 	enable_search: true
-	enable_api: true
+	enable_api: false
+	hidden: true
 	fields:
 		"original.$.name":
 			label:"名称"
@@ -27,7 +28,7 @@ Creator.Objects["cfs.files.filerecord"] =
 		default:
 			columns: ["original.$.name","original.$.size","metadata.$.owner_name","uploadedAt"]
 		all:
-			filter_scope: "spacex"
+			filter_scope: "space"
 
 	permission_set:
 		user:
