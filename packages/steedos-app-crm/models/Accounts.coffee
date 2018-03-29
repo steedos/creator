@@ -29,6 +29,8 @@ Creator.Objects.accounts =
 			inlineHelpText: ""
 			required: true
 			sortable: true
+			searchable:true
+			is_name: true
 		website: 
 			type: "text"
 			label: "网址"

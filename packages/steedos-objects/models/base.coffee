@@ -8,7 +8,8 @@ Creator.baseObject =
 			index: true
 			defaultValue: "{{userId}}"
 		space:
-			type: "text"
+			type: "lookup"
+			reference_to: "spaces"
 			omit: true
 			index: true
 			hidden: true
@@ -17,6 +18,7 @@ Creator.baseObject =
 			label:"创建日期"
 			readonly: true
 			sortable: true
+			omit: true
 		created_by:
 			label:"创建人"
 			type: "lookup"
@@ -24,18 +26,21 @@ Creator.baseObject =
 			reference_to: "users"
 			disabled: true
 			index: true
+			omit: true
 		modified:
 			label:"修改时间"
 			type: "datetime"
 			readonly: true
 			sortable: true
 			index: true
+			omit: true
 		modified_by:
 			label:"修改人"
 			type: "lookup"
 			readonly: true
 			reference_to: "users"
 			disabled: true
+			omit: true
 		is_deleted:
 			type: "boolean"
 			omit: true
@@ -92,12 +97,12 @@ Creator.baseObject =
 			todo: (userId, doc)->
 				doc.space = Session.get("spaceId")
 
-		"after.insert.client.default":
-			on: "client"
-			when: "after.insert"
-			todo: (userId, doc)->
-				if doc
-					Meteor.call "object_recent_viewed", this.object_name, doc._id
+#		"after.insert.client.default":
+#			on: "client"
+#			when: "after.insert"
+#			todo: (userId, doc)->
+#				if doc
+#					Meteor.call "object_recent_viewed", this.object_name, doc._id
 
 	actions:
 
