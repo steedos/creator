@@ -115,7 +115,7 @@ _expandFields = (object_name, columns)->
 			ref = _.compact(ref)
 			
 			ref = ref.join(",")
-			expand_fields.push(n + "($select=" + ref + ")")
+			expand_fields.push("#{n}_expand($select=#{ref})")
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
 
@@ -135,7 +135,8 @@ _columns = (object_name, columns, list_view_id, is_related)->
 				if /\w+\.\$\.\w+/g.test(field_name)
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
-				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
+				val = options.data["#{n}_expand"] || options.data[n]
+				cellOption = {_id: options.data._id, val: val, doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		
 		if grid_settings and grid_settings.settings

@@ -107,9 +107,32 @@ _columns = (object_name, columns)->
 				if /\w+\.\$\.\w+/g.test(field_name)
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
-				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
+				val = options.data["#{n}_expand"] || options.data[n]
+				cellOption = {_id: options.data._id, val: val, doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		return columnItem
+
+_expandFields = (object_name, columns)->
+	expand_fields = []
+	fields = Creator.getObject(object_name).fields
+	_.each columns, (n)->
+		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+			ref = fields[n].reference_to
+			if _.isFunction(ref)
+				ref = ref()
+
+			if !_.isArray(ref)
+				ref = [ref]
+				
+			ref = _.map ref, (o)->
+				return Creator.getObject(o).NAME_FIELD_KEY
+
+			ref = _.compact(ref)
+			
+			ref = ref.join(",")
+			expand_fields.push("#{n}_expand($select=#{ref})")
+			# expand_fields.push n + "($select=name)"
+	return expand_fields
 
 Template.search_result_list.onRendered -> 
 	self = this
@@ -121,6 +144,7 @@ Template.search_result_list.onRendered ->
 		filter = _filter(record_ids)
 		select = _select(object_name)
 		columns = _columns(object_name, select)
+		expand_fields = _expandFields(object_name, select)
 
 		actions = Creator.getActions(object_name)
 		if actions.length
@@ -176,6 +200,7 @@ Template.search_result_list.onRendered ->
 							error.message = t "creator_odata_api_not_found"
 				select: select
 				filter: filter
+				expand: expand_fields
 			columns: columns
 			onCellClick: (e)->
 				if e.column?.dataField ==  "_id_actions"
