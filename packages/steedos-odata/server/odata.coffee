@@ -69,7 +69,8 @@ Meteor.startup ->
 									else
 										singleQuery = _.extend {_id: entity[navigationProperty].ids[0]}, include.query
 										entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions)
-										entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
+										if entities[idx][navigationProperty]
+											entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
 
 				else
 				# TODO
