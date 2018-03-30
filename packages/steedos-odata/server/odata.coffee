@@ -23,6 +23,7 @@ Meteor.startup ->
 	dealWithExpand = (createQuery, entities, key,action)->
 		if _.isEmpty createQuery.includes
 			return
+
 		obj = Creator.objectsByName[key]
 		_.each createQuery.includes, (include)->
 			# console.log 'include: ', include
@@ -51,12 +52,12 @@ Meteor.startup ->
 
 									# 特殊处理在相关表中没有找到数据的情况，返回原数据
 									entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions) || entities[idx][navigationProperty]
+
 					if _.isArray field.reference_to
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]?.ids
 								referenceToCollection = Creator.Collections[entity[navigationProperty].o]
 								if referenceToCollection
-									
 									if field.multiple
 										_ids = _.clone(entity[navigationProperty].ids)
 										multiQuery = _.extend {_id: {$in: entity[navigationProperty].ids}}, include.query
@@ -68,8 +69,7 @@ Meteor.startup ->
 									else
 										singleQuery = _.extend {_id: entity[navigationProperty].ids[0]}, include.query
 										entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions)
-										if entities[idx][navigationProperty]
-											entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
+										entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
 
 				else
 				# TODO
@@ -338,6 +338,7 @@ Meteor.startup ->
 				statusCode: 403
 				body  = setErrorMessage(403,collection,key,'post')
 		get:()->
+			console.log "@urlParams", @urlParams
 
 			key = @urlParams.object_name
 
