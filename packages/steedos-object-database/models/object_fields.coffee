@@ -60,7 +60,6 @@ Creator.Objects.object_fields =
 
 		group:
 			type: "text"
-			is_wide: true
 
 		defaultValue:
 			type: "text"
