@@ -23,6 +23,18 @@ Creator.Objects.objects =
 			type: 'boolean'
 		is_enable:
 			type: "boolean"
+		enable_search:
+			type: "boolean"
+		enable_files:
+			type: "boolean"
+		enable_tasks:
+			type: "boolean"
+		enable_notes:
+			type: "boolean"
+		enable_api:
+			type: "boolean"
+			defaultValue: true
+			hidden: true
 		description: 
 			label: "Description"
 			type: "text"
