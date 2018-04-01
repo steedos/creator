@@ -26,10 +26,9 @@ Creator.Objects.objects =
 				_.forEach standard_svgs, (svg)->
 					options.push {value: svg, label: svg, icon: svg}
 				return options
-		is_view:
-			type: 'boolean'
 		is_enable:
 			type: "boolean"
+			defaultValue: true
 		enable_search:
 			type: "boolean"
 		enable_files:
@@ -42,9 +41,14 @@ Creator.Objects.objects =
 			type: "boolean"
 			defaultValue: true
 			hidden: true
+		is_view:
+			type: 'boolean'
+			defaultValue: false
+			hidden: true
 		description: 
 			label: "Description"
-			type: "text"
+			type: "textarea"
+			is_wide: true
 		fields:
 			blackbox: true
 			omit: true
@@ -68,10 +72,12 @@ Creator.Objects.objects =
 		custom:
 			type: "boolean"
 			hidden: true
+		owner: 
+			hidden: true
 
 	list_views:
 		default:
-			columns: ["name", "label", "icon", "is_enable", "enable_search", "enable_files", "enable_tasks", "enable_notes", "description", "modified"]
+			columns: ["name", "label", "is_enable", "modified"]
 		all:
 			filter_scope: "space"
 
