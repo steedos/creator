@@ -261,7 +261,7 @@ Template.search_result_list.events
 				search_Keywords = search_text.trim().split(" ")
 				search_Keywords.forEach (keyword)->
 					# 特殊字符编码
-					keyword = escape(Creator.convertSpecialCharacter(keyword))
+					keyword = encodeURIComponent(Creator.convertSpecialCharacter(keyword))
 					console.log "keyword", keyword
 					if filter.length > 0
 						filter.push "or"

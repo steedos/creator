@@ -144,7 +144,7 @@ Meteor.startup ->
 				return body
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.viewAllRecords or (permissions.allowRead and @userId)
-				qs = querystring.unescape(querystring.stringify(@queryParams))
+				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 
 				if key is 'cfs.files.filerecord'
@@ -266,7 +266,7 @@ Meteor.startup ->
 				recent_view_records_ids = recent_view_records_ids.getProperty("ids")
 				recent_view_records_ids = _.flatten(recent_view_records_ids)
 				recent_view_records_ids = _.uniq(recent_view_records_ids)
-				qs = querystring.unescape(querystring.stringify(@queryParams))
+				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 				createQuery.query._id = {$in:recent_view_records_ids}
 				if key is 'cfs.files.filerecord'
@@ -407,7 +407,7 @@ Meteor.startup ->
 
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				if permissions.allowRead
-					qs = querystring.unescape(querystring.stringify(@queryParams))
+					qs = decodeURIComponent(querystring.stringify(@queryParams))
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 					createQuery.query._id =  @urlParams._id
 					if key is 'cfs.files.filerecord'
@@ -547,7 +547,7 @@ Meteor.startup ->
 
 							permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 							if permissions.viewAllRecords or (permissions.allowRead and @userId)
-									qs = querystring.unescape(querystring.stringify(@queryParams))
+									qs = decodeURIComponent(querystring.stringify(@queryParams))
 									createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 
 									if key is 'cfs.files.filerecord'
