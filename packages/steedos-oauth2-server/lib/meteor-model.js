@@ -94,8 +94,13 @@ MeteorModel = (function() {
                 if (this.debug === true) {
                     console.log('[OAuth2Server]', 'in saveAccessToken (token:', token, ', clientId:', clientId, ', user:', user, ', expires:', expires, ')');
                 }
-
+                
                 try {
+                    // 有效期永久性判断
+                    var clientObj = this.clientsCollection.findOne({clientId: clientId});
+                    if(clientObj && clientObj.expires=='YJ'){
+                        expires = null;
+                    }
                     var tokenId = this.accessTokenCollection.insert({
                         accessToken: token,
                         clientId: clientId,
