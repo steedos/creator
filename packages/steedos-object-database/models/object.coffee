@@ -79,6 +79,7 @@ Creator.Objects.objects =
 		default:
 			columns: ["name", "label", "is_enable", "modified"]
 		all:
+			label:"所有对象"
 			filter_scope: "space"
 
 	permission_set:
