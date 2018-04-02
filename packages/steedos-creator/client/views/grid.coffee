@@ -197,14 +197,14 @@ Template.creator_grid.onRendered ->
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
-				if list_view_id == "recent"
+				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
 					filter = undefined
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
 			else
-				if list_view_id == "recent"
+				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
 					filter = undefined
 				else

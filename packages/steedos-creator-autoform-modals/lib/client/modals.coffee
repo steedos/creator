@@ -61,20 +61,21 @@ getSimpleSchema = (collectionName)->
 		else
 			final_schema = schema
 
-		#新增_ids虚拟字段，以实现条记录同时更新
-		final_schema._ids = 
-			type: String
-			optional: true
-			autoform:
-				type: "hidden"
-		#新增_object_name虚拟字段，以让后台method知道更新哪个表
-		final_schema._object_name = 
-			type: String
-			optional: true
-			autoform:
-				type: "hidden"
-				defaultValue: ->
-					return getObjectName collectionName
+		if Session.get 'cmMeteorMethod'
+			#新增_ids虚拟字段，以实现条记录同时更新
+			final_schema._ids = 
+				type: String
+				optional: true
+				autoform:
+					type: "hidden"
+			#新增_object_name虚拟字段，以让后台method知道更新哪个表
+			final_schema._object_name = 
+				type: String
+				optional: true
+				autoform:
+					type: "hidden"
+					defaultValue: ->
+						return getObjectName collectionName
 		
 	return new SimpleSchema(final_schema)
 
@@ -307,7 +308,7 @@ helpers =
 	
 	schema: ()->
 		cmCollection = Session.get 'cmCollection'
-		return getSimpleSchema cmCollection
+		return getSimpleSchema(cmCollection)
 
 	schemaFields: ()->
 		cmCollection = Session.get 'cmCollection'
@@ -315,7 +316,7 @@ helpers =
 		if cmCollection
 			schemaInstance = getSimpleSchema(cmCollection)
 			schema = schemaInstance._schema
-			
+
 			firstLevelKeys = schemaInstance._firstLevelSchemaKeys
 			object_name = getObjectName cmCollection
 			permission_fields = _.clone(Creator.getFields(object_name))
@@ -343,7 +344,7 @@ helpers =
 				return finalFields
 
 			hiddenFields = Creator.getHiddenFields(schema)
-			
+
 			fieldGroups = []
 			fieldsForGroup = []
 			isSingle = Session.get "cmEditSingleField"
