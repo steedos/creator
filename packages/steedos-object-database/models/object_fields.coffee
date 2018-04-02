@@ -126,7 +126,7 @@ Creator.Objects.object_fields =
 
 	list_views:
 		default:
-			columns: ["name", "object", "label", "type", "multiple", "required", "omit", "group", "searchable", "index", "description", "modified"]
+			columns: ["name", "label", "type", "object", "modified"]
 		all:
 			filter_scope: "space"
 
