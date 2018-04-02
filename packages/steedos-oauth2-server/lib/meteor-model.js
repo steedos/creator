@@ -96,10 +96,10 @@ MeteorModel = (function() {
                 }
                 
                 try {
-                    // 有效期（默认一小时）
+                    // 有效期永久性判断
                     var clientObj = this.clientsCollection.findOne({clientId: clientId});
-                    if(clientObj && clientObj.expires>1){
-                        expires.setHours(expires.getHours()+clientObj.expires-1);
+                    if(clientObj && clientObj.expires=='YJ'){
+                        expires = null;
                     }
                     var tokenId = this.accessTokenCollection.insert({
                         accessToken: token,
