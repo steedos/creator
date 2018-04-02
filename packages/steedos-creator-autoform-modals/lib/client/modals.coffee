@@ -486,19 +486,22 @@ Template.CreatorAfModal.events
 						urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}")
 						delete data._object_name
 					if Session.get("cmOperation") == "update"
-						if Session.get("cmMeteorMethod") == "af_multiple_update"
+						if Session.get("cmMeteorMethod")
 							if updateDoc["$set"]
 								_id = updateDoc["$set"]._ids || Session.get("cmDoc")._id
-								delete updateDoc["$set"]._ids
-								delete updateDoc["$set"]._object_name
 							else
 								_id = Session.get("cmDoc")._id
-
-							if updateDoc["$unset"]
-								delete updateDoc["$unset"]._ids
-								delete updateDoc["$unset"]._object_name
+							
 						else
 							_id = Session.get("cmDoc")._id
+
+						if updateDoc["$set"]
+							delete updateDoc["$set"]._ids
+							delete updateDoc["$set"]._object_name
+
+						if updateDoc["$unset"]
+							delete updateDoc["$unset"]._ids
+							delete updateDoc["$unset"]._object_name
 
 						_ids = _id.split(",")
 						_.each _ids, (id)->
