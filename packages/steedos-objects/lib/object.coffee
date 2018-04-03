@@ -108,6 +108,14 @@ Creator.Object = (options)->
 	# 前端根据permissions改写field相关属性，后端只要走默认属性就行，不需要改写
 	if Meteor.isClient
 		permissions = options.permissions
+		pListViews = permissions.list_views
+		if pListViews?.length
+			tempListView = null
+			defaultListViewId = options.list_views?.all?._id
+			if defaultListViewId
+				# 把视图权限配置中默认的all视图id转换成all关键字
+				permissions.list_views = _.map pListViews, (list_view_item) ->
+					return if defaultListViewId == list_view_item then "all" else list_view_item
 		self.permissions = new ReactiveVar(permissions)
 		_.each self.fields, (field, field_name)->
 			if field and !field.omit
