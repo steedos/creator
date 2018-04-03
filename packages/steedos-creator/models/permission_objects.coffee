@@ -71,7 +71,7 @@ Creator.Objects.permission_objects =
 				return _options
 		readable_fields:
 			type: "lookup"
-			label:'只读字段'
+			label:'可见字段'
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
