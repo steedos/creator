@@ -131,4 +131,4 @@ Creator.Objects.qhd_informations =
 							score = score + 5
 						else if point == '专报信息'
 							score = score + 10
-					Creator.Collections['qhd_informations'].direct.update({_id:doc._id},{$set:{score:score}})
+				Creator.Collections['qhd_informations'].direct.update({_id:doc._id},{$set:{score:score}})
