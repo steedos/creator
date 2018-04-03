@@ -25,30 +25,35 @@ isRepeatedName = (doc, name)->
 		return true
 	return false
 
+check = (userId, doc)->
+	if Steedos.isSpaceAdmin(userId, doc.space)
+		throw new Meteor.Error 500, "只有工作去管理员才能配置触发器"
+
+	if doc.on == 'server' && !Steedos.isLegalVersion(doc.space,"workflow.enterprise")
+		throw new Meteor.Error 500, "只有企业版支持配置服务端的触发器"
+
 Creator.Objects.object_triggers =
 	name: "object_triggers"
-	label: "Triggers"
 	icon: "asset_relationship"
 	fields:
 		name:
-			label: "Name"
 			type: "text"
 			searchable: true
 			index: true
+			required: true
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
 		object:
 			type: "master_detail"
 			reference_to: "objects"
+			required: true
 		on:
-			label: "运行于"
 			type: "lookup"
 			required: true
 			optionsFunction: ()->
 				return [{label: "客户端", value: "client", icon: "address"}, {label: "服务端", value: "server", icon: "address"}]
 		when:
-			label: "运行时"
 			type: "lookup"
 			required: true
 			optionsFunction: ()->
@@ -63,7 +68,6 @@ Creator.Objects.object_triggers =
 		is_enable:
 			type: "boolean"
 		todo:
-			label: "执行的脚本"
 			type: "textarea"
 			required: true
 			is_wide:true
@@ -107,10 +111,17 @@ Creator.Objects.object_triggers =
 			todo: (userId, doc)->
 				_syncToObject(doc)
 
+		"before.delete.server.object_actions":
+			on: "server"
+			when: "before.remove"
+			todo: (userId, doc)->
+				check(userId, doc)
+
 		"before.update.server.object_actions":
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
+				check(userId, doc)
 				if modifier?.$set?.name && isRepeatedName(doc, modifier.$set.name)
 					throw new Meteor.Error 500, "对象名称不能重复"
 
@@ -118,5 +129,6 @@ Creator.Objects.object_triggers =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+				check(userId, doc)
 				if isRepeatedName(doc)
 					throw new Meteor.Error 500, "对象名称不能重复"

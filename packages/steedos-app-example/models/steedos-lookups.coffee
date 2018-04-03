@@ -19,11 +19,16 @@ if Meteor.isDevelopment
 			customer_id:
 				label: "客户(单选)"
 				type: "lookup"
-				reference_to: "accounts"
+				reference_to: ["accounts", "contracts"]
 			customer_ids:
 				label: "客户(多选)"
 				type: "lookup"
 				reference_to: "accounts"
+				multiple: true
+			customer_ua:
+				label: "客户、合同(多选)"
+				type: "lookup"
+				reference_to: ["accounts", "contracts"]
 				multiple: true
 			# object_switche_id:
 			# 	label: "客户/用户(单选)"
@@ -57,7 +62,7 @@ if Meteor.isDevelopment
 				multiple: true
 				optionsFunction: ()->
 					_options = []
-					_.forEach Creator.Objects, (o, k)->
+					_.forEach Creator.objectsByName, (o, k)->
 						_options.push {label: o.label, value: k, icon: o.icon}
 					return _options
 			boolean:
@@ -74,7 +79,7 @@ if Meteor.isDevelopment
 				type: "lookup"
 				optionsFunction: ()->
 					_options = []
-					_.forEach Creator.Objects, (o, k)->
+					_.forEach Creator.objectsByName, (o, k)->
 						_options.push {label: o.label, value: k, icon: o.icon}
 					return _options
 				group: "options function test"

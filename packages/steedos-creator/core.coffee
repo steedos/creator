@@ -84,6 +84,32 @@ Creator.getObjectRecord = (object_name, record_id)->
 	if collection
 		return collection.findOne(record_id)
 
+# 该函数只在初始化Object时，把相关对象的计算结果保存到Object的related_objects属性中，后续可以直接从related_objects属性中取得计算结果而不用再次调用该函数来计算
+Creator.getObjectRelateds = (object_name)->
+	if Meteor.isClient
+		if !object_name
+			object_name = Session.get("object_name")
+	
+	related_objects = []
+	# _object = Creator.getObject(object_name)
+	# 因Creator.getObject函数内部要调用该函数，所以这里不可以调用Creator.getObject取对象，只能调用Creator.Objects来取对象
+	_object = Creator.Objects[object_name]
+	if !_object
+		return related_objects
+
+	_.each Creator.Objects, (related_object, related_object_name)->
+		_.each related_object.fields, (related_field, related_field_name)->
+			if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
+				related_objects.push {object_name:related_object_name, foreign_key: related_field_name}
+	
+	if _object.enable_files
+		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
+	if _object.enable_tasks
+		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
+	if _object.enable_notes
+		related_objects.push {object_name:"notes", foreign_key: "related_to"}
+
+	return related_objects
 
 Creator.getPermissions = (object_name, spaceId, userId)->
 	if Meteor.isClient
@@ -95,6 +121,7 @@ Creator.getPermissions = (object_name, spaceId, userId)->
 		return obj.permissions.get()
 	else if Meteor.isServer
 		Creator.getObjectPermissions(spaceId, userId, object_name)
+
 Creator.getRecordPermissions = (object_name, record, userId)->
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
@@ -112,12 +139,47 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	return permissions
 
+Creator.processPermissions = (po)->
+	if po.allowCreate
+		po.allowRead = true
+	if po.allowEdit
+		po.allowRead = true
+	if po.allowDelete
+		po.allowEdit = true
+		po.allowRead = true
+	if po.viewAllRecords
+		po.allowRead = true
+	if po.modifyAllRecords
+		po.allowRead = true
+		po.allowEdit = true
+		po.allowDelete = true
+		po.viewAllRecords = true
 
 Creator.getApp = (app_id)->
 	if !app_id
 		app_id = Session.get("app_id")
 	app = Creator.Apps[app_id]
 	return app
+
+Creator.getVisibleApps = ()->
+	apps = []
+	_.each Creator.Apps, (v, k)->
+		if v.visible != false
+			apps.push v
+	return apps;
+
+Creator.getVisibleAppsObjects = ()->
+	apps = Creator.getVisibleApps()
+	objects = []
+	_.forEach apps, (app)->
+		objects = objects.concat(app.objects)
+	return _.uniq objects
+
+Creator.getAppsObjects = ()->
+	objects = []
+	_.forEach Creator.Apps, (app)->
+		objects = objects.concat(app.objects)
+	return _.uniq objects
 
 
 # "=", "<>", ">", ">=", "<", "<=", "startswith", "contains", "notcontains".
@@ -187,34 +249,27 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 			spaceId = Session.get("spaceId")
 		if !userId
 			userId = Meteor.userId()
-	
-	related_object_names = []
-	permissions = Creator.getPermissions(object_name, spaceId, userId)
 
+	related_object_names = []
 	_object = Creator.getObject(object_name)
 
 	if !_object
 		return related_object_names
 
+	related_object_names = _.pluck(_object.related_objects,"object_name")
+	if related_object_names?.length == 0
+		return related_object_names
+
+	permissions = Creator.getPermissions(object_name, spaceId, userId)
 	permission_related_objects = permissions.related_objects
 
-	_.each Creator.Objects, (related_object, related_object_name)->
-			_.each related_object.fields, (related_field, related_field_name)->
-				if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
-					if permission_related_objects
-						if _.indexOf(permission_related_objects, related_object_name) > -1
-							related_object_names.push related_object_name
-					else
-						related_object_names.push related_object_name
-	
-	if _object.enable_files
-		if permission_related_objects
-			if _.indexOf(permission_related_objects, "cms_files") > -1
-				related_object_names.push "cms_files"
-		else
-			related_object_names.push "cms_files"
+	related_object_names = _.intersection related_object_names, permission_related_objects
+	return _.filter _object.related_objects, (related_object)->
+		return related_object_names.indexOf(related_object.object_name) > -1
 
-	return related_object_names
+Creator.getRelatedObjectNames = (object_name, spaceId, userId)->
+	related_objects = Creator.getRelatedObjects(object_name, spaceId, userId)
+	return _.pluck(related_objects,"object_name")
 
 Creator.getActions = (object_name, spaceId, userId)->
 	if Meteor.isClient
@@ -240,6 +295,10 @@ Creator.getActions = (object_name, spaceId, userId)->
 	
 	return actions
 
+///
+	返回当前用户有权限访问的所有list_view，包括分享的，用户自定义非分享的（除非owner变了），以及默认的其他视图
+	注意Creator.getPermissions函数中是不会有用户自定义非分享的视图的，所以Creator.getPermissions函数中拿到的结果不全，并不是当前用户能看到所有视图
+///
 Creator.getListViews = (object_name, spaceId, userId)->
 	if Meteor.isClient
 		if !object_name
@@ -261,10 +320,8 @@ Creator.getListViews = (object_name, spaceId, userId)->
 	_.each object.list_views, (item, item_name)->
 		if item_name != "default"
 			if permission_list_views
-				if _.indexOf(permission_list_views, item_name) > -1
+				if _.indexOf(permission_list_views, item_name) > -1 || item.owner == userId
 					list_views.push item
-			else
-				list_views.push item
 	
 	return list_views
 
@@ -278,18 +335,28 @@ Creator.getFields = (object_name, spaceId, userId)->
 			userId = Meteor.userId()
 
 	firstLevelKeys = Creator.getSchema(object_name)._firstLevelSchemaKeys
-	permission_fields =  Creator.getPermissions(object_name, spaceId, userId).fields
+	permission_fields =  Creator.getPermissions(object_name, spaceId, userId).readable_fields
 
 	return permission_fields
 
 Creator.isloading = ()->
 	return Creator.isLoadingSpace.get()
 
+Creator.convertSpecialCharacter = (str)->
+	return str.replace(/([\^\$\(\)\*\+\?\.\\\|\[\]\{\}])/g, "\\$1")
+
 # 计算fields相关函数
 # START
+Creator.getHiddenFields = (schema)->
+	fields = _.map(schema, (field, fieldName) ->
+		return field.autoform and field.autoform.type == "hidden" and !field.autoform.omit and fieldName
+	)
+	fields = _.compact(fields)
+	return fields
+
 Creator.getFieldsWithNoGroup = (schema)->
 	fields = _.map(schema, (field, fieldName) ->
-  		return (!field.autoform or !field.autoform.group) and fieldName
+  		return (!field.autoform or !field.autoform.group) and (!field.autoform or field.autoform.type != "hidden") and fieldName
 	)
 	fields = _.compact(fields)
 	return fields
@@ -304,7 +371,7 @@ Creator.getSortedFieldGroupNames = (schema)->
 
 Creator.getFieldsForGroup = (schema, groupName) ->
   	fields = _.map(schema, (field, fieldName) ->
-    	return field.autoform and field.autoform.group == groupName and fieldName
+    	return field.autoform and field.autoform.group == groupName and field.autoform.type != "hidden" and fieldName
   	)
   	fields = _.compact(fields)
   	return fields
@@ -330,7 +397,7 @@ Creator.getFieldsInFirstLevel = (firstLevelKeys, keys) ->
 	keys = _.compact(keys)
 	return keys
 
-Creator.getFieldsForReorder = (schema, keys) ->
+Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 	fields = []
 	i = 0
 	while i < keys.length
@@ -348,24 +415,43 @@ Creator.getFieldsForReorder = (schema, keys) ->
 			if value.autoform?.is_wide
 				is_wide_2 = true
 
-		if is_wide_1
+		if isSingle
 			fields.push keys.slice(i, i+1)
 			i += 1
-		else if !is_wide_1 and is_wide_2
-			childKeys = keys.slice(i, i+1)
-			childKeys.push undefined
-			fields.push childKeys
-			i += 1
-		else if !is_wide_1 and !is_wide_2
-			childKeys = keys.slice(i, i+1)
-			if keys[i+1]
-				childKeys.push keys[i+1]
-			else
+		else
+			if is_wide_1
+				fields.push keys.slice(i, i+1)
+				i += 1
+			else if !is_wide_1 and is_wide_2
+				childKeys = keys.slice(i, i+1)
 				childKeys.push undefined
-			fields.push childKeys
-			i += 2
+				fields.push childKeys
+				i += 1
+			else if !is_wide_1 and !is_wide_2
+				childKeys = keys.slice(i, i+1)
+				if keys[i+1]
+					childKeys.push keys[i+1]
+				else
+					childKeys.push undefined
+				fields.push childKeys
+				i += 2
 	
 	return fields
+
+
+Creator.getDBApps = (space_id)->
+	dbApps = {}
+	Creator.Collections["apps"].find({space: space_id}, {
+		fields: {
+			created: 0,
+			created_by: 0,
+			modified: 0,
+			modified_by: 0
+		}
+	}).forEach (app)->
+		dbApps[app._id] = app
+
+	return dbApps
 
 # END
 

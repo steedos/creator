@@ -1,11 +1,22 @@
 
 Creator.objectsByName = {}   # 此对象只能在确保所有Object初始化完成后调用， 否则获取到的object不全
+if Meteor.isClient
+	Creator.objects_initialized = new ReactiveVar(false)
 
 Creator.Object = (options)->
 	self = this
 
 	if (!options.name) 
 		throw new Error('Creator.Object options must specify name');
+	unless options.permission_set
+		options.permission_set = {}
+	if !(options.permission_set?.admin)
+		options.permission_set.admin = {}
+	if !(options.permission_set?.user)
+		options.permission_set.user = {}
+
+	self._id = options._id || options.name
+	self.space = options.space
 	self.name = options.name
 	self.label = options.label
 	self.icon = options.icon
@@ -20,7 +31,9 @@ Creator.Object = (options)->
 	self.enable_tasks = options.enable_tasks
 	self.enable_notes = options.enable_notes
 	self.enable_audit = options.enable_audit
+	self.hidden = options.hidden
 	self.enable_api = (options.enable_api == undefined) or options.enable_api
+	self.custom = options.custom
 
 	if (!options.fields) 
 		throw new Error('Creator.Object options must specify name');	
@@ -38,15 +51,7 @@ Creator.Object = (options)->
 
 	self.list_views = {} 
 	_.each options.list_views, (item, item_name)->
-		oitem = _.clone(item)
-		oitem.name = item_name
-		if !oitem.columns
-			if self.list_views.default?.columns
-				oitem.columns = self.list_views.default.columns
-		if !oitem.columns
-			oitem.columns = ["name"]
-		if !oitem.filter_scope
-			oitem.filter_scope = "mine"
+		oitem = Creator.convertListView(self.list_views.default?.columns, item, item_name)
 		self.list_views[item_name] = oitem
 
 	self.triggers = _.clone(Creator.baseObject.triggers)
@@ -67,47 +72,59 @@ Creator.Object = (options)->
 	_.each self.actions, (item, item_name)->
 		item.name = item_name
 
-	# if self.name == "contacts"
-	# 	console.log "self.fields===fff:", self.fields
-	# 	console.log "self.fields===mmm:", _.keys(self.fields)
-		
+	self.related_objects = Creator.getObjectRelateds(self.name)
+	
+	# 让所有object默认有所有list_views/actions/related_objects/readable_fields/editable_fields完整权限，该权限可能被数据库中设置的admin/user权限覆盖
 	self.permission_set = _.clone(Creator.baseObject.permission_set)
+	defaultListViews = _.keys(self.list_views)
+	defaultActions = _.keys(self.actions)
+	defaultRelatedObjects = _.pluck(self.related_objects,"object_name")
+	defaultReadableFields = []
+	defaultEditableFields = []
+	_.each self.fields, (field, field_name)->
+		if !(field.hidden)    #231 omit字段支持在非编辑页面查看, 因此删除了此处对omit的判断
+			defaultReadableFields.push field_name
+			if !field.readonly
+				defaultEditableFields.push field_name
+		
 	_.each self.permission_set, (item, item_name)->
-		# if self.list_views
-		# 	self.permission_set[item_name].list_views = _.keys(self.list_views)
+		if item_name == "none"
+			return
+		if self.list_views
+			self.permission_set[item_name].list_views = defaultListViews
 		if self.actions
-			self.permission_set[item_name].actions = _.keys(self.actions)
+			self.permission_set[item_name].actions = defaultActions
 		if self.related_objects
-			self.permission_set[item_name].related_objects = _.keys(self.related_objects)
-		# if self.fields
-		# 	self.permission_set[item_name].fields = _.keys(self.fields)
-		# if self.name == "contacts"
-		# 	console.log "self.permission_set===1_0", _.keys(self.fields)
-		# 	console.log "self.permission_set===xxx_#{item_name}", self.permission_set[item_name].fields
-		# 	console.log "self.permission_set===1", self.permission_set
-		# 	console.log "self.permission_set===1string", JSON.stringify self.permission_set
+			self.permission_set[item_name].related_objects = defaultRelatedObjects
+		if self.fields
+			self.permission_set[item_name].readable_fields = defaultReadableFields
+			self.permission_set[item_name].editable_fields = defaultEditableFields
 
-	# if self.name == "contacts"
-	# 	console.log "options.permission_set===2", options.permission_set
-	# 	console.log "options.permission_set===2string", JSON.stringify options.permission_set
 	_.each options.permission_set, (item, item_name)->
 		if !self.permission_set[item_name]
 			self.permission_set[item_name] = {}
 		self.permission_set[item_name] = _.extend(_.clone(self.permission_set[item_name]), item)
-	# if self.name == "contacts"
-	# 	console.log "self.permission_set===3", self.permission_set
-	# 	console.log "self.permission_set===3string", JSON.stringify self.permission_set
-		
 
-	self.permissions = new ReactiveVar(Creator.baseObject.permission_set.none)
+	# 前端根据permissions改写field相关属性，后端只要走默认属性就行，不需要改写
+	if Meteor.isClient
+		permissions = options.permissions
+		self.permissions = new ReactiveVar(permissions)
+		_.each self.fields, (field, field_name)->
+			if field and !field.omit
+				if _.indexOf(permissions.readable_fields, field_name) > -1
+					field.hidden = false
+					if _.indexOf(permissions.editable_fields, field_name) < 0
+						field.readonly = true
+						field.disabled = true
+					else
+						field.readonly = false
+						field.disabled = false
+				else
+					field.hidden = true
+	else
+		self.permissions = new ReactiveVar(Creator.baseObject.permission_set.none)
 
-	if db[self.name]
-		Creator.Collections[self.name] = db[self.name]
-	else if options.db
-		Creator.Collections[self.name] = options.db
-	
-	if !Creator.Collections[self.name]
-		Creator.Collections[self.name] = new Meteor.Collection(self.name)
+	Creator.Collections[self.name] = Creator.createCollection(options)
 	self.db = Creator.Collections[self.name]
 
 	schema = Creator.getObjectSchema(self)
@@ -158,6 +175,6 @@ if Meteor.isClient
 
 	Meteor.startup ->
 		Tracker.autorun ->
-			if Session.get("steedos-locale")
+			if Session.get("steedos-locale") && Creator.objects_initialized.get()
 				_.each Creator.objectsByName, (object, object_name)->
 					object.i18n()

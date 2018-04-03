@@ -214,108 +214,95 @@ Creator.initListViews = (object_name)->
 
 
 
+Creator.convertListView = (default_columens, list_view, list_view_name)->
+	oitem = _.clone(list_view)
+	if !_.has(oitem, "name")
+		oitem.name = list_view_name
+	if !oitem.columns
+		if default_columens
+			oitem.columns = default_columens
+	if !oitem.columns
+		oitem.columns = ["name"]
+	if !oitem.filter_scope
+		oitem.filter_scope = "mine"
+
+	if !_.has(oitem, "_id")
+		oitem._id = list_view_name
+	else
+		oitem.label = list_view.name
+
+	return oitem
+
 
 if Meteor.isClient
-	Creator.getRelatedList = (object_name, record_id)->
+	Creator.getRelatedList = (object_name)->
 		list = []
-		related_object_names = Creator.getRelatedObjects(object_name)
+		related_objects = Creator.getRelatedObjects(object_name)
 
-		_.each Creator.Objects, (related_object, related_object_name)->
-			if _.indexOf(related_object_names, related_object_name) > -1
-				_.each related_object.fields, (related_field, related_field_name)->
-					if related_field.type=="master_detail" and related_field.reference_to and related_field.reference_to == object_name
-						tabular_name = "creator_" + related_object_name
-						if Tabular.tablesByName[tabular_name]
-							columns = ["name"]
-							if related_object.list_views?.default?.columns
-								columns = related_object.list_views.default.columns
-							columns = _.without(columns, related_field_name)
-							Tabular.tablesByName[tabular_name].options?.columns = Creator.getTabularColumns(related_object_name, columns, true);
-
-							if /\w+\.\$\.\w+/g.test(related_field_name)
-								# object类型带子属性的related_field_name要去掉中间的美元符号，否则显示不出字段值
-								related_field_name = related_field_name.replace(/\$\./,"")
-							related =
-								object_name: related_object_name
-								columns: columns
-								tabular_table: Tabular.tablesByName[tabular_name]
-								related_field_name: related_field_name
-
-							list.push related
-
-		if Creator.Objects[object_name]?.enable_files and _.indexOf(related_object_names, "cms_files") > -1
-			file_object_name = "cms_files"
-			file_tabular_name = "creator_" + file_object_name
-			file_related_field_name = "parent"
-			file_related_object = Creator.Objects[file_object_name]
-			
-			if Tabular.tablesByName[file_tabular_name]
+		_.each related_objects, (related_object_item) ->
+			related_object_name = related_object_item.object_name
+			related_field_name = related_object_item.foreign_key
+			related_object = Creator.getObject(related_object_name)
+			unless related_object
+				return
+			tabular_name = "creator_" + related_object_name
+			if Tabular.tablesByName[tabular_name]
 				columns = ["name"]
-				if file_related_object.list_views?.default?.columns
-					columns = file_related_object.list_views.default.columns
-				columns = _.without(columns, file_related_field_name)
-				Tabular.tablesByName[file_tabular_name].options?.columns = Creator.getTabularColumns(file_object_name, columns, true);
+				if related_object.list_views?.default?.columns
+					columns = related_object.list_views.default.columns
+				columns = _.without(columns, related_field_name)
+				Tabular.tablesByName[tabular_name].options?.columns = Creator.getTabularColumns(related_object_name, columns, true);
 
-				file_related =
-					object_name: file_object_name
+				if /\w+\.\$\.\w+/g.test(related_field_name)
+					# object类型带子属性的related_field_name要去掉中间的美元符号，否则显示不出字段值
+					related_field_name = related_field_name.replace(/\$\./,"")
+				related =
+					object_name: related_object_name
 					columns: columns
-					tabular_table: Tabular.tablesByName[file_tabular_name]
-					related_field_name: file_related_field_name
-					is_file: true
+					tabular_table: Tabular.tablesByName[tabular_name]
+					related_field_name: related_field_name
+					is_file: related_object_name == "cms_files"
 
-				list.push file_related
-
-		extra_related_objects = []
-		if Creator.Objects[object_name]?.enable_tasks
-			extra_related_objects.push "tasks"
-		if Creator.Objects[object_name]?.enable_notes
-			extra_related_objects.push "notes"
-
-		if extra_related_objects.length > 0
-			_.each extra_related_objects, (obj)->
-				extra_object_name = obj
-				extra_tabular_name = "creator_" + extra_object_name
-				extra_related_field_name = "related_to"
-				extra_related_object = Creator.Objects[extra_object_name]
-
-				if Tabular.tablesByName[extra_tabular_name]
-					columns = ["name"]
-					if extra_related_object.list_views?.default?.columns
-						columns = extra_related_object.list_views.default.columns
-					columns = _.without(columns, extra_related_field_name)
-					Tabular.tablesByName[extra_tabular_name].options?.columns = Creator.getTabularColumns(extra_object_name, columns, true);
-
-					extra_related =
-						object_name: extra_object_name
-						columns: columns
-						tabular_table: Tabular.tablesByName[extra_tabular_name]
-						related_field_name: extra_related_field_name
-
-				list.push extra_related
+				list.push related
 
 		return list
 
 
+///
+	取出list_view_id对应的视图，如果不存在或者没有权限，就返回第一个视图
+///
 Creator.getListView = (object_name, list_view_id)->
+	if Meteor.isClient
+		if !object_name
+			object_name = Session.get("object_name")
+		if !list_view_id
+			list_view_id = Session.get("list_view_id")
 	object = Creator.getObject(object_name)
 	if !object
 		return
-	custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
-	if object.list_views
-		if object.list_views[list_view_id]
-			list_view = object.list_views[list_view_id]
-		else if custom_list_view
-			list_view = 
-				columns: custom_list_view.columns
-				filter_scope: custom_list_view.filter_scope
-				label: custom_list_view.name
-				name: custom_list_view.name
-				_id: list_view_id
-		else
-			view_ids = _.keys(object.list_views) 
-			view_ids = _.without(view_ids, "default")
-			list_view = object.list_views[view_ids[0]]
-		Creator.getTable(object_name)?.options.columns = Creator.getTabularColumns(object_name, list_view.columns);
-		Creator.getTable(object_name)?.options.language?.zeroRecords = t("list_view_no_records")
-		Creator.getTable(object_name)?.options.order = Creator.getTabularOrder(object_name, list_view_id, list_view.columns)
+	listViews = Creator.getListViews(object_name)
+	unless listViews?.length
+		return
+	list_view = _.findWhere(listViews,{"_id":list_view_id})
+	unless list_view
+		list_view = listViews[0]
+	Creator.getTable(object_name)?.options.columns = Creator.getTabularColumns(object_name, list_view.columns);
+	Creator.getTable(object_name)?.options.language?.zeroRecords = t("list_view_no_records")
+	Creator.getTable(object_name)?.options.order = Creator.getTabularOrder(object_name, list_view_id, list_view.columns)
 	return list_view
+
+#获取list_view_id对应的视图是否是最近查看视图
+Creator.getListViewIsRecent = (object_name, list_view_id)->
+	if Meteor.isClient
+		if !object_name
+			object_name = Session.get("object_name")
+		if !list_view_id
+			list_view_id = Session.get("list_view_id")
+	if typeof(list_view_id) == "string"
+		object = Creator.getObject(object_name)
+		if !object
+			return
+		listView = _.findWhere(object.list_views,{_id: list_view_id})
+	else
+		listView = list_view_id
+	return listView?.name == "recent"

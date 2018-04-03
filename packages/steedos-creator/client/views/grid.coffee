@@ -2,6 +2,8 @@ dxDataGridInstance = null
 
 _itemClick = (e, curObjectName)->
 	record = e.data
+	if !record
+		return
 	record_permissions = Creator.getRecordPermissions curObjectName, record, Meteor.userId()
 	actions = _actionItems(curObjectName, record._id, record_permissions)
 
@@ -23,7 +25,6 @@ _itemClick = (e, curObjectName)->
 			collectionName = object.label
 			name_field_key = object.NAME_FIELD_KEY
 			if action.todo == "standard_delete"
-				console.log value.itemData
 				action_record_title = value.itemData.record[name_field_key]
 				swal
 					title: "删除#{object.label}"
@@ -34,13 +35,11 @@ _itemClick = (e, curObjectName)->
 					cancelButtonText: t('Cancel')
 					(option) ->
 						if option
-							Creator.Collections[objectName].remove {_id: recordId}, (error, result) ->
-								if error
-									toastr.error error.reason
-								else
-									info = object.label + "\"#{action_record_title}\"" + "已删除"
-									toastr.success info
-									dxDataGridInstance.refresh()
+							Creator.removeRecord(objectName, recordId, ->
+								info = object.label + "\"#{action_record_title}\"" + "已删除"
+								toastr.success info
+								dxDataGridInstance.refresh()
+							)
 			else
 				Session.set("action_fields", undefined)
 				Session.set("action_collection", "Creator.Collections.#{objectName}")
@@ -71,7 +70,6 @@ _actionItems = (object_name, record_id, record_permissions)->
 				return action.visible
 		else
 			return false
-	console.log "_actionItem,actions2:", actions
 	return actions
 
 _fields = (object_name, list_view_id)->
@@ -92,7 +90,10 @@ _fields = (object_name, list_view_id)->
 			return n.split(".")[0]
 		else
 			return undefined
-	
+
+	if Creator.isCommonSpace(Session.get("spaceId")) && fields.indexOf("space") < 0
+		fields.push('space')
+
 	fields = _.compact(fields)
 	return fields
 
@@ -100,7 +101,7 @@ _expandFields = (object_name, columns)->
 	expand_fields = []
 	fields = Creator.getObject(object_name).fields
 	_.each columns, (n)->
-		if fields[n].type == "master_detail" || fields[n].type == "lookup"
+		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
 			ref = fields[n].reference_to
 			if _.isFunction(ref)
 				ref = ref()
@@ -110,6 +111,8 @@ _expandFields = (object_name, columns)->
 				
 			ref = _.map ref, (o)->
 				return Creator.getObject(o).NAME_FIELD_KEY
+
+			ref = _.compact(ref)
 			
 			ref = ref.join(",")
 			expand_fields.push(n + "($select=" + ref + ")")
@@ -174,6 +177,14 @@ Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
 		is_related = self.data.is_related
+		if is_related
+			list_view_id = "all"
+		else
+			list_view_id = Session.get("list_view_id")
+		unless list_view_id
+			toastr.error t("creator_list_view_permissions_lost")
+			return
+
 		object_name = Session.get("object_name")
 		creator_obj = Creator.getObject(object_name)
 
@@ -183,18 +194,22 @@ Template.creator_grid.onRendered ->
 		related_object_name = Session.get("related_object_name")
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
-		if is_related
-			list_view_id = "recent"
-		else
-			list_view_id = Session.get("list_view_id")
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
-				url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
-				filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
+				if Creator.getListViewIsRecent(object_name, list_view_id)
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
+					filter = undefined
+				else
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
+					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
 			else
-				url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-				filter = Creator.getODataFilter(list_view_id, object_name)
+				if Creator.getListViewIsRecent(object_name, list_view_id)
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
+					filter = undefined
+				else
+					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+					filter = Creator.getODataFilter(list_view_id, object_name)
 			
 			curObjectName = if is_related then related_object_name else object_name
 
@@ -218,35 +233,35 @@ Template.creator_grid.onRendered ->
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
-
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
-
 			expand_fields = _expandFields(curObjectName, selectColumns)
-			showColumns.push
-				dataField: "_id_actions"
-				width: 46
-				allowSorting: false
-				allowReordering: false
-				headerCellTemplate: (container) ->
-					return ""
-				cellTemplate: (container, options) ->
-					htmlText = """
-						<span class="slds-grid slds-grid--align-spread creator-table-actions">
-							<div class="forceVirtualActionMarker forceVirtualAction">
-								<a class="rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger" aria-haspopup="true" role="button" title="" href="javascript:void(0);" data-toggle="dropdown">
-									<span class="slds-icon_container slds-icon-utility-down">
-										<span class="lightningPrimitiveIcon">
-											#{Blaze.toHTMLWithData Template.steedos_button_icon, {class: "slds-icon slds-icon-text-default slds-icon--xx-small", source: "utility-sprite", name:"down"}}
+			actions = Creator.getActions(curObjectName)
+			if actions.length
+				showColumns.push
+					dataField: "_id_actions"
+					width: 46
+					allowSorting: false
+					allowReordering: false
+					headerCellTemplate: (container) ->
+						return ""
+					cellTemplate: (container, options) ->
+						htmlText = """
+							<span class="slds-grid slds-grid--align-spread creator-table-actions">
+								<div class="forceVirtualActionMarker forceVirtualAction">
+									<a class="rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger" aria-haspopup="true" role="button" title="" href="javascript:void(0);" data-toggle="dropdown">
+										<span class="slds-icon_container slds-icon-utility-down">
+											<span class="lightningPrimitiveIcon">
+												#{Blaze.toHTMLWithData Template.steedos_button_icon, {class: "slds-icon slds-icon-text-default slds-icon--xx-small", source: "utility-sprite", name:"down"}}
+											</span>
+											<span class="slds-assistive-text" data-aura-rendered-by="15534:0">显示更多信息</span>
 										</span>
-										<span class="slds-assistive-text" data-aura-rendered-by="15534:0">显示更多信息</span>
-									</span>
-								</a>
-							</div>
-						</span>
-					"""
-					$("<div>").append(htmlText).appendTo(container);
+									</a>
+								</div>
+							</span>
+						"""
+						$("<div>").append(htmlText).appendTo(container);
 			showColumns.splice 0, 0, 
 				dataField: "_id_checkbox"
 				width: 60
@@ -257,6 +272,9 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
+			console.log "selectColumns", selectColumns
+			console.log "filter", filter
+			console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			else
@@ -283,19 +301,20 @@ Template.creator_grid.onRendered ->
 						columns = gridState.columns
 						column_width = {}
 						sort = []
-						columns = _.sortBy(_.values(columns), "visibleIndex")
-						_.each columns, (column_obj)->
-							if column_obj.width
-								column_width[column_obj.dataField] = column_obj.width
-							if column_obj.sortOrder
-								sort.push [column_obj.dataField, column_obj.sortOrder]
-						
-						Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
-							(error, result)->
-								if error
-									console.log error
-								else
-									console.log "grid_settings success"
+						if columns and columns.length
+							columns = _.sortBy(_.values(columns), "visibleIndex")
+							_.each columns, (column_obj)->
+								if column_obj.width
+									column_width[column_obj.dataField] = column_obj.width
+								if column_obj.sortOrder
+									sort.push [column_obj.dataField, column_obj.sortOrder]
+							
+							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
+								(error, result)->
+									if error
+										console.log error
+									else
+										console.log "grid_settings success"
 				}
 				dataSource: 
 					store: 
@@ -350,13 +369,11 @@ Template.creator_grid.events
 				cancelButtonText: t('Cancel')
 				(option) ->
 					if option
-						Creator.Collections[objectName].remove {_id: recordId}, (error, result) ->
-							if error
-								toastr.error error.reason
-							else
-								info = object.label + "\"#{action_record_title}\"" + "已删除"
-								toastr.success info
-								dxDataGridInstance.refresh()
+						Creator.removeRecord(objectName, recordId, ->
+							info = object.label + "\"#{action_record_title}\"" + "已删除"
+							toastr.success info
+							dxDataGridInstance.refresh()
+						)
 		else
 			Session.set("action_fields", undefined)
 			Session.set("action_collection", "Creator.Collections.#{objectName}")
@@ -405,8 +422,13 @@ Template.creator_grid.events
 Template.creator_grid.onCreated ->
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
-			dxDataGridInstance.refresh().done (result)->
-				Creator.remainCheckboxState(dxDataGridInstance.$element())
+			# dxDataGridInstance.refresh().done (result)->
+			# 	Creator.remainCheckboxState(dxDataGridInstance.$element())
+			app_id = Session.get "app_id"
+			object_name = Session.get "object_name"
+			record_id = result._id
+			url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+			FlowRouter.go url
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->

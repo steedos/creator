@@ -104,8 +104,10 @@ Package.onUse(function(api) {
 	api.addFiles('lib/actions.coffee');
 	api.addFiles('lib/listviews.coffee');
 	api.addFiles('lib/apps.coffee');
+	api.addFiles('lib/user_object_view.coffee', 'server');
 	// api.addFiles('lib/eval.js');
 	// api.addFiles('lib/formula_engine.coffee');
+	api.addFiles('lib/object_recent.coffee', 'client');
 
 	api.addFiles('models/object_recent_viewed.coffee');
 	api.addFiles('models/object_listviews.coffee');
@@ -158,6 +160,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/layout/header_search.less', 'client');
 	api.addFiles('client/layout/header_search.coffee', 'client');
 	api.addFiles('client/layout/header.html', 'client');
+	api.addFiles('client/layout/header.coffee', 'client');
 	api.addFiles('client/layout/navigation.html', 'client');
 	api.addFiles('client/layout/navigation.coffee', 'client');
 	api.addFiles('client/layout/sidebar.html', 'client');
@@ -188,7 +191,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/related_object_list.html', 'client');
 	api.addFiles('client/mobile/related_object_list.less', 'client');
 	api.addFiles('client/mobile/related_object_list.coffee', 'client');
-
+	api.addFiles('client/mobile/mobile_report.html', 'client');
+	api.addFiles('client/mobile/mobile_report.less', 'client');
+	api.addFiles('client/mobile/mobile_report.coffee', 'client');
+	
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
@@ -215,6 +221,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/view.less', 'client');
 	api.addFiles('client/views/app_home.html', 'client');
 
+	api.addFiles('client/views/report_content.html', 'client');
+	api.addFiles('client/views/report_content.coffee', 'client');
+
 	api.addFiles('client/views/report.html', 'client');
 	api.addFiles('client/views/report.coffee', 'client');
 	api.addFiles('client/views/report.less', 'client');
@@ -239,6 +248,14 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/filter_option.coffee', 'client');
 	api.addFiles('client/views/filter_option.less', 'client');
 
+	api.addFiles('client/views/record_search_list.html', 'client');
+	api.addFiles('client/views/record_search_list.coffee', 'client');
+	api.addFiles('client/views/record_search_list.less', 'client');
+
+	api.addFiles('client/views/search_result_list.html', 'client');
+	api.addFiles('client/views/search_result_list.coffee', 'client');
+	api.addFiles('client/views/search_result_list.less', 'client');
+
 	api.addFiles('client/views/related_object_list.html', 'client');
 	api.addFiles('client/views/related_object_list.coffee', 'client');
 	api.addFiles('client/views/related_object_list.less', 'client');
@@ -254,4 +271,8 @@ Package.onUse(function(api) {
 
 
 	api.addFiles('client/theme.less', 'client');
+	api.addFiles('client/i18n.coffee', 'client');
+
+	api.addAssets('assets/logo.png', 'client');
+
 });

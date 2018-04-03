@@ -54,12 +54,13 @@ Template.headerSearch.helpers
 	highlight: (label)->
 		searchText = Template.instance().searchText.get()
 		if searchText && _.isString(searchText)
-			search_Keywords = searchText.split(" ")
+			search_Keywords = searchText.trim().split(" ")
 			search_Keywords.forEach (keyword)->
+				keyword = Creator.convertSpecialCharacter(keyword)
 				keyword = keyword.trim()
 				if keyword
 					reg = new RegExp(keyword, "g")
-					label = label.replace(reg, '<mark>' + keyword + '</mark>')
+					label = label?.replace(reg, '<mark>' + keyword + '</mark>')
 		return label
 
 	is_searching: ()->
@@ -105,4 +106,11 @@ Template.headerSearch.events
 		, 300
 
 	'click #option-00,#option-01': (e, t)->
-		toastr.info("TODO#68")
+		app_id = Session.get "app_id"
+		search_text = t.searchText.get()
+		url = "/app/#{app_id}/search/#{search_text}"
+		FlowRouter.go url
+	
+	'keydown input#global-search': (e, t)->
+		if e.keyCode == "13" or e.key == "Enter"
+			$("#option-00").click()

@@ -16,7 +16,7 @@ Template.creatorNavigation.helpers
 		if app
 			_.each app.objects, (v)->
 				obj = Creator.getObject(v)
-				if obj.permissions.get().allowRead
+				if obj?.permissions.get().allowRead and !obj.hidden
 					objects.push v
 		return objects
 
@@ -54,9 +54,6 @@ Template.creatorNavigation.helpers
 
 	avatarURL: (avatar,w,h,fs) ->
 		return Steedos.absoluteUrl("avatar/#{Meteor.userId()}?w=#{w}&h=#{h}&fs=#{fs}&avatar=#{avatar}");
-
-	signOutUrl: ()->
-		return Steedos.absoluteUrl("/steedos/logout")
 
 	isNode: ()->
 		return Steedos.isNode()

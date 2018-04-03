@@ -25,17 +25,17 @@ isRepeatedName = (doc, name)->
 	return false
 Creator.Objects.object_actions =
 	name: "object_actions"
-	label: "Actions"
 	icon: "marketing_actions"
 	fields:
 		object:
 			type: "master_detail"
 			reference_to: "objects"
+			required: true
 		name:
-			label: "Name"
 			type: "text"
 			searchable:true
 			index:true
+			required: true
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
@@ -43,9 +43,11 @@ Creator.Objects.object_actions =
 			type: "boolean"
 		visible:
 			type: "boolean"
+			omit: true
 		on:
 			type: "lookup"
 			is_wide:true
+			required: true
 			optionsFunction: ()->
 				[
 					{label: "显示在列表右上角", value: "list", icon: "contact_list"}
@@ -60,7 +62,7 @@ Creator.Objects.object_actions =
 
 	list_views:
 		default:
-			columns: ["name", "label", "object", "on", "visible", "is_enable", "modified"]
+			columns: ["name", "label", "object", "on", "is_enable", "modified"]
 		all:
 			filter_scope: "space"
 
@@ -108,5 +110,6 @@ Creator.Objects.object_actions =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+				doc.visible = true
 				if isRepeatedName(doc)
 					throw new Meteor.Error 500, "对象名称不能重复"

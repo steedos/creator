@@ -9,10 +9,14 @@
 	"list_view_no_records": "No items to display.",
 	"please_select": "Please select ",
 
+	"list_view": "List View",
+
 	"creator_list_item_counts": "%s items",
 	"creator_list_new_list_view": "New",
 	"creator_list_delete_list_view": "Delete",
 	"creator_list_select_fields": "Select Fields to Display",
+	"creator_available_fields" :"Available Fields",
+	"creator_visible_fields":"Visible Fields",
 	"creator_list_filter": "Filter",
 	"creator_list_filter_cancel": "Cancel",
 	"creator_list_filter_save_as": "Save as",
@@ -22,6 +26,8 @@
 	"creator_list_remove_all_filters": "Remove All",
 	"creator_list_matching_all_filters": "Matching all these filters",
 	"creator_list_view_controls": "LIST VIEW CONTROLS",
+	"reset_column_width": "Reset column width",
+	"creator_list_edit": "Edit List View",
 
 	"creator_filter_option_field": "field",
 	"creator_filter_option_operation": "operation",
@@ -55,5 +61,9 @@
 
 	"creator_odata_api_not_found": "Sorry, the resource you are trying to access does not exist or you do not have permission to access it!",
 
-	"creator_list_no_actions_tip": "no operation"
+	"creator_list_no_actions_tip": "no operation",
+	"creator_list_view_permissions_lost": "You do not have permission to access this view",
+
+	"creator_report_drill_down_label": "Drill Down Data",
+	"creator_report_drill_down_total_label": "Total"
 }

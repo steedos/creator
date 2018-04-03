@@ -41,12 +41,14 @@
 		max-width: 100%;
 	
 		.slds-modal__content {
+			min-height: 160px;
 			.remove-prompt {
 				font-size: 16px;
 			}
 			.form-group.multiple-box{
 				margin-bottom: 0px;
 				.slds-checkbox{
+					margin-left: 0 !important;
 					.slds-checkbox--faux{
 						margin-top: -3px;
 					}
@@ -58,13 +60,25 @@
 				}
 			}
 			.form-group {
+				margin-bottom: 0;
+				.help-block {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
+				&.has-error {
+					.help-block {
+						margin-top: 5px;
+					}
+				}
 				> div {
 					> .checkbox {
 						margin-top: -18px;
 						min-height: 45px;
 						label {
 							padding-left: 0;
-							font-weight: bold;
+							// font-weight: bold;
+							font-weight: normal;
+							color: #706e6b;
 							input[type="checkbox"] {
 								position: absolute;
 								top: 28px;
@@ -77,7 +91,6 @@
 			.form-control[disabled]{
 				border: none;
 				padding: 0;
-				height: auto;
 				background: #fff;
 			}
 		}
@@ -104,10 +117,22 @@
 			}
 		}	
 	}
+	
+	.hidden-fields {
+		display: none;
+	}
 
 	@media (max-width: 599px) {
 		.view-page-section-row {
 			display: block;
+		}
+	}
+}
+
+@media screen and (min-width: 768px){
+	.creator-auotform-modals {
+		.normal-large {
+			width: 600px;
 		}
 	}
 }
@@ -122,7 +147,7 @@
 				border-radius: 0;
 				.title {
 					font-size: 20px;
-					line-height: 32px;
+					line-height: 1.875rem;
 				}
 				.slds-button_neutral {
 					float: left;

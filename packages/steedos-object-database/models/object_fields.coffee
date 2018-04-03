@@ -27,7 +27,6 @@ isRepeatedName = (doc, name)->
 
 Creator.Objects.object_fields =
 	name: "object_fields"
-	label: "字段"
 	icon: "orders"
 	enable_api: true
 	fields:
@@ -42,6 +41,7 @@ Creator.Objects.object_fields =
 		object:
 			type: "master_detail"
 			reference_to: "objects"
+			required: true
 		type:
 			type: "select"
 			required: true
@@ -60,7 +60,6 @@ Creator.Objects.object_fields =
 
 		group:
 			type: "text"
-			is_wide: true
 
 		defaultValue:
 			type: "text"
@@ -81,17 +80,28 @@ Creator.Objects.object_fields =
 		readonly:
 			type: "boolean"
 
-		disabled:
-			type: "boolean"
-
+#		disabled:
+#			type: "boolean"
+		#TODO 将此功能开放给用户时，需要关闭此属性
 		omit:
 			type: "boolean"
 
 		index:
 			type: "boolean"
 
+		searchable:
+			type: "boolean"
+
 		sortable:
 			type: "boolean"
+
+		precision:
+			type: "currency"
+			defaultValue: 18
+
+		scale:
+			type: "currency"
+			defaultValue: 2
 
 		reference_to: #在服务端处理此字段值，如果小于2个，则存储为字符串，否则存储为数组
 			type: "lookup"
@@ -103,13 +113,7 @@ Creator.Objects.object_fields =
 			multiple: true
 
 		rows:
-			type: "number"
-
-		precision:
-			type: "number"
-
-		scale:
-			type: "number"
+			type: "currency"
 
 		options:
 			type: "textarea"
@@ -122,7 +126,7 @@ Creator.Objects.object_fields =
 
 	list_views:
 		default:
-			columns: ["name", "object", "label", "type", "multiple", "required", "omit", "group", "description", "modified"]
+			columns: ["name", "label", "type", "object", "modified"]
 		all:
 			filter_scope: "space"
 

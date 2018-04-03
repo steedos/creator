@@ -7,23 +7,28 @@ Creator.Objects.contract_receipts =
 			label: "名称"
 			type: "text"
 			required: true
-			searchable:true
+			searchable: true
+			is_wide: true
+		amount:
+			label: "金额"
+			type: "currency"
+			required: true
+		due_date:
+			label: "计划收款日期"
+			type: "date"
 		contract:
 			label: "合同"
 			type: "master_detail"
 			reference_to: "contracts"
 			required: true
-		amount:
-			label: "金额"
-			type: "currency"
-			required: true
-		is_received:
+		account:
+			label: "单位"
+			type: "master_detail"
+			reference_to: "accounts"
+		is_closed:
 			label: "已收款"
 			type: "boolean"
-		planned_date:
-			label: "计划收款日期"
-			type: "date"
-		received_date:
+		close_date:
 			label: "实际收款日期"
 			type: "date"
 		billing_date:
@@ -39,7 +44,7 @@ Creator.Objects.contract_receipts =
 
 	list_views:
 		default:
-			columns: ["name", "amount", "contract", "received_date", "planned_date"]
+			columns: ["name", "amount", "contract", "close_date", "due_date"]
 
 		recent:
 			label: "最近查看"
@@ -47,3 +52,19 @@ Creator.Objects.contract_receipts =
 		all:
 			label: "所有"
 			filter_scope: "space"
+			
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

@@ -1,6 +1,6 @@
 Creator.Objects.accounts = 
 	name: "accounts"
-	label: "客户"
+	label: "单位"
 	icon: "account"
 	enable_files: true
 	enable_search: true
@@ -9,7 +9,7 @@ Creator.Objects.accounts =
 	enable_api: true
 	fields:
 		owner:
-			label: "客户所有人"
+			label: "所有人"
 			omit: false
 			disabled: true
 		priority:
@@ -17,16 +17,17 @@ Creator.Objects.accounts =
 			type: "select"
 			sortable: true
 			options: [
-				{label: "Hot", value: "high"},
-				{label: "Warm", value: "normal"},
-				{label: "Cold", value: "low"}
+				{label: "高", value: "high"},
+				{label: "中", value: "normal"},
+				{label: "低", value: "low"}
 			]
 		name: 
-			label: "客户名"
+			label: "名称"
 			type: "text"
 			defaultValue: ""
 			description: ""
 			inlineHelpText: ""
+			searchable:true
 			required: true
 			sortable: true
 		website: 
@@ -46,16 +47,15 @@ Creator.Objects.accounts =
 
 	list_views:
 		default:
-			columns: ["name", "description", "modified"]
+			columns: ["name", "priority", "owner", "modified"]
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
 		all:
-			label: "所有客户"
+			label: "所有单位"
 			filter_scope: "space"
-			columns: ["name", "description", "modified", "owner"]
 		mine:
-			label: "我的客户"
+			label: "我的单位"
 			filter_scope: "mine"
 
 	actions: 
@@ -69,3 +69,19 @@ Creator.Objects.accounts =
 			visible: false
 			todo: ()->
 				alert("you clicked on print button") 
+
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

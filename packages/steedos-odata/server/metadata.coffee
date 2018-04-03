@@ -21,10 +21,9 @@ Meteor.startup ->
 		entities_schema.annotations = []
 
 		_.each Creator.Collections, (value, key, list)->
-			if not Creator.Objects[key]?.enable_api
+			_object = Creator.getObject(key)
+			if not _object?.enable_api
 				return
-
-			_object = Creator.objectsByName[key]
 
 			# 主键
 			keys = [{propertyRef: {name: "_id", computedKey: true}}]
@@ -75,9 +74,9 @@ Meteor.startup ->
 					reference_to.forEach (r)->
 						reference_obj = Creator.objectsByName[r]
 						if reference_obj
-							_name = field_name.toUpperCase()
+							_name = field_name + SteedosOData.EXPAND_FIELD_SUFFIX
 							if _.isArray(field.reference_to)
-								_name = field_name.toUpperCase() + "." + reference_obj.name.toUpperCase()
+								_name = field_name + SteedosOData.EXPAND_FIELD_SUFFIX + "." + reference_obj.name
 							navigationProperty.push {
 								name: _name,
 	#							type: "Collection(" + _NAMESPACE + "." + reference_obj.name + ")",
