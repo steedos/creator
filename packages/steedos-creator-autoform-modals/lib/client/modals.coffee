@@ -21,7 +21,7 @@ collectionObj = (name) ->
 		o[x]
 	, window
 
-oDataOperation = (type, url, data)->
+oDataOperation = (type, url, data, object_name)->
 	self = this
 	$.ajax
 		type: type
@@ -39,7 +39,10 @@ oDataOperation = (type, url, data)->
 			else if Session.get("cmOperation") == "update"
 				_id = data._id
 			# console.log _id
-			self.done(null, {_id: _id})
+			data = {_id: _id}
+			data.type = type
+			data.object_name = object_name
+			self.done(null, data)
 		error: (jqXHR, textStatus, errorThrown) ->
 			# console.log(errorThrown);
 			self.done(new Error(errorThrown))
@@ -191,22 +194,6 @@ Template.CreatorAutoformModals.events
 
 			error: (jqXHR, textStatus, errorThrown) ->
 				console.log(errorThrown)
-
-		# collectionObj(collection).remove _id, (e)->
-		# 	$("body").removeClass("loading")
-		# 	if e
-		# 		console.error e
-		# 		if e.reason
-		# 			toastr?.error?(t(e.reason))
-		# 		else if e.message
-		# 			toastr?.error?(t(error.message))
-		# 		else
-		# 			toastr?.error?('Sorry, this could not be deleted.')
-		# 	else
-		# 		cmOnSuccessCallback?()
-		# 		$('#afModal').modal('hide')
-		# 		toastr?.success?(t("afModal_remove_suc"))
-
 
 	'click button.btn-update-and-create': (event,template)->
 		formId = Session.get('cmFormId') or defaultFormId
@@ -522,12 +509,18 @@ Template.CreatorAfModal.events
 					
 
 					_.each urls, (url)->
-						oDataOperation.call(self, type, url, data)
+						oDataOperation.call(self, type, url, data, object_name)
 
 					return false
 
-				onSuccess: ->
+				onSuccess: (operation,result)->
 					$('#afModal').modal 'hide'
+					if result.type == "post"
+						app_id = Session.get("app_id")
+						object_name = result.object_name
+						record_id = result._id
+						url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+						FlowRouter.go url
 				
 				onError: (operation,error) ->
 					console.error error
