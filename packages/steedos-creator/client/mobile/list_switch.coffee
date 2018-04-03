@@ -107,7 +107,7 @@ Template.listSwitch.events
 		object_name = Template.instance().data.object_name
 		list_views = Creator.getListViews(object_name)
 		_.each list_views, (view)->
-			actionSheetItems.push {text: view.name, list_view_id: view._id}
+			actionSheetItems.push {text: view.label, list_view_id: view._id}
 
 		actionSheetOption = 
 			dataSource: actionSheetItems
