@@ -263,7 +263,7 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 	permissions = Creator.getPermissions(object_name, spaceId, userId)
 	permission_related_objects = permissions.related_objects
 
-	related_object_names = _.intersection related_object_names, permission_related_objects
+	related_object_names = _.difference related_object_names, permission_related_objects
 	return _.filter _object.related_objects, (related_object)->
 		return related_object_names.indexOf(related_object.object_name) > -1
 
@@ -291,7 +291,7 @@ Creator.getActions = (object_name, spaceId, userId)->
 
 	# if permission_actions
 	actions = _.filter actions, (action)->
-		return _.indexOf(permission_actions, action.name) > -1
+		return _.indexOf(permission_actions, action.name) < 0
 	
 	return actions
 
@@ -319,12 +319,12 @@ Creator.getListViews = (object_name, spaceId, userId)->
 
 	_.each object.list_views, (item, item_name)->
 		if item_name != "default"
-			if permission_list_views
-				if _.indexOf(permission_list_views, item_name) > -1 || item.owner == userId
-					list_views.push item
+			if _.isEmpty(permission_list_views) || _.indexOf(permission_list_views, item_name) < 0 || item.owner == userId
+				list_views.push item
 	
 	return list_views
 
+# 理论上不应该调用该函数，因为字段的权限都在Creator.getObject(object_name).fields的相关属性中有标识了
 Creator.getFields = (object_name, spaceId, userId)->
 	if Meteor.isClient
 		if !object_name
@@ -334,10 +334,9 @@ Creator.getFields = (object_name, spaceId, userId)->
 		if !userId
 			userId = Meteor.userId()
 
-	firstLevelKeys = Creator.getSchema(object_name)._firstLevelSchemaKeys
+	fields = Creator.getObject(object_name).fields
 	permission_fields =  Creator.getPermissions(object_name, spaceId, userId).readable_fields
-
-	return permission_fields
+	return _.difference(_.keys(fields), permission_fields)
 
 Creator.isloading = ()->
 	return Creator.isLoadingSpace.get()

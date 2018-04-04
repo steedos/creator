@@ -76,29 +76,29 @@ Creator.Object = (options)->
 	
 	# 让所有object默认有所有list_views/actions/related_objects/readable_fields/editable_fields完整权限，该权限可能被数据库中设置的admin/user权限覆盖
 	self.permission_set = _.clone(Creator.baseObject.permission_set)
-	defaultListViews = _.keys(self.list_views)
-	defaultActions = _.keys(self.actions)
-	defaultRelatedObjects = _.pluck(self.related_objects,"object_name")
-	defaultReadableFields = []
-	defaultEditableFields = []
-	_.each self.fields, (field, field_name)->
-		if !(field.hidden)    #231 omit字段支持在非编辑页面查看, 因此删除了此处对omit的判断
-			defaultReadableFields.push field_name
-			if !field.readonly
-				defaultEditableFields.push field_name
+	# defaultListViews = _.keys(self.list_views)
+	# defaultActions = _.keys(self.actions)
+	# defaultRelatedObjects = _.pluck(self.related_objects,"object_name")
+	# defaultReadableFields = []
+	# defaultEditableFields = []
+	# _.each self.fields, (field, field_name)->
+	# 	if !(field.hidden)    #231 omit字段支持在非编辑页面查看, 因此删除了此处对omit的判断
+	# 		defaultReadableFields.push field_name
+	# 		if !field.readonly
+	# 			defaultEditableFields.push field_name
 		
-	_.each self.permission_set, (item, item_name)->
-		if item_name == "none"
-			return
-		if self.list_views
-			self.permission_set[item_name].list_views = defaultListViews
-		if self.actions
-			self.permission_set[item_name].actions = defaultActions
-		if self.related_objects
-			self.permission_set[item_name].related_objects = defaultRelatedObjects
-		if self.fields
-			self.permission_set[item_name].readable_fields = defaultReadableFields
-			self.permission_set[item_name].editable_fields = defaultEditableFields
+	# _.each self.permission_set, (item, item_name)->
+	# 	if item_name == "none"
+	# 		return
+	# 	if self.list_views
+	# 		self.permission_set[item_name].list_views = defaultListViews
+	# 	if self.actions
+	# 		self.permission_set[item_name].actions = defaultActions
+	# 	if self.related_objects
+	# 		self.permission_set[item_name].related_objects = defaultRelatedObjects
+	# 	if self.fields
+	# 		self.permission_set[item_name].readable_fields = defaultReadableFields
+	# 		self.permission_set[item_name].editable_fields = defaultEditableFields
 
 	_.each options.permission_set, (item, item_name)->
 		if !self.permission_set[item_name]
@@ -119,9 +119,9 @@ Creator.Object = (options)->
 		self.permissions = new ReactiveVar(permissions)
 		_.each self.fields, (field, field_name)->
 			if field and !field.omit
-				if _.indexOf(permissions.readable_fields, field_name) > -1
+				if _.indexOf(permissions.readable_fields, field_name) < 0
 					field.hidden = false
-					if _.indexOf(permissions.editable_fields, field_name) < 0
+					if _.indexOf(permissions.editable_fields, field_name) > -1
 						field.readonly = true
 						field.disabled = true
 					else
