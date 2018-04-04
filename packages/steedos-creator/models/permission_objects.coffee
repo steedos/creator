@@ -42,7 +42,7 @@ Creator.Objects.permission_objects =
 		modifyAllRecords: 
 			type: "boolean"
 			label: "修改所有记录",
-		list_views:
+		disabled_list_views:
 			type: "lookup"
 			label:'列表视图'
 			multiple: true
@@ -56,7 +56,7 @@ Creator.Objects.permission_objects =
 					if k != "default" and (!_.has(f, "shared") || f.shared)
 						_options.push {label: f.label || f.name || k, value: f._id}
 				return _options
-		actions:
+		disabled_actions:
 			type: "lookup"
 			label:'操作'
 			multiple: true
@@ -69,7 +69,7 @@ Creator.Objects.permission_objects =
 				_.forEach actions, (f, k)->
 					_options.push {label: f.label || k, value: k}
 				return _options
-		readable_fields:
+		unreadable_fields:
 			type: "lookup"
 			label:'可见字段'
 			multiple: true
@@ -82,7 +82,7 @@ Creator.Objects.permission_objects =
 				_.forEach fields, (f, k)->
 					_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
-		editable_fields:
+		uneditable_fields:
 			type: "lookup"
 			label:'可编辑字段'
 			multiple: true
@@ -95,7 +95,7 @@ Creator.Objects.permission_objects =
 				_.forEach fields, (f, k)->
 					_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
-		related_objects:
+		unrelated_objects:
 			type: "lookup"
 			label:'关联对象'
 			multiple: true

@@ -261,9 +261,9 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 		return related_object_names
 
 	permissions = Creator.getPermissions(object_name, spaceId, userId)
-	permission_related_objects = permissions.related_objects
+	unrelated_objects = permissions.unrelated_objects
 
-	related_object_names = _.difference related_object_names, permission_related_objects
+	related_object_names = _.difference related_object_names, unrelated_objects
 	return _.filter _object.related_objects, (related_object)->
 		return related_object_names.indexOf(related_object.object_name) > -1
 
@@ -286,12 +286,11 @@ Creator.getActions = (object_name, spaceId, userId)->
 		return
 
 	permissions = Creator.getPermissions(object_name, spaceId, userId)
-	permission_actions = permissions.actions
+	disabled_actions = permissions.disabled_actions
 	actions = _.sortBy(_.values(obj.actions) , 'sort');
 
-	# if permission_actions
 	actions = _.filter actions, (action)->
-		return _.indexOf(permission_actions, action.name) < 0
+		return _.indexOf(disabled_actions, action.name) < 0
 	
 	return actions
 
@@ -313,13 +312,13 @@ Creator.getListViews = (object_name, spaceId, userId)->
 	if !object
 		return
 
-	permission_list_views = Creator.getPermissions(object_name, spaceId, userId).list_views
+	disabled_list_views = Creator.getPermissions(object_name, spaceId, userId).disabled_list_views || []
 
 	list_views = []
 
 	_.each object.list_views, (item, item_name)->
 		if item_name != "default"
-			if _.isEmpty(permission_list_views) || _.indexOf(permission_list_views, item_name) < 0 || item.owner == userId
+			if _.indexOf(disabled_list_views, item_name) < 0 || item.owner == userId
 				list_views.push item
 	
 	return list_views
@@ -335,8 +334,8 @@ Creator.getFields = (object_name, spaceId, userId)->
 			userId = Meteor.userId()
 
 	fields = Creator.getObject(object_name).fields
-	permission_fields =  Creator.getPermissions(object_name, spaceId, userId).readable_fields
-	return _.difference(_.keys(fields), permission_fields)
+	unreadable_fields =  Creator.getPermissions(object_name, spaceId, userId).unreadable_fields
+	return _.difference(_.keys(fields), unreadable_fields)
 
 Creator.isloading = ()->
 	return Creator.isLoadingSpace.get()

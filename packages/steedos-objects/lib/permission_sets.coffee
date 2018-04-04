@@ -73,11 +73,11 @@ if Meteor.isServer
 				opsetAdmin.allowRead = posAdmin.allowRead
 				opsetAdmin.modifyAllRecords = posAdmin.modifyAllRecords
 				opsetAdmin.viewAllRecords = posAdmin.viewAllRecords
-				opsetAdmin.list_views = posAdmin.list_views
-				opsetAdmin.actions = posAdmin.actions
-				opsetAdmin.readable_fields = posAdmin.readable_fields
-				opsetAdmin.editable_fields = posAdmin.editable_fields
-				opsetAdmin.related_objects = posAdmin.related_objects
+				opsetAdmin.disabled_list_views = posAdmin.disabled_list_views
+				opsetAdmin.disabled_actions = posAdmin.disabled_actions
+				opsetAdmin.unreadable_fields = posAdmin.unreadable_fields
+				opsetAdmin.uneditable_fields = posAdmin.uneditable_fields
+				opsetAdmin.unrelated_objects = posAdmin.unrelated_objects
 		if psetsUser
 			posUser = Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: psetsUser._id})
 			if posUser
@@ -87,11 +87,11 @@ if Meteor.isServer
 				opsetUser.allowRead = posUser.allowRead
 				opsetUser.modifyAllRecords = posUser.modifyAllRecords
 				opsetUser.viewAllRecords = posUser.viewAllRecords
-				opsetUser.list_views = posUser.list_views
-				opsetUser.actions = posUser.actions
-				opsetUser.readable_fields = posUser.readable_fields
-				opsetUser.editable_fields = posUser.editable_fields
-				opsetUser.related_objects = posUser.related_objects
+				opsetUser.disabled_list_views = posUser.disabled_list_views
+				opsetUser.disabled_actions = posUser.disabled_actions
+				opsetUser.unreadable_fields = posUser.unreadable_fields
+				opsetUser.uneditable_fields = posUser.uneditable_fields
+				opsetUser.unrelated_objects = posUser.unrelated_objects
 
 		if !userId
 			permissions = opsetAdmin
@@ -121,18 +121,18 @@ if Meteor.isServer
 				if po.viewAllRecords
 					permissions.viewAllRecords = true
 
-				permissions.list_views = unionPlus(permissions.list_views, po.list_views)
-				permissions.actions = unionPlus(permissions.actions, po.actions)
-				permissions.readable_fields = unionPlus(permissions.readable_fields, po.readable_fields)
-				permissions.editable_fields = unionPlus(permissions.editable_fields, po.editable_fields)
-				permissions.related_objects = unionPlus(permissions.related_objects, po.related_objects)
+				permissions.disabled_list_views = unionPlus(permissions.disabled_list_views, po.disabled_list_views)
+				permissions.disabled_actions = unionPlus(permissions.disabled_actions, po.disabled_actions)
+				permissions.unreadable_fields = unionPlus(permissions.unreadable_fields, po.unreadable_fields)
+				permissions.uneditable_fields = unionPlus(permissions.uneditable_fields, po.uneditable_fields)
+				permissions.unrelated_objects = unionPlus(permissions.unrelated_objects, po.unrelated_objects)
 
 		if object.is_view
 			permissions.allowCreate = false
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 			permissions.modifyAllRecords = false
-			permissions.actions = []
+			permissions.disabled_actions = []
 
 		Creator.processPermissions permissions
 		return permissions
