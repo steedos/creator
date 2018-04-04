@@ -86,14 +86,15 @@ Creator.Objects.permission_objects =
 			type: "lookup"
 			label:'不可编辑字段'
 			multiple: true
-			depend_on: ["object_name"]
+			depend_on: ["object_name", "unreadable_fields"]
 			optionsFunction: (values)->
 				_options = []
 				_object = Creator.getObject(values.object_name)
 				fields = _object.fields
 				icon = _object.icon
 				_.forEach fields, (f, k)->
-					_options.push {label: f.label || k, value: k, icon: icon}
+					if _.indexOf(values.unreadable_fields, k) < 0 
+						_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
 		unrelated_objects:
 			type: "lookup"
