@@ -26,6 +26,7 @@ Creator.Objects.qhd_informations =
 				return company
 		content:
 			type:"textarea",
+			rows: 8
 			label:"内容"
 			searchable:true
 			required: true
