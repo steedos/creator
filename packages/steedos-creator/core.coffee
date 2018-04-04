@@ -324,7 +324,7 @@ Creator.getListViews = (object_name, spaceId, userId)->
 	
 	return list_views
 
-# 理论上不应该调用该函数，因为字段的权限都在Creator.getObject(object_name).fields的相关属性中有标识了
+# 前台理论上不应该调用该函数，因为字段的权限都在Creator.getObject(object_name).fields的相关属性中有标识了
 Creator.getFields = (object_name, spaceId, userId)->
 	if Meteor.isClient
 		if !object_name

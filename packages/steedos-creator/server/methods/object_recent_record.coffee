@@ -31,12 +31,12 @@ search_object = (space, object_name,userId, searchText)->
 				query_or = []
 				_object_name_key = _object.NAME_FIELD_KEY
 				objFields = Creator.getObject(object_name).fields
-				read_fields = permissions.readable_fields
+				permission_fields = permissions.readable_fields || []
 				fields = {_id: 1}
 				_.each objFields, (field,field_name)->
 					if field.searchable
 						subquery = {}
-						if read_fields.indexOf(field_name)> -1
+						if permission_fields.indexOf(field_name) < 0
 							fields[field_name] = 1
 							if field.is_name
 								_object_name_key = field_name
