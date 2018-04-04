@@ -26,7 +26,7 @@ Creator.Objects.permission_objects =
 
 		allowRead: 
 			type: "boolean"
-			label: "查看我的记录",
+			label: "允许查看",
 		allowCreate: 
 			label: "允许创建",
 			type: "boolean"
@@ -44,7 +44,7 @@ Creator.Objects.permission_objects =
 			label: "修改所有记录",
 		disabled_list_views:
 			type: "lookup"
-			label:'列表视图'
+			label:'禁用列表视图'
 			multiple: true
 			depend_on: ["object_name"]
 			defaultIcon: "lead_list"
@@ -58,7 +58,7 @@ Creator.Objects.permission_objects =
 				return _options
 		disabled_actions:
 			type: "lookup"
-			label:'操作'
+			label:'禁用操作'
 			multiple: true
 			depend_on: ["object_name"]
 			defaultIcon: "marketing_actions"
@@ -71,7 +71,7 @@ Creator.Objects.permission_objects =
 				return _options
 		unreadable_fields:
 			type: "lookup"
-			label:'可见字段'
+			label:'不可见字段'
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
@@ -84,7 +84,7 @@ Creator.Objects.permission_objects =
 				return _options
 		uneditable_fields:
 			type: "lookup"
-			label:'可编辑字段'
+			label:'不可编辑字段'
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
@@ -97,7 +97,7 @@ Creator.Objects.permission_objects =
 				return _options
 		unrelated_objects:
 			type: "lookup"
-			label:'关联对象'
+			label:'禁用关联对象'
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
