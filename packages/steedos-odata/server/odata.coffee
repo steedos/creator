@@ -133,15 +133,17 @@ Meteor.startup ->
 		get: ()->
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
-				statusCode: 401
-				body = setErrorMessage(401)
-				return body
-
+				return {
+					statusCode: 401
+					body:setErrorMessage(401)
+				}
 			collection = Creator.Collections[key]
 			if not collection
-				statusCode: 404
-				body = setErrorMessage(404,collection,key)
-				return body
+				return {
+					statusCode: 404
+					body:setErrorMessage(404,collection,key)
+				}
+				
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.viewAllRecords or (permissions.allowRead and @userId)
 				qs = decodeURIComponent(querystring.stringify(@queryParams))
@@ -197,24 +199,31 @@ Meteor.startup ->
 					headers['OData-Version'] = SteedosOData.VERSION
 					{body: body, headers: headers}
 				else
-					statusCode: 404
-					body  = setErrorMessage(404,collection,key)
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
 			else
-				statusCode: 403
-				body  = setErrorMessage(403,collection,key,"get")
+				return{
+					statusCode: 403
+					body: setErrorMessage(403,collection,key,"get")
+				}
+				
 		post: ()->
 			try
 				key = @urlParams.object_name
 				if not Creator.objectsByName[key]?.enable_api
-					statusCode: 401
-					body = setErrorMessage(401)
-					return body
+					return {
+						statusCode: 401
+						body:setErrorMessage(401)
+				}
 
 				collection = Creator.Collections[key]
 				if not collection
-					statusCode: 404
-					body = setErrorMessage(404,collection,key)
-					return body
+					return {
+						statusCode: 404
+						body:setErrorMessage(404,collection,key)
+					}
 
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				if permissions.allowCreate
@@ -233,27 +242,36 @@ Meteor.startup ->
 						headers['OData-Version'] = SteedosOData.VERSION
 						{body: body, headers: headers}
 					else
-						statusCode: 404
-						body = setErrorMessage(404,collection,key,'post')
+						return{
+							statusCode: 404
+							body: setErrorMessage(404,collection,key,'post')
+						}
 				else
-					statusCode: 403
-					body  = setErrorMessage(403,collection,key,'post')
+					return{
+						statusCode: 403
+						body: setErrorMessage(403,collection,key,'post')
+					}
 			catch e
-				console.log e
+				return {
+					statusCode: 500
+					body:e
+				}
 
 	})
 	SteedosOdataAPI.addRoute(':object_name/recent', {authRequired: true, spaceRequired: false}, {
 		get:()->
 			key = @urlParams.object_name
 			if not Creator.objectsByName[key]?.enable_api
-				statusCode: 401
-				body = setErrorMessage(401)
-				return body
+				return{
+					statusCode: 401
+					body: setErrorMessage(401)
+				}
 			collection = Creator.Collections[key]
 			if not collection
-				statusCode: 404
-				body = setErrorMessage(404,collection,key)
-				return body
+				return {
+					statusCode: 404
+					body: setErrorMessage(404,collection,key)
+				}
 			permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 			if permissions.allowRead
 				recent_view_collection = Creator.Collections["object_recent_viewed"]
@@ -300,11 +318,15 @@ Meteor.startup ->
 					headers['OData-Version'] = SteedosOData.VERSION
 					{body: body, headers: headers}
 				else
-					statusCode: 404
-					body  = setErrorMessage(404,collection,key,'get')
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key,'get')
+					}
 			else
-				statusCode: 403
-				body  = setErrorMessage(403,collection,key,'get')
+				return{
+					statusCode: 403
+					body: setErrorMessage(403,collection,key,'get')
+				}
 	})
 
 	SteedosOdataAPI.addRoute(':object_name/:_id', {authRequired: true, spaceRequired: false}, {
@@ -312,15 +334,16 @@ Meteor.startup ->
 			try
 				key = @urlParams.object_name
 				if not Creator.objectsByName[key]?.enable_api
-					statusCode: 401
-					body = setErrorMessage(401)
-					return body
+					return{
+						statusCode: 401
+						body: setErrorMessage(401)
+					}
 				collection = Creator.Collections[key]
 				if not collection
-					statusCode: 404
-					body = setErrorMessage(404,collection,key)
-					return body
-
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				if permissions.allowCreate
 					@bodyParams.space = @urlParams.spaceId
@@ -338,13 +361,21 @@ Meteor.startup ->
 						headers['OData-Version'] = SteedosOData.VERSION
 						{body: body, headers: headers}
 					else
-						statusCode: 404
-						body = setErrorMessage(404,collection,key,'post')
+						return{
+							statusCode: 404
+							body: setErrorMessage(404,collection,key,'post')
+						}
 				else
-					statusCode: 403
-					body  = setErrorMessage(403,collection,key,'post')
+					return{
+						statusCode: 403
+						body: setErrorMessage(403,collection,key,'post')
+					}
 			catch e
-				console.log e
+				body = e
+				return{
+					statusCode:500
+					body:body
+				}
 		get:()->
 
 			key = @urlParams.object_name
@@ -395,15 +426,16 @@ Meteor.startup ->
 			else
 
 				if not Creator.objectsByName[key]?.enable_api
-					statusCode: 401
-					body = setErrorMessage(401)
-					return body
-
+					return {
+						statusCode: 401
+						body: setErrorMessage(401)
+					}
 				collection = Creator.Collections[key]
 				if not collection
-					statusCode: 404
-					body = setErrorMessage(404,collection,key)
-					return body
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
 
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				if permissions.allowRead
@@ -437,27 +469,35 @@ Meteor.startup ->
 							headers['OData-Version'] = SteedosOData.VERSION
 							{body: body, headers: headers}
 						else
-							statusCode: 403
-							body  = setErrorMessage(403,collection,key,'get')
+							return{
+								statusCode: 403
+								body: setErrorMessage(403,collection,key,'get')
+							}
 					else
-						statusCode: 404
-						body  = setErrorMessage(404,collection,key,'get')
+						return{
+							statusCode: 404
+							body: setErrorMessage(404,collection,key,'get')
+						}
 				else
-					statusCode: 403
-					body  = setErrorMessage(403,collection,key,'get')
+					return{
+						statusCode: 403
+						body: setErrorMessage(403,collection,key,'get')
+					}
 		put:()->
 			try
 				key = @urlParams.object_name
 				if not Creator.objectsByName[key]?.enable_api
-					statusCode: 401
-					body = setErrorMessage(401)
-					return body
+					return{
+						statusCode: 401
+						body: setErrorMessage(401)
+					}
 
 				collection = Creator.Collections[key]
 				if not collection
-					statusCode: 404
-					body = setErrorMessage(404,collection,key)
-					return body
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
 				if permissions.modifyAllRecords or (permissions.allowEdit and record_owner==@userId )
@@ -481,32 +521,41 @@ Meteor.startup ->
 							headers['OData-Version'] = SteedosOData.VERSION
 							{body: body, headers: headers}
 						else
-							statusCode: 404
-							body  = setErrorMessage(404,collection,key)
-							return body
+							return{
+								statusCode: 404
+								body: setErrorMessage(404,collection,key)
+							}
 					else
-						statusCode: 403
-						body  = setErrorMessage(403,collection,key,'put')
-						return body
+						return{
+							statusCode: 403
+							body: setErrorMessage(403,collection,key,'put')
+						}
 				else
-					statusCode: 403
-					body  = setErrorMessage(403,collection,key,'put')
-					return body
+					return{
+						statusCode: 403
+						body: setErrorMessage(403,collection,key,'put')
+					}
 			catch e
-				console.log e
+				body = e
+				return{
+					statusCode:500
+					body:body
+				}
 		delete:()->
 			try
 				key = @urlParams.object_name
 				if not Creator.objectsByName[key]?.enable_api
-					statusCode: 401
-					body = setErrorMessage(401)
-					return body
-
+					return{
+						statusCode: 401
+						body: setErrorMessage(401)
+						}
+					
 				collection = Creator.Collections[key]
 				if not collection
-					statusCode: 404
-					body = setErrorMessage(404,collection,key)
-					return body
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
 				if permissions.modifyAllRecords or (permissions.allowDelete and record_owner==@userId )
@@ -514,15 +563,19 @@ Meteor.startup ->
 					if collection.remove selector
 						{status: 'success', message: 'Item removed'}
 					else
-						statusCode: 404
-						body  = setErrorMessage(404,collection,key)
-						return body
+						return{
+							statusCode: 404
+							body: setErrorMessage(404,collection,key)
+						}
 				else
-					statusCode: 403
-					body  = setErrorMessage(403,collection,key)
-					return body
+					return {
+						statusCode: 403
+						body: setErrorMessage(403,collection,key)
+					}
 			catch e
-				console.log e
+				return{
+					statusCode: 404
+					body:e }
 	})
 	
 	#TODO remove
