@@ -122,6 +122,7 @@ Creator.Objects.objects =
 				if modifier?.$set?.name && doc.name != modifier.$set.name
 					console.log "不能修改name"
 					throw new Meteor.Error 500, "不能修改name"
+				doc.custom = true
 
 		"after.insert.server.objects":
 			on: "server"
