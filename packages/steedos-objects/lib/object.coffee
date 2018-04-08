@@ -123,6 +123,8 @@ Creator.Object = (options)->
 					if _.indexOf(permissions.uneditable_fields, field_name) > -1
 						field.readonly = true
 						field.disabled = true
+						# 当只读时，如果不去掉必填字段，autoform是会报错的
+						field.required = false
 					else
 						field.readonly = false
 						field.disabled = false
