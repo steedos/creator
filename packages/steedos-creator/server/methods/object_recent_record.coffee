@@ -32,14 +32,17 @@ search_object = (space, object_name,userId, searchText)->
 				_object_name_key = _object.NAME_FIELD_KEY
 				objFields = Creator.getObject(object_name).fields
 				unreadable_fields = permissions.unreadable_fields || []
-				fields = {_id: 1}
+				permissions_fields = {}
 				_.each objFields, (field,field_name)->
+					if unreadable_fields.indexOf(field_name) < 0
+						permissions_fields[field_name] = field					
+				fields = {_id: 1}
+				_.each permissions_fields, (field,field_name)->
 					if field.searchable
 						subquery = {}
-						if unreadable_fields.indexOf(field_name) < 0
-							fields[field_name] = 1
-							if field.is_name
-								_object_name_key = field_name
+						fields[field_name] = 1
+						if field.is_name
+							_object_name_key = field_name
 						search_Keywords = searchText.trim().split(" ")
 						search_Keywords.forEach (keyword)->
 							keyword = Creator.convertSpecialCharacter(keyword)
@@ -51,6 +54,7 @@ search_object = (space, object_name,userId, searchText)->
 					if not permissions.viewAllRecords
 						if permissions.allowRead
 							query.owner = userId
+				if object_name == "qhd_informations"
 					records = _object_collection.find(query, {fields: fields, sort: {modified: -1}, limit: 5}).fetch()
 					records.forEach (record)->
 						data.push {_id: record._id, _name: record[_object_name_key], _object_name: object_name}
