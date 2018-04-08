@@ -48,8 +48,8 @@ Creator.loadObjects = (obj, object_name)->
 
 	Creator.initTriggers(object_name)
 	Creator.initListViews(object_name)
-	if Meteor.isServer
-		Creator.initPermissions(object_name)
+	# if Meteor.isServer
+	# 	Creator.initPermissions(object_name)
 
 
 Creator.getTable = (object_name)->

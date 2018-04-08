@@ -138,38 +138,38 @@ if Meteor.isServer
 		return permissions
 
 
-	Creator.initPermissions = (object_name) ->
+	# Creator.initPermissions = (object_name) ->
 
-		# 应该把计算出来的
-		Creator.Collections[object_name].allow
-			insert: (userId, doc) ->
-				if !userId 
-					return false
-				if !doc.space
-					return false
-				permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
-				if !permissions.allowCreate
-					return false
+		# # 应该把计算出来的
+		# Creator.Collections[object_name].allow
+		# 	insert: (userId, doc) ->
+		# 		if !userId 
+		# 			return false
+		# 		if !doc.space
+		# 			return false
+		# 		permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
+		# 		if !permissions.allowCreate
+		# 			return false
 
-				return true
-			update: (userId, doc) ->
-				if !userId 
-					return false
-				if !doc.space
-					return false
-				permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
-				if !permissions.allowEdit
-					return false
-				return true
-			remove: (userId, doc) ->
-				if !userId 
-					return false
-				if !doc.space
-					return false
-				permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
-				if !permissions.allowDelete
-					return false
-				return true
+		# 		return true
+		# 	update: (userId, doc) ->
+		# 		if !userId 
+		# 			return false
+		# 		if !doc.space
+		# 			return false
+		# 		permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
+		# 		if !permissions.allowEdit
+		# 			return false
+		# 		return true
+		# 	remove: (userId, doc) ->
+		# 		if !userId 
+		# 			return false
+		# 		if !doc.space
+		# 			return false
+		# 		permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
+		# 		if !permissions.allowDelete
+		# 			return false
+		# 		return true
 
 	Meteor.methods
 		# Calculate Permissions on Server
