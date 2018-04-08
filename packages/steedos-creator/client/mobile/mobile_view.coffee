@@ -243,22 +243,9 @@ Template.mobileView.events
 		template.action_collection_name.set(object.label)
 		if this.name == "standard_delete"
 			Session.set "reload_dxlist", false
-			swal
-				title: "删除#{object.label}"
-				text: "<div class='delete-creator-warning'>是否确定要删除此#{object.label}？</div>"
-				html: true
-				showCancelButton:true
-				confirmButtonText: t('Delete')
-				cancelButtonText: t('Cancel')
-				(option) ->
-					if option
-						Creator.Collections[object_name].remove {_id: record_id}, (error, result) ->
-							if error
-								toastr.error error.reason
-							else
-								Session.set "reload_dxlist", true
-								toastr.success "删除成功"
-								template.$(".mobile-view-back").click()
+			Creator.executeAction object_name, this, record_id, null, ()->
+				Session.set "reload_dxlist", true
+				template.$(".mobile-view-back").click()
 		else
 			Creator.executeAction object_name, this, record_id
 

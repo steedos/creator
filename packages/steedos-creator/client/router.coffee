@@ -61,6 +61,7 @@ FlowRouter.route '/app/:app_id/search/:search_text',
 	action: (params, queryParams)->
 		Session.set("app_id", FlowRouter.getParam("app_id"))
 		Session.set("search_text", FlowRouter.getParam("search_text"))
+		Session.set("record_id", null) #有的地方会响应Session中record_id值，如果不清空可能会有异常现象，比如删除搜索结果中的记录后会跳转到记录对应的object的列表
 		BlazeLayout.render Creator.getLayout(),
 			main: "record_search_list"
 
