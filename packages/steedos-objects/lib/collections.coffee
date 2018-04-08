@@ -1,9 +1,9 @@
 Meteor.startup ()->
 	if Meteor.isServer
 		creator_db_url = process.env.MONGO_URL_CREATOR
-		console.log "creator_db_url", creator_db_url
+		console.log "MONGO_URL_CREATOR", creator_db_url
 		oplog_url = process.env.MONGO_OPLOG_URL_CREATOR
-		console.log "oplog_url", oplog_url
+		console.log "MONGO_OPLOG_URL_CREATOR", oplog_url
 		if creator_db_url
 			if !oplog_url
 				throw new Meteor.Error(500, "Please configure environment variables: MONGO_OPLOG_URL_CREATOR")
