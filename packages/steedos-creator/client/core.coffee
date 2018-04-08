@@ -53,7 +53,14 @@ Creator.removeRecord = (object_name,record_id,callback)->
 				toastr?.success?(t("afModal_remove_suc"))
 
 		error: (jqXHR, textStatus, errorThrown) ->
-			console.log(errorThrown)
+			error = jqXHR.responseJSON
+			console.error error
+			if error.reason
+				toastr?.error?(TAPi18n.__(error.reason))
+			else if error.message
+				toastr?.error?(TAPi18n.__(error.message))
+			else
+				toastr?.error?(error)
 
 if Meteor.isClient
 	# 定义全局变量以Session.get("object_name")为key记录其选中的记录id集合
