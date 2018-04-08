@@ -34,6 +34,7 @@ Creator.Objects.apps =
 			type: "boolean"
 		sort:
 			type: "number"
+			defaultValue: 9100
 		secret:
 			type: String
 			max: 16

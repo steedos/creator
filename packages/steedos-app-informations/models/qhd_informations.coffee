@@ -26,6 +26,7 @@ Creator.Objects.qhd_informations =
 				return company
 		content:
 			type:"textarea",
+			rows: 8
 			label:"内容"
 			searchable:true
 			required: true
@@ -131,4 +132,4 @@ Creator.Objects.qhd_informations =
 							score = score + 5
 						else if point == '专报信息'
 							score = score + 10
-					Creator.Collections['qhd_informations'].direct.update({_id:doc._id},{$set:{score:score}})
+				Creator.Collections['qhd_informations'].direct.update({_id:doc._id},{$set:{score:score}})

@@ -97,8 +97,9 @@ MeteorModel = (function() {
                 
                 try {
                     // 有效期（默认一小时）
-                    var clientObj = this.clientsCollection.findOne({clientId: clientId});
-                    if(clientObj && clientObj.expires>1){
+                    var collection = this.clientsCollection;
+                    var clientObj = collection.findOne({clientId: clientId});
+                    if(clientObj && clientObj.expires && clientObj.expires>1){
                         expires.setHours(expires.getHours()+clientObj.expires-1);
                     }
                     var tokenId = this.accessTokenCollection.insert({

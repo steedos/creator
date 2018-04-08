@@ -206,3 +206,11 @@ Meteor.startup ->
 			$(".list-table-container table.dataTable thead th").each ->
 				width = $(this).outerWidth()
 				$(".slds-th__action", this).css("width", "#{width}px")
+
+	$(document).keydown (e) ->
+		if e.keyCode == "13" or e.key == "Enter"
+			if e.target.tagName != "TEXTAREA"
+				if Session.get("cmOperation") == "update"
+					$(".creator-auotform-modals .btn-update").click()
+				else if Session.get("cmOperation") == "insert"
+					$(".creator-auotform-modals .btn-insert").click()
