@@ -141,7 +141,7 @@ Creator.Objects.objects =
 				documents = object_collections.find({},{fields: {_id: 1}})
 
 				if documents.count() > 0
-					throw new Meteor.Error 500, "对象中已经有记录，请先删除记录后， 再删除此对象"
+					throw new Meteor.Error 500, "对象(#{doc.name})中已经有记录，请先删除记录后， 再删除此对象"
 
 		"after.remove.server.objects":
 			on: "server"
@@ -164,4 +164,4 @@ Creator.Objects.objects =
 					Creator.getCollection(doc.name)._collection.dropCollection()
 				catch e
 					console.error("#{e.stack}")
-					throw new Meteor.Error 500, "对象不存在或已被删除"
+					throw new Meteor.Error 500, "对象(#{doc.name})不存在或已被删除"
