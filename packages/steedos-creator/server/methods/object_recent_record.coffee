@@ -54,7 +54,6 @@ search_object = (space, object_name,userId, searchText)->
 					if not permissions.viewAllRecords
 						if permissions.allowRead
 							query.owner = userId
-				if object_name == "qhd_informations"
 					records = _object_collection.find(query, {fields: fields, sort: {modified: -1}, limit: 5}).fetch()
 					records.forEach (record)->
 						data.push {_id: record._id, _name: record[_object_name_key], _object_name: object_name}
