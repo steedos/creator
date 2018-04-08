@@ -67,7 +67,8 @@ Creator.Objects.permission_objects =
 				_object = Creator.getObject(values.object_name)
 				actions = _object.actions
 				_.forEach actions, (f, k)->
-					_options.push {label: f.label || k, value: k}
+					if ["standard_new", "standard_edit", "standard_delete"].indexOf(k) < 0
+						_options.push {label: f.label || k, value: k}
 				return _options
 		unreadable_fields:
 			type: "lookup"
