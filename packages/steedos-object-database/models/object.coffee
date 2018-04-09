@@ -44,7 +44,7 @@ Creator.Objects.objects =
 		is_view:
 			type: 'boolean'
 			defaultValue: false
-			hidden: true
+			omit: true
 		description: 
 			label: "Description"
 			type: "textarea"
@@ -71,7 +71,7 @@ Creator.Objects.objects =
 			hidden: true
 		custom:
 			type: "boolean"
-			hidden: true
+			omit: true
 		owner: 
 			hidden: true
 
