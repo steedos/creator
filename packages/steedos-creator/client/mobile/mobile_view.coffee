@@ -6,13 +6,13 @@ Template.mobileView.onRendered ->
 	self = this
 
 	self.$(".mobile-view").removeClass "hidden"
-	self.$(".mobile-view").animateCss "fadeInRight"
+	self.$(".mobile-view").animateCss "fadeInRight", ->
 
-	self.autorun ->
-		object_name = Template.instance().data.object_name
-		record_id = Template.instance().data.record_id
-		if object_name and record_id
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], {}
+		self.autorun ->
+			object_name = self.data.object_name
+			record_id = self.data.record_id
+			if object_name and record_id
+				Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], {}
 
 
 	# 此处不使用method而是使用订阅去获取相关object的record，避免添加数据之后，前台获取的数据条数没有发生变化
