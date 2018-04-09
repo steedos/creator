@@ -16,15 +16,13 @@ Creator.Objects.permission_objects =
 			reference_to: "permission_set"
 		object_name:
 			label: "对象",
-			type: "master_detail"
-			reference_to: "objects"
+			type: "lookup"
 			required: true
 			optionsFunction: ()->
 				_options = []
-				_.forEach Creator.Objects, (o, k)->
+				_.forEach Creator.objectsByName, (o, k)->
 					_options.push {label: o.label, value: k, icon: o.icon}
 				return _options
-
 		allowRead: 
 			type: "boolean"
 			label: "允许查看",
