@@ -523,12 +523,10 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 
 	var filterQuery = {};
 
-	if (this.dependOn && this.dependValues.get()) {
-		if (this.filtersFunction && _.isFunction(this.filtersFunction)) {
-			filterQuery = this.filtersFunction(this.filters, this.dependValues.get());
-		} else {
-			filterQuery = this.getFiltersSelectors();
-		}
+	if (this.filtersFunction && _.isFunction(this.filtersFunction)) {
+		filterQuery = this.filtersFunction(this.filters, this.dependValues.get());
+	} else {
+		filterQuery = this.getFiltersSelectors();
 	}
 
 	var searchVal = {
