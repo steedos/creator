@@ -19,7 +19,12 @@ Creator.Objects.apps =
 		icon:
 			type: "text"
 		icon_slds:
-			type: "text"
+			type: "lookup"
+			optionsFunction: ()->
+				options = []
+				_.forEach Creator.resources.sldsIcons.standard, (svg)->
+					options.push {value: svg, label: svg, icon: svg}
+				return options
 		objects:
 			label: "对象"
 			type: "lookup"
