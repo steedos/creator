@@ -76,12 +76,16 @@ Creator.Objects.permission_objects =
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
+				object_name = values.object_name
+				unless object_name
+					return []
 				_options = []
-				_object = Creator.getObject(values.object_name)
+				_object = Creator.getObject(object_name)
 				fields = _object.fields
 				icon = _object.icon
 				_.forEach fields, (f, k)->
-					_options.push {label: f.label || k, value: k, icon: icon}
+					unless f.omit
+						_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
 		uneditable_fields:
 			type: "lookup"
@@ -89,13 +93,17 @@ Creator.Objects.permission_objects =
 			multiple: true
 			depend_on: ["object_name", "unreadable_fields"]
 			optionsFunction: (values)->
+				object_name = values.object_name
+				unless object_name
+					return []
 				_options = []
-				_object = Creator.getObject(values.object_name)
+				_object = Creator.getObject(object_name)
 				fields = _object.fields
 				icon = _object.icon
 				_.forEach fields, (f, k)->
-					if _.indexOf(values.unreadable_fields, k) < 0 
-						_options.push {label: f.label || k, value: k, icon: icon}
+					unless f.omit
+						if _.indexOf(values.unreadable_fields, k) < 0 
+							_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
 		unrelated_objects:
 			type: "lookup"
