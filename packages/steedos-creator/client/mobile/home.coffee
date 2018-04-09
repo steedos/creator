@@ -7,11 +7,13 @@ Template.homeMenu.helpers
 		apps = []
 		_.each Creator.Apps, (v, k)->
 			if v.visible != false
-				if v.url
-					v.url = Steedos.absoluteUrl(v.url)
-				else if v._id
+				if v._id
 					v.url = Steedos.absoluteUrl("/app/#{v._id}/");
 				
 				apps.push v
 		
 		return apps
+
+Template.homeMenu.events
+	'click .go-admin-menu': (event, template)->
+		FlowRouter.go(Steedos.absoluteUrl '/admin')
