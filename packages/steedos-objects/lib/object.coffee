@@ -119,7 +119,8 @@ Creator.Object = (options)->
 		_.each self.fields, (field, field_name)->
 			if field and !field.omit
 				if _.indexOf(permissions.unreadable_fields, field_name) < 0
-					field.hidden = false
+					if field.hidden
+						return
 					if _.indexOf(permissions.uneditable_fields, field_name) > -1
 						field.readonly = true
 						field.disabled = true
