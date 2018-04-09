@@ -171,13 +171,15 @@ Meteor.startup ->
 							createQuery.limit = 1000
 				else
 					createQuery.limit = 10
+				unreadable_fields = permissions.unreadable_fields || []
 				if createQuery.projection
 					projection = {}
 					_.keys(createQuery.projection).forEach (key)->
-						if _.indexOf(permissions.readable_fields,key)>-1
+						if _.indexOf(unreadable_fields, key) < 0
 							projection[key] = 1
 				if not createQuery.projection or !_.size(createQuery.projection)
-					_.each permissions.readable_fields,(field)->
+					readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
+					_.each readable_fields,(field)->
 						createQuery.projection[field] = 1
 				if not permissions.viewAllRecords
 					createQuery.query.owner = @userId
@@ -439,6 +441,7 @@ Meteor.startup ->
 
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				if permissions.allowRead
+					unreadable_fields = permissions.unreadable_fields || []
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 					createQuery.query._id =  @urlParams._id
@@ -449,10 +452,11 @@ Meteor.startup ->
 					if createQuery.projection
 						projection = {}
 						_.keys(createQuery.projection).forEach (key)->
-							if _.indexOf(permissions.readable_fields,key)>-1
+							if _.indexOf(unreadable_fields, key) < 0
 								projection[key] = 1
 					if not createQuery.projection or !_.size(createQuery.projection)
-						_.each permissions.readable_fields,(field)->
+						readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
+						_.each readable_fields,(field)->
 							createQuery.projection[field] = 1
 					entity = collection.findOne(createQuery.query,visitorParser(createQuery))
 					entities = []
@@ -504,7 +508,7 @@ Meteor.startup ->
 					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
 					fields_editable = true
 					_.keys(@bodyParams.$set).forEach (key)->
-						if _.indexOf(permissions.editable_fields,key)<0
+						if _.indexOf(permissions.uneditable_fields, key) > -1
 							fields_editable = false
 					if fields_editable
 						entityIsUpdated = collection.update selector, @bodyParams

@@ -44,7 +44,7 @@ Creator.Objects.objects =
 		is_view:
 			type: 'boolean'
 			defaultValue: false
-			hidden: true
+			omit: true
 		description: 
 			label: "Description"
 			type: "textarea"
@@ -71,7 +71,7 @@ Creator.Objects.objects =
 			hidden: true
 		custom:
 			type: "boolean"
-			hidden: true
+			omit: true
 		owner: 
 			hidden: true
 
@@ -122,6 +122,12 @@ Creator.Objects.objects =
 				if modifier?.$set?.name && doc.name != modifier.$set.name
 					console.log "不能修改name"
 					throw new Meteor.Error 500, "不能修改name"
+				if modifier.$set
+					modifier.$set.custom = true
+
+				if modifier.$unset && modifier.$unset.custom
+					delete modifier.$unset.custom
+
 
 		"after.insert.server.objects":
 			on: "server"
@@ -141,7 +147,7 @@ Creator.Objects.objects =
 				documents = object_collections.find({},{fields: {_id: 1}})
 
 				if documents.count() > 0
-					throw new Meteor.Error 500, "对象中已经有记录，请先删除记录后， 再删除此对象"
+					throw new Meteor.Error 500, "对象(#{doc.name})中已经有记录，请先删除记录后， 再删除此对象"
 
 		"after.remove.server.objects":
 			on: "server"
@@ -160,7 +166,8 @@ Creator.Objects.objects =
 
 				#drop collection
 				console.log "drop collection", doc.name
-				Creator.getCollection(doc.name)._collection.dropCollection()
-#
-#				Creator.getCollection(doc.name).rawCollection().drop (err, client)->
-#					Creator.removeCollection(doc.name)
+				try
+					Creator.getCollection(doc.name)._collection.dropCollection()
+				catch e
+					console.error("#{e.stack}")
+					throw new Meteor.Error 500, "对象(#{doc.name})不存在或已被删除"
