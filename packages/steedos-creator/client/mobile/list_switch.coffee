@@ -73,6 +73,18 @@ Template.listSwitch.helpers
 		object_name = Template.instance().data.object_name
 		return Creator.getListViews(object_name)
 
+	allowCreate: ()->
+		object_name = Template.instance().data.object_name
+		return Creator.getPermissions(object_name).allowCreate
+
+	collection: ()->
+		object_name = Template.instance().data.object_name
+		return "Creator.Collections." + object_name
+
+	collectionName: ()->
+		object_name = Template.instance().data.object_name
+		return Creator.getObject(object_name).label
+
 	object_label: ()->
 		object_name = Template.instance().data.object_name
 		return Creator.getObject(object_name).label
@@ -100,6 +112,10 @@ Template.listSwitch.events
 				FlowRouter.go lastUrl
 			else
 				FlowRouter.go '/app/menu'
+
+	'click .add-list-item': (event, template)->
+		Session.set("reload_dxlist", false)
+		template.$(".btn-add-list-item").click()
 
 	'click .list-name': (event, template)->
 		actionSheetItems = []
@@ -144,3 +160,12 @@ Template.listSwitch.onCreated ->
 					console.log "custom_list_views",self.list_view_id.get()
 			c.stop()
 	
+AutoForm.hooks addListItem:
+	onSuccess: (formType, result)->
+		Session.set("reload_dxlist", true)
+		if result.type == "post"
+			app_id = FlowRouter._current.params.app_id
+			object_name = result.object_name
+			record_id = result._id
+			record_url = Steedos.absoluteUrl("/app/#{app_id}/#{object_name}/view/#{record_id}")
+			FlowRouter.go record_url

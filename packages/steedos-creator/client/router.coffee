@@ -130,13 +130,14 @@ objectRoutes.route '/view/:record_id',
 		object_name = FlowRouter.getParam("object_name")
 		record_id = FlowRouter.getParam("record_id")
 		data = {app_id: app_id, object_name: object_name, record_id: record_id}
+		ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
 		if Steedos.isMobile()
 			if $("#mobile_view_#{record_id}").length == 0
 				Meteor.defer ->
 					Blaze.renderWithData(Template.mobileView, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			Session.set("detail_info_visible", true)
-			ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
+			# ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
 #			Meteor.call "object_recent_viewed", FlowRouter.getParam("object_name"), FlowRouter.getParam("record_id")
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_view"
