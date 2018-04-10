@@ -44,7 +44,16 @@ Creator.Objects.apps =
 			type: String
 			max: 16
 			min: 16
-			optional: true
+			#optional: true
+		is_creator:
+			type:"boolean"
+			defaultValue:true
+	triggers:
+		"before.insert.server.apps":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				doc.is_creator = true
 	list_views:
 		default:
 			columns: ["name"]
