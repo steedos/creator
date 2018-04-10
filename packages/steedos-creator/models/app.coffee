@@ -47,17 +47,12 @@ Creator.Objects.apps =
 			#optional: true
 		is_creator:
 			type:"boolean"
-			defaultValue:true
-	triggers:
-		"before.insert.server.apps":
-			on: "server"
-			when: "before.insert"
-			todo: (userId, doc)->
-				doc.is_creator = true
+
 	list_views:
 		default:
-			columns: ["name"]
+			columns: ["name", "objects", "visible", "sort"]
 		all:
+			label: "所有应用"
 			filter_scope: "space"
 	permission_set:
 		user:
