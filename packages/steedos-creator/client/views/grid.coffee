@@ -336,6 +336,10 @@ Template.creator_grid.onRendered ->
 					current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
 					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
+					if Session.get("page_index")
+						if Session.get("page_index").object_name == curObjectName
+							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageIndex(Session.get("page_index").page_index)
+						delete Session.keys["page_index"]
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 			dxDataGridInstance.pageSize(pageSize)
 			window.dxDataGridInstance = dxDataGridInstance
@@ -381,6 +385,11 @@ Template.creator_grid.events
 			return
 		template.$("td").removeClass("slds-has-focus")
 		$(event.currentTarget).addClass("slds-has-focus")
+
+	'click .link-detail': (event, template)->
+		page_index = window.dxDataGridInstance.pageIndex()
+		object_name = Session.get("object_name")
+		Session.set 'page_index', {object_name: object_name, page_index: page_index}
 
 Template.creator_grid.onCreated ->
 	AutoForm.hooks creatorAddForm:
