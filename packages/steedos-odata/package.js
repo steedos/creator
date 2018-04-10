@@ -38,7 +38,7 @@ Package.onUse(function(api) {
 
 
 	//api.addFiles('server/routes/metadata.coffee', 'server');
-
+	api.addFiles('client/core.coffee','client');
 	api.addFiles('core.coffee');
 
 });
