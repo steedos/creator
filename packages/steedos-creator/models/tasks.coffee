@@ -62,18 +62,18 @@ Creator.Objects.tasks =
 
 	list_views:
 		default:
-			columns: ["name", "due_date", "state", "assigned_to", "related_to"]
+			columns: ["name", "due_date", "state", "assignees", "related_to"]
 		# recent:
 		# 	label: "最近查看"
 		# 	filter_scope: "space"
 		my_open_tasks:
 			label: "待办任务"
 			filter_scope: "space"
-			filters: [["assigned_to", "=", "{userId}"]]
+			filters: [["assignees", "=", "{userId}"], ["state", "<>", "completed"]]
 		my_closed_tasks:
 			label: "已办任务"
 			filter_scope: "space"
-			filters: [["assigned_to", "=", "{userId}"], ["state", "=", "completed"]]
+			filters: [["assignees", "=", "{userId}"], ["state", "=", "completed"]]
 		created_tasks:
 			label: "交办任务"
 			filter_scope: "space"
