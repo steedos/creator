@@ -265,9 +265,9 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
-			console.log "selectColumns", selectColumns
-			console.log "filter", filter
-			console.log "expand_fields", expand_fields
+			# console.log "selectColumns", selectColumns
+			# console.log "filter", filter
+			# console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			else
@@ -408,32 +408,32 @@ Template.creator_grid.onCreated ->
 				Creator.remainCheckboxState(dxDataGridInstance.$element())
 	,false
 
-Template.creator_grid.onDestroyed ->
-	#离开界面时，清除hooks为空函数
-	AutoForm.hooks creatorAddForm:
-		onSuccess: (formType, result)->
-			$('#afModal').modal 'hide'
-			if result.type == "post"
-				app_id = Session.get("app_id")
-				object_name = result.object_name
-				record_id = result._id
-				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
-				FlowRouter.go url
-	,true
-	AutoForm.hooks creatorEditForm:
-		onSuccess: (formType, result)->
-			$('#afModal').modal 'hide'
-			if result.type == "post"
-				app_id = Session.get("app_id")
-				object_name = result.object_name
-				record_id = result._id
-				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
-				FlowRouter.go url
-	,true
-	AutoForm.hooks creatorCellEditForm:
-		onSuccess: ()->
-			$('#afModal').modal 'hide'
-	,true
+# Template.creator_grid.onDestroyed ->
+# 	#离开界面时，清除hooks为空函数
+# 	AutoForm.hooks creatorAddForm:
+# 		onSuccess: (formType, result)->
+# 			$('#afModal').modal 'hide'
+# 			if result.type == "post"
+# 				app_id = Session.get("app_id")
+# 				object_name = result.object_name
+# 				record_id = result._id
+# 				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+# 				FlowRouter.go url
+# 	,true
+# 	AutoForm.hooks creatorEditForm:
+# 		onSuccess: (formType, result)->
+# 			$('#afModal').modal 'hide'
+# 			if result.type == "post"
+# 				app_id = Session.get("app_id")
+# 				object_name = result.object_name
+# 				record_id = result._id
+# 				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+# 				FlowRouter.go url
+# 	,true
+# 	AutoForm.hooks creatorCellEditForm:
+# 		onSuccess: ()->
+# 			$('#afModal').modal 'hide'
+# 	,true
 
 
 Template.creator_grid.refresh = ->
