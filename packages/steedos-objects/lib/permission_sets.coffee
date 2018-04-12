@@ -29,7 +29,7 @@ if Meteor.isServer
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1}}).fetch()
 		apps = []
 		if Creator.isSpaceAdmin(spaceId, userId)
-			psetsAdmin.assigned_apps = _.union(psetsAdmin?.assigned_apps,psetsUser?.assigned_apps)
+			psetsAdmin?.assigned_apps = _.union(psetsAdmin?.assigned_apps,psetsUser?.assigned_apps)
 			psetBase = psetsAdmin
 		else
 			psetBase = psetsUser
