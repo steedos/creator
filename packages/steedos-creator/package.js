@@ -130,6 +130,9 @@ Package.onUse(function(api) {
 	api.addFiles('models/queue_import.coffee');
 	api.addFiles('models/settings.coffee');
 
+	api.addFiles('models/object_workflows.coffee');
+	api.addFiles('models/object_fields_map.coffee');
+
 	api.addFiles('server/methods/bootstrap.coffee', 'server');
 
 	api.addFiles('server/methods/object_options.coffee', 'server');
@@ -142,6 +145,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/object_export2xml.coffee', 'server');
 	api.addFiles('server/methods/object_import_jobs.coffee', 'server');
 	api.addFiles('server/methods/related_objects_records.coffee', 'server');
+	api.addFiles('server/methods/object_workflows.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
 	api.addFiles('server/publications/object_tabular.coffee', 'server');
@@ -199,8 +203,8 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/mobile_report.coffee', 'client');
 	api.addFiles('client/mobile/switch_space.html', 'client');
 	api.addFiles('client/mobile/switch_space.coffee', 'client');
-	
-	
+
+
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
@@ -278,6 +282,8 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/odata_service.html', 'client');
 	api.addFiles('client/views/odata_service.coffee', 'client');
 
+	api.addFiles('client/views/initiate_approval.html', 'client');
+	api.addFiles('client/views/initiate_approval.coffee', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
