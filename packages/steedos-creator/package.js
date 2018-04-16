@@ -229,6 +229,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/view.coffee', 'client');
 	api.addFiles('client/views/view.less', 'client');
 	api.addFiles('client/views/app_home.html', 'client');
+	
+	api.addFiles('client/views/filter_logic.html', 'client');
+	api.addFiles('client/views/filter_logic.coffee', 'client');
+	api.addFiles('client/views/filter_logic.less', 'client');
 
 	api.addFiles('client/views/report_content.html', 'client');
 	api.addFiles('client/views/report_content.coffee', 'client');
