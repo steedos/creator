@@ -9,6 +9,8 @@ Creator.Objects.object_listviews =
 			searchable:true
 			index:true
 			required: true
+		label:
+			label: "显示名称"
 		object_name:
 			label: "对象",
 			type: "master_detail"
@@ -68,9 +70,9 @@ Creator.Objects.object_listviews =
 			when: "before.insert"
 			todo: (userId, doc)->
 				object_name = Session.get("object_name")
-				list_view = Creator.getListView(object_name, "default")
-				filter_scope = list_view.filter_scope || "space"
-				columns = list_view.columns
+				list_view = Creator.getObjectDefaultView(object_name)
+				filter_scope = list_view?.filter_scope || "space"
+				columns = list_view?.columns
 				if filter_scope == "spacex"
 					filter_scope = "space"
 				if !doc.object_name
