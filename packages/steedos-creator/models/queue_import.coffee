@@ -135,7 +135,7 @@ Creator.Objects.queue_import =
 				if Session.get("list_view_id") == "waitting"
 					importObj = Creator.Collections["queue_import"].findOne({_id:record_id})
 					space = Session.get("spaceId")
-					Meteor.call 'startImportJobs',importObj,space
+					Meteor.call 'startImportJobs',record_id,space
 					importInfo = Creator.Collections["queue_import"].findOne({_id:record_id},{fields:{total_count:1,success_count:1}})
 					text = "导入完成详细信息请在已完成视图下查看。"
 					swal(text)

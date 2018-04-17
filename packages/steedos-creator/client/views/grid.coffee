@@ -358,7 +358,6 @@ Template.creator_grid.onRendered ->
 					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 			dxDataGridInstance.pageSize(pageSize)
-			window.dxDataGridInstance = dxDataGridInstance
 			
 Template.creator_grid.helpers Creator.helpers
 
@@ -403,7 +402,7 @@ Template.creator_grid.events
 		$(event.currentTarget).addClass("slds-has-focus")
 
 	'click .link-detail': (event, template)->
-		page_index = window.dxDataGridInstance.pageIndex()
+		page_index = dxDataGridInstance.pageIndex()
 		object_name = Session.get("object_name")
 		Session.set 'page_index', {object_name: object_name, page_index: page_index}
 

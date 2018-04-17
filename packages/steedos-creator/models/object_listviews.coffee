@@ -42,13 +42,14 @@ Creator.Objects.object_listviews =
 				fields = Creator.getFields(Session.get("object_name"))
 				icon = _object.icon
 				_.forEach fields, (f)->
-					label = _object.fields[f].label
-					_options.push {label: f.label || f, value: f, icon: icon}
+					if !_object.fields[f].hidden and !_object.fields[f].omit
+						label = _object.fields[f].label
+						_options.push {label: f.label || f, value: f, icon: icon}
 				return _options
 		shared:
 			label: "共享视图到工作区"
 			type: "boolean"
-			hidden: true
+			# hidden: true
 		filters:
 			type: "[Object]"
 			omit: true
