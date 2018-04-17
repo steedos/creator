@@ -6,6 +6,8 @@ Creator.Objects.object_workflows =
 		name:
 			label: "名称"
 			type: "text"
+			required: true
+
 		object_name:
 			label: "对象"
 			type: "lookup"
@@ -21,6 +23,24 @@ Creator.Objects.object_workflows =
 			type: "lookup"
 			required: true
 			reference_to: "flows"
+
+		field_map:
+			label: "字段映射关系"
+			type: "[Object]"
+
+		"field_map.$.object_field":
+			label: "对象字段"
+			type: "String"
+
+		"field_map.$.workflow_field":
+			label: "表单字段"
+			type: "String"
+
+		sync_attachment:
+			label: "附件同步方式"
+			type: "select"
+			options: "不同步:null,同步最新版本:lastest,同步所有版本:all"
+			required: true
 
 	list_views:
 		default:
