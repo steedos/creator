@@ -6,7 +6,7 @@ Creator.baseObject =
 			reference_to: "users"
 			sortable: true
 			index: true
-			defaultValue: "{{userId}}"
+			defaultValue: "{userId}"
 		space:
 			type: "lookup"
 			reference_to: "spaces"
@@ -46,6 +46,11 @@ Creator.baseObject =
 			omit: true
 			index: true
 			hidden: true
+		sharing:
+			label: "记录级权限"
+			type: "Array"
+			hidden: true
+			blackbox: true
 
 	permission_set:
 		none:

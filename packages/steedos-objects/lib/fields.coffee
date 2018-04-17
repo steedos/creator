@@ -1,6 +1,16 @@
 Creator.getObjectSchema = (obj) ->
 	schema = {}
-	_.each obj.fields, (field, field_name)->
+
+	fieldsArr = []
+
+	_.each obj.fields , (field, field_name)->
+		if !_.has(field, "name")
+			field.name = field_name
+		fieldsArr.push field
+
+	_.each _.sortBy(fieldsArr, "sort_no"), (field)->
+
+		field_name = field.name
 
 		fs = {}
 		if field.regEx
@@ -150,7 +160,10 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = Number
 			fs.autoform.type = "steedosNumber"
 			fs.autoform.precision = field.precision || 18
-			fs.autoform.scale = field.scale || 2
+			if !field.scale && field.scale !=0
+				fs.autoform.scale = 2
+			else
+				fs.autoform.scale = field.scale
 		else if field.type == "boolean"
 			fs.type = Boolean
 			fs.autoform.type = "boolean-checkbox"
@@ -283,3 +296,19 @@ Creator.getFieldOperation = (field_type) ->
 		operations.push(optionals.equal, optionals.unequal)
 
 	return operations
+
+###
+    先按照有排序号的小的在前，大的在后
+    再将没有排序号的显示在
+###
+Creator.getObjectFieldsName = (object_name)->
+	fields = Creator.getObject(object_name)?.fields
+	fieldsArr = []
+
+	_.each fields, (field)->
+		fieldsArr.push {name: field.name, sort_no: field.sort_no}
+
+	fieldsName = []
+	_.each _.sortBy(fieldsArr, "sort_no"), (field)->
+		fieldsName.push(field.name)
+	return fieldsName

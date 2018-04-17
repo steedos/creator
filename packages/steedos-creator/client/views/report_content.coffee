@@ -153,6 +153,7 @@ getFieldLabel = (field, key)->
 	return fieldLabel
 
 pivotGridChart = null
+gridLoadedArray = null
 
 renderChart = (self)->
 	record_id = Session.get("record_id")
@@ -168,8 +169,33 @@ renderChart = (self)->
 		objectFields = Creator.getObject(objectName)?.fields
 		unless objectFields
 			return
+		unless gridLoadedArray
+			return
 		groupSums = grid._options.summary.groupItems
-		dataSourceItems = grid.getDataSource().items()
+		# dataSourceItems = grid.getDataSource().items()
+		firstRowField = _.findWhere(grid._options.columns, {groupIndex:0})
+		unless firstRowField
+			return
+		window.loadArray = gridLoadedArray
+		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray().sort(Creator.sortingMethod.bind({key:"key"}))
+		aggregateSeeds = []
+		aggregateKeys = []
+		_.each groupSums, (gs, index)->
+			aggregateSeeds.push(0)
+			aggregateKeys.push({type:gs.summaryType, column:gs.column ,value:0})
+		_.each dataSourceItems, (dsi) ->
+			_.each aggregateKeys, (ak)->
+				ak.value = 0
+			DevExpress.data.query(dsi.items).aggregate(aggregateSeeds, (total, itemData) ->
+				_.each aggregateKeys, (ak)->
+					if ak.type == "count"
+						ak.value++
+					else if ak.type == "sum"
+						ak.value += itemData[ak.column]
+				return _.map aggregateKeys, (ak)->
+					return ak.value
+			).done (result) ->
+				dsi.aggregates = result
 		chartData = []
 		chartPanes = []
 		chartSeries = []
@@ -200,8 +226,7 @@ renderChart = (self)->
 				chartData.push chartItem
 				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryType}", argumentField: tempKey
 
-
-		pivotGridChart = $("#pivotgrid-chart").show().dxChart({
+		dxOptions = 
 			dataSource: chartData, 
 			commonSeriesSettings: {
 				type: "bar"
@@ -210,7 +235,15 @@ renderChart = (self)->
 			panes: chartPanes,
 			series: chartSeries,
 			valueAxis: chartValueAxis
-		}).dxChart('instance')
+		objectGroupField = objectFields[firstRowField.dataField]
+		if objectGroupField?.type == "select"
+			dxOptions.argumentAxis =  
+				label:
+					customizeText: (data)->
+						tFieldValue = data.value
+						tFieldLabel = _.findWhere(objectGroupField.options,{value:tFieldValue})?.label
+						return if tFieldLabel then tFieldLabel else tFieldValue
+		pivotGridChart = $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart('instance')
 	else
 		grid = Tracker.nonreactive ()->
 			return self.pivotGridInstance.get()
@@ -256,6 +289,11 @@ renderTabularReport = (reportObject)->
 			caption: caption
 			dataField: item
 		}
+		if itemField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				tFieldValue = rowData[item]
+				tFieldLabel = _.findWhere(itemField.options,{value:tFieldValue})?.label
+				return if tFieldLabel then tFieldLabel else tFieldValue
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -357,6 +395,12 @@ renderSummaryReport = (reportObject)->
 			caption: itemLabel
 			dataField: item
 		}
+		if itemField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				tFieldValue = rowData[item]
+				tFieldLabel = _.findWhere(itemField.options,{value:tFieldValue})?.label
+				return if tFieldLabel then tFieldLabel else tFieldValue
+
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -377,6 +421,11 @@ renderSummaryReport = (reportObject)->
 			dataField: group
 			groupIndex: index
 		}
+		if groupField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				tFieldValue = rowData[group]
+				tFieldLabel = _.findWhere(groupField.options,{value:tFieldValue})?.label
+				return if tFieldLabel then tFieldLabel else tFieldValue
 		if sorts[group]
 			field.sortOrder = sorts[group]
 		if columnWidths[group]
@@ -482,6 +531,7 @@ renderSummaryReport = (reportObject)->
 					request.headers['X-Space-Id'] = spaceId
 					request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
 				onLoaded: (loadOptions)->
+					gridLoadedArray = loadOptions
 					if groupSummaryItems.length
 						if reportObject.charting
 							self.is_chart_open.set(true)
@@ -535,6 +585,11 @@ renderMatrixReport = (reportObject)->
 				dataField: row
 				area: 'row'
 			}
+			if rowField.type == "select"
+				field.customizeText = (data)->
+					tFieldValue = data.value
+					tFieldLabel = _.findWhere(rowField.options,{value:tFieldValue})?.label
+					return if tFieldLabel then tFieldLabel else tFieldValue
 			if sorts[row]
 				field.sortOrder = sorts[row]
 			if columnWidths[row]
@@ -554,16 +609,12 @@ renderMatrixReport = (reportObject)->
 				width: 100
 				dataField: column
 				area: 'column'
-				customizeText: (data)->
-					if columnField.type == "select"
-						valueOption = _.findWhere(columnField.options,{value:data.value})
-						if valueOption
-							return valueOption.label
-						else
-							return data.value
-					else
-						return data.value
 			}
+			if columnField.type == "select"
+				field.customizeText = (data)->
+					tFieldValue = data.value
+					tFieldLabel = _.findWhere(columnField.options,{value:tFieldValue})?.label
+					return if tFieldLabel then tFieldLabel else tFieldValue
 			if sorts[column]
 				field.sortOrder = sorts[column]
 			if columnWidths[column]
@@ -765,6 +816,7 @@ renderReport = (reportObject)->
 	switch reportObject.report_type
 		when 'tabular'
 			# 报表类型从matrix转变成tabular时，需要把原来matrix报表清除
+			gridLoadedArray = null
 			self.pivotGridInstance?.get()?.dispose()
 			renderTabularReport.bind(self)(reportObject)
 		when 'summary'
@@ -773,6 +825,7 @@ renderReport = (reportObject)->
 			renderSummaryReport.bind(self)(reportObject)
 		when 'matrix'
 			# 报表类型从summary转变成matrix时，需要把原来summary报表清除
+			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
 			renderMatrixReport.bind(self)(reportObject)
 
