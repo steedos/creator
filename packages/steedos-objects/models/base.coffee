@@ -158,7 +158,7 @@ Creator.baseObject =
 				return !!object_workflow
 			on: "record"
 			todo: ()->
-				Modal.show('initiate_approval')
+				Modal.show('initiate_approval', { object_name: this.object_name, record_id: this.record_id })
 
 		# "export":
 		# 	label: "Export"
