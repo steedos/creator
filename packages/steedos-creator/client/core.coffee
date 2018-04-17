@@ -88,7 +88,6 @@ if Meteor.isClient
 				selector.push ["owner", "=", Meteor.userId()]
 
 			if filter_logic
-				debugger
 				format_logic = filter_logic.replace(/\(/g, "[").replace(/\)/g, "]").replace(/\s+/g, ",").replace(/(and|or)/ig, "'$1'")
 				format_logic = format_logic.replace(/(\d)+/ig, (x)->
 					_f = filters[x-1]
