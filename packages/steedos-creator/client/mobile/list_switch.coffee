@@ -162,6 +162,7 @@ Template.listSwitch.onCreated ->
 	
 AutoForm.hooks addListItem:
 	onSuccess: (formType, result)->
+		$('#afModal').modal 'hide'
 		Session.set("reload_dxlist", true)
 		if result.type == "post"
 			app_id = Session.get("app_id")
@@ -169,3 +170,4 @@ AutoForm.hooks addListItem:
 			record_id = result._id
 			record_url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
 			FlowRouter.go record_url
+, false
