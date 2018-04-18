@@ -13,7 +13,9 @@ Npm.depends({
 	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
-	"xml2js": "0.4.19"
+	"xml2js": "0.4.19",
+	"xlsx":"0.12.9",
+	"node-xlsx":"0.12.0"
 });
 
 Package.onUse(function(api) {

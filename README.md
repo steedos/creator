@@ -22,8 +22,8 @@ Apps 表示功能模块，Apps下包含Objects
 - 增删改页面，根据Schema，自动生成对象新建、编辑、删除操作界面
 
 ### list_views 列表
-用于定义Object的列表显示样式，至少包含一个除default之外的视图
-- list_views.default.columns用于定义各列表中默认显示的列
+用于定义Object的列表显示样式
+- all view的columns、filter_scope、sort、extra_columns作为其他视图的属性默认值
 - 可在objects中定义多个list_view
 - 未来允许用户自己配置list_view，保存在数据库中
 - 系统会自动计算，为master_detail类型的字段，在主表中自动生成子表的list_views, 使用默认列
@@ -31,8 +31,6 @@ Apps 表示功能模块，Apps下包含Objects
 - sort 用于定义指定list_view的排序方式，可以同时定义多种排序方式。sort属性为数组，暂时只支持按照一个字段排序，预留多个字段排序的功能。
 - 实例:
 	- list_views:
-		- default:
-			- columns: ["name", "customer_id", "amount", "company_signed_date", "company_signed_id"]
 		- recent:
 			- filter_scope: "space"
 		- all:
@@ -46,42 +44,6 @@ Apps 表示功能模块，Apps下包含Objects
   - recent列表视图可查看用户最近点击的记录
   - list_view_id == "recent"时生效
   - 用户每次点击记录，系统都会自动保存点击信息。每个用户对每个对象最多保存10条记录。
-
-### actions 按钮与操作
-
-用于定义界面上的按钮与操作，
-- action.todo 如果是函数，直接执行
-- action.todo 如果是字符串，表示系统内置函数，Creator找到该内置函数并执行
-- action.on:
-  - "list" 为列表定义action，显示在列表右上角
-  - "record" 为记录定义action，显示在记录查看页右上角
-- action.todo 函数中可以使用以下变量
-  - this.object_name
-  - this.object
-  - this.action
-- action.sort 排序号，显示时，按照从小到达顺序排列。编辑action的sort默认为0
-实例
-- actions
-  - "export":
-    - visible: true
-    - on: "list"
-    - todo: ()->
-
-### triggers 触发器
-triggers 用于定义在服务端执行的触发器
-- 同一个事件可以定义多个trigger，但不能重名
-    - on: ["server", "client"]
-    - when: 可选择以下事件
-		- "before.insert"
-		- "before.update"
-		- "before.remove"
-		- "after.insert"
-		- "after.update"
-		- "after.remove"
-    - todo: 传入触发的函数
-- trigger.todo 函数中可以使用以下变量
-  - this.object_name
-- trigger.todo 函数，如果return的是false，则中断操作，如在before.insert里return false,则不执行insert操作。
 
 
 ### SAAS 多租户

@@ -152,6 +152,11 @@ getFieldLabel = (field, key)->
 				fieldLabel += " " + relate_field.label
 	return fieldLabel
 
+getSelectFieldLabel = (value, options)->
+	label = _.findWhere(options,{value:value})?.label
+	label = if label then label else value
+	return if label then label else "--"
+
 pivotGridChart = null
 gridLoadedArray = null
 
@@ -176,8 +181,12 @@ renderChart = (self)->
 		firstRowField = _.findWhere(grid._options.columns, {groupIndex:0})
 		unless firstRowField
 			return
-		window.loadArray = gridLoadedArray
-		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray().sort(Creator.sortingMethod.bind({key:"key"}))
+		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
+		objectGroupField = objectFields[firstRowField.dataField]
+		if objectGroupField?.type == "select"
+			_.each dataSourceItems, (dsi)->
+				dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+		dataSourceItems = dataSourceItems.sort(Creator.sortingMethod.bind({key:"key"}))
 		aggregateSeeds = []
 		aggregateKeys = []
 		_.each groupSums, (gs, index)->
@@ -221,11 +230,10 @@ renderChart = (self)->
 			_.each dataSourceItems, (dsi, index2)->
 				tempKey = "key#{index2 + 1}"
 				chartItem = {}
-				chartItem[tempKey] = dsi.key
+				chartItem[tempKey] = if dsi.key then dsi.key else "--"
 				chartItem[tempSummaryType] = dsi.aggregates[index1]
 				chartData.push chartItem
 				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryType}", argumentField: tempKey
-
 		dxOptions = 
 			dataSource: chartData, 
 			commonSeriesSettings: {
@@ -235,14 +243,6 @@ renderChart = (self)->
 			panes: chartPanes,
 			series: chartSeries,
 			valueAxis: chartValueAxis
-		objectGroupField = objectFields[firstRowField.dataField]
-		if objectGroupField?.type == "select"
-			dxOptions.argumentAxis =  
-				label:
-					customizeText: (data)->
-						tFieldValue = data.value
-						tFieldLabel = _.findWhere(objectGroupField.options,{value:tFieldValue})?.label
-						return if tFieldLabel then tFieldLabel else tFieldValue
 		pivotGridChart = $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart('instance')
 	else
 		grid = Tracker.nonreactive ()->
@@ -291,9 +291,7 @@ renderTabularReport = (reportObject)->
 		}
 		if itemField.type == "select"
 			field.calculateDisplayValue = (rowData)->
-				tFieldValue = rowData[item]
-				tFieldLabel = _.findWhere(itemField.options,{value:tFieldValue})?.label
-				return if tFieldLabel then tFieldLabel else tFieldValue
+				return getSelectFieldLabel rowData[item], itemField.options
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -397,10 +395,7 @@ renderSummaryReport = (reportObject)->
 		}
 		if itemField.type == "select"
 			field.calculateDisplayValue = (rowData)->
-				tFieldValue = rowData[item]
-				tFieldLabel = _.findWhere(itemField.options,{value:tFieldValue})?.label
-				return if tFieldLabel then tFieldLabel else tFieldValue
-
+				return getSelectFieldLabel rowData[item], itemField.options
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -423,9 +418,7 @@ renderSummaryReport = (reportObject)->
 		}
 		if groupField.type == "select"
 			field.calculateDisplayValue = (rowData)->
-				tFieldValue = rowData[group]
-				tFieldLabel = _.findWhere(groupField.options,{value:tFieldValue})?.label
-				return if tFieldLabel then tFieldLabel else tFieldValue
+				return getSelectFieldLabel rowData[group], groupField.options
 		if sorts[group]
 			field.sortOrder = sorts[group]
 		if columnWidths[group]
@@ -587,9 +580,7 @@ renderMatrixReport = (reportObject)->
 			}
 			if rowField.type == "select"
 				field.customizeText = (data)->
-					tFieldValue = data.value
-					tFieldLabel = _.findWhere(rowField.options,{value:tFieldValue})?.label
-					return if tFieldLabel then tFieldLabel else tFieldValue
+					return getSelectFieldLabel data.value, rowField.options
 			if sorts[row]
 				field.sortOrder = sorts[row]
 			if columnWidths[row]
@@ -612,9 +603,7 @@ renderMatrixReport = (reportObject)->
 			}
 			if columnField.type == "select"
 				field.customizeText = (data)->
-					tFieldValue = data.value
-					tFieldLabel = _.findWhere(columnField.options,{value:tFieldValue})?.label
-					return if tFieldLabel then tFieldLabel else tFieldValue
+					return getSelectFieldLabel data.value, columnField.options
 			if sorts[column]
 				field.sortOrder = sorts[column]
 			if columnWidths[column]
