@@ -40,6 +40,7 @@ Template.initiate_approval.events
                 instance = responseText.inserts[0]
                 # 跳转到APPS草稿
                 Steedos.openWindow workflowUrl + 'workflow/space/' + Session.get('spaceId') + '/draft/' + instance._id
+                Creator.getCollection(object_name).update(record_id, { $set: { instance_ids: [instance._id], instance_state: 'draft' } })
                 return
             error: (xhr, msg, ex) ->
                 $(document.body).removeClass 'loading'

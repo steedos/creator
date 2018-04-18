@@ -51,6 +51,12 @@ Creator.baseObject =
 			type: "Array"
 			hidden: true
 			blackbox: true
+		instance_ids:
+			type: [String]
+			omit: true
+		instance_state:
+			type: String
+			omit: true
 
 	permission_set:
 		none:

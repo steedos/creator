@@ -48,33 +48,74 @@ InstanceRecordQueue.Configure = function (options) {
 			console.log(doc);
 		}
 
-		// Edoc.send(doc.doc);
 		var insId = doc.info.instance_id,
 			records = doc.info.records;
-		var ins = Creator.getCollection('instances').findOne(insId);
-		var values = ins.values;
-		var ow = Creator.getCollection('object_workflows').findOne({
-			object_name: records.o,
-			flow_id: ins.flow
-		});
-		var setObj, objectCollection = Creator.getCollection(records.o);
-		objectCollection.find({
-			_id: {
-				$in: records.ids
+		var ins = Creator.getCollection('instances').findOne(insId, {
+			fields: {
+				name: 1,
+				flow: 1,
+				values: 1
 			}
-		}).forEach(function (record) {
-			setObj = {};
-			ow.field_map.forEach(function (fm) {
-				if (values.hasOwnProperty(fm.workflow_field)) {
-					setObj[fm.object_field] = values[fm.workflow_field];
+		});
+		var values = ins.values;
+
+		if (records) {
+			// 此情况属于从creator中发起审批
+			var ow = Creator.getCollection('object_workflows').findOne({
+				object_name: records.o,
+				flow_id: ins.flow
+			});
+			var setObj, objectCollection = Creator.getCollection(records.o);
+			objectCollection.find({
+				_id: {
+					$in: records.ids
+				}
+			}).forEach(function (record) {
+				setObj = {};
+				ow.field_map.forEach(function (fm) {
+					if (values.hasOwnProperty(fm.workflow_field)) {
+						setObj[fm.object_field] = values[fm.workflow_field];
+					}
+				})
+				if (!_.isEmpty(setObj)) {
+					objectCollection.update(record._id, {
+						$set: setObj
+					})
 				}
 			})
-			if (!_.isEmpty(setObj)) {
-				objectCollection.update(record._id, {
-					$set: setObj
+		} else {
+			// 此情况属于从apps中发起审批
+			Creator.getCollection('object_workflows').find({
+				flow_id: ins.flow
+			}).forEach(function (ow) {
+				var newObj = {},
+					objectCollection = Creator.getCollection(ow.object_name);
+				ow.field_map.forEach(function (fm) {
+					if (values.hasOwnProperty(fm.workflow_field)) {
+						newObj[fm.object_field] = values[fm.workflow_field];
+					}
 				})
-			}
-		})
+				newObj._id = objectCollection._makeNewID();
+				newObj.space = ow.space;
+				newObj.name = ins.name;
+				newObj.instance_ids = [ins._id];
+				newObj.instance_state = 'completed';
+				console.log(newObj);
+				var r = objectCollection.insert(newObj);
+				console.log(newObj);
+				console.log(r);
+				if (r) {
+					Creator.getCollection('instances').update(ins._id, {
+						$set: {
+							record_ids: {
+								o: ow.object_name,
+								ids: [newObj._id]
+							}
+						}
+					})
+				}
+			})
+		}
 
 		InstanceRecordQueue.collection.update(doc._id, {
 			$set: {
