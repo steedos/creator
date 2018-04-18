@@ -100,10 +100,7 @@ InstanceRecordQueue.Configure = function (options) {
 				newObj.name = ins.name;
 				newObj.instance_ids = [ins._id];
 				newObj.instance_state = 'completed';
-				console.log(newObj);
 				var r = objectCollection.insert(newObj);
-				console.log(newObj);
-				console.log(r);
 				if (r) {
 					Creator.getCollection('instances').update(ins._id, {
 						$set: {
