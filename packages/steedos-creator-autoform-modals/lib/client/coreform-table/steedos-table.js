@@ -237,11 +237,13 @@ SteedosTable.showModal = function(field, index, method) {
 }
 
 SteedosTable.getKeys = function(field) {
-    if (!AutoForm.getCurrentDataForForm("creatorAddForm")) {
+    var formId = AutoForm.getFormId()
+
+    if (!AutoForm.getCurrentDataForForm(formId)) {
         return [];
     }
 
-    var ss = AutoForm.getFormSchema("creatorAddForm");
+    var ss = AutoForm.getFormSchema(formId);
 
     var keys = [];
 
