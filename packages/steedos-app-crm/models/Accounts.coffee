@@ -21,6 +21,19 @@ Creator.Objects.accounts =
 				{label: "中", value: "normal"},
 				{label: "低", value: "low"}
 			]
+		table:
+			label: "表格"
+			type: "array"
+			sub_field: [
+				{"name": "tel", type: "text"},
+				{"name": "email", type: "text"}
+			]
+		tel:
+			type: "text"
+			parent_field: "table"
+		email:
+			type: "text"
+			parent_field: "table"
 		name: 
 			label: "名称"
 			type: "text"

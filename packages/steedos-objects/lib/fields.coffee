@@ -184,7 +184,7 @@ Creator.getObjectSchema = (obj) ->
 				fs.type = String
 				fs.autoform.type = 'fileUpload'
 				fs.autoform.collection = field.collection
-		else if  field.type == "filesize"
+		else if field.type == "filesize"
 			fs.type = Number
 			fs.autoform.type = 'filesize'
 		else
@@ -234,6 +234,18 @@ Creator.getObjectSchema = (obj) ->
 			fs.index = field.index
 		else if field.sortable
 			fs.index = true
+
+		if field.type == "array"
+			fs.type = Array
+			fs.autoform.editable = true
+			fs.autoform.type = "table"
+			schema[field_name + ".$"] = {
+				type: Object
+			}
+		
+		if field.parent_field
+			field_name = field.parent_field + ".$." + field_name
+		
 		schema[field_name] = fs
 
 	return schema
