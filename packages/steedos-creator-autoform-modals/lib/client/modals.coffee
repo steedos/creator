@@ -484,6 +484,11 @@ Template.CreatorAfModal.events
 										trigger.todo.apply({object_name: object_name},[userId, result])
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
+					console.log insertDoc
+					console.log "**************************"
+					return false
+					console.log "=========================="
+
 					userId = Meteor.userId()
 					cmCollection = Session.get 'cmCollection'
 					object_name = getObjectName(cmCollection)

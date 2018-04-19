@@ -2,6 +2,20 @@ SteedosTable = {};
 
 SteedosTable.formId = "instanceform";
 
+CreatorTable = {};
+
+CreatorTable.getKeySchema = function(field){
+    var formId = AutoForm.getFormId();
+    var schema = AutoForm.getFormSchema(formId)._schema;
+    var keys = SteedosTable.getKeys(field);
+    keys = _.map(keys, function(key){
+        var key_schema = {};
+        key_schema[field + ".$." + key] = schema[field + ".$." + key];
+        return key_schema;
+    })
+    return keys;
+}
+
 SteedosTable.checkItem = function(field, item_index) {
     var fieldObj = SteedosTable.getField(field);
 
@@ -46,12 +60,31 @@ SteedosTable.getTableValue = function(field) {
     return $("table[name='" + field + "']").val().val;
 }
 
+CreatorTable.getTableValue = function(field) {
+    var value = [];
+    var formId = AutoForm.getFormId();
+    $("table[name='" + field + "'] tr").each(function(){
+        var trValue = {}
+        $("td", this).each(function(){
+            var name = $(".form-control", this).attr("name")
+            trValue[name] = AutoForm.getFieldValue(name, formId);
+        })
+        value.push(trValue);
+    })
+    console.log(value);
+    return value;
+}
+
 SteedosTable.getValidValue = function(field) {
+    debugger
+
     var value = SteedosTable.getTableValue(field);
 
     if (!value) {
         return
     }
+
+    console.log("SteedosTable.getValidValue...............")
 
     var validValue = [];
 
@@ -125,31 +158,6 @@ SteedosTable.getField = function(field) {
 }
 
 
-SteedosTable.getModalData = function(field, index) {
-
-    var data = {};
-
-    var fieldObj = SteedosTable.getField(field);
-
-    if (!fieldObj) {
-        return;
-    }
-
-    data.field = fieldObj;
-
-    data.field.formula = Form_formula.getFormulaFieldVariable("Form_formula.field_values", fieldObj.sfields);
-
-    data.value = {};
-
-    data.value[field] = SteedosTable.getTableItemValue(field, index);
-
-    data.index = index;
-
-    return data;
-}
-
-
-
 SteedosTable.getItemModalValue = function(field, item_index) {
 
     if (!AutoForm.getFormValues("steedos_table_modal_" + field + "_" + item_index)) {
@@ -168,53 +176,7 @@ SteedosTable.addItem = function(field, index) {
 
 }
 
-SteedosTable.updateItem = function(field, index) {
 
-    var item = $("tr[name='" + field + "_item_" + index + "']");
-
-    var item_value = SteedosTable.getItemModalValue(field, index);
-
-    if (item && item.length > 0) {
-        var keys = SteedosTable.getKeys(field);
-        var tds = SteedosTable.getRemoveTd(field, index);
-
-        var sfields = SteedosTable.getField(field).sfields;
-
-        keys.forEach(function(key) {
-            var sfield = sfields.findPropertyByPK("code", key);
-
-            var value = item_value[key];
-
-            tds = tds + SteedosTable.getTd(sfield, index, value);
-
-        });
-
-        item.empty();
-
-        item.append(tds);
-
-    } else {
-
-        SteedosTable.addItem(field, index);
-    }
-
-    if (SteedosTable.getTableValue(field)) {
-
-        SteedosTable.setTableItemValue(field, index, item_value);
-
-        //SteedosTable.valueHash[field][index] = item_value;
-
-    } else {
-        //SteedosTable.valueHash[field] = [item_value];
-
-        SteedosTable.setTableValue(field, [item_value])
-
-    }
-
-    //执行主表公式计算
-    InstanceManager.runFormula(field);
-
-}
 
 SteedosTable.removeItem = function(field, index) {
 
@@ -493,10 +455,6 @@ SteedosTable.getTDValue = function(field, value) {
 if(Meteor.isClient){
     AutoForm.addInputType("table", {
         template: "afTable",
-        valueOut: function() {
-            var name = this.data("schemaKey");
-            return SteedosTable.getValidValue(name);
-        },
         valueConverters: {
             "stringArray": AutoForm.valueConverters.stringToStringArray,
             "number": AutoForm.valueConverters.stringToNumber,
@@ -516,13 +474,34 @@ if(Meteor.isClient){
 
     Template.afTable.events({
         'tap .creator-table .steedosTable-item-add,.add-item-tr': function(event, template) {
-            var name = template.data.name;
+            debugger
+            var field = template.data.name;
 
-            var tableValue = SteedosTable.getTableValue(name);
+            var key_schema = CreatorTable.getKeySchema(field)
 
-            var new_item_index = tableValue ? tableValue.length : 0;
+            console.log(key_schema)
 
-            SteedosTable.showModal(name, new_item_index, "add");
+            // var formId = AutoForm.getFormId();
+            // var schema = AutoForm.getFormSchema(formId);
+            // var name = template.data.name;
+            // var keys = SteedosTable.getKeys(name);
+            // var tr = "<tr>";
+            // var td = "";
+
+            // _.each(keys, function(k){
+            //     if(k){
+            //         td += "<td></td>";
+            //     }
+            // })
+            // tr = tr + td + "</tr>"
+
+            // template.$("#" + name + "Tbody").append(tr);
+
+            // var tableValue = SteedosTable.getTableValue(name);
+
+            // var new_item_index = tableValue ? tableValue.length : 0;
+
+            // SteedosTable.showModal(name, new_item_index, "add");
         },
 
         'tap .creator-table .steedosTable-item-field': function(event, template) {
@@ -565,7 +544,7 @@ if(Meteor.isClient){
 
         // $("tbody[name='" + field + "Tbody']").html(SteedosTable.getTbody(keys, field, SteedosTable.getTableValue(field), this.data.atts.editable));
 
-        $("tbody[name='" + field + "Tbody']").html(SteedosTable.getTbody(keys, field, SteedosTable.getTableValue(field), true));
+        // $("tbody[name='" + field + "Tbody']").html(SteedosTable.getTbody(keys, field, SteedosTable.getTableValue(field), true));
         
         str = t("steedos_table_add_item");
         addItemTr = "<tr class='add-item-tr'><td colspan='"+keys.length+"'><i class='ion ion-plus-round'></i>"+str+"</td></tr>";
