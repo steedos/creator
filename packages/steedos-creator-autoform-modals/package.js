@@ -27,10 +27,7 @@ Package.on_use(function (api) {
   api.add_files('lib/client/modals.coffee', 'client');
   api.add_files('lib/client/modals.less', 'client');
 
-  api.add_files('lib/client/coreform-table/creator_table_tr.html', 'client');
-  api.add_files('lib/client/coreform-table/creator_table_tr.coffee', 'client');
   api.add_files('lib/client/coreform-table/steedos-table.html', 'client');
   api.add_files('lib/client/coreform-table/steedos-table.js', 'client');
   api.add_files('lib/client/coreform-table/steedos-table.less', 'client');
-  api.add_files('lib/client/coreform-table/2_steedos_data_format.js', 'client');
 });

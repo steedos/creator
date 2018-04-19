@@ -485,9 +485,6 @@ Template.CreatorAfModal.events
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
 					console.log insertDoc
-					console.log "**************************"
-					return false
-					console.log "=========================="
 
 					userId = Meteor.userId()
 					cmCollection = Session.get 'cmCollection'
