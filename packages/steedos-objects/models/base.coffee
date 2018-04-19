@@ -54,9 +54,11 @@ Creator.baseObject =
 		instance_ids:
 			type: [String]
 			omit: true
+			hidden: true
 		instance_state:
 			type: String
 			omit: true
+			hidden: true
 
 	permission_set:
 		none:

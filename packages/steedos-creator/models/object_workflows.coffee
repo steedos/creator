@@ -26,15 +26,15 @@ Creator.Objects.object_workflows =
 
 		field_map:
 			label: "字段映射关系"
-			type: [Object]
+			type: "[Object]"
 
 		"field_map.$.object_field":
 			label: "对象字段"
-			type: String
+			type: "String"
 
 		"field_map.$.workflow_field":
 			label: "表单字段"
-			type: String
+			type: "String"
 
 		sync_attachment:
 			label: "附件同步方式"

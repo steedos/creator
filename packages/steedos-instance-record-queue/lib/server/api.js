@@ -42,6 +42,118 @@ InstanceRecordQueue.Configure = function (options) {
 		console.log('InstanceRecordQueue.Configure', options);
 	}
 
+	self.syncAttach = function (sync_attachment, insId, spaceId, newRecordId, objectName) {
+		if (sync_attachment == "lastest") {
+			cfs.instances.find({
+				'metadata.instance': insId,
+				'metadata.current': true
+			}).forEach(function (f) {
+				var newFile = new FS.File(),
+					cmsFileId = Creator.getCollection('cms_files')._makeNewID();
+
+				newFile.attachData(f.createReadStream('instances'), {
+					type: f.original.type
+				}, function (err) {
+					if (err) {
+						throw new Meteor.Error(err.error, err.reason);
+					}
+					newFile.name(f.name());
+					newFile.size(f.size());
+					var metadata = {
+						// owner: ?,
+						// owner_name: ?,
+						space: spaceId,
+						record_id: newRecordId,
+						object_name: objectName,
+						parent: cmsFileId
+					};
+
+					newFile.metadata = metadata;
+					var fileObj = cfs.files.insert(newFile);
+					if (fileObj) {
+						Creator.getCollection('cms_files').insert({
+							_id: cmsFileId,
+							parent: {
+								o: objectName,
+								ids: [newRecordId]
+							},
+							size: fileObj.size(),
+							name: fileObj.name(),
+							extention: fileObj.extension(),
+							space: spaceId,
+							versions: [fileObj._id]
+							// owner: ?
+						})
+					}
+				})
+			})
+		} else if (sync_attachment == "all") {
+			var parents = [];
+			cfs.instances.find({
+				'metadata.instance': insId
+			}).forEach(function (f) {
+				var newFile = new FS.File(),
+					cmsFileId = f.metadata.parent;
+
+				if (!parents.includes(cmsFileId)) {
+					parents.push(cmsFileId);
+					Creator.getCollection('cms_files').insert({
+						_id: cmsFileId,
+						parent: {
+							o: objectName,
+							ids: [newRecordId]
+						},
+						space: spaceId,
+						versions: []
+						// owner: ?
+					})
+				}
+
+				newFile.attachData(f.createReadStream('instances'), {
+					type: f.original.type
+				}, function (err) {
+					if (err) {
+						throw new Meteor.Error(err.error, err.reason);
+					}
+					newFile.name(f.name());
+					newFile.size(f.size());
+					var metadata = {
+						// owner: ?,
+						// owner_name: ?,
+						space: spaceId,
+						record_id: newRecordId,
+						object_name: objectName,
+						parent: cmsFileId
+					};
+
+					newFile.metadata = metadata;
+					var fileObj = cfs.files.insert(newFile);
+					if (fileObj) {
+
+						if (f.metadata.current == true) {
+							Creator.getCollection('cms_files').update(cmsFileId, {
+								$set: {
+									size: fileObj.size(),
+									name: fileObj.name(),
+									extention: fileObj.extension(),
+								},
+								$addToSet: {
+									versions: fileObj._id
+								}
+							})
+						} else {
+							Creator.getCollection('cms_files').update(cmsFileId, {
+								$addToSet: {
+									versions: fileObj._id
+								}
+							})
+						}
+					}
+				})
+			})
+		}
+	}
+
 	self.sendDoc = function (doc) {
 		if (InstanceRecordQueue.debug) {
 			console.log("sendDoc");
@@ -61,11 +173,14 @@ InstanceRecordQueue.Configure = function (options) {
 
 		if (records) {
 			// 此情况属于从creator中发起审批
+			var objectName = records.o;
 			var ow = Creator.getCollection('object_workflows').findOne({
-				object_name: records.o,
+				object_name: objectName,
 				flow_id: ins.flow
 			});
-			var setObj, objectCollection = Creator.getCollection(records.o);
+			var setObj,
+				objectCollection = Creator.getCollection(objectName),
+				sync_attachment = ow.sync_attachment;
 			objectCollection.find({
 				_id: {
 					$in: records.ids
@@ -82,35 +197,87 @@ InstanceRecordQueue.Configure = function (options) {
 						$set: setObj
 					})
 				}
+
+				// 附件同步
+				try {
+					self.syncAttach(sync_attachment, insId, record.space, record._id, objectName);
+				} catch (error) {
+
+					Creator.getCollection('cms_files').remove({
+						'parent': {
+							o: objectName,
+							ids: [record._id]
+						}
+					})
+					cfs.files.remove({
+						'metadata.record_id': record._id
+					})
+
+					throw new Error(error);
+				}
+
 			})
 		} else {
 			// 此情况属于从apps中发起审批
 			Creator.getCollection('object_workflows').find({
 				flow_id: ins.flow
 			}).forEach(function (ow) {
-				var newObj = {},
-					objectCollection = Creator.getCollection(ow.object_name);
-				ow.field_map.forEach(function (fm) {
-					if (values.hasOwnProperty(fm.workflow_field)) {
-						newObj[fm.object_field] = values[fm.workflow_field];
-					}
-				})
-				newObj._id = objectCollection._makeNewID();
-				newObj.space = ow.space;
-				newObj.name = ins.name;
-				newObj.instance_ids = [ins._id];
-				newObj.instance_state = 'completed';
-				var r = objectCollection.insert(newObj);
-				if (r) {
-					Creator.getCollection('instances').update(ins._id, {
-						$set: {
-							record_ids: {
-								o: ow.object_name,
-								ids: [newObj._id]
-							}
+				try {
+					var newObj = {},
+						objectCollection = Creator.getCollection(ow.object_name),
+						sync_attachment = ow.sync_attachment,
+						newRecordId = objectCollection._makeNewID(),
+						spaceId = ow.space,
+						objectName = ow.object_name;
+					ow.field_map.forEach(function (fm) {
+						if (values.hasOwnProperty(fm.workflow_field)) {
+							newObj[fm.object_field] = values[fm.workflow_field];
 						}
 					})
+					newObj._id = newRecordId;
+					newObj.space = spaceId;
+					newObj.name = ins.name;
+					newObj.instance_ids = [insId];
+					newObj.instance_state = 'completed';
+					var r = objectCollection.insert(newObj);
+					if (r) {
+						Creator.getCollection('instances').update(ins._id, {
+							$set: {
+								record_ids: {
+									o: objectName,
+									ids: [newRecordId]
+								}
+							}
+						})
+					}
+
+					// 附件同步
+					self.syncAttach(sync_attachment, insId, spaceId, newRecordId, objectName);
+
+				} catch (error) {
+
+					objectCollection.remove({
+						_id: newRecordId,
+						space: spaceId
+					});
+					Creator.getCollection('instances').update(ins._id, {
+						$unset: {
+							record_ids: 1
+						}
+					})
+					Creator.getCollection('cms_files').remove({
+						'parent': {
+							o: objectName,
+							ids: [newRecordId]
+						}
+					})
+					cfs.files.remove({
+						'metadata.record_id': newRecordId
+					})
+
+					throw new Error(error);
 				}
+
 			})
 		}
 
