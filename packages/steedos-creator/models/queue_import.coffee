@@ -133,12 +133,5 @@ Creator.Objects.queue_import =
 			visible: true
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				if Session.get("list_view_id") == "waitting"
-					importObj = Creator.Collections["queue_import"].findOne({_id:record_id})
-					space = Session.get("spaceId")
-					Meteor.call 'startImportJobs',record_id,space
-					importInfo = Creator.Collections["queue_import"].findOne({_id:record_id},{fields:{total_count:1,success_count:1}})
-					text = "导入完成详细信息请在已完成视图下查看。"
-					swal(text)
-				else
-					swal("请在待执行视图下执行导入")
+				space = Session.get("spaceId")
+				Meteor.call 'startImportJobs',record_id,space
