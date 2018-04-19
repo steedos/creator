@@ -337,7 +337,7 @@ Creator.getObjectDefaultColumns = (object_name)->
 	return defaultView?.columns
 
 ###
-	获取对象的列表额外加载的字段
+	获取对象的列表默认额外加载的字段
 ###
 Creator.getObjectDefaultExtraColumns = (object_name)->
 	defaultView = Creator.getObjectDefaultView(object_name)

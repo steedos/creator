@@ -7,14 +7,9 @@ Package.describe({
 });
 
 Npm.depends({
-	'icalendar': '0.7.1',
-	'ical.js': '1.2.2',
-	'MD5': '1.3.0',
-	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
 	"xml2js": "0.4.19",
-	"xlsx":"0.12.9",
 	"node-xlsx":"0.12.0"
 });
 
