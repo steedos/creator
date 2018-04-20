@@ -20,6 +20,39 @@ formatFileSize = (filesize)->
 
 	return rev.toFixed(2) + unit
 
+Template.creator_table_cell.onRendered ->
+	self = this
+	self.autorun ->
+		# debugger
+		val = self.data.val
+		_field = self.data.field
+		object_name = self.data.object_name
+		this_object = Creator.getObject(object_name)
+		if _field.type == "array"
+
+			columns = Creator.getSchema(object_name)._objectKeys[_field.name + ".$."]
+
+			columns = _.map columns, (column)->
+				field = this_object.fields[_field.name + ".$." + column]
+				columnItem =
+					caption: field.label || column
+					dataField: column
+					alignment: "left"
+					cellTemplate: (container, options) ->
+						# debugger
+						field_name = _field.name + ".$." + column
+						field_name = field_name.replace(/\$\./,"")
+						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name}
+						Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
+				return columnItem
+
+				
+
+			self.$(".cellGridContainer").dxDataGrid
+				dataSource: val,
+				columns: columns
+				height: "auto"
+
 Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
@@ -34,6 +67,8 @@ Template.creator_table_cell.helpers
 
 		_field = this.field
 
+		# debugger
+
 		if !_field
 			return
 
@@ -42,7 +77,16 @@ Template.creator_table_cell.helpers
 		if _.isFunction(reference_to)
 			reference_to = reference_to()
 
-		if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
+		if _field.type == "array"
+			data.push {isArray: true}
+			# $(".cellGridContainer").dxDataGrid({
+			# 	dataSource: val,
+			# 	columns: ["tel", "email"]
+			# });
+
+
+		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
+			debugger
 
 			# 有optionsFunction的情况下，reference_to不考虑数组
 			if _.isFunction(_field.optionsFunction)
@@ -83,6 +127,7 @@ Template.creator_table_cell.helpers
 					if !_.isArray(val)
 						val = if val then [val] else []
 					try
+						# debugger;
 
 						reference_to_object = Creator.getObject(reference_to)
 

@@ -16,8 +16,13 @@ Template.creator_view.onRendered ->
 	this.autorun ->
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
+		object_fields = Creator.getObject(object_name).fields
 		if object_name and record_id
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], {}
+			fields = Creator.getFields("accounts")
+			ref_fields = {}
+			_.each fields, (f)->
+				ref_fields[f] = 1
+			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields
 
 Template.creator_view.helpers Creator.helpers
 
