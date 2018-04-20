@@ -318,8 +318,9 @@ helpers =
 				permission_fields.push "_object_name"
 
 			if Session.get 'cmFields'
-				firstLevelKeys = Session.get('cmFields').replace(/\ /g, "")
-				firstLevelKeys = firstLevelKeys.split(",")
+				cmFields = Session.get('cmFields').replace(/\ /g, "")
+				cmFields = cmFields.split(",")
+				firstLevelKeys = _.intersection(firstLevelKeys, cmFields)
 			if Session.get 'cmOmitFields'
 				firstLevelKeys = _.difference firstLevelKeys, [Session.get('cmOmitFields')]
 			
