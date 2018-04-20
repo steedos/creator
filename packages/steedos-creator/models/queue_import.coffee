@@ -89,10 +89,9 @@ Creator.Objects.queue_import =
 			type:["text"]
 			omit:true
 	list_views:
-		default:
-			columns: ["object_name","encoding","field_mapping","description"]
 		all:
 			label: "所有导入队列"
+			columns: ["object_name","encoding","field_mapping","description"]
 			filter_scope: "space"
 		waitting:
 			label: "待执行"

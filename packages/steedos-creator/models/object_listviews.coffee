@@ -105,9 +105,8 @@ Creator.Objects.object_listviews =
 					throw new Meteor.Error 403, "can not remove default list view"
 				
 	list_views:
-		default:
-			columns: ["name", "shared", "modified"]
 		all:
+			columns: ["name", "shared", "modified"]
 			label:'全部列表视图'
 			filter_scope: "space"
 
