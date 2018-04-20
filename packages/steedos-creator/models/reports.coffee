@@ -45,20 +45,8 @@ Creator.Objects.reports =
 			type: "text"
 		"filters.$.operation": 
 			label: "操作符"
-			type: "select"
+			type: "text"
 			defaultValue: "="
-			options: ()->
-				options = [
-					{label: t("creator_filter_operation_equal"), value: "="},
-					{label: t("creator_filter_operation_unequal"), value: "<>"},
-					{label: t("creator_filter_operation_less_than"), value: "<"},
-					{label: t("creator_filter_operation_greater_than"), value: ">"},
-					{label: t("creator_filter_operation_less_or_equal"), value: "<="},
-					{label: t("creator_filter_operation_greater_or_equal"), value: ">="},
-					{label: t("creator_filter_operation_contains"), value: "contains"},
-					{label: t("creator_filter_operation_does_not_contain"), value: "notcontains"},
-					{label: t("creator_filter_operation_starts_with"), value: "startswith"},
-				]
 		"filters.$.value": 
 			label: "字段值"
 			# type: "text"
