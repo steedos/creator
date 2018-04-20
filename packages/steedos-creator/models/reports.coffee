@@ -38,15 +38,17 @@ Creator.Objects.reports =
 			]
 		filters: 
 			label: "过滤条件"
-			type: [Object]
+			type: "[Object]"
 			omit: true
 		"filters.$.field": 
 			label: "字段名"
 			type: "text"
 		"filters.$.operation": 
 			label: "操作符"
-			type: "text"
+			type: "select"
 			defaultValue: "="
+			options: ()->
+				return Creator.getFieldOperation()
 		"filters.$.value": 
 			label: "字段值"
 			# type: "text"
