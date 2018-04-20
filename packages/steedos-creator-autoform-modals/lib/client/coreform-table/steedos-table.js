@@ -18,13 +18,15 @@ CreatorTable.getKeySchema = function(field){
 
 
 CreatorTable.getTableValue = function(table) {
-	var formId = AutoForm.getFormId();
+    var formId = AutoForm.getFormId();
+    var value = [];
     $("tbody tr", $(table)).each(function(){
         var trValue = {}
         $("td", this).each(function(){
 			var name = $(".form-control", this).attr("name")
 			var key = name.replace(/\w+.\d+.(\w+)/ig, "$1")
-            trValue[name] = AutoForm.getFieldValue(name, formId);
+            // trValue[name] = AutoForm.getFieldValue(name, formId);
+            trValue[name] = "22222"
         })
         value.push(trValue);
     })
@@ -76,6 +78,8 @@ if(Meteor.isClient){
     AutoForm.addInputType("table", {
         template: "afTable",
         valueOut: function() {
+            // console.log("valueOut..............")
+            // CreatorTable.getTableValue(this);
 			return 
         },
         valueConverters: {
@@ -140,7 +144,7 @@ if(Meteor.isClient){
         
         $("thead[name='" + field + "Thead']").html(CreatorTable.getThead(keys, true));
 
-        str = t("steedos_table_add_item");
+        str = "新增一行";
         addItemTr = "<tr class='add-item-tr'><td colspan='"+keys.length+"'><i class='ion ion-plus-round'></i>"+str+"</td></tr>";
 
         if (this.data.atts.editable) {
