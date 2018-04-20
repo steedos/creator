@@ -24,16 +24,14 @@ Creator.Objects.accounts =
 		table:
 			label: "表格"
 			type: "array"
-			sub_field: [
-				{"name": "tel", type: "text"},
-				{"name": "email", type: "text"}
-			]
-		tel:
+		"table.$":
+			type: "Object"
+		"table.$.tel":
 			type: "text"
-			parent_field: "table"
-		email:
+		"table.$.email":
 			type: "text"
-			parent_field: "table"
+			type: "master_detail"
+			reference_to: "accounts"
 		name: 
 			label: "名称"
 			type: "text"
