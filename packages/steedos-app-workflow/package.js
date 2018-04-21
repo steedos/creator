@@ -20,6 +20,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/forms.coffee');
 	api.addFiles('models/flows.coffee');
 	api.addFiles('models/statistic_instance.coffee');
+	api.addFiles('models/categories.coffee');
 
 	api.addFiles('cfs/instances.coffee', 'server');
 })

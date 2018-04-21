@@ -13,7 +13,7 @@ Template.initiate_approval.events
         uobj.methodOverride = 'POST'
         uobj['X-User-Id'] = Meteor.userId()
         uobj['X-Auth-Token'] = Accounts._storedLoginToken()
-        url = workflowUrl + 'api/workflow/drafts?' + $.param(uobj)
+        url = Meteor.absoluteUrl() + 'api/workflow/drafts?' + $.param(uobj)
         data = 'Instances': [ {
             'flow': flowId
             'applicant': Meteor.userId()

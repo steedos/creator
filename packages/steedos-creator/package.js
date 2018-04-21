@@ -150,7 +150,11 @@ Package.onUse(function(api) {
 	api.addFiles('server/publications/user_tabular_settings.coffee', 'server');
 	api.addFiles('server/publications/related_objects_records.coffee', 'server');
 
+	api.addFiles('server/lib/permission_manager.coffee', 'server');
+	api.addFiles('server/lib/uuflow_manager.coffee', 'server');
+
 	api.addFiles('server/routes/s3.coffee', 'server');
+	api.addFiles('server/routes/api_workflow_drafts.coffee', 'server');
 
 	api.addFiles('client/views/_helpers.coffee', 'client');
 
@@ -286,5 +290,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/i18n.coffee', 'client');
 
 	api.addAssets('assets/logo.png', 'client');
+
+	api.export(['uuflowManager', 'permissionManager'], ['server']);
 
 });
