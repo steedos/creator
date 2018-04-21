@@ -269,7 +269,7 @@ renderTabularReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -566,7 +566,7 @@ renderMatrixReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
