@@ -174,6 +174,8 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 
 	new_ins_id = Creator.Collections.instances.insert(ins_obj)
 
+	uuflowManager.initiateAttach(ins_obj.record_ids, space_id, ins_obj._id, appr_obj._id)
+
 	return new_ins_id
 
 uuflowManager.initiateValues = (recordIds, flowId) ->
@@ -190,10 +192,38 @@ uuflowManager.initiateValues = (recordIds, flowId) ->
 
 	return values
 
-uuflowManager.initiateAttach = (recordIds, flowId) ->
+uuflowManager.initiateAttach = (recordIds, spaceId, insId, approveId) ->
 
-	record = Creator.Collections[recordIds.o].findOne(recordIds.ids[0])
-	# TODO
+	Creator.Collections['cms_files'].find({
+		space: spaceId,
+		parent: recordIds
+	}).forEach (cf) ->
+		_.each cf.versions, (versionId, idx) ->
+			f = Creator.Collections['cfs.files.filerecord'].findOne(versionId)
+			newFile = new FS.File()
+
+			newFile.attachData f.createReadStream('files'), {
+					type: f.original.type
+			}, (err) ->
+				if (err)
+					throw new Meteor.Error(err.error, err.reason)
+
+				newFile.name(f.name())
+				newFile.size(f.size())
+				metadata = {
+					owner: f.metadata.owner,
+					owner_name: f.metadata.owner_name,
+					space: spaceId,
+					instance: insId,
+					approve: approveId
+					parent: cf._id
+				}
+
+				if idx is 0
+					metadata.current = true
+
+				newFile.metadata = metadata
+				cfs.instances.insert(newFile)
 
 
 	return

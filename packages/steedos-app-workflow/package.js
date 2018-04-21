@@ -6,6 +6,10 @@ Package.describe({
 	documentation: null
 });
 
+Npm.depends({
+	mkdirp: "0.3.5"
+});
+
 Package.onUse(function(api) {
 
 	api.use('steedos:creator@0.0.5');
