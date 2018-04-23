@@ -31,6 +31,7 @@ Creator.bootstrap = (spaceId, callback)->
 
 			Creator.Objects = result.objects
 			object_listviews = result.object_listviews
+			Creator.object_workflows = result.object_workflows
 
 			_.each Creator.Objects, (object, object_name)->
 				_.extend object.list_views, object_listviews[object_name]
