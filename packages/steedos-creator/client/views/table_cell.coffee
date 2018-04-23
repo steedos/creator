@@ -36,6 +36,8 @@ Template.creator_table_cell.onRendered ->
 
 			columns = _.map columns, (column)->
 				field = this_object.fields[_field.name + ".$." + column]
+				if field.hidden
+					return undefined
 				columnItem =
 					cssClass: "slds-cell-edit"
 					caption: field.label || column
@@ -47,6 +49,8 @@ Template.creator_table_cell.onRendered ->
 						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name, isTable: true}
 						Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 				return columnItem
+			
+			columns = _.compact(columns)
 
 			self.$(".cellGridContainer").dxDataGrid
 				dataSource: val,

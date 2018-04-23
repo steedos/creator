@@ -17,16 +17,25 @@ CreatorTable.getKeySchema = function(field){
 }
 
 
-CreatorTable.getThead = function(keys, editable) {
+CreatorTable.getThead = function(field, keys) {
+    var formId = AutoForm.getFormId();
+
+    var ss = AutoForm.getFormSchema(formId);
+
     trs = "<td class='title-delete'></td>"
 
     keys.forEach(function(sf, index) {
 
         label = sf;
 
-        trs = trs + "<td nowrap='nowrap' class='title'>" + label + "</td>";
+        if (ss._schema[field + ".$." + sf].autoform && ss._schema[field + ".$." + sf].autoform.type == "hidden") {
+            trs = trs + "<td nowrap='nowrap' class='hidden-field'>" + label + "</td>";
+        } else {
+            trs = trs + "<td nowrap='nowrap' class='title'>" + label + "</td>";
+        }
 
     });
+    
 
     thead = '<tr>' + trs + '</tr>';
 
@@ -132,7 +141,7 @@ if(Meteor.isClient){
         })
         this.trField.set(validValue);
        
-        $("thead[name='" + field + "Thead']").html(CreatorTable.getThead(keys, true));
+        $("thead[name='" + field + "Thead']").html(CreatorTable.getThead(field, keys));
 
         str = "新增一行";
 
@@ -162,6 +171,11 @@ if(Meteor.isClient){
                 return _value
             });
             return keys
+        },
+        isHiddenField: function(key) {
+            var formId = AutoForm.getFormId();
+            var ss = AutoForm.getFormSchema(formId);
+            return ss._schema[key].autoform && ss._schema[key].autoform.type == "hidden";
         },
         isDisabledField: function(key) {
             var formId = AutoForm.getFormId();

@@ -15,13 +15,24 @@
                                 <i class="ion ion-close-round"></i>
                             </td>
                             {{#each fieldName this.index this.value}}
-                                {{#if isDisabledField this.key}}
-                                    <td>
-                                        <span class="disabled-field-value">{{disabledFieldsValue this.key}}</span>
-                                        <span class="disabled-field">{{> afQuickField name=this.name disabled=false readonly=true}}</span>
-                                    </td>
+                                {{#if isHiddenField this.key}}
+                                    {{#if isDisabledField this.key}}
+                                        <td class="hidden-field">
+                                            <span class="disabled-field-value">{{disabledFieldsValue this.key}}</span>
+                                            <span class="disabled-field">{{> afQuickField name=this.name disabled=false readonly=true}}</span>
+                                        </td>
+                                    {{else}}
+                                        <td class="hidden-field">{{> afQuickField name=this.name}}</td>
+                                    {{/if}}
                                 {{else}}
-                                    <td>{{> afQuickField name=this.name value=this.value}}</td>
+                                    {{#if isDisabledField this.key}}
+                                        <td>
+                                            <span class="disabled-field-value">{{disabledFieldsValue this.key}}</span>
+                                            <span class="disabled-field">{{> afQuickField name=this.name disabled=false readonly=true}}</span>
+                                        </td>
+                                    {{else}}
+                                        <td>{{> afQuickField name=this.name}}</td>
+                                    {{/if}}
                                 {{/if}}
                             {{/each}}
                         </tr>
