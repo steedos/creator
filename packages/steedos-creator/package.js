@@ -128,7 +128,6 @@ Package.onUse(function(api) {
 	api.addFiles('models/settings.coffee');
 
 	api.addFiles('models/object_workflows.coffee');
-	api.addFiles('models/object_fields_map.coffee');
 
 	api.addFiles('server/methods/bootstrap.coffee', 'server');
 
