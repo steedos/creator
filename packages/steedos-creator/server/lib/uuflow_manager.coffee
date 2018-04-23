@@ -248,9 +248,11 @@ uuflowManager.initiateRecordInstanceInfo = (recordIds, insId) ->
 	return
 
 uuflowManager.checkIsFirstInitiate = (recordIds) ->
-	if Creator.Collections[recordIds.o].find({
+	record = Creator.Collections[recordIds.o].findOne({
 		_id: recordIds.ids[0], instance_ids: { $exists: true }, instance_state: { $exists: true }
-	}).count() > 0
+	}, { fields: { instance_ids: 1 } })
+
+	if record and Creator.Collections.instances.find(record.instance_ids[0]).count() > 0
 		throw new Meteor.Error('error!', "此记录已发起过流程审批！")
 
 	return
