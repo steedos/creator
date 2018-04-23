@@ -37,19 +37,22 @@ Template.creator_table_cell.onRendered ->
 			columns = _.map columns, (column)->
 				field = this_object.fields[_field.name + ".$." + column]
 				columnItem =
+					cssClass: "slds-cell-edit"
 					caption: field.label || column
 					dataField: column
 					alignment: "left"
 					cellTemplate: (container, options) ->
 						field_name = _field.name + ".$." + column
 						field_name = field_name.replace(/\$\./,"")
-						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name}
+						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name, isTable: true}
 						Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 				return columnItem
 
 			self.$(".cellGridContainer").dxDataGrid
 				dataSource: val,
 				columns: columns
+				showColumnLines: false
+				showRowLines: true
 				height: "auto"
 
 Template.creator_table_cell.helpers Creator.helpers
@@ -206,4 +209,9 @@ Template.creator_table_cell.helpers
 		if !permission.allowEdit
 			return false
 
+		return true
+
+	showEditIcon: ()->
+		if this.isTable
+			return false
 		return true

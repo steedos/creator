@@ -52,6 +52,9 @@ getObjectName = (collectionName)->
 
 getSimpleSchema = (collectionName)->
 	if collectionName
+		object_name = getObjectName collectionName
+		object_fields = Creator.getObject(object_name).fields
+		_fields = Creator.getFields(object_name)
 		schema = collectionObj(collectionName).simpleSchema()._schema
 		fields = Session.get("cmFields")
 
@@ -59,6 +62,11 @@ getSimpleSchema = (collectionName)->
 		if fields
 			fields = fields.replace(/\ /g, "").split(",")
 			_.each fields, (field)->
+				if object_fields[field]?.type == "array"
+					table_fields = _.filter _fields, (f)->
+						return /\w+(\.\$\.){1}\w+/.test(f)
+					_.each table_fields, (f)->
+						_.extend(final_schema, _.pick(schema, f))
 				obj = _.pick(schema, field, field + ".$")
 				_.extend(final_schema, obj)
 		else
@@ -366,6 +374,8 @@ helpers =
 				groupFields: fieldGroups
 				hiddenFields: hiddenFields
 				disabledFields: disabledFields
+
+			console.log finalFields
 
 			return finalFields
 
