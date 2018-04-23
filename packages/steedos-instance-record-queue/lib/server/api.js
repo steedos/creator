@@ -204,6 +204,17 @@ InstanceRecordQueue.Configure = function (options) {
 
 				// 附件同步
 				try {
+					// 以最终申请单附件为准，旧的record中附件删除
+					Creator.getCollection('cms_files').remove({
+						'parent': {
+							o: objectName,
+							ids: [record._id]
+						}
+					})
+					cfs.files.remove({
+						'metadata.record_id': record._id
+					})
+					// 同步新附件
 					self.syncAttach(sync_attachment, insId, record.space, record._id, objectName);
 				} catch (error) {
 
