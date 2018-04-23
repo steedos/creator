@@ -109,14 +109,11 @@ if(Meteor.isClient){
         },
         
         'click .delete-row': function(event, template) {
-            var index = $(event.currentTarget).closest("tr").index();
-            trField = template.trField.get();
-            trField.splice(index, 1);
-            
-            _.each(trField, function(field, index){
-                field.index = index
-            })
-            debugger;
+            var index = event.currentTarget.dataset.index;
+            var trField = template.trField.get();
+            trField[index] = undefined
+
+        
             template.trField.set(trField);
         }
     });
