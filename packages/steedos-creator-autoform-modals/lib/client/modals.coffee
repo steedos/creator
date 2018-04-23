@@ -528,6 +528,9 @@ Template.CreatorAfModal.events
 							delete updateDoc["$unset"]._ids
 							delete updateDoc["$unset"]._object_name
 
+						# insertDoc里面的值是最全最精确的
+						updateDoc["$set"] = insertDoc
+
 						_ids = _id.split(",")
 						_.each _ids, (id)->
 							urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{id}")
