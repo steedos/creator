@@ -218,6 +218,20 @@ Template.creator_view.helpers
 		app_id = Session.get "app_id"
 		related_object_name = this.object_name
 		return Creator.getRelatedObjectUrl(object_name, app_id, record_id, related_object_name)
+	
+	cell_data: (key)->
+		record = Creator.getObjectRecord()
+		data = {}
+		data._id = record._id
+		data.val = record[key]
+		data.doc = record
+		data.field = Creator.getObject().fields[key]
+		data.field_name = key
+		data.object_name = Session.get("object_name")
+		data.disabled = true
+		data.parent_view = "record_details"
+		console.log data
+		return data
 
 
 Template.creator_view.events

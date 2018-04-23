@@ -35,7 +35,7 @@ CreatorTable.getTableValue = function(table) {
 
 
 CreatorTable.getThead = function(keys, editable) {
-    trs = ""
+    trs = "<td class='title-delete'></td>"
 
     keys.forEach(function(sf, index) {
 
@@ -100,7 +100,7 @@ if(Meteor.isClient){
     });
 
     Template.afTable.events({
-        'tap .creator-table .steedosTable-item-add,.add-item-tr': function(event, template) {
+        'click .add-item-tr': function(event, template) {
 
             var field = template.data.name;
 
@@ -115,7 +115,18 @@ if(Meteor.isClient){
 
             template.trField.set(trField);
         },
-
+        
+        'click .delete-row': function(event, template) {
+            var index = $(event.currentTarget).closest("tr").index();
+            trField = template.trField.get();
+            trField.splice(index, 1);
+            
+            _.each(trField, function(field, index){
+                field.index = index
+            })
+            debugger;
+            template.trField.set(trField);
+        }
     });
 
     Template.afTable.onCreated(function(){
@@ -137,15 +148,14 @@ if(Meteor.isClient){
             return _value
         })
         this.trField.set(validValue);
-        // var validValue = SteedosTable.handleData(field, this.data.value);
-        // SteedosTable.setTableValue(field, validValue);
-
-        // $("thead[name='" + field + "Thead']").html(CreatorTable.getThead(field, this.data.atts.editable));
-        
+       
         $("thead[name='" + field + "Thead']").html(CreatorTable.getThead(keys, true));
 
         str = "新增一行";
-        addItemTr = "<tr class='add-item-tr'><td colspan='"+keys.length+"'><i class='ion ion-plus-round'></i>"+str+"</td></tr>";
+
+        keyLength = keys.length + 1
+
+        addItemTr = "<tr class='add-item-tr'><td colspan='"+keyLength+"'><i class='ion ion-plus-round'></i>"+str+"</td></tr>";
 
         if (this.data.atts.editable) {
            $("tfoot[name='" + field + "Tfoot']").append(addItemTr);

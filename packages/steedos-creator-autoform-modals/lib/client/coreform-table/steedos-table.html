@@ -17,6 +17,9 @@
                     {{#each trField}}
                         {{#if this}}
                         <tr>
+                            <td class="delete-row" data-index = {{this.index}}>
+                                <i class="ion ion-close-round"></i>
+                            </td>
                             {{#each fieldName this.index this.value}}
                             <td>{{> afQuickField name=this.name value=this.value}}</td>
                             {{/each}}
@@ -24,16 +27,6 @@
                         {{/if}}
 					{{/each}}
 					</tbody>
-                    <!-- <tbody id="{{this.name}}Tbody" name="{{this.name}}Tbody">
-                        <tr>
-                            <td>{{> afQuickField name="table.0.tel"}}</td>
-                            <td>{{> afQuickField name="table.0.email"}}</td>
-                        </tr>
-                        <tr>
-                            <td>{{> afQuickField name="table.1.tel"}}</td>
-                            <td>{{> afQuickField name="table.1.email"}}</td>
-                        </tr>
-                    </tbody> -->
                     <tfoot id="{{this.name}}Tfoot" name="{{this.name}}Tfoot">
 
                     </tfoot>

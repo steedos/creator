@@ -3,7 +3,7 @@
 # - this.field_name
 # - this.field
 # - this.doc
-# - this.id
+# - this._id
 
 formatFileSize = (filesize)->
 	rev = filesize / 1024.00
@@ -23,12 +23,14 @@ formatFileSize = (filesize)->
 Template.creator_table_cell.onRendered ->
 	self = this
 	self.autorun ->
-		# debugger
-		val = self.data.val
 		_field = self.data.field
 		object_name = self.data.object_name
 		this_object = Creator.getObject(object_name)
-		if _field.type == "array"
+		record_id = self.data._id
+		record = Creator.getCollection(object_name).findOne(record_id)
+
+		if  _field.type == "array"
+			val = record[_field.name]
 
 			columns = Creator.getSchema(object_name)._objectKeys[_field.name + ".$."]
 
@@ -39,14 +41,11 @@ Template.creator_table_cell.onRendered ->
 					dataField: column
 					alignment: "left"
 					cellTemplate: (container, options) ->
-						# debugger
 						field_name = _field.name + ".$." + column
 						field_name = field_name.replace(/\$\./,"")
 						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name}
 						Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 				return columnItem
-
-				
 
 			self.$(".cellGridContainer").dxDataGrid
 				dataSource: val,
@@ -61,7 +60,9 @@ Template.creator_table_cell.helpers
 
 		val = this.val
 
-		this_object = Creator.getObject(this.object_name)
+		object_name = this.object_name
+
+		this_object = Creator.getObject(object_name)
 
 		this_name_field_key = this_object.NAME_FIELD_KEY
 
@@ -78,15 +79,9 @@ Template.creator_table_cell.helpers
 			reference_to = reference_to()
 
 		if _field.type == "array"
-			data.push {isArray: true}
-			# $(".cellGridContainer").dxDataGrid({
-			# 	dataSource: val,
-			# 	columns: ["tel", "email"]
-			# });
-
+			data.push {isTable: true}
 
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
-			debugger
 
 			# 有optionsFunction的情况下，reference_to不考虑数组
 			if _.isFunction(_field.optionsFunction)
