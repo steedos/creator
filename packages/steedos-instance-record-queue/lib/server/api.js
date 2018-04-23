@@ -60,8 +60,8 @@ InstanceRecordQueue.Configure = function (options) {
 					newFile.name(f.name());
 					newFile.size(f.size());
 					var metadata = {
-						// owner: ?,
-						// owner_name: ?,
+						owner: f.metadata.owner,
+						owner_name: f.metadata.owner_name,
 						space: spaceId,
 						record_id: newRecordId,
 						object_name: objectName,
@@ -81,8 +81,10 @@ InstanceRecordQueue.Configure = function (options) {
 							name: fileObj.name(),
 							extention: fileObj.extension(),
 							space: spaceId,
-							versions: [fileObj._id]
-							// owner: ?
+							versions: [fileObj._id],
+							owner: f.metadata.owner,
+							created_by: f.metadata.owner,
+							modified_by: f.metadata.owner
 						})
 					}
 				})
@@ -104,8 +106,10 @@ InstanceRecordQueue.Configure = function (options) {
 							ids: [newRecordId]
 						},
 						space: spaceId,
-						versions: []
-						// owner: ?
+						versions: [],
+						owner: f.metadata.owner,
+						created_by: f.metadata.owner,
+						modified_by: f.metadata.owner
 					})
 				}
 
@@ -118,8 +122,8 @@ InstanceRecordQueue.Configure = function (options) {
 					newFile.name(f.name());
 					newFile.size(f.size());
 					var metadata = {
-						// owner: ?,
-						// owner_name: ?,
+						owner: f.metadata.owner,
+						owner_name: f.metadata.owner_name,
 						space: spaceId,
 						record_id: newRecordId,
 						object_name: objectName,

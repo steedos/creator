@@ -176,6 +176,8 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 
 	uuflowManager.initiateAttach(ins_obj.record_ids, space_id, ins_obj._id, appr_obj._id)
 
+	uuflowManager.initiateRecordInstanceInfo(ins_obj.record_ids, new_ins_id)
+
 	return new_ins_id
 
 uuflowManager.initiateValues = (recordIds, flowId) ->
@@ -225,5 +227,15 @@ uuflowManager.initiateAttach = (recordIds, spaceId, insId, approveId) ->
 				newFile.metadata = metadata
 				cfs.instances.insert(newFile)
 
+
+	return
+
+uuflowManager.initiateRecordInstanceInfo = (recordIds, insId) ->
+	Creator.Collections[recordIds.o].update(recordIds.ids[0], {
+		$set: {
+			instance_ids: [insId],
+			instance_state: 'draft'
+		}
+	})
 
 	return
