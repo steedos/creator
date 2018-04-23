@@ -60,9 +60,16 @@ uuflowManager.getCategory = (category_id) ->
 	return Creator.Collections.categories.findOne(category_id)
 
 uuflowManager.create_instance = (instance_from_client, user_info) ->
+	check instance_from_client["applicant"], String
+	check instance_from_client["space"], String
+	check instance_from_client["flow"], String
+	check instance_from_client["record_ids"], {o: String, ids: [String]}
+
+	# 校验是否record已经发起过审批，如果发起过审批则报错
+	uuflowManager.checkIsFirstInitiate(instance_from_client["record_ids"])
+
 	space_id = instance_from_client["space"]
 	flow_id = instance_from_client["flow"]
-	instance_flow_version = instance_from_client["flow_version"]
 	user_id = user_info._id
 	# 获取前台所传的trace
 	trace_from_client = null
@@ -237,5 +244,13 @@ uuflowManager.initiateRecordInstanceInfo = (recordIds, insId) ->
 			instance_state: 'draft'
 		}
 	})
+
+	return
+
+uuflowManager.checkIsFirstInitiate = (recordIds) ->
+	if Creator.Collections[recordIds.o].find({
+		_id: recordIds.ids[0], instance_ids: { $exists: true }, instance_state: { $exists: true }
+	}).count() > 0
+		throw new Meteor.Error('error!', "此记录已发起过流程审批！")
 
 	return
