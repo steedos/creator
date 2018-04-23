@@ -17,23 +17,6 @@ CreatorTable.getKeySchema = function(field){
 }
 
 
-CreatorTable.getTableValue = function(table) {
-    var formId = AutoForm.getFormId();
-    var value = [];
-    $("tbody tr", $(table)).each(function(){
-        var trValue = {}
-        $("td", this).each(function(){
-			var name = $(".form-control", this).attr("name")
-			var key = name.replace(/\w+.\d+.(\w+)/ig, "$1")
-            // trValue[name] = AutoForm.getFieldValue(name, formId);
-            trValue[name] = "22222"
-        })
-        value.push(trValue);
-    })
-    return value;
-}
-
-
 CreatorTable.getThead = function(keys, editable) {
     trs = "<td class='title-delete'></td>"
 
@@ -175,9 +158,27 @@ if(Meteor.isClient){
                 var _value = {};
                 _value.name = field + "."+ index +"." + key;
                 _value.value = value[i]
+                _value.key = field + ".$." + key;
                 return _value
             });
             return keys
+        },
+        isDisabledField: function(key) {
+            var formId = AutoForm.getFormId();
+            var ss = AutoForm.getFormSchema(formId);
+            return ss._schema[key].autoform && ss._schema[key].autoform.disabled;
+        },
+        disabledFieldsValue: function(key) {
+            var formId = AutoForm.getFormId();
+            var ss = AutoForm.getFormSchema(formId)
+            if (ss._schema[key].autoform && ss._schema[key].autoform.disabled) {
+                defaultValue = ss._schema[key].autoform.defaultValue;
+                if (_.isFunction(defaultValue)) {
+                    defaultValue = defaultValue();
+                }
+                return defaultValue;
+            }
+            return ;
         }
     }); 
 }

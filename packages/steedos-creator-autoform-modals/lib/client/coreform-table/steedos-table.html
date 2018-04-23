@@ -15,7 +15,14 @@
                                 <i class="ion ion-close-round"></i>
                             </td>
                             {{#each fieldName this.index this.value}}
-                            <td>{{> afQuickField name=this.name value=this.value}}</td>
+                                {{#if isDisabledField this.key}}
+                                    <td>
+                                        <span class="disabled-field-value">{{disabledFieldsValue this.key}}</span>
+                                        <span class="disabled-field">{{> afQuickField name=this.name disabled=false readonly=true}}</span>
+                                    </td>
+                                {{else}}
+                                    <td>{{> afQuickField name=this.name value=this.value}}</td>
+                                {{/if}}
                             {{/each}}
                         </tr>
                         {{/if}}
