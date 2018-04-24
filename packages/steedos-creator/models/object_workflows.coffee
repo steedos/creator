@@ -27,11 +27,7 @@ Creator.Objects.object_workflows =
 
 		field_map:
 			label: "字段映射关系"
-			type: "array"
-
-		"field_map.$":
-			label: "字段映射关系"
-			type: "Object"
+			type: "grid"
 
 		"field_map.$.object_field":
 			label: "对象字段"
