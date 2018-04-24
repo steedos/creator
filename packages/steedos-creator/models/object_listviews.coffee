@@ -48,7 +48,7 @@ Creator.Objects.object_listviews =
 				return _options
 		sort:
 			label: "默认排序规则"
-			type: "array"
+			type: "grid"
 
 		"sort.$":
 			blackbox: true
