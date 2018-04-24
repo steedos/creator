@@ -269,7 +269,7 @@ renderTabularReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -282,7 +282,9 @@ renderTabularReport = (reportObject)->
 		fieldKeys = item.split(".")
 		selectColumns.push(fieldKeys[0])
 		if fieldKeys.length > 1
-			expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
 		itemField = objectFields[fieldKeys[0]]
 		caption = getFieldLabel itemField, item
 		field = {
@@ -324,7 +326,9 @@ renderTabularReport = (reportObject)->
 	pageSize = 10000
 	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
 	selectColumns = _.uniq selectColumns
-	expandFields = _.uniq expandFields
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
 	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		showColumnLines: false
@@ -339,7 +343,7 @@ renderTabularReport = (reportObject)->
 		dataSource: 
 			select: selectColumns
 			filter: filter
-			expand: expandFields
+			expand: expands
 			store: 
 				type: "odata",
 				version: 4,
@@ -373,7 +377,7 @@ renderSummaryReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -386,7 +390,9 @@ renderSummaryReport = (reportObject)->
 		fieldKeys = item.split(".")
 		selectColumns.push(fieldKeys[0])
 		if fieldKeys.length > 1
-			expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
 		itemField = objectFields[fieldKeys[0]]
 		itemLabel = getFieldLabel itemField, item
 		field = {
@@ -408,7 +414,9 @@ renderSummaryReport = (reportObject)->
 		fieldKeys = group.split(".")
 		selectColumns.push(fieldKeys[0])
 		if fieldKeys.length > 1
-			expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
 		groupField = objectFields[fieldKeys[0]]
 		groupLabel = getFieldLabel groupField, group
 		field = {
@@ -459,7 +467,9 @@ renderSummaryReport = (reportObject)->
 			fieldKeys = value.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			valueField = objectFields[fieldKeys[0]]
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
@@ -500,7 +510,9 @@ renderSummaryReport = (reportObject)->
 	pageSize = 10000
 	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
 	selectColumns = _.uniq selectColumns
-	expandFields = _.uniq expandFields
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
 	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		columnResizingMode: "widget"
@@ -513,7 +525,7 @@ renderSummaryReport = (reportObject)->
 		dataSource: 
 			select: selectColumns
 			filter: filter
-			expand: expandFields
+			expand: expands
 			store: 
 				type: "odata",
 				version: 4,
@@ -554,7 +566,7 @@ renderMatrixReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -569,7 +581,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = row.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			rowField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel rowField, row
 			field = {
@@ -592,7 +606,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = column.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			columnField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel columnField, column
 			field = {
@@ -632,7 +648,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = value.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			valueField = objectFields[fieldKeys[0]]
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
@@ -666,7 +684,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = item.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			itemField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel itemField, item
 			field = {
@@ -688,7 +708,9 @@ renderMatrixReport = (reportObject)->
 	pageSize = 10000
 	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
 	selectColumns = _.uniq selectColumns
-	expandFields = _.uniq expandFields
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
 	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		columnResizingMode: "widget"
@@ -712,7 +734,7 @@ renderMatrixReport = (reportObject)->
 			fields: reportFields
 			select: selectColumns
 			filter: filter
-			expand: expandFields
+			expand: expands
 			store: 
 				type: "odata",
 				version: 4,
