@@ -53,11 +53,21 @@
 			}
 			
 			.filter-logic-title {
-				display: flex;
-				-webkit-box-pack: justify;
-				-webkit-justify-content: space-between;
-				-ms-flex-pack: justify;
-				justify-content: space-between;
+				display: block;
+				overflow: hidden;
+
+				.title {
+					float: left;
+				}
+
+				.logic-info {
+					float: left;
+					color: #706e6b;
+				}
+
+				.remove_filter_logic {
+					float: right;
+				}
 			}
         }
     }
