@@ -33,7 +33,7 @@ _itemClick = (e, curObjectName)->
 				Creator.executeAction objectName, action, recordId, action_record_title, ()->
 					dxDataGridInstance.refresh()
 			else
-				Creator.executeAction objectName, action, recordId
+				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"
@@ -69,8 +69,9 @@ _fields = (object_name, list_view_id)->
 		if object.list_views[list_view_id]?.columns
 			fields = object.list_views[list_view_id].columns
 		else
-			if object.list_views?.default?.columns
-				fields = object.list_views.default.columns
+			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+			if defaultColumns
+				fields = defaultColumns
 
 	fields = fields.map (n)->
 		if object.fields[n]?.type and !object.fields[n].hidden
@@ -92,7 +93,7 @@ _expandFields = (object_name, columns)->
 		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
 			if fields[n].optionsFunction
 				ref = fields[n].optionsFunction().getProperty("value")
-			else
+			else  
 				ref = fields[n].reference_to
 				if _.isFunction(ref)
 					ref = ref()
@@ -101,7 +102,7 @@ _expandFields = (object_name, columns)->
 				ref = [ref]
 				
 			ref = _.map ref, (o)->
-				key = Creator.getObject(o).NAME_FIELD_KEY || "name"
+				key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
 				return key
 
 			ref = _.compact(ref)
@@ -117,6 +118,7 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.Collections.settings.findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns)
+	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
 	return columns.map (n,i)->
 		field = object.fields[n]
 		columnItem = 
@@ -134,8 +136,8 @@ _columns = (object_name, columns, list_view_id, is_related)->
 		
 		if grid_settings and grid_settings.settings
 			column_width_settings = grid_settings.settings[list_view_id]?.column_width
-			column_sort_settings = grid_settings.settings[list_view_id]?.sort
-		
+			column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
+
 		if column_width_settings
 			width = column_width_settings[n]
 			if width
@@ -147,6 +149,11 @@ _columns = (object_name, columns, list_view_id, is_related)->
 
 		if column_sort_settings and column_sort_settings.length > 0
 			_.each column_sort_settings, (sort)->
+				if sort[0] == n
+					columnItem.sortOrder = sort[1]
+		else
+			#默认读取default view的sort配置
+			_.each column_default_sort, (sort)->
 				if sort[0] == n
 					columnItem.sortOrder = sort[1]
 		
@@ -231,8 +238,9 @@ Template.creator_grid.onRendered ->
 
 			extra_columns = ["owner"]
 			object = Creator.getObject(curObjectName)
-			if object.list_views?.default?.extra_columns
-				extra_columns = _.union extra_columns, object.list_views.default.extra_columns
+			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
+			if defaultExtraColumns
+				extra_columns = _.union extra_columns, defaultExtraColumns
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
@@ -310,7 +318,7 @@ Template.creator_grid.onRendered ->
 								if column_obj.width
 									column_width[column_obj.dataField] = column_obj.width
 								if column_obj.sortOrder
-									sort.push [column_obj.dataField, column_obj.sortOrder]
+									sort.push {field_name: column_obj.dataField, order: column_obj.sortOrder}
 							
 							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
 								(error, result)->
@@ -350,7 +358,6 @@ Template.creator_grid.onRendered ->
 					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 			dxDataGridInstance.pageSize(pageSize)
-			window.dxDataGridInstance = dxDataGridInstance
 			
 Template.creator_grid.helpers Creator.helpers
 
@@ -395,7 +402,7 @@ Template.creator_grid.events
 		$(event.currentTarget).addClass("slds-has-focus")
 
 	'click .link-detail': (event, template)->
-		page_index = window.dxDataGridInstance.pageIndex()
+		page_index = dxDataGridInstance.pageIndex()
 		object_name = Session.get("object_name")
 		Session.set 'page_index', {object_name: object_name, page_index: page_index}
 

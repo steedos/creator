@@ -152,6 +152,11 @@ getFieldLabel = (field, key)->
 				fieldLabel += " " + relate_field.label
 	return fieldLabel
 
+getSelectFieldLabel = (value, options)->
+	label = _.findWhere(options,{value:value})?.label
+	label = if label then label else value
+	return if label then label else "--"
+
 pivotGridChart = null
 gridLoadedArray = null
 
@@ -176,8 +181,12 @@ renderChart = (self)->
 		firstRowField = _.findWhere(grid._options.columns, {groupIndex:0})
 		unless firstRowField
 			return
-		window.loadArray = gridLoadedArray
-		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray().sort(Creator.sortingMethod.bind({key:"key"}))
+		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
+		objectGroupField = objectFields[firstRowField.dataField]
+		if objectGroupField?.type == "select"
+			_.each dataSourceItems, (dsi)->
+				dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+		dataSourceItems = dataSourceItems.sort(Creator.sortingMethod.bind({key:"key"}))
 		aggregateSeeds = []
 		aggregateKeys = []
 		_.each groupSums, (gs, index)->
@@ -221,13 +230,11 @@ renderChart = (self)->
 			_.each dataSourceItems, (dsi, index2)->
 				tempKey = "key#{index2 + 1}"
 				chartItem = {}
-				chartItem[tempKey] = dsi.key
+				chartItem[tempKey] = if dsi.key then dsi.key else "--"
 				chartItem[tempSummaryType] = dsi.aggregates[index1]
 				chartData.push chartItem
 				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryType}", argumentField: tempKey
-
-
-		pivotGridChart = $("#pivotgrid-chart").show().dxChart({
+		dxOptions = 
 			dataSource: chartData, 
 			commonSeriesSettings: {
 				type: "bar"
@@ -236,7 +243,7 @@ renderChart = (self)->
 			panes: chartPanes,
 			series: chartSeries,
 			valueAxis: chartValueAxis
-		}).dxChart('instance')
+		pivotGridChart = $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart('instance')
 	else
 		grid = Tracker.nonreactive ()->
 			return self.pivotGridInstance.get()
@@ -262,7 +269,7 @@ renderTabularReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -275,13 +282,18 @@ renderTabularReport = (reportObject)->
 		fieldKeys = item.split(".")
 		selectColumns.push(fieldKeys[0])
 		if fieldKeys.length > 1
-			expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
 		itemField = objectFields[fieldKeys[0]]
 		caption = getFieldLabel itemField, item
 		field = {
 			caption: caption
 			dataField: item
 		}
+		if itemField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				return getSelectFieldLabel rowData[item], itemField.options
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -314,7 +326,9 @@ renderTabularReport = (reportObject)->
 	pageSize = 10000
 	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
 	selectColumns = _.uniq selectColumns
-	expandFields = _.uniq expandFields
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
 	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		showColumnLines: false
@@ -329,7 +343,7 @@ renderTabularReport = (reportObject)->
 		dataSource: 
 			select: selectColumns
 			filter: filter
-			expand: expandFields
+			expand: expands
 			store: 
 				type: "odata",
 				version: 4,
@@ -363,7 +377,7 @@ renderSummaryReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -376,13 +390,18 @@ renderSummaryReport = (reportObject)->
 		fieldKeys = item.split(".")
 		selectColumns.push(fieldKeys[0])
 		if fieldKeys.length > 1
-			expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
 		itemField = objectFields[fieldKeys[0]]
 		itemLabel = getFieldLabel itemField, item
 		field = {
 			caption: itemLabel
 			dataField: item
 		}
+		if itemField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				return getSelectFieldLabel rowData[item], itemField.options
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -395,7 +414,9 @@ renderSummaryReport = (reportObject)->
 		fieldKeys = group.split(".")
 		selectColumns.push(fieldKeys[0])
 		if fieldKeys.length > 1
-			expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
 		groupField = objectFields[fieldKeys[0]]
 		groupLabel = getFieldLabel groupField, group
 		field = {
@@ -403,6 +424,9 @@ renderSummaryReport = (reportObject)->
 			dataField: group
 			groupIndex: index
 		}
+		if groupField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				return getSelectFieldLabel rowData[group], groupField.options
 		if sorts[group]
 			field.sortOrder = sorts[group]
 		if columnWidths[group]
@@ -443,7 +467,9 @@ renderSummaryReport = (reportObject)->
 			fieldKeys = value.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			valueField = objectFields[fieldKeys[0]]
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
@@ -484,7 +510,9 @@ renderSummaryReport = (reportObject)->
 	pageSize = 10000
 	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
 	selectColumns = _.uniq selectColumns
-	expandFields = _.uniq expandFields
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
 	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		columnResizingMode: "widget"
@@ -497,7 +525,7 @@ renderSummaryReport = (reportObject)->
 		dataSource: 
 			select: selectColumns
 			filter: filter
-			expand: expandFields
+			expand: expands
 			store: 
 				type: "odata",
 				version: 4,
@@ -538,7 +566,7 @@ renderMatrixReport = (reportObject)->
 	userId = Meteor.userId()
 	spaceId = Session.get("spaceId")
 	selectColumns = []
-	expandFields = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -553,7 +581,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = row.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			rowField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel rowField, row
 			field = {
@@ -562,6 +592,9 @@ renderMatrixReport = (reportObject)->
 				dataField: row
 				area: 'row'
 			}
+			if rowField.type == "select"
+				field.customizeText = (data)->
+					return getSelectFieldLabel data.value, rowField.options
 			if sorts[row]
 				field.sortOrder = sorts[row]
 			if columnWidths[row]
@@ -573,7 +606,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = column.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			columnField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel columnField, column
 			field = {
@@ -581,16 +616,10 @@ renderMatrixReport = (reportObject)->
 				width: 100
 				dataField: column
 				area: 'column'
-				customizeText: (data)->
-					if columnField.type == "select"
-						valueOption = _.findWhere(columnField.options,{value:data.value})
-						if valueOption
-							return valueOption.label
-						else
-							return data.value
-					else
-						return data.value
 			}
+			if columnField.type == "select"
+				field.customizeText = (data)->
+					return getSelectFieldLabel data.value, columnField.options
 			if sorts[column]
 				field.sortOrder = sorts[column]
 			if columnWidths[column]
@@ -619,7 +648,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = value.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			valueField = objectFields[fieldKeys[0]]
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
@@ -653,7 +684,9 @@ renderMatrixReport = (reportObject)->
 			fieldKeys = item.split(".")
 			selectColumns.push(fieldKeys[0])
 			if fieldKeys.length > 1
-				expandFields.push("#{fieldKeys[0]}($select=#{fieldKeys[1]})")
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
 			itemField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel itemField, item
 			field = {
@@ -675,7 +708,9 @@ renderMatrixReport = (reportObject)->
 	pageSize = 10000
 	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
 	selectColumns = _.uniq selectColumns
-	expandFields = _.uniq expandFields
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
 	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		columnResizingMode: "widget"
@@ -699,7 +734,7 @@ renderMatrixReport = (reportObject)->
 			fields: reportFields
 			select: selectColumns
 			filter: filter
-			expand: expandFields
+			expand: expands
 			store: 
 				type: "odata",
 				version: 4,

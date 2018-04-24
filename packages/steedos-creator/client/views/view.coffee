@@ -226,7 +226,7 @@ Template.creator_view.events
 		Session.set("action_collection", "Creator.Collections.#{objectName}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
-		Creator.executeAction objectName, this, id
+		Creator.executeAction objectName, this, id, $(event.currentTarget)
 
 	'click .creator-view-tabs-link': (event) ->
 		$(".creator-view-tabs-link").closest(".slds-tabs_default__item").removeClass("slds-is-active")

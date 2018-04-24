@@ -2,13 +2,14 @@ Creator.Objects.queue_import =
 	name: "queue_import"
 	label: "数据导入"
 	icon: "report"
-
+	enable_files:true
 	fields:
-		import_file: 
-			label: "导入数据内容"
-			type: "textarea"
+		description: 
+			label: "导入描述"
+			type: "text"
 			is_wide:true
 			required:true
+			is_name:true
 		object_name:
 			label: "导入对象"
 			type: "lookup"
@@ -42,7 +43,12 @@ Creator.Objects.queue_import =
 			omit:true
 		field_mapping: 
 			label: "映射关系"
-			type: ["text"]
+			type: "lookup"
+			multiple: true
+			depend_on: ["object_name"]
+			defaultIcon: "service_contract"
+			optionsFunction: (values)->
+				return Creator.getObjectLookupFieldOptions values?.object_name, true
 			required:true
 		# import_action:
 		# 	label:"导入目的"
@@ -83,14 +89,13 @@ Creator.Objects.queue_import =
 			type:["text"]
 			omit:true
 	list_views:
-		default:
-			columns: ["object_name","encoding","field_mapping"]
 		all:
 			label: "所有导入队列"
+			columns: ["object_name","encoding","field_mapping","description"]
 			filter_scope: "space"
 		waitting:
 			label: "待执行"
-			columns: ["import_file","object_name","encoding","field_mapping","created"]
+			columns: ["description","object_name","encoding","field_mapping","created"]
 			filter_scope: "space"
 			filters: [["state", "=", "waitting"]]
 		finished:
@@ -127,12 +132,5 @@ Creator.Objects.queue_import =
 			visible: true
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				if Session.get("list_view_id") == "waitting"
-					importObj = Creator.Collections["queue_import"].findOne({_id:record_id})
-					space = Session.get("spaceId")
-					Meteor.call 'startImportJobs',importObj,space
-					importInfo = Creator.Collections["queue_import"].findOne({_id:record_id},{fields:{total_count:1,success_count:1}})
-					text = "导入完成详细信息请在已完成视图下查看。"
-					swal(text)
-				else
-					swal("请在待执行视图下执行导入")
+				space = Session.get("spaceId")
+				Meteor.call 'startImportJobs',record_id,space

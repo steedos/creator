@@ -9,6 +9,8 @@ Creator.Objects.object_listviews =
 			searchable:true
 			index:true
 			required: true
+		label:
+			label: "显示名称"
 		object_name:
 			label: "对象",
 			type: "master_detail"
@@ -40,13 +42,32 @@ Creator.Objects.object_listviews =
 				fields = Creator.getFields(Session.get("object_name"))
 				icon = _object.icon
 				_.forEach fields, (f)->
-					label = _object.fields[f].label
-					_options.push {label: f.label || f, value: f, icon: icon}
+					if !_object.fields[f].hidden and !_object.fields[f].omit
+						label = _object.fields[f].label
+						_options.push {label: f.label || f, value: f, icon: icon}
 				return _options
+###################### TODO 待table类型字段开发完成后，再开启sort属性
+#		sort:
+#			label: "默认排序规则"
+#			type: "[Object]"
+#
+#		"sort.$":
+#			blackbox: true
+#			type: "Object"
+#
+#		"sort.$.field_name":
+#			label: "字段"
+#			type: "String"
+#
+#		"sort.$.order":
+#			label: "顺序"
+#			type: "select"
+#			defaultValue: "asc"
+#			options: "正序:asc,倒序:desc"
 		shared:
 			label: "共享视图到工作区"
 			type: "boolean"
-			hidden: true
+			# hidden: true
 		filters:
 			type: "[Object]"
 			omit: true
@@ -68,9 +89,9 @@ Creator.Objects.object_listviews =
 			when: "before.insert"
 			todo: (userId, doc)->
 				object_name = Session.get("object_name")
-				list_view = Creator.getListView(object_name, "default")
-				filter_scope = list_view.filter_scope || "space"
-				columns = list_view.columns
+				list_view = Creator.getObjectDefaultView(object_name)
+				filter_scope = list_view?.filter_scope || "space"
+				columns = list_view?.columns
 				if filter_scope == "spacex"
 					filter_scope = "space"
 				if !doc.object_name
@@ -102,9 +123,8 @@ Creator.Objects.object_listviews =
 					throw new Meteor.Error 403, "can not remove default list view"
 				
 	list_views:
-		default:
-			columns: ["name", "shared", "modified"]
 		all:
+			columns: ["name", "shared", "modified"]
 			label:'全部列表视图'
 			filter_scope: "space"
 

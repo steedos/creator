@@ -97,6 +97,35 @@ Creator.Objects.objects =
 			modifyAllRecords: true
 			viewAllRecords: true
 
+	actions:
+		copy_odata:
+			label: "复制OData网址"
+			visible: true
+			on: "record"
+			todo: (object_name, record_id, item_element)->
+				record = Creator.getObjectById(record_id)
+				#enable_api 属性未开放
+				if record?.enable_api || true
+					o_name = record?.name
+					path = SteedosOData.getODataPath(Session.get("spaceId"), o_name)
+					item_element.attr('data-clipboard-text', path);
+					if !item_element.attr('data-clipboard-new')
+						clipboard = new Clipboard(item_element[0]);
+						item_element.attr('data-clipboard-new', true)
+
+						clipboard.on('success',  (e) ->
+							toastr.success('复制成功');
+						)
+						clipboard.on('error',  (e) ->
+							toastr.error('复制失败');
+							console.error "e"
+						);
+						#fix 详细页面(网页LI 手机版view-action)第一次点击复制不执行
+						if item_element[0].tagName == 'LI' || item_element.hasClass('view-action')
+							item_element.trigger("click");
+				else
+					toastr.error('复制失败: 未启用API');
+
 
 	triggers:
 		"before.insert.server.objects":
@@ -106,13 +135,6 @@ Creator.Objects.objects =
 				if isRepeatedName(doc)
 					throw new Meteor.Error 500, "对象名称不能重复"
 				doc.custom = true
-
-		"before.update.server.objects":
-			on: "server"
-			when: "before.update"
-			todo: (userId, doc)->
-				if isRepeatedName(doc)
-					throw new Meteor.Error 500, "对象名称不能重复"
 
 		"before.update.server.objects":
 			on: "server"
@@ -134,7 +156,7 @@ Creator.Objects.objects =
 			todo: (userId, doc)->
 				#新增object时，默认新建一个name字段
 				Creator.getCollection("object_fields").insert({object: doc.name, owner: userId, name: "name", space: doc.space, type: "text", required: true, index: true, searchable: true})
-				Creator.getCollection("object_listviews").insert({name: "all", space: doc.space, owner: userId, object_name: doc.name, shared: true, filter_scope: "space", columns: ["name"], is_default: true})
+				Creator.getCollection("object_listviews").insert({name: "all", space: doc.space, owner: userId, object_name: doc.name, shared: true, filter_scope: "space", columns: ["name"]})
 				Creator.getCollection("object_listviews").insert({name: "recent", space: doc.space, owner: userId, object_name: doc.name, shared: true, filter_scope: "space", columns: ["name"]})
 
 		"before.remove.server.objects":
@@ -161,8 +183,8 @@ Creator.Objects.objects =
 
 				Creator.getCollection("permission_objects").direct.remove({object_name: doc.name})
 
-				Creator.getCollection("object_listviews").direct.remove({space: doc.space, object_name: doc.name, is_default: true, owner: userId, shared: true, filter_scope: "space"})
-
+				Creator.getCollection("object_listviews").direct.remove({object_name: doc.name})
+				
 				#drop collection
 				console.log "drop collection", doc.name
 				try

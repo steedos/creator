@@ -39,7 +39,7 @@ Creator.Objects.organizations =
 
 		sort_no:
 			label: "排序号"
-			type: "text"
+			type: "number"
 			defaultValue: 100
 			sortable: true
 
@@ -65,9 +65,9 @@ Creator.Objects.organizations =
 			omit: true
 
 	list_views:
-		default:
-			columns: ["name", "parent", "sort_no", "modified"]
+	
 		all:
+			columns: ["name", "parent", "sort_no", "modified"]
 			label: "所有部门"
 			filter_scope: "space"
 
