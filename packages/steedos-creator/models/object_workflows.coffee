@@ -1,6 +1,6 @@
 Creator.Objects.object_workflows =
 	name: "object_workflows"
-	label: "对象与流程对应关系"
+	label: "相关流程"
 	icon: "apps"
 	fields:
 		name:
@@ -10,7 +10,8 @@ Creator.Objects.object_workflows =
 
 		object_name:
 			label: "对象"
-			type: "lookup"
+			type: "master_detail"
+			reference_to: "objects"
 			required: true
 			optionsFunction: ()->
 				_options = []
