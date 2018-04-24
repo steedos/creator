@@ -237,10 +237,13 @@ Creator.getObjectSchema = (obj) ->
 		else if field.sortable
 			fs.index = true
 
-		if field.type == "array"
+		if field.type == "grid"
 			fs.type = Array
 			fs.autoform.editable = true
 			fs.autoform.type = "table"
+			
+			schema[field_name + ".$"] = 
+				type: Object
 		
 		schema[field_name] = fs
 
