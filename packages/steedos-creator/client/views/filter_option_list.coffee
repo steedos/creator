@@ -189,7 +189,27 @@ Template.filter_option_list.onCreated ->
 						filter.valuelabel = options_labels
 				else
 					self.filterItems.set(filters)	
+
 Template.filter_option_list.onRendered ->
+	$("#info_popover").dxPopover({
+		target: "#logic_logic",
+		showEvent: "mouseenter",
+		hideEvent: "mouseleave",
+		position: "top",
+		width: 300,
+		animation: { 
+			show: {
+				type: "pop",
+				from: {  scale: 0 },
+				to: { scale: 1 }
+			},
+			hide: {
+				type: "fade",
+				from: 1,
+				to: 0
+			}
+		}
+	});
 
 Template.filter_option_list.onDestroyed ->
 	$(document).off "click", ".wrapper", self.destroyOptionbox

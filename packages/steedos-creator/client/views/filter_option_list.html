@@ -52,14 +52,19 @@
         <div class="filter-logic-container slds-p-around--small" style="background: #f3f2f2">
             <div class="filter-logic-title slds-p-bottom--x-small">
                 {{#if show_filter_logic}}
-                    <span class="">
+                    <span class="title">
                         <span class="slds-m-right--xx-small uiLabel">
                             筛选器逻辑
                         </span>
                     </span>
-                    <a class="remove_filter_logic">删除</a>
                 {{else}}
                     <a class="add_filter_logic">添加筛选逻辑</a>
+                {{/if}}
+                <span class="logic-info {{#unless show_filter_logic}}hidden{{/unless}}" id="logic_logic">
+                    <i class="ion ion-information-circled"></i>
+                </span>
+                {{#if show_filter_logic}}
+                    <a class="remove_filter_logic">删除</a>
                 {{/if}}
             </div>
             {{#if show_filter_logic}}
@@ -71,4 +76,7 @@
             {{/if}}
         </div>
     {{/if}}
+    <div id="info_popover">
+        筛选逻辑管理筛选如何以及何时应用到列表视图。使用 AND 和 OR 运算符微调结果。
+    </div>
 </template>
