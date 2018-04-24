@@ -35,7 +35,7 @@ Creator.Objects.object_fields =
 			searchable: true
 			index: true
 			required: true
-			regEx: SimpleSchema.RegEx.code
+			regEx: SimpleSchema.RegEx.field
 		label:
 			type: "text"
 		object:
@@ -62,6 +62,7 @@ Creator.Objects.object_fields =
 				currency: "金额"
 				lookup: "相关表"
 				master_detail: "主表/子表"
+				grid: "表格"
 		sort_no:
 			label: "排序号"
 			type: "number"
