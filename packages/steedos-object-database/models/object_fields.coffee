@@ -18,13 +18,15 @@ _syncToObject = (doc) ->
 			cf_arr = f.name.split(".$.")
 			child_fields = {}
 			child_fields[cf_arr[1]] = f
-			table_fields[cf_arr[0]] = child_fields
+			if !_.size(table_fields[cf_arr[0]])
+				table_fields[cf_arr[0]] = {}
+			_.extend(table_fields[cf_arr[0]], child_fields)
 		else
 			fields[f.name] = f
 
 	_.each table_fields, (f, k)->
 		if fields[k].type == "grid"
-			if !_.isObject(fields[k].fields)
+			if !_.size(fields[k].fields)
 				fields[k].fields = {}
 			_.extend(fields[k].fields, f)
 
