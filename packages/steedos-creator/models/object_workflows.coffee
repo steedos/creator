@@ -1,6 +1,6 @@
 Creator.Objects.object_workflows =
 	name: "object_workflows"
-	label: "对象与流程对应关系"
+	label: "相关流程"
 	icon: "apps"
 	fields:
 		name:
@@ -10,7 +10,8 @@ Creator.Objects.object_workflows =
 
 		object_name:
 			label: "对象"
-			type: "lookup"
+			type: "master_detail"
+			reference_to: "objects"
 			required: true
 			optionsFunction: ()->
 				_options = []
@@ -26,15 +27,15 @@ Creator.Objects.object_workflows =
 
 		field_map:
 			label: "字段映射关系"
-			type: "[Object]"
+			type: "grid"
 
 		"field_map.$.object_field":
 			label: "对象字段"
-			type: "String"
+			type: "text"
 
 		"field_map.$.workflow_field":
 			label: "表单字段"
-			type: "String"
+			type: "text"
 
 		sync_attachment:
 			label: "附件同步方式"

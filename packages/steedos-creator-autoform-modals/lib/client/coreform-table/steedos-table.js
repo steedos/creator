@@ -25,8 +25,7 @@ CreatorTable.getThead = function(field, keys) {
     trs = "<td class='title-delete'></td>"
 
     keys.forEach(function(sf, index) {
-
-        label = sf;
+        label = AutoForm.getLabelForField(field + ".$." + sf);
 
         if (ss._schema[field + ".$." + sf].autoform && ss._schema[field + ".$." + sf].autoform.type == "hidden") {
             trs = trs + "<td nowrap='nowrap' class='hidden-field'>" + label + "</td>";

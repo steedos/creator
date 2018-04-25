@@ -62,7 +62,7 @@ getSimpleSchema = (collectionName)->
 		if fields
 			fields = fields.replace(/\ /g, "").split(",")
 			_.each fields, (field)->
-				if object_fields[field]?.type == "array"
+				if object_fields[field]?.type == "grid"
 					table_fields = _.filter _fields, (f)->
 						return /\w+(\.\$\.){1}\w+/.test(f)
 					_.each table_fields, (f)->

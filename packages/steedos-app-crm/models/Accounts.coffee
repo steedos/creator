@@ -21,17 +21,6 @@ Creator.Objects.accounts =
 				{label: "中", value: "normal"},
 				{label: "低", value: "low"}
 			]
-		table:
-			label: "表格"
-			type: "array"
-		"table.$":
-			type: "Object"
-		"table.$.tel":
-			type: "text"
-		"table.$.email":
-			type: "text"
-			type: "master_detail"
-			reference_to: "accounts"
 		name: 
 			label: "名称"
 			type: "text"

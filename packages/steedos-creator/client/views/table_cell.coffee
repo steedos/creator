@@ -29,7 +29,7 @@ Template.creator_table_cell.onRendered ->
 		record_id = self.data._id
 		record = Creator.getCollection(object_name).findOne(record_id)
 
-		if  _field.type == "array"
+		if  _field.type == "grid"
 			val = record[_field.name]
 
 			columns = Creator.getSchema(object_name)._objectKeys[_field.name + ".$."]
@@ -85,7 +85,7 @@ Template.creator_table_cell.helpers
 		if _.isFunction(reference_to)
 			reference_to = reference_to()
 
-		if _field.type == "array"
+		if _field.type == "grid"
 			data.push {isTable: true}
 
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)

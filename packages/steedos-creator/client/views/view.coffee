@@ -18,7 +18,7 @@ Template.creator_view.onRendered ->
 		record_id = Session.get "record_id"
 		object_fields = Creator.getObject(object_name).fields
 		if object_name and record_id
-			fields = Creator.getFields("accounts")
+			fields = Creator.getFields(object_name)
 			ref_fields = {}
 			_.each fields, (f)->
 				ref_fields[f] = 1

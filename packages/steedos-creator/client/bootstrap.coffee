@@ -2,7 +2,7 @@ Creator.bootstrapLoaded = new ReactiveVar(false)
 
 Creator.bootstrap = (spaceId, callback)->
 	Creator.bootstrapLoaded.set(false)
-	unless spaceId
+	unless spaceId and Meteor.userId()
 		return
 
 	#Meteor.call "creator.bootstrap", spaceId, (error, result)->

@@ -148,7 +148,6 @@ Meteor.startup ->
 			if permissions.viewAllRecords or (permissions.allowRead and @userId)
 				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
-
 				if key is 'cfs.files.filerecord'
 					createQuery.query['metadata.space'] = @urlParams.spaceId
 				else if key is 'spaces'
@@ -384,7 +383,6 @@ Meteor.startup ->
 		get:()->
 
 			key = @urlParams.object_name
-
 			if key.indexOf("(") > -1
 				body = {}
 				headers = {}
@@ -429,7 +427,6 @@ Meteor.startup ->
 
 				{body: body, headers: headers}
 			else
-
 				if not Creator.objectsByName[key]?.enable_api
 					return {
 						statusCode: 401
@@ -464,7 +461,7 @@ Meteor.startup ->
 					entity = collection.findOne(createQuery.query,visitorParser(createQuery))
 					entities = []
 					if entity
-						if entity.owner == @userId
+						if entity.owner == @userId or permissions.viewAllRecords
 							body = {}
 							headers = {}
 							entities.push entity
