@@ -1,4 +1,4 @@
-SimpleSchema.RegEx.field = new RegExp('^[a-zA-Z]\\w*(\\.\\$\\.\\w+)?[a-zA-Z0-9]*$')
+SimpleSchema.RegEx.field = new RegExp('^[a-zA-Z_]\\w*(\\.\\$\\.\\w+)?[a-zA-Z0-9]*$')
 
 if Meteor.isClient
 	Meteor.startup ()->

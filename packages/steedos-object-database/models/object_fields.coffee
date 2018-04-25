@@ -11,8 +11,22 @@ _syncToObject = (doc) ->
 
 	fields = {}
 
+	table_fields = {}
+
 	_.forEach object_fields, (f)->
-		fields[f.name] = f
+		if /^[a-zA-Z_]\w*(\.\$\.\w+){1}[a-zA-Z0-9]*$/.test(f.name)
+			cf_arr = f.name.split(".$.")
+			child_fields = {}
+			child_fields[cf_arr[1]] = f
+			table_fields[cf_arr[0]] = child_fields
+		else
+			fields[f.name] = f
+
+	_.each table_fields, (f, k)->
+		if fields[k].type == "grid"
+			if !_.isObject(fields[k].fields)
+				fields[k].fields = {}
+			_.extend(fields[k].fields, f)
 
 	Creator.getCollection("objects").update({name: doc.object}, {
 		$set:
