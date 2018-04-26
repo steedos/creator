@@ -100,7 +100,7 @@ steedos:sso
 steedos:app-informations
 steedos:app-admin
 #steedos:app-cms
-#steedos:app-workflow
+steedos:app-workflow
 #steedos:app-example
 steedos:creator
 natestrauser:select2
