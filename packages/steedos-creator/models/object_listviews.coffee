@@ -11,6 +11,7 @@ Creator.Objects.object_listviews =
 			required: true
 		label:
 			label: "显示名称"
+			type:'text'
 		object_name:
 			label: "对象",
 			type: "master_detail"
@@ -132,7 +133,7 @@ Creator.Objects.object_listviews =
 				
 	list_views:
 		all:
-			columns: ["name", "shared", "modified"]
+			columns: ["name","label", "shared", "modified"]
 			label:'全部列表视图'
 			filter_scope: "space"
 
