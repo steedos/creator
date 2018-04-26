@@ -52,8 +52,10 @@ Creator.baseObject =
 			hidden: true
 		"instances.$._id":
 			type: "text"
+			hidden: true
 		"instances.$.state":
 			type: "text"
+			hidden: true
 		sharing:
 			label: "记录级权限"
 			type: ["Object"]
@@ -66,12 +68,15 @@ Creator.baseObject =
 		"sharing.$.u":
 			label: "授权用户"
 			type: "[text]"
+			hidden: true
 		"sharing.$.o":
 			label: "授权组织"
 			type: "[text]"
+			hidden: true
 		"sharing.$.r":
 			label: "来自规则"
 			type: "text"
+			hidden: true
 
 	permission_set:
 		none:
