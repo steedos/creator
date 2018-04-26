@@ -35,33 +35,6 @@ Creator.editObject = (object_name,record_id)->
 			Session.set 'cmDoc', result
 			$(".btn.creator-edit").click()
 
-Creator.removeRecord = (object_name,record_id,callback)->
-	url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
-	$.ajax
-		type: "delete"
-		url: url
-		dataType: "json"
-		contentType: "application/json"
-		beforeSend: (request) ->
-			request.setRequestHeader('X-User-Id', Meteor.userId())
-			request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
-
-		success: (data) ->
-			if callback and typeof callback == "function"
-				callback()
-			else
-				toastr?.success?(t("afModal_remove_suc"))
-
-		error: (jqXHR, textStatus, errorThrown) ->
-			error = jqXHR.responseJSON
-			console.error error
-			if error.reason
-				toastr?.error?(TAPi18n.__(error.reason))
-			else if error.message
-				toastr?.error?(TAPi18n.__(error.message))
-			else
-				toastr?.error?(error)
-
 if Meteor.isClient
 	# 定义全局变量以Session.get("object_name")为key记录其选中的记录id集合
 	Creator.TabularSelectedIds = {}
@@ -108,10 +81,44 @@ if Meteor.isClient
 		custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
 		selector = []
 		if custom_list_view
+			filter_logic = custom_list_view.filter_logic
 			filter_scope = custom_list_view.filter_scope
 			filters = custom_list_view.filters
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]
+
+			if filter_logic
+				format_logic = filter_logic.replace(/\(\s+/ig, "(").replace(/\s+\)/ig, ")").replace(/\(/g, "[").replace(/\)/g, "]").replace(/\s+/g, ",").replace(/(and|or)/ig, "'$1'")
+				format_logic = format_logic.replace(/(\d)+/ig, (x)->
+					_f = filters[x-1]
+					field = _f.field
+					option = _f.operation
+					value = Creator.evaluateFormula(_f.value)
+					sub_selector = []
+					if _.isArray(value) == true
+						if option == "="
+							_.each value, (v)->
+								sub_selector.push [field, option, v], "or"
+						else if option == "<>"
+							_.each value, (v)->
+								sub_selector.push [field, option, v], "and"
+						else
+							_.each value, (v)->
+								sub_selector.push [field, option, v], "or"
+						if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
+							sub_selector.pop()
+					else
+						sub_selector = [field, option, value]
+					console.log "sub_selector", sub_selector
+					return JSON.stringify(sub_selector)
+				)
+				format_logic = "[#{format_logic}]"
+				if selector.length
+					selector.push("and", Creator.eval(format_logic))
+				else
+					selector.push(Creator.eval(format_logic))
+
+				return selector
 
 			if filters and filters.length > 0
 				if selector.length > 0
@@ -180,12 +187,15 @@ if Meteor.isClient
 		if related_object_name == "cms_files"
 			selector.push("and", ["parent/o", "=", object_name])
 			selector.push("and", ["parent/ids", "=", record_id])
+		else if object_name == "objects"
+			record_object_name = Creator.getObjectRecord().name
+			selector.push("and", [related_field_name, "=", record_object_name])
 		else
 			selector.push("and", [related_field_name, "=", record_id])
 		
 		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
 		if !permissions.viewAllRecords and permissions.allowRead
-			selector.push("and", ["owner", "and", userId])
+			selector.push("and", ["owner", "=", userId])
 
 		return selector
 
@@ -216,7 +226,7 @@ Meteor.startup ->
 
 	$(document).keydown (e) ->
 		if e.keyCode == "13" or e.key == "Enter"
-			if e.target.tagName != "TEXTAREA"
+			if e.target.tagName != "TEXTAREA" or $(e.target).closest("div").hasClass("bootstrap-tagsinput")
 				if Session.get("cmOperation") == "update"
 					$(".creator-auotform-modals .btn-update").click()
 				else if Session.get("cmOperation") == "insert"

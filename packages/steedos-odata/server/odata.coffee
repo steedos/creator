@@ -132,7 +132,8 @@ Meteor.startup ->
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
 			key = @urlParams.object_name
-			if not Creator.objectsByName[key]?.enable_api
+			object = Creator.objectsByName[key]
+			if not object?.enable_api
 				return {
 					statusCode: 401
 					body:setErrorMessage(401)
@@ -148,7 +149,6 @@ Meteor.startup ->
 			if permissions.viewAllRecords or (permissions.allowRead and @userId)
 				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
-
 				if key is 'cfs.files.filerecord'
 					createQuery.query['metadata.space'] = @urlParams.spaceId
 				else if key is 'spaces'
@@ -182,7 +182,17 @@ Meteor.startup ->
 					_.each readable_fields,(field)->
 						createQuery.projection[field] = 1
 				if not permissions.viewAllRecords
-					createQuery.query.owner = @userId
+					if object.enable_share
+						# 满足共享规则中的记录也要搜索出来
+						delete createQuery.query.owner
+						shares = []
+						orgs = Steedos.getUserOrganizations(@urlParams.spaceId, @userId, true)
+						shares.push {"owner": @userId}
+						shares.push { "sharing.u": @userId }
+						shares.push { "sharing.o": { $in: orgs } }
+						createQuery.query["$or"] = shares
+					else
+						createQuery.query.owner = @userId
 
 				entities = []
 				if @queryParams.$top isnt '0'
@@ -254,6 +264,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'post')
 					}
 			catch e
+				console.error e
 				return {
 					statusCode: 500
 					body:e
@@ -325,6 +336,7 @@ Meteor.startup ->
 						body: setErrorMessage(404,collection,key,'get')
 					}
 			else
+				console.error e
 				return{
 					statusCode: 403
 					body: setErrorMessage(403,collection,key,'get')
@@ -373,6 +385,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'post')
 					}
 			catch e
+				console.error e
 				body = e
 				return{
 					statusCode:500
@@ -381,7 +394,6 @@ Meteor.startup ->
 		get:()->
 
 			key = @urlParams.object_name
-
 			if key.indexOf("(") > -1
 				body = {}
 				headers = {}
@@ -426,8 +438,8 @@ Meteor.startup ->
 
 				{body: body, headers: headers}
 			else
-
-				if not Creator.objectsByName[key]?.enable_api
+				object = Creator.objectsByName[key]
+				if not object?.enable_api
 					return {
 						statusCode: 401
 						body: setErrorMessage(401)
@@ -461,7 +473,14 @@ Meteor.startup ->
 					entity = collection.findOne(createQuery.query,visitorParser(createQuery))
 					entities = []
 					if entity
-						if entity.owner == @userId
+						isAllowed = entity.owner == @userId or permissions.viewAllRecords
+						if object.enable_share and !isAllowed
+							shares = []
+							orgs = Steedos.getUserOrganizations(@urlParams.spaceId, @userId, true)
+							shares.push { "sharing.u": @userId }
+							shares.push { "sharing.o": { $in: orgs } }
+							isAllowed = collection.findOne({ _id: @urlParams._id, "$or": shares }, { fields: { _id: 1 } })
+						if isAllowed
 							body = {}
 							headers = {}
 							entities.push entity
@@ -490,7 +509,8 @@ Meteor.startup ->
 		put:()->
 			try
 				key = @urlParams.object_name
-				if not Creator.objectsByName[key]?.enable_api
+				object = Creator.objectsByName[key]
+				if not object?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
@@ -504,7 +524,8 @@ Meteor.startup ->
 					}
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
-				if permissions.modifyAllRecords or (permissions.allowEdit and record_owner==@userId )
+				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId )
+				if isAllowed
 					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
 					fields_editable = true
 					_.keys(@bodyParams.$set).forEach (key)->
@@ -540,6 +561,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'put')
 					}
 			catch e
+				console.error e
 				body = e
 				return{
 					statusCode:500
@@ -548,7 +570,8 @@ Meteor.startup ->
 		delete:()->
 			try
 				key = @urlParams.object_name
-				if not Creator.objectsByName[key]?.enable_api
+				object = Creator.objectsByName[key]
+				if not object?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
@@ -562,7 +585,8 @@ Meteor.startup ->
 					}
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
-				if permissions.modifyAllRecords or (permissions.allowDelete and record_owner==@userId )
+				isAllowed = permissions.modifyAllRecords or (permissions.allowDelete and record_owner==@userId )
+				if isAllowed
 					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
 					if collection.remove selector
 						{status: 'success', message: 'Item removed'}
@@ -577,6 +601,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key)
 					}
 			catch e
+				console.error e
 				return{
 					statusCode: 404
 					body:e }

@@ -1,4 +1,11 @@
 Meteor.startup ()->
+	getOption = (option)->
+		foo = option.split(":")
+		if foo.length > 1
+			return {label: foo[0], value: foo[1]}
+		else
+			return {label: foo[0], value: foo[0]}
+
 	Creator.convertObject = (object)->
 		_.forEach object.triggers, (trigger, key)->
 
@@ -57,18 +64,43 @@ Meteor.startup ()->
 			if field.options && _.isString(field.options)
 				try
 					_options = []
+					#支持\n或者英文逗号分割,
 					_.forEach field.options.split("\n"), (option)->
-						foo = option.split(":")
-						if foo.length > 1
-							_options.push {label: foo[0], value: foo[1]}
+						if option.indexOf(",")
+							options = option.split(",")
+							_.forEach options, (_option)->
+								_options.push(getOption(_option))
 						else
-							_options.push {label: foo[0], value: foo[0]}
+							_options.push(getOption(option))
 					field.options = _options
 				catch error
 					console.error "Creator.convertFieldsOptions", field.options, error
 
 			
-			
+			if Meteor.isServer
+				options = field.options
+				if options && _.isFunction(options)
+					field._options = field.options.toString()
+			else
+				options = field._options
+				if options && _.isString(options)
+					try
+						field.options = Creator.eval("(#{options})")
+					catch error
+						console.error "convert error #{object.name} -> #{field.name}", error
+
+			if Meteor.isServer
+				regEx = field.regEx
+				if regEx
+					field._regEx = field.regEx.toString()
+			else
+				regEx = field._regEx
+				if regEx
+					try
+						field.regEx = Creator.eval("(#{regEx})")
+					catch error
+						console.error "convert error #{object.name} -> #{field.name}", error
+
 			if Meteor.isServer
 				if field.autoform
 					_type = field.autoform.type

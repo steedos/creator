@@ -1,25 +1,48 @@
-Creator.isLoadingSpace = new ReactiveVar(true)
+Creator.bootstrapLoaded = new ReactiveVar(false)
 
-Creator.bootstrap = (callback)->
-	Creator.isLoadingSpace.set(true)
-	spaceId = Session.get("spaceId")
-	unless spaceId
+Creator.bootstrap = (spaceId, callback)->
+	Creator.bootstrapLoaded.set(false)
+	unless spaceId and Meteor.userId()
 		return
-	Meteor.call "creator.bootstrap", spaceId, (error, result)->
-		if error or !result
-			console.log error
-		else
-			if result.space._id != spaceId
-				Steedos.setSpaceId(result.space._id)
 
+	#Meteor.call "creator.bootstrap", spaceId, (error, result)->
+	
+	url = Steedos.absoluteUrl "/api/bootstrap/#{spaceId}"
+	$.ajax
+		type: "get"
+		url: url
+		dataType: "json"
+		#contentType: "application/json"
+		beforeSend: (request) ->
+			request.setRequestHeader('X-User-Id', Meteor.userId())
+			request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+		error: (jqXHR, textStatus, errorThrown) ->
+				error = jqXHR.responseJSON
+				console.error error
+				if error?.reason
+					toastr?.error?(TAPi18n.__(error.reason))
+				else if error?.message
+					toastr?.error?(TAPi18n.__(error.message))
+				else
+					toastr?.error?(error)
+		success: (result) ->
+			# if result.space._id != spaceId
+			# 	Steedos.setSpaceId(result.space._id)
+
+			Creator.USER_CONTEXT = result.USER_CONTEXT
 			Creator.Objects = result.objects
 			object_listviews = result.object_listviews
+			Creator.object_workflows = result.object_workflows
 
 			_.each Creator.Objects, (object, object_name)->
 				_.extend object.list_views, object_listviews[object_name]
 				Creator.loadObjects object, object_name
 
 			Creator.Apps = result.apps
+
+			_.each Creator.Apps, (app, key) ->
+				if !app._id
+					app._id = key
 
 			apps = result.assigned_apps
 			if apps.length
@@ -29,13 +52,13 @@ Creator.bootstrap = (callback)->
 					else
 						app.visible = false
 
-		if _.isFunction(callback)
-			callback()
+			if _.isFunction(callback)
+				callback()
 
-		Creator.isLoadingSpace.set(false)
+			Creator.bootstrapLoaded.set(true)
 
 Meteor.startup ->
 	Tracker.autorun ->
-		Creator.objects_initialized.set(false)
-		Creator.bootstrap ()->
-			Creator.objects_initialized.set(true)
+		spaceId = Session.get("spaceId")
+		Creator.bootstrap spaceId, ()->
+			return

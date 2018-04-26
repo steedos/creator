@@ -14,7 +14,7 @@ _syncToObject = (doc) ->
 	_.forEach object_triggers, (f)->
 		triggers[f.name] = f
 
-	Creator.getCollection("objects").update({_id: doc.object}, {
+	Creator.getCollection("objects").update({name: doc.object}, {
 		$set:
 			triggers: triggers
 	})
@@ -48,6 +48,11 @@ Creator.Objects.object_triggers =
 			type: "master_detail"
 			reference_to: "objects"
 			required: true
+			optionsFunction: ()->
+				_options = []
+				_.forEach Creator.objectsByName, (o, k)->
+					_options.push {label: o.label, value: k, icon: o.icon}
+				return _options
 		on:
 			type: "lookup"
 			required: true

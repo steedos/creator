@@ -1,7 +1,5 @@
 
 Creator.objectsByName = {}   # 此对象只能在确保所有Object初始化完成后调用， 否则获取到的object不全
-if Meteor.isClient
-	Creator.objects_initialized = new ReactiveVar(false)
 
 Creator.Object = (options)->
 	self = this
@@ -34,6 +32,7 @@ Creator.Object = (options)->
 	self.hidden = options.hidden
 	self.enable_api = (options.enable_api == undefined) or options.enable_api
 	self.custom = options.custom
+	self.enable_share = options.enable_share
 
 	if (!options.fields) 
 		throw new Error('Creator.Object options must specify name');	
@@ -49,9 +48,10 @@ Creator.Object = (options)->
 			self.fields[field_name] = {}
 		self.fields[field_name] = _.extend(_.clone(field), self.fields[field_name])
 
-	self.list_views = {} 
+	self.list_views = {}
+	defaultColumns = Creator.getObjectDefaultColumns(self.name)
 	_.each options.list_views, (item, item_name)->
-		oitem = Creator.convertListView(self.list_views.default?.columns, item, item_name)
+		oitem = Creator.convertListView(defaultColumns, item, item_name)
 		self.list_views[item_name] = oitem
 
 	self.triggers = _.clone(Creator.baseObject.triggers)
@@ -117,7 +117,7 @@ Creator.Object = (options)->
 					return if defaultListViewId == list_view_item then "all" else list_view_item
 		self.permissions = new ReactiveVar(permissions)
 		_.each self.fields, (field, field_name)->
-			if field and !field.omit
+			if field
 				if _.indexOf(permissions.unreadable_fields, field_name) < 0
 					if field.hidden
 						return
@@ -126,9 +126,6 @@ Creator.Object = (options)->
 						field.disabled = true
 						# 当只读时，如果不去掉必填字段，autoform是会报错的
 						field.required = false
-					else
-						field.readonly = false
-						field.disabled = false
 				else
 					field.hidden = true
 	else
@@ -185,6 +182,6 @@ if Meteor.isClient
 
 	Meteor.startup ->
 		Tracker.autorun ->
-			if Session.get("steedos-locale") && Creator.objects_initialized.get()
+			if Session.get("steedos-locale") && Creator.bootstrapLoaded.get()
 				_.each Creator.objectsByName, (object, object_name)->
 					object.i18n()

@@ -118,13 +118,21 @@
 		}	
 	}
 	
-	.hidden-fields {
+	.hidden-fields, .disabled-fields {
 		display: none;
 	}
 
 	@media (max-width: 599px) {
 		.view-page-section-row {
 			display: block;
+		}
+	}
+}
+
+.creator-auotform-modals {
+	.single-input {
+		.slds-modal__content {
+			overflow: visible;
 		}
 	}
 }

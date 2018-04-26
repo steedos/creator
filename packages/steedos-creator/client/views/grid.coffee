@@ -33,7 +33,7 @@ _itemClick = (e, curObjectName)->
 				Creator.executeAction objectName, action, recordId, action_record_title, ()->
 					dxDataGridInstance.refresh()
 			else
-				Creator.executeAction objectName, action, recordId
+				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"
@@ -69,8 +69,9 @@ _fields = (object_name, list_view_id)->
 		if object.list_views[list_view_id]?.columns
 			fields = object.list_views[list_view_id].columns
 		else
-			if object.list_views?.default?.columns
-				fields = object.list_views.default.columns
+			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+			if defaultColumns
+				fields = defaultColumns
 
 	fields = fields.map (n)->
 		if object.fields[n]?.type and !object.fields[n].hidden
@@ -82,24 +83,31 @@ _fields = (object_name, list_view_id)->
 		fields.push('space')
 
 	fields = _.compact(fields)
-	return fields
+	fieldsName = Creator.getObjectFieldsName(object_name)
+	return _.intersection(fieldsName, fields)
 
 _expandFields = (object_name, columns)->
 	expand_fields = []
 	fields = Creator.getObject(object_name).fields
 	_.each columns, (n)->
 		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
-			ref = fields[n].reference_to
-			if _.isFunction(ref)
-				ref = ref()
+			if fields[n].optionsFunction
+				ref = fields[n].optionsFunction().getProperty("value")
+			else  
+				ref = fields[n].reference_to
+				if _.isFunction(ref)
+					ref = ref()
 
 			if !_.isArray(ref)
 				ref = [ref]
 				
 			ref = _.map ref, (o)->
-				return Creator.getObject(o).NAME_FIELD_KEY
+				key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
+				return key
 
 			ref = _.compact(ref)
+
+			ref = _.uniq(ref)
 			
 			ref = ref.join(",")
 			expand_fields.push(n + "($select=" + ref + ")")
@@ -110,6 +118,7 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.Collections.settings.findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns)
+	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
 	return columns.map (n,i)->
 		field = object.fields[n]
 		columnItem = 
@@ -127,8 +136,8 @@ _columns = (object_name, columns, list_view_id, is_related)->
 		
 		if grid_settings and grid_settings.settings
 			column_width_settings = grid_settings.settings[list_view_id]?.column_width
-			column_sort_settings = grid_settings.settings[list_view_id]?.sort
-		
+			column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
+
 		if column_width_settings
 			width = column_width_settings[n]
 			if width
@@ -138,8 +147,24 @@ _columns = (object_name, columns, list_view_id, is_related)->
 		else
 			columnItem.width = defaultWidth
 
+		list_view = Creator.getListView(object_name, list_view_id)
+
+		list_view_sort = Creator.transformSortToDX(list_view.sort)
+
 		if column_sort_settings and column_sort_settings.length > 0
+			console.log("settings sort...")
 			_.each column_sort_settings, (sort)->
+				if sort[0] == n
+					columnItem.sortOrder = sort[1]
+		else if !_.isEmpty(list_view_sort)
+			console.log("view sort...")
+			_.each list_view_sort, (sort)->
+				if sort[0] == n
+					columnItem.sortOrder = sort[1]
+		else
+			console.log("default sort...")
+			#默认读取default view的sort配置
+			_.each column_default_sort, (sort)->
 				if sort[0] == n
 					columnItem.sortOrder = sort[1]
 		
@@ -213,10 +238,20 @@ Template.creator_grid.onRendered ->
 					selectColumns = _fields(curObjectName)
 				return selectColumns
 
+			pageIndex = Tracker.nonreactive ()->
+				if Session.get("page_index")
+					if Session.get("page_index").object_name == curObjectName
+						page_index = Session.get("page_index").page_index
+						delete Session.keys["page_index"]
+						return page_index
+				else
+					return 0
+
 			extra_columns = ["owner"]
 			object = Creator.getObject(curObjectName)
-			if object.list_views?.default?.extra_columns
-				extra_columns = _.union extra_columns, object.list_views.default.extra_columns
+			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
+			if defaultExtraColumns
+				extra_columns = _.union extra_columns, defaultExtraColumns
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
@@ -229,6 +264,7 @@ Template.creator_grid.onRendered ->
 				showColumns.push
 					dataField: "_id_actions"
 					width: 46
+					allowExporting: false
 					allowSorting: false
 					allowReordering: false
 					headerCellTemplate: (container) ->
@@ -252,6 +288,7 @@ Template.creator_grid.onRendered ->
 			showColumns.splice 0, 0, 
 				dataField: "_id_checkbox"
 				width: 60
+				allowExporting: false
 				allowSorting: false
 				allowReordering: false
 				headerCellTemplate: (container) ->
@@ -259,14 +296,17 @@ Template.creator_grid.onRendered ->
 				cellTemplate: (container, options) ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
-			console.log "selectColumns", selectColumns
-			console.log "filter", filter
-			console.log "expand_fields", expand_fields
+			# console.log "selectColumns", selectColumns
+			# console.log "filter", filter
+			# console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			else
 				pageSize = 10
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
+
+			# fileName
+			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id).label
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
@@ -275,6 +315,10 @@ Template.creator_grid.onRendered ->
 					allowedPageSizes: [10,25, 50, 100],
 					showInfo: false,
 					showNavigationButtons: true
+				export:
+					enabled: true
+					fileName: fileName
+					allowExportSelectedData: false
 				showColumnLines: false
 				allowColumnReordering: true
 				allowColumnResizing: true
@@ -294,7 +338,7 @@ Template.creator_grid.onRendered ->
 								if column_obj.width
 									column_width[column_obj.dataField] = column_obj.width
 								if column_obj.sortOrder
-									sort.push [column_obj.dataField, column_obj.sortOrder]
+									sort.push {field_name: column_obj.dataField, order: column_obj.sortOrder}
 							
 							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
 								(error, result)->
@@ -302,6 +346,8 @@ Template.creator_grid.onRendered ->
 										console.log error
 									else
 										console.log "grid_settings success"
+					customLoad: ->
+						return {pageIndex: pageIndex}
 				}
 				dataSource: 
 					store: 
@@ -320,6 +366,18 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
+				customizeExportData: (col, row)->
+					_.each row, (r)->
+						_.each r.values, (val, index)->
+							if val
+								if val.constructor == Object
+									r.values[index] = val.name
+								else if val.constructor == Array
+									r.values[index] = val.getProperty("name").join(",")
+								else if val.constructor == Date
+									utcOffset = moment().utcOffset() / 60
+									val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
+									r.values[index] = val
 				onCellClick: (e)->
 					console.log "curObjectName", curObjectName
 					if e.column?.dataField ==  "_id_actions"
@@ -332,7 +390,6 @@ Template.creator_grid.onRendered ->
 					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 			dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 			dxDataGridInstance.pageSize(pageSize)
-			window.dxDataGridInstance = dxDataGridInstance
 			
 Template.creator_grid.helpers Creator.helpers
 
@@ -376,6 +433,11 @@ Template.creator_grid.events
 		template.$("td").removeClass("slds-has-focus")
 		$(event.currentTarget).addClass("slds-has-focus")
 
+	'click .link-detail': (event, template)->
+		page_index = dxDataGridInstance.pageIndex()
+		object_name = Session.get("object_name")
+		Session.set 'page_index', {object_name: object_name, page_index: page_index}
+
 Template.creator_grid.onCreated ->
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
@@ -393,32 +455,32 @@ Template.creator_grid.onCreated ->
 				Creator.remainCheckboxState(dxDataGridInstance.$element())
 	,false
 
-Template.creator_grid.onDestroyed ->
-	#离开界面时，清除hooks为空函数
-	AutoForm.hooks creatorAddForm:
-		onSuccess: (formType, result)->
-			$('#afModal').modal 'hide'
-			if result.type == "post"
-				app_id = Session.get("app_id")
-				object_name = result.object_name
-				record_id = result._id
-				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
-				FlowRouter.go url
-	,true
-	AutoForm.hooks creatorEditForm:
-		onSuccess: (formType, result)->
-			$('#afModal').modal 'hide'
-			if result.type == "post"
-				app_id = Session.get("app_id")
-				object_name = result.object_name
-				record_id = result._id
-				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
-				FlowRouter.go url
-	,true
-	AutoForm.hooks creatorCellEditForm:
-		onSuccess: ()->
-			$('#afModal').modal 'hide'
-	,true
+# Template.creator_grid.onDestroyed ->
+# 	#离开界面时，清除hooks为空函数
+# 	AutoForm.hooks creatorAddForm:
+# 		onSuccess: (formType, result)->
+# 			$('#afModal').modal 'hide'
+# 			if result.type == "post"
+# 				app_id = Session.get("app_id")
+# 				object_name = result.object_name
+# 				record_id = result._id
+# 				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+# 				FlowRouter.go url
+# 	,true
+# 	AutoForm.hooks creatorEditForm:
+# 		onSuccess: (formType, result)->
+# 			$('#afModal').modal 'hide'
+# 			if result.type == "post"
+# 				app_id = Session.get("app_id")
+# 				object_name = result.object_name
+# 				record_id = result._id
+# 				url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+# 				FlowRouter.go url
+# 	,true
+# 	AutoForm.hooks creatorCellEditForm:
+# 		onSuccess: ()->
+# 			$('#afModal').modal 'hide'
+# 	,true
 
 
 Template.creator_grid.refresh = ->

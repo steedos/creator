@@ -1,6 +1,16 @@
 Creator.getObjectSchema = (obj) ->
 	schema = {}
-	_.each obj.fields, (field, field_name)->
+
+	fieldsArr = []
+
+	_.each obj.fields , (field, field_name)->
+		if !_.has(field, "name")
+			field.name = field_name
+		fieldsArr.push field
+
+	_.each _.sortBy(fieldsArr, "sort_no"), (field)->
+
+		field_name = field.name
 
 		fs = {}
 		if field.regEx
@@ -24,14 +34,22 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.rows = field.rows || 3
 		else if field.type == "date"
 			fs.type = Date
-			fs.autoform.type = "bootstrap-datetimepicker"
-			fs.autoform.dateTimePickerOptions =
-				format: "YYYY-MM-DD"
+			fs.autoform.afFieldInput = 
+				type: "bootstrap-datetimepicker"
+				dateTimePickerOptions:
+					format: "YYYY-MM-DD"
+			# fs.autoform.afFieldInput.type = "bootstrap-datetimepicker"
+			# fs.autoform.afFieldInput.dateTimePickerOptions =
+			# 	format: "YYYY-MM-DD"
 		else if field.type == "datetime"
 			fs.type = Date
-			fs.autoform.type = "bootstrap-datetimepicker"
-			fs.autoform.dateTimePickerOptions =
-				format: "YYYY-MM-DD HH:mm"
+			fs.autoform.afFieldInput = 
+				type: "bootstrap-datetimepicker"
+				dateTimePickerOptions:
+					format: "YYYY-MM-DD HH:mm"
+			# fs.autoform.afFieldInput.type = "bootstrap-datetimepicker"
+			# fs.autoform.afFieldInput.dateTimePickerOptions =
+			# 	format: "YYYY-MM-DD HH:mm"
 		else if field.type == "[Object]"
 			fs.type = [Object]
 		else if field.type == "html"
@@ -70,6 +88,9 @@ Creator.getObjectSchema = (obj) ->
 				fs.optionsFunction = field.optionsFunction
 
 			if field.reference_to
+
+				if field.reference_sort
+					fs.autoform.optionsSort = field.reference_sort
 
 				if field.reference_to == "users"
 					fs.autoform.type = "selectuser"
@@ -139,7 +160,10 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = Number
 			fs.autoform.type = "steedosNumber"
 			fs.autoform.precision = field.precision || 18
-			fs.autoform.scale = field.scale || 2
+			if !field.scale && field.scale !=0
+				fs.autoform.scale = 2
+			else
+				fs.autoform.scale = field.scale
 		else if field.type == "boolean"
 			fs.type = Boolean
 			fs.autoform.type = "boolean-checkbox"
@@ -160,9 +184,11 @@ Creator.getObjectSchema = (obj) ->
 				fs.type = String
 				fs.autoform.type = 'fileUpload'
 				fs.autoform.collection = field.collection
-		else if  field.type == "filesize"
+		else if field.type == "filesize"
 			fs.type = Number
 			fs.autoform.type = 'filesize'
+		else if field.type == "Object"
+			fs.type = Object
 		else
 			fs.type = field.type
 
@@ -210,6 +236,15 @@ Creator.getObjectSchema = (obj) ->
 			fs.index = field.index
 		else if field.sortable
 			fs.index = true
+
+		if field.type == "grid"
+			fs.type = Array
+			fs.autoform.editable = true
+			fs.autoform.type = "table"
+			
+			schema[field_name + ".$"] = 
+				type: Object
+		
 		schema[field_name] = fs
 
 	return schema
@@ -230,3 +265,64 @@ Creator.getFieldDisplayValue = (object_name, field_name, field_value)->
 		html = moment(this.val).format('YYYY-MM-DD')
 
 	return html
+
+
+Creator.getFieldOperation = (field_type) ->
+	# 日期类型: date, datetime  支持操作符: "=", "<>", "<", ">", "<=", ">="
+	# 文本类型: text, textarea, html  支持操作符: "=", "<>", "contains", "notcontains", "startswith"
+	# 选择类型: lookup, master_detail, select 支持操作符: "=", "<>"
+	# 数值类型: currency, number  支持操作符: "=", "<>", "<", ">", "<=", ">="
+	# 布尔类型: boolean  支持操作符: "=", "<>"
+	# 数组类型: checkbox, [text]  支持操作符: "=", "<>"
+
+	optionals = {
+		equal: {label: t("creator_filter_operation_equal"), value: "="},
+		unequal: {label: t("creator_filter_operation_unequal"), value: "<>"},
+		less_than: {label: t("creator_filter_operation_less_than"), value: "<"},
+		greater_than: {label: t("creator_filter_operation_greater_than"), value: ">"},
+		less_or_equal: {label: t("creator_filter_operation_less_or_equal"), value: "<="},
+		greater_or_equal: {label: t("creator_filter_operation_greater_or_equal"), value: ">="},
+		contains: {label: t("creator_filter_operation_contains"), value: "contains"},
+		not_contain: {label: t("creator_filter_operation_does_not_contain"), value: "notcontains"},
+		starts_with: {label: t("creator_filter_operation_starts_with"), value: "startswith"},
+	}
+
+	if field_type == undefined
+		return _.values(optionals)
+
+	operations = []
+
+	if field_type == "date" or field_type == "datetime"
+		operations.push(optionals.equal, optionals.unequal, optionals.less_than, optionals.greater_than, optionals.less_or_equal, optionals.greater_or_equal)
+	else if field_type == "text" or field_type == "textarea" or field_type == "html"
+		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
+	else if field_type == "lookup" or field_type == "master_detail" or field_type == "select"
+		operations.push(optionals.equal, optionals.unequal)
+	else if field_type == "currency" or field_type == "number"
+		operations.push(optionals.equal, optionals.unequal, optionals.less_than, optionals.greater_than, optionals.less_or_equal, optionals.greater_or_equal)
+	else if field_type == "boolean"
+		operations.push(optionals.equal, optionals.unequal)
+	else if field_type == "checkbox"
+		operations.push(optionals.equal, optionals.unequal)
+	else if field_type == "[text]"
+		operations.push(optionals.equal, optionals.unequal)
+	else
+		operations.push(optionals.equal, optionals.unequal)
+
+	return operations
+
+###
+    先按照有排序号的小的在前，大的在后
+    再将没有排序号的显示在
+###
+Creator.getObjectFieldsName = (object_name)->
+	fields = Creator.getObject(object_name)?.fields
+	fieldsArr = []
+
+	_.each fields, (field)->
+		fieldsArr.push {name: field.name, sort_no: field.sort_no}
+
+	fieldsName = []
+	_.each _.sortBy(fieldsArr, "sort_no"), (field)->
+		fieldsName.push(field.name)
+	return fieldsName

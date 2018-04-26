@@ -27,10 +27,13 @@ if Meteor.isServer
 		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1, assigned_apps:1}})
 		psetsUser = this.psetsUser || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1, assigned_apps:1}})
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1}}).fetch()
-
 		apps = []
 		if Creator.isSpaceAdmin(spaceId, userId)
-			psetBase = psetsAdmin
+			if psetsAdmin?.assigned_apps and psetsUser?.assigned_apps
+				psetsAdmin?.assigned_apps = _.union(psetsAdmin?.assigned_apps,psetsUser?.assigned_apps)
+				psetBase = psetsAdmin
+			if !psetsUser?.assigned_apps
+				psetBase = psetsUser
 		else
 			psetBase = psetsUser
 		if psetBase?.assigned_apps
@@ -147,7 +150,7 @@ if Meteor.isServer
 		# 			return false
 		# 		if !doc.space
 		# 			return false
-		# 		permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
+	    	# 		permissions = Creator.getObjectPermissions(doc.space, userId, object_name)
 		# 		if !permissions.allowCreate
 		# 			return false
 

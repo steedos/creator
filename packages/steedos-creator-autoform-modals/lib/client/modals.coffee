@@ -52,6 +52,9 @@ getObjectName = (collectionName)->
 
 getSimpleSchema = (collectionName)->
 	if collectionName
+		object_name = getObjectName collectionName
+		object_fields = Creator.getObject(object_name).fields
+		_fields = Creator.getFields(object_name)
 		schema = collectionObj(collectionName).simpleSchema()._schema
 		fields = Session.get("cmFields")
 
@@ -59,6 +62,11 @@ getSimpleSchema = (collectionName)->
 		if fields
 			fields = fields.replace(/\ /g, "").split(",")
 			_.each fields, (field)->
+				if object_fields[field]?.type == "grid"
+					table_fields = _.filter _fields, (f)->
+						return /\w+(\.\$\.){1}\w+/.test(f)
+					_.each table_fields, (f)->
+						_.extend(final_schema, _.pick(schema, f))
 				obj = _.pick(schema, field, field + ".$")
 				_.extend(final_schema, obj)
 		else
@@ -113,6 +121,8 @@ Template.CreatorAutoformModals.rendered = ->
 	$('#afModal').on 'hidden.bs.modal', ->
 		$(window).unbind 'keyup', onEscKey
 
+		doc = Session.get 'cmDoc'
+
 		sessionKeys = [
 			'cmCollection',
 			'cmOperation',
@@ -151,6 +161,7 @@ Template.CreatorAutoformModals.rendered = ->
 			keyPress = Session.get 'cmPressKey'
 			keyPress = '.' + keyPress.replace(/\s+/ig, '.')
 			Meteor.defer ()->
+				Session.set 'cmDoc', doc
 				$(keyPress).click()
 
 
@@ -315,8 +326,9 @@ helpers =
 				permission_fields.push "_object_name"
 
 			if Session.get 'cmFields'
-				firstLevelKeys = Session.get('cmFields').replace(/\ /g, "")
-				firstLevelKeys = firstLevelKeys.split(",")
+				cmFields = Session.get('cmFields').replace(/\ /g, "")
+				cmFields = cmFields.split(",")
+				firstLevelKeys = _.intersection(firstLevelKeys, cmFields)
 			if Session.get 'cmOmitFields'
 				firstLevelKeys = _.difference firstLevelKeys, [Session.get('cmOmitFields')]
 			
@@ -331,6 +343,7 @@ helpers =
 				return finalFields
 
 			hiddenFields = Creator.getHiddenFields(schema)
+			disabledFields = Creator.getDisabledFields(schema)
 
 			fieldGroups = []
 			fieldsForGroup = []
@@ -360,6 +373,9 @@ helpers =
 				grouplessFields: grouplessFields
 				groupFields: fieldGroups
 				hiddenFields: hiddenFields
+				disabledFields: disabledFields
+
+			console.log finalFields
 
 			return finalFields
 
@@ -368,6 +384,26 @@ helpers =
 			return true
 		else
 			return false
+
+	isDisabled: (key)->
+		cmCollection = Session.get 'cmCollection'
+		if cmCollection
+			object_name = getObjectName(cmCollection)
+			fields = Creator.getObject(object_name).fields
+			return fields[key].disabled
+
+	disabledFieldsValue: (key)->
+		cmCollection = Session.get 'cmCollection'
+		if cmCollection
+			object_name = getObjectName(cmCollection)
+			fields = Creator.getObject(object_name).fields
+			defaultValue = fields[key].defaultValue
+			if _.isFunction(defaultValue)
+				defaultValue = defaultValue()
+			return defaultValue
+
+	getLabel: (key)->
+		return AutoForm.getLabelForField(key)
 
 	isSingle: ()->
 		return Session.get("cmEditSingleField")
@@ -459,6 +495,8 @@ Template.CreatorAfModal.events
 										trigger.todo.apply({object_name: object_name},[userId, result])
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
+					console.log insertDoc
+
 					userId = Meteor.userId()
 					cmCollection = Session.get 'cmCollection'
 					object_name = getObjectName(cmCollection)
@@ -490,6 +528,9 @@ Template.CreatorAfModal.events
 							delete updateDoc["$unset"]._ids
 							delete updateDoc["$unset"]._object_name
 
+						# insertDoc里面的值是最全最精确的
+						updateDoc["$set"] = insertDoc
+
 						_ids = _id.split(",")
 						_.each _ids, (id)->
 							urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{id}")
@@ -515,12 +556,12 @@ Template.CreatorAfModal.events
 
 				onSuccess: (operation,result)->
 					$('#afModal').modal 'hide'
-					if result.type == "post"
-						app_id = Session.get("app_id")
-						object_name = result.object_name
-						record_id = result._id
-						url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
-						FlowRouter.go url
+					# if result.type == "post"
+					# 	app_id = Session.get("app_id")
+					# 	object_name = result.object_name
+					# 	record_id = result._id
+					# 	url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
+					# 	FlowRouter.go url
 				
 				onError: (operation,error) ->
 					console.error error
@@ -573,7 +614,9 @@ Template.CreatorAfModal.events
 		# 上次的操作是保存并新建，清空 cmDoc，并设置 cmOperation为 insert
 
 		if Session.get 'cmShowAgain'
-			Session.set 'cmDoc', undefined
+			console.log "t.data.operation", t.data.operation
+			if t.data.operation == 'update'
+				Session.set 'cmDoc', undefined
 			Session.set 'cmOperation', 'insert'
 
 		# 重置 cmShowAgain

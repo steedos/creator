@@ -16,8 +16,13 @@ Template.creator_view.onRendered ->
 	this.autorun ->
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
+		object_fields = Creator.getObject(object_name).fields
 		if object_name and record_id
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], {}
+			fields = Creator.getFields(object_name)
+			ref_fields = {}
+			_.each fields, (f)->
+				ref_fields[f] = 1
+			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields
 
 Template.creator_view.helpers Creator.helpers
 
@@ -91,7 +96,7 @@ Template.creator_view.helpers
 		record = Creator.getObjectRecord()
 		name_field_key = Creator.getObject()?.NAME_FIELD_KEY
 		if record and name_field_key
-			return record[name_field_key]
+			return record.label || record[name_field_key]
 
 	backUrl: ()->
 		return Creator.getObjectUrl(Session.get("object_name"), null)
@@ -140,6 +145,9 @@ Template.creator_view.helpers
 				# 附件的关联搜索条件是定死的
 				selector["#{related_field_name}.o"] = Session.get "object_name"
 				selector["#{related_field_name}.ids"] = [record_id]
+			else if Session.get("object_name") == "objects"
+				recordObjectName = Creator.getObjectRecord()?.name
+				selector[related_field_name] = recordObjectName
 			else
 				selector[related_field_name] = record_id
 			permissions = Creator.getPermissions(object_name)
@@ -210,6 +218,20 @@ Template.creator_view.helpers
 		app_id = Session.get "app_id"
 		related_object_name = this.object_name
 		return Creator.getRelatedObjectUrl(object_name, app_id, record_id, related_object_name)
+	
+	cell_data: (key)->
+		record = Creator.getObjectRecord()
+		data = {}
+		data._id = record._id
+		data.val = record[key]
+		data.doc = record
+		data.field = Creator.getObject().fields[key]
+		data.field_name = key
+		data.object_name = Session.get("object_name")
+		data.disabled = true
+		data.parent_view = "record_details"
+		console.log data
+		return data
 
 
 Template.creator_view.events
@@ -223,7 +245,7 @@ Template.creator_view.events
 		Session.set("action_collection", "Creator.Collections.#{objectName}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
-		Creator.executeAction objectName, this, id
+		Creator.executeAction objectName, this, id, $(event.currentTarget)
 
 	'click .creator-view-tabs-link': (event) ->
 		$(".creator-view-tabs-link").closest(".slds-tabs_default__item").removeClass("slds-is-active")
@@ -286,7 +308,10 @@ Template.creator_view.events
 			if object_name == related_obj.object_name
 				relatedKey = related_obj.related_field_name
 
-		if relatedKey
+		if  Session.get("object_name") == "objects"
+			recordObjectName = Creator.getObjectRecord().name
+			Session.set 'cmDoc', {"#{relatedKey}": recordObjectName}
+		else if relatedKey
 			Session.set 'cmDoc', {"#{relatedKey}": {o: Session.get("object_name"), ids: [relatedValue]}}
 
 		Session.set("action_fields", undefined)
@@ -294,7 +319,7 @@ Template.creator_view.events
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
 		Meteor.defer ()->
-			$(".creator-add").click()
+			$(".creator-add-related").click()
 		return 
 
 	'click .list-item-action': (event, template) ->

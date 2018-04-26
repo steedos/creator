@@ -18,12 +18,15 @@ Creator.Objects.contracts =
 			label: "金额"
 			type: "currency"
 			required: true
+			sortable: true
 		signed_date:
 			label: "签订日期" 
 			type: "date"
+			sortable: true
 		owner:
 			label: "责任人"
 			omit: false
+			sortable: true
 		account:
 			label: "对方单位"
 			type: "master_detail"
@@ -35,9 +38,11 @@ Creator.Objects.contracts =
 		start_date:
 			label: "开始日期"
 			type: "date"
+			sortable: true
 		end_date: 
 			label: "结束日期"
 			type: "date"
+			sortable: true
 		description: 
 			label: "备注"
 			type: "textarea"
@@ -45,13 +50,12 @@ Creator.Objects.contracts =
 
 
 	list_views:
-		default:
-			columns: ["name", "amount", "signed_date", "account", "owner"]
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
 		all:
 			label: "所有合同"
+			columns: ["name", "amount", "signed_date", "account", "owner"]
 			filter_scope: "space"
 		mine:
 			label: "我的合同"

@@ -11,10 +11,26 @@ _syncToObject = (doc) ->
 
 	fields = {}
 
-	_.forEach object_fields, (f)->
-		fields[f.name] = f
+	table_fields = {}
 
-	Creator.getCollection("objects").update({_id: doc.object}, {
+	_.forEach object_fields, (f)->
+		if /^[a-zA-Z_]\w*(\.\$\.\w+){1}[a-zA-Z0-9]*$/.test(f.name)
+			cf_arr = f.name.split(".$.")
+			child_fields = {}
+			child_fields[cf_arr[1]] = f
+			if !_.size(table_fields[cf_arr[0]])
+				table_fields[cf_arr[0]] = {}
+			_.extend(table_fields[cf_arr[0]], child_fields)
+		else
+			fields[f.name] = f
+
+	_.each table_fields, (f, k)->
+		if fields[k].type == "grid"
+			if !_.size(fields[k].fields)
+				fields[k].fields = {}
+			_.extend(fields[k].fields, f)
+
+	Creator.getCollection("objects").update({name: doc.object}, {
 		$set:
 			fields: fields
 	})
@@ -35,13 +51,18 @@ Creator.Objects.object_fields =
 			searchable: true
 			index: true
 			required: true
-			regEx: SimpleSchema.RegEx.code
+			regEx: SimpleSchema.RegEx.field
 		label:
 			type: "text"
 		object:
 			type: "master_detail"
 			reference_to: "objects"
 			required: true
+			optionsFunction: ()->
+				_options = []
+				_.forEach Creator.objectsByName, (o, k)->
+					_options.push {label: o.label, value: k, icon: o.icon}
+				return _options
 		type:
 			type: "select"
 			required: true
@@ -57,6 +78,13 @@ Creator.Objects.object_fields =
 				currency: "金额"
 				lookup: "相关表"
 				master_detail: "主表/子表"
+				grid: "表格"
+		sort_no:
+			label: "排序号"
+			type: "number"
+			defaultValue: 100
+			scale: 0
+			sortable: true
 
 		group:
 			type: "text"
@@ -110,7 +138,7 @@ Creator.Objects.object_fields =
 				_.forEach Creator.Objects, (o, k)->
 					_options.push {label: o.label, value: k, icon: o.icon}
 				return _options
-			multiple: true
+#			multiple: true #先修改为单选
 
 		rows:
 			type: "currency"
@@ -126,7 +154,8 @@ Creator.Objects.object_fields =
 
 	list_views:
 		default:
-			columns: ["name", "label", "type", "object", "modified"]
+			columns: ["name", "label", "type", "object", "sort_no", "modified"]
+			sort: [{field_name: "sort_no", order: "asc"}]
 		all:
 			filter_scope: "space"
 
@@ -172,8 +201,11 @@ Creator.Objects.object_fields =
 				if modifier?.$set?.name && isRepeatedName(doc, modifier.$set.name)
 					throw new Meteor.Error 500, "对象名称不能重复"
 
-				if modifier?.$set?.reference_to && modifier.$set.reference_to.length == 1
-					_reference_to = modifier.$set.reference_to[0]
+				if modifier?.$set?.reference_to
+					if modifier.$set.reference_to.length == 1
+						_reference_to = modifier.$set.reference_to[0]
+					else
+						_reference_to = modifier.$set.reference_to
 
 				object = Creator.getCollection("objects").findOne({_id: doc.object}, {fields: {name: 1, label: 1}})
 
@@ -183,13 +215,20 @@ Creator.Objects.object_fields =
 					if modifier?.$set?.reference_to && doc.reference_to != _reference_to && object_documents.count() > 0
 						throw new Meteor.Error 500, "对象#{object.label}中已经有记录，不能修改reference_to字段"
 
+					if modifier?.$unset?.reference_to && doc.reference_to != _reference_to && object_documents.count() > 0
+						throw new Meteor.Error 500, "对象#{object.label}中已经有记录，不能修改reference_to字段"
+
+#					if modifier?.$set?.reference_to
+#						if modifier.$set.reference_to.length == 1
+#							modifier.$set.reference_to = modifier.$set.reference_to[0]
+
 		"before.insert.server.object_fields":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
 
-				if doc.reference_to?.length == 1
-					doc.reference_to = doc.reference_to[0]
+#				if doc.reference_to?.length == 1
+#					doc.reference_to = doc.reference_to[0]
 
 				if isRepeatedName(doc)
 					throw new Meteor.Error 500, "对象名称不能重复"

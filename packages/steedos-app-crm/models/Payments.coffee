@@ -13,27 +13,33 @@ Creator.Objects.contract_payments =
 			label: "金额"
 			type: "currency"
 			required: true
+			sortable: true
 		due_date:
 			label: "计划付款日期"
 			type: "date"
+			sortable: true
 		contract:
 			label: "合同"
 			type: "master_detail"
 			reference_to: "contracts"
 			required: true
+			sortable: true
 		account:
 			label: "单位"
 			type: "master_detail"
 			reference_to: "accounts"
+			sortable: true
 		is_closed:
 			label: "已付款"
 			type: "boolean"
 		close_date:
 			label: "实际付款日期"
 			type: "date"
+			sortable: true
 		billing_date:
 			label: "发票日期"
 			type: "date"
+			sortable: true
 		billing_no:
 			label: "发票号"
 			type: "text"
@@ -43,14 +49,12 @@ Creator.Objects.contract_payments =
 			is_wide: true
 
 	list_views:
-		default:
-			columns: ["name", "amount", "contract", "due_date", "is_closed"]
-
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
 		all:
 			label: "所有"
+			columns: ["name", "amount", "contract", "due_date", "is_closed"]
 			filter_scope: "space"
 
 	permission_set:

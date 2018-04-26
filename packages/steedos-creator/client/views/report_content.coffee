@@ -1,5 +1,45 @@
 Template.creator_report_content.helpers Creator.helpers
 
+getODataFilterForReport = (object_name, filter_scope, filters)->
+	unless object_name
+		return ["_id", "=", -1]
+	userId = Meteor.userId()
+	spaceId = Session.get("spaceId")
+	selector = []
+	if spaceId and userId
+		if object_name == "users"
+			selector.push ["_id", "=", userId]
+
+		if filters and filters.length > 0
+			filters = Creator.formatFiltersToDev(filters)
+			if filters and filters.length > 0
+				if selector.length > 0
+					selector.push "and"
+				_.each filters, (filter)->
+					if object_name != 'spaces' || (filter.length > 0 && filter[0] != "_id")
+						selector.push filter
+
+			if filter_scope == "mine"
+				if selector.length > 0
+					selector.push "and"
+				selector.push ["owner", "=", userId]
+		else
+			permissions = Creator.getPermissions(object_name)
+			if permissions.viewAllRecords
+				if filter_scope == "mine"
+					if selector.length > 0
+						selector.push "and"
+					selector.push ["owner", "=", userId]
+			else if permissions.allowRead
+				if selector.length > 0
+					selector.push "and"
+				selector.push ["owner", "=", userId]
+
+	if selector.length == 0
+		# 不可以返回undefined，因为它不能实现清除过虑条件
+		return null
+	return selector
+
 getReportContent = ()->
 	self = this
 	filters = Session.get("filter_items")
@@ -110,41 +150,124 @@ getFieldLabel = (field, key)->
 				fieldLabel += " " + relate_field.label
 	return fieldLabel
 
-pivotGridChart = null
+getSelectFieldLabel = (value, options)->
+	label = _.findWhere(options,{value:value})?.label
+	label = if label then label else value
+	return if label then label else "--"
 
-renderChart = (grid, self)->
+pivotGridChart = null
+gridLoadedArray = null
+
+renderChart = (self)->
 	record_id = Session.get("record_id")
 	reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
 	unless reportObject
 		return
 	if reportObject?.report_type == "summary"
-		# 因摘要类型可能在设计模式下改了报表属性，这里chart没办法自动同步，所以只能重新根据报表属性生成chart
-		gridData = self.dataGridInstance.get()?.getDataSource().store()._array
-		if gridData
-			reportContent = getReportContent.bind(self)()
-			_.extend(reportObject,reportContent)
-			renderMatrixReport.bind(self)(reportObject, gridData, true)
-			grid = self.pivotGridInstance.get()
-	unless grid
-		return
+		grid = Tracker.nonreactive ()->
+			return self.dataGridInstance.get()
+		unless grid
+			return
+		objectName = reportObject.object_name
+		objectFields = Creator.getObject(objectName)?.fields
+		unless objectFields
+			return
+		unless gridLoadedArray
+			return
+		groupSums = grid._options.summary.groupItems
+		# dataSourceItems = grid.getDataSource().items()
+		firstRowField = _.findWhere(grid._options.columns, {groupIndex:0})
+		unless firstRowField
+			return
+		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
+		objectGroupField = objectFields[firstRowField.dataField]
+		if objectGroupField?.type == "select"
+			_.each dataSourceItems, (dsi)->
+				dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+		dataSourceItems = dataSourceItems.sort(Creator.sortingMethod.bind({key:"key"}))
+		aggregateSeeds = []
+		aggregateKeys = []
+		_.each groupSums, (gs, index)->
+			aggregateSeeds.push(0)
+			aggregateKeys.push({type:gs.summaryType, column:gs.column ,value:0})
+		_.each dataSourceItems, (dsi) ->
+			_.each aggregateKeys, (ak)->
+				ak.value = 0
+			DevExpress.data.query(dsi.items).aggregate(aggregateSeeds, (total, itemData) ->
+				_.each aggregateKeys, (ak)->
+					if ak.type == "count"
+						ak.value++
+					else if ak.type == "sum"
+						ak.value += itemData[ak.column]
+				return _.map aggregateKeys, (ak)->
+					return ak.value
+			).done (result) ->
+				dsi.aggregates = result
+		chartData = []
+		chartPanes = []
+		chartSeries = []
+		chartValueAxis = []
+		keyOption = ""
+		chartItem = {}
+		serie = {}
+		tempPaneName = ""
+		tempSummaryType = ""
+		tempKey = ""
+		tempAxisText = ""
+		_.each groupSums, (gs, index1)->
+			tempSummaryType = gs.summaryType
+			tempPaneName = "#{gs.column}_#{tempSummaryType}"
+			chartPanes.push name: tempPaneName
+			tempAxisText = if tempSummaryType == "count" then "计数" else "总和"
+			unless gs.column == "_id"
+				fieldName = objectFields[gs.column]?.label
+				unless fieldName
+					fieldName = gs.column
+				tempAxisText += " #{fieldName}"
+			chartValueAxis.push pane: tempPaneName, title: { text: tempAxisText }
+			_.each dataSourceItems, (dsi, index2)->
+				tempKey = "key#{index2 + 1}"
+				chartItem = {}
+				chartItem[tempKey] = if dsi.key then dsi.key else "--"
+				chartItem[tempSummaryType] = dsi.aggregates[index1]
+				chartData.push chartItem
+				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryType}", argumentField: tempKey
+		dxOptions = 
+			dataSource: chartData, 
+			commonSeriesSettings: {
+				type: "bar"
+			},
+			equalBarWidth: false,
+			panes: chartPanes,
+			series: chartSeries,
+			valueAxis: chartValueAxis
+		pivotGridChart = $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart('instance')
+	else
+		grid = Tracker.nonreactive ()->
+			return self.pivotGridInstance.get()
+		unless grid
+			return
+		pivotGridChart = $('#pivotgrid-chart').show().dxChart(
+			equalBarWidth: false
+			commonSeriesSettings: 
+				type: 'bar'
+			tooltip:
+				enabled: true
+			size: 
+				height: 300
+			adaptiveLayout: 
+				width: 450
+		).dxChart('instance')
+		grid.bindChart pivotGridChart,
+			dataFieldsDisplayMode: 'splitPanes'
+			alternateDataFields: false
 
-	pivotGridChart = $('#pivotgrid-chart').show().dxChart(
-		equalBarWidth: false
-		commonSeriesSettings: 
-			type: 'bar'
-		tooltip:
-			enabled: true
-		size: 
-			height: 300
-		adaptiveLayout: 
-			width: 450
-	).dxChart('instance')
-	grid.bindChart pivotGridChart,
-		dataFieldsDisplayMode: 'splitPanes'
-		alternateDataFields: false
-
-renderTabularReport = (reportObject, reportData)->
+renderTabularReport = (reportObject)->
 	self = this
+	userId = Meteor.userId()
+	spaceId = Session.get("spaceId")
+	selectColumns = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -153,14 +276,22 @@ renderTabularReport = (reportObject, reportData)->
 	sorts = _.object(reportObject.options?.sort)
 	columnWidths = _.object(reportObject.options?.column_width)
 	reportColumns = reportObject.columns?.map (item, index)->
-		itemFieldKey = item.replace(/\./g,"*%*")
-		fieldFirstKey = item.split(".")[0]
-		itemField = objectFields[fieldFirstKey]
+		# itemFieldKey = item.replace(/\./g,"*%*")
+		fieldKeys = item.split(".")
+		selectColumns.push(fieldKeys[0])
+		if fieldKeys.length > 1
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
+		itemField = objectFields[fieldKeys[0]]
 		caption = getFieldLabel itemField, item
 		field = {
 			caption: caption
-			dataField: itemFieldKey
+			dataField: item
 		}
+		if itemField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				return getSelectFieldLabel rowData[item], itemField.options
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -190,6 +321,13 @@ renderTabularReport = (reportObject, reportData)->
 	_.every reportColumns, (n)->
 		n.sortingMethod = Creator.sortingMethod
 
+	pageSize = 10000
+	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
+	selectColumns = _.uniq selectColumns
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
+	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		showColumnLines: false
 		columnResizingMode: "widget"
@@ -200,19 +338,44 @@ renderTabularReport = (reportObject, reportData)->
 		"export":
 			enabled: true
 			fileName: reportObject.name
-		dataSource: reportData
+		dataSource: 
+			select: selectColumns
+			filter: filter
+			expand: expands
+			store: 
+				type: "odata",
+				version: 4,
+				url: Steedos.absoluteUrl(url)
+				withCredentials: false,
+				beforeSend: (request) ->
+					request.headers['X-User-Id'] = userId
+					request.headers['X-Space-Id'] = spaceId
+					request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
+				onLoaded: (loadOptions)->
+					self.is_chart_open.set(false)
+					self.is_chart_disabled.set(true)
+					$('#pivotgrid-chart').hide()
+					return
+				errorHandler: (error) ->
+					if error.httpStatus == 404 || error.httpStatus == 400
+						error.message = t "creator_odata_api_not_found"
 		paging: false
 		scrolling: 
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
 	
+	
 	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
 
-	this.dataGridInstance?.set datagrid
+	self.dataGridInstance?.set datagrid
 
-renderSummaryReport = (reportObject, reportData)->
+renderSummaryReport = (reportObject)->
 	self = this
+	userId = Meteor.userId()
+	spaceId = Session.get("spaceId")
+	selectColumns = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -221,14 +384,22 @@ renderSummaryReport = (reportObject, reportData)->
 	sorts = _.object(reportObject.options?.sort)
 	columnWidths = _.object(reportObject.options?.column_width)
 	reportColumns = reportObject.columns?.map (item, index)->
-		itemFieldKey = item.replace(/\./g,"*%*")
-		fieldFirstKey = item.split(".")[0]
-		itemField = objectFields[fieldFirstKey]
+		# itemFieldKey = item.replace(/\./g,"*%*")
+		fieldKeys = item.split(".")
+		selectColumns.push(fieldKeys[0])
+		if fieldKeys.length > 1
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
+		itemField = objectFields[fieldKeys[0]]
 		itemLabel = getFieldLabel itemField, item
 		field = {
 			caption: itemLabel
-			dataField: itemFieldKey
+			dataField: item
 		}
+		if itemField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				return getSelectFieldLabel rowData[item], itemField.options
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -237,15 +408,23 @@ renderSummaryReport = (reportObject, reportData)->
 	unless reportColumns
 		reportColumns = []
 	_.each reportObject.rows, (group, index)->
-		groupFieldKey = group.replace(/\./g,"*%*")
-		fieldFirstKey = group.split(".")[0]
-		groupField = objectFields[fieldFirstKey]
+		# groupFieldKey = group.replace(/\./g,"*%*")
+		fieldKeys = group.split(".")
+		selectColumns.push(fieldKeys[0])
+		if fieldKeys.length > 1
+			unless expandFields[fieldKeys[0]]
+				expandFields[fieldKeys[0]] = []
+			expandFields[fieldKeys[0]].push fieldKeys[1]
+		groupField = objectFields[fieldKeys[0]]
 		groupLabel = getFieldLabel groupField, group
 		field = {
 			caption: groupLabel
-			dataField: groupFieldKey
+			dataField: group
 			groupIndex: index
 		}
+		if groupField.type == "select"
+			field.calculateDisplayValue = (rowData)->
+				return getSelectFieldLabel rowData[group], groupField.options
 		if sorts[group]
 			field.sortOrder = sorts[group]
 		if columnWidths[group]
@@ -282,8 +461,14 @@ renderSummaryReport = (reportObject, reportData)->
 				groupSummaryItems.push defaultCounterSum
 				totalSummaryItems.push defaultCounterSum
 		else
-			valueFieldKey = value.replace(/\./g,"*%*")
-			valueField = objectFields[value.split(".")[0]]
+			# valueFieldKey = value.replace(/\./g,"*%*")
+			fieldKeys = value.split(".")
+			selectColumns.push(fieldKeys[0])
+			if fieldKeys.length > 1
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
+			valueField = objectFields[fieldKeys[0]]
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
 			if valueField.type == "number" or valueField.type == "currency"
@@ -303,9 +488,8 @@ renderSummaryReport = (reportObject, reportData)->
 					break
 			summaryItem = 
 				displayFormat: caption
-				column: valueFieldKey
+				column: value
 				summaryType: operation
-				# displayFormat: value.label
 			# sum统计统一设置为在分组统计中按列对齐，其他比如计数统计向左对齐
 			if ["sum"].indexOf(operation) > -1
 				summaryItem.alignByColumn = true
@@ -321,6 +505,13 @@ renderSummaryReport = (reportObject, reportData)->
 	_.every reportColumns, (n)->
 		n.sortingMethod = Creator.sortingMethod
 
+	pageSize = 10000
+	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
+	selectColumns = _.uniq selectColumns
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
+	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		columnResizingMode: "widget"
 		sorting: 
@@ -329,30 +520,51 @@ renderSummaryReport = (reportObject, reportData)->
 		"export":
 			enabled: true
 			fileName: reportObject.name
-		dataSource: reportData
+		dataSource: 
+			select: selectColumns
+			filter: filter
+			expand: expands
+			store: 
+				type: "odata",
+				version: 4,
+				url: Steedos.absoluteUrl(url)
+				withCredentials: false,
+				beforeSend: (request) ->
+					request.headers['X-User-Id'] = userId
+					request.headers['X-Space-Id'] = spaceId
+					request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
+				onLoaded: (loadOptions)->
+					gridLoadedArray = loadOptions
+					if groupSummaryItems.length
+						if reportObject.charting
+							self.is_chart_open.set(true)
+							self.is_chart_open.dep.changed()
+						else
+							self.is_chart_open.set(false)
+						self.is_chart_disabled.set(false)
+					else
+						self.is_chart_open.set(false)
+						self.is_chart_disabled.set(true)
+						$('#pivotgrid-chart').hide()
+					return
+				errorHandler: (error) ->
+					if error.httpStatus == 404 || error.httpStatus == 400
+						error.message = t "creator_odata_api_not_found"
 		paging: false
 		scrolling: 
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
-
 	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
-
-	if groupSummaryItems.length || totalSummaryItems.length
-		if reportObject.charting
-			self.is_chart_open.set(true)
-		else
-			self.is_chart_open.set(false)
-		self.is_chart_disabled.set(false)
-	else
-		self.is_chart_open.set(false)
-		self.is_chart_disabled.set(true)
-		$('#pivotgrid-chart').hide()
 
 	this.dataGridInstance?.set datagrid
 
-renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
+renderMatrixReport = (reportObject)->
 	self = this
+	userId = Meteor.userId()
+	spaceId = Session.get("spaceId")
+	selectColumns = []
+	expandFields = {}
 	objectName = reportObject.object_name
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
@@ -363,36 +575,49 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 	reportFields = []
 	_.each reportObject.rows, (row)->
 		if row != "_id"
-			rowFieldKey = row.replace(/\./g,"*%*")
-			fieldFirstKey = row.split(".")[0]
-			rowField = objectFields[fieldFirstKey]
+			# rowFieldKey = row.replace(/\./g,"*%*")
+			fieldKeys = row.split(".")
+			selectColumns.push(fieldKeys[0])
+			if fieldKeys.length > 1
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
+			rowField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel rowField, row
 			field = {
-				expanded: isOnlyForChart
 				caption: caption
 				width: 100
-				dataField: rowFieldKey
+				dataField: row
 				area: 'row'
 			}
+			if rowField.type == "select"
+				field.customizeText = (data)->
+					return getSelectFieldLabel data.value, rowField.options
 			if sorts[row]
 				field.sortOrder = sorts[row]
 			if columnWidths[row]
 				field.width = columnWidths[row]
 			reportFields.push field
-	# 如果是为摘要等其他类型报表加载Chart，则统计是以行为准，列只用来显示
-	columns = if isOnlyForChart then reportObject.rows else reportObject.columns
-	_.each columns, (column)->
+	_.each reportObject.columns, (column)->
 		if column != "_id"
-			columnFieldKey = column.replace(/\./g,"*%*")
-			fieldFirstKey = column.split(".")[0]
-			columnField = objectFields[fieldFirstKey]
+			# columnFieldKey = column.replace(/\./g,"*%*")
+			fieldKeys = column.split(".")
+			selectColumns.push(fieldKeys[0])
+			if fieldKeys.length > 1
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
+			columnField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel columnField, column
 			field = {
 				caption: caption
 				width: 100
-				dataField: columnFieldKey
+				dataField: column
 				area: 'column'
 			}
+			if columnField.type == "select"
+				field.customizeText = (data)->
+					return getSelectFieldLabel data.value, columnField.options
 			if sorts[column]
 				field.sortOrder = sorts[column]
 			if columnWidths[column]
@@ -417,8 +642,14 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 			if counting
 				reportFields.push defaultCounterSum
 		else
-			valueFieldKey = value.replace(/\./g,"*%*")
-			valueField = objectFields[value.split(".")[0]]
+			# valueFieldKey = value.replace(/\./g,"*%*")
+			fieldKeys = value.split(".")
+			selectColumns.push(fieldKeys[0])
+			if fieldKeys.length > 1
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
+			valueField = objectFields[fieldKeys[0]]
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
 			if valueField.type == "number" or valueField.type == "currency"
@@ -426,12 +657,12 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 			if valueField.type == "lookup" or valueField.type == "master_detail"
 				if valueField?.reference_to
 					relate_object_Fields = Creator.getObject(valueField?.reference_to)?.fields
-					relate_valueField = relate_object_Fields[value.split(".")[1]]
+					relate_valueField = relate_object_Fields[fieldKeys[1]]
 					if relate_valueField?.type == "number" or relate_valueField?.type == "currency"
 						operation = "sum"	
 			caption = valueField.label
 			unless caption
-				caption = objectName + "_" + valueFieldKey
+				caption = objectName + "_" + value
 			switch operation
 				when "sum"
 					caption = "总和 #{caption}"
@@ -441,19 +672,24 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 					break
 			reportFields.push 
 				caption: caption
-				dataField: valueFieldKey
+				dataField: value
 				# dataType: valueField.type
 				summaryType: operation
 				area: 'data'
 	_.each reportObject.fields, (item)->
-		itemFieldKey = item.replace(/\./g,"*%*")
-		if item != "_id" and !_.findWhere(reportFields,{dataField: itemFieldKey})
-			fieldFirstKey = item.split(".")[0]
-			itemField = objectFields[fieldFirstKey]
+		# itemFieldKey = item.replace(/\./g,"*%*")
+		if item != "_id" and !_.findWhere(reportFields,{dataField: item})
+			fieldKeys = item.split(".")
+			selectColumns.push(fieldKeys[0])
+			if fieldKeys.length > 1
+				unless expandFields[fieldKeys[0]]
+					expandFields[fieldKeys[0]] = []
+				expandFields[fieldKeys[0]].push fieldKeys[1]
+			itemField = objectFields[fieldKeys[0]]
 			caption = getFieldLabel itemField, item
 			field = {
 				caption: caption
-				dataField: itemFieldKey
+				dataField: item
 			}
 			reportFields.push field
 
@@ -466,7 +702,14 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 	
 	_.every reportFields, (n)->
 		n.sortingMethod = Creator.sortingMethod.bind({key:"value"})
-
+	
+	pageSize = 10000
+	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{pageSize}&$count=true"
+	selectColumns = _.uniq selectColumns
+	expands = []
+	_.each expandFields, (v,k)->
+		expands.push "#{k}($select=#{_.uniq(v).join(',')})"
+	filter = getODataFilterForReport reportObject.object_name, reportObject.filter_scope, reportObject.filters
 	dxOptions = 
 		columnResizingMode: "widget"
 		sorting: 
@@ -485,61 +728,73 @@ renderMatrixReport = (reportObject, reportData, isOnlyForChart)->
 		"export":
 			enabled: true
 			fileName: reportObject.name
-		dataSource:
+		dataSource: 
 			fields: reportFields
-			store: reportData
+			select: selectColumns
+			filter: filter
+			expand: expands
+			store: 
+				type: "odata",
+				version: 4,
+				url: Steedos.absoluteUrl(url)
+				withCredentials: false,
+				beforeSend: (request) ->
+					request.headers['X-User-Id'] = userId
+					request.headers['X-Space-Id'] = spaceId
+					request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
+				onLoaded: (loadOptions)->
+					if _.where(reportFields,{area:"data"}).length
+						if reportObject.charting
+							self.is_chart_open.set(true)
+							self.is_chart_open.dep.changed()
+						else
+							self.is_chart_open.set(false)
+						self.is_chart_disabled.set(false)
+					else
+						self.is_chart_open.set(false)
+						self.is_chart_disabled.set(true)
+						$('#pivotgrid-chart').hide()
+					return
+				errorHandler: (error) ->
+					if error.httpStatus == 404 || error.httpStatus == 400
+						error.message = t "creator_odata_api_not_found"
 
-	unless isOnlyForChart
-		drillDownDataSource = {}
-		salesPopup = $('#drill-down-popup').dxPopup(
-			width: 600
-			height: 400
-			contentTemplate: (contentElement) ->
-				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
-				drillDownFields = _.without drillDownFields, null, undefined
-				drillDownColumns = []
-				gridFields = self.pivotGridInstance.get().getDataSource()._fields
-				drillDownFields.forEach (n)->
-					if n == "_id"
-						return
-					gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
-					drillDownColumns.push {
-						dataField: gridFieldItem.dataField
-						caption: gridFieldItem.caption
-						sortingMethod: Creator.sortingMethod
-					}
-				$('<div />').addClass('drill-down-content').dxDataGrid(
-					width: 560
-					height: 300
-					columns: drillDownColumns).appendTo contentElement
-			onShowing: ->
-				$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
-		).dxPopup('instance')
-		dxOptions.onCellClick = (e)->
-			if e.area == 'data'
-				pivotGridDataSource = e.component.getDataSource()
-				rowPathLength = e.cell.rowPath.length
-				rowPathName = e.cell.rowPath[rowPathLength - 1]
-				popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
-				drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
-				salesPopup.option 'title', popupTitle
-				salesPopup.show()
+	drillDownDataSource = {}
+	salesPopup = $('#drill-down-popup').dxPopup(
+		width: 600
+		height: 400
+		contentTemplate: (contentElement) ->
+			drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
+			drillDownFields = _.without drillDownFields, null, undefined
+			drillDownColumns = []
+			gridFields = self.pivotGridInstance.get().getDataSource()._fields
+			drillDownFields.forEach (n)->
+				if n == "_id"
+					return
+				# gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
+				gridFieldItem = _.findWhere(gridFields,{dataField:n})
+				drillDownColumns.push {
+					dataField: gridFieldItem.dataField
+					caption: gridFieldItem.caption
+					sortingMethod: Creator.sortingMethod
+				}
+			$('<div />').addClass('drill-down-content').dxDataGrid(
+				width: 560
+				height: 300
+				columns: drillDownColumns).appendTo contentElement
+		onShowing: ->
+			$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
+	).dxPopup('instance')
+	dxOptions.onCellClick = (e)->
+		if e.area == 'data'
+			pivotGridDataSource = e.component.getDataSource()
+			rowPathLength = e.cell.rowPath.length
+			rowPathName = e.cell.rowPath[rowPathLength - 1]
+			popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
+			drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
+			salesPopup.option 'title', popupTitle
+			salesPopup.show()
 	pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
-	
-	if isOnlyForChart
-		$('#pivotgrid').hide()
-	
-	if _.where(reportFields,{area:"data"}).length
-		unless isOnlyForChart
-			if reportObject.charting
-				self.is_chart_open.set(true)
-			else
-				self.is_chart_open.set(false)
-		self.is_chart_disabled.set(false)
-	else
-		self.is_chart_open.set(false)
-		self.is_chart_disabled.set(true)
-		$('#pivotgrid-chart').hide()
 
 	this.pivotGridInstance?.set pivotGrid
 
@@ -561,36 +816,27 @@ renderReport = (reportObject)->
 	reportObject.counting = report_settings.counting
 	
 	objectName = reportObject.object_name
-	filterFields = _.union reportObject.columns, reportObject.rows, reportObject.values, reportObject.fields
-	filterFields = _.without filterFields, null, undefined
-	filter_scope = reportObject.filter_scope || "space"
-	filters = reportObject.filters
 	object = Creator.getObject(objectName)
 	unless object
 		toastr.error "未找到对象#{objectName}，请确认该报表指定的对象名是否正确"
 		return
-	if filters and filters.length > 0
-		filters = _.map filters, (obj)->
-			return [obj.field, obj.operation, obj.value]
-		
-		filters = Creator.formatFiltersToMongo(filters)
-	$("body").addClass("loading")
-	Meteor.call "report_data",{object_name: objectName, space: spaceId, filter_scope: filter_scope, filters: filters, fields: filterFields}, (error, result)->
-		$("body").removeClass("loading")
-		if error
-			console.error('report_data method error:', error)
-			return
-		switch reportObject.report_type
-			when 'tabular'
-				renderTabularReport.bind(self)(reportObject, result)
-			when 'summary'
-				# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
-				self.pivotGridInstance?.get()?.dispose()
-				renderSummaryReport.bind(self)(reportObject, result)
-			when 'matrix'
-				# 报表类型从summary转变成matrix时，需要把原来summary报表清除
-				self.dataGridInstance?.get()?.dispose()
-				renderMatrixReport.bind(self)(reportObject, result)
+	if pivotGridChart
+		pivotGridChart.dispose()
+	switch reportObject.report_type
+		when 'tabular'
+			# 报表类型从matrix转变成tabular时，需要把原来matrix报表清除
+			gridLoadedArray = null
+			self.pivotGridInstance?.get()?.dispose()
+			renderTabularReport.bind(self)(reportObject)
+		when 'summary'
+			# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
+			self.pivotGridInstance?.get()?.dispose()
+			renderSummaryReport.bind(self)(reportObject)
+		when 'matrix'
+			# 报表类型从summary转变成matrix时，需要把原来summary报表清除
+			gridLoadedArray = null
+			self.dataGridInstance?.get()?.dispose()
+			renderMatrixReport.bind(self)(reportObject)
 
 
 Template.creator_report_content.onRendered ->
@@ -620,13 +866,10 @@ Template.creator_report_content.onRendered ->
 	
 	this.autorun (c)->
 		is_chart_open = self.is_chart_open.get()
-		grid = Tracker.nonreactive ()->
-			return self.pivotGridInstance.get()
 		if is_chart_open
 			Tracker.nonreactive ()->
-				renderChart grid, self
+				renderChart self
 		else
-			pivotGridChart?.dispose()
 			$('#pivotgrid-chart').hide()
 
 

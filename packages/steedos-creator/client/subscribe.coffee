@@ -16,15 +16,16 @@ Meteor.startup ->
 			Creator.subs["CreatorListViews"].subscribe "object_listviews", Session.get("object_name"), Session.get("spaceId")
 
 	Tracker.autorun (c)->
-		if Creator.subs["CreatorListViews"].ready() && Creator.objects_initialized.get()
+		if Creator.subs["CreatorListViews"].ready() && Creator.bootstrapLoaded.get()
 			object_listViews = Creator.getCollection("object_listviews").find({space: Session.get("spaceId"), object_name: Session.get("object_name")})
 			list_views = Creator.Objects[Session.get("object_name")].list_views
 			list_views_byname = Creator.getObject(Session.get("object_name")).list_views
+			defaultColumns = Creator.getObjectDefaultColumns(Session.get("object_name"))
 			object_listViews.forEach (listview)->
-				_list_view = Creator.convertListView(list_views.default?.columns, listview, listview.name)
+				_list_view = Creator.convertListView(defaultColumns, listview, listview.name)
 				_key = listview._id
-				if listview.is_default
-					_key = "all"
+#				if listview.is_default
+#					_key = "all"
 				list_views[_key] = _list_view
 				list_views_byname[_key] = _list_view
 

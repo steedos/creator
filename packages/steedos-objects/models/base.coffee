@@ -1,12 +1,12 @@
-Creator.baseObject = 
-	fields: 
+Creator.baseObject =
+	fields:
 		owner:
 			label:"所有者"
 			type: "lookup"
 			reference_to: "users"
 			sortable: true
 			index: true
-			defaultValue: "{{userId}}"
+			defaultValue: "{userId}"
 		space:
 			type: "lookup"
 			reference_to: "spaces"
@@ -46,9 +46,35 @@ Creator.baseObject =
 			omit: true
 			index: true
 			hidden: true
+		instance_ids:
+			type: [String]
+			omit: true
+			hidden: true
+		instance_state:
+			type: String
+			omit: true
+			hidden: true
+		sharing: 
+			label: "记录级权限"
+			type: ["Object"]
+			# omit: true
+			hidden: true
+			blackbox: true
+		"sharing.$":
+			blackbox: true
+			omit: true
+		"sharing.$.u": 
+			label: "授权用户"
+			type: "[text]"
+		"sharing.$.o": 
+			label: "授权组织"
+			type: "[text]"
+		"sharing.$.r": 
+			label: "来自规则"
+			type: "text"
 
 	permission_set:
-		none: 
+		none:
 			allowCreate: false
 			allowDelete: false
 			allowEdit: false
@@ -60,18 +86,18 @@ Creator.baseObject =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true
 
 	triggers:
-		
-		"before.insert.server.default": 
+
+		"before.insert.server.default":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
@@ -82,7 +108,7 @@ Creator.baseObject =
 					doc.created_by = userId;
 					doc.modified_by = userId;
 
-		"before.update.server.default": 
+		"before.update.server.default":
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
@@ -91,18 +117,52 @@ Creator.baseObject =
 					modifier.$set = modifier.$set || {};
 					modifier.$set?.modified_by = userId
 
-		"before.insert.client.default": 
+		"before.insert.client.default":
 			on: "client"
 			when: "before.insert"
 			todo: (userId, doc)->
 				doc.space = Session.get("spaceId")
 
-#		"after.insert.client.default":
-#			on: "client"
-#			when: "after.insert"
-#			todo: (userId, doc)->
-#				if doc
-#					Meteor.call "object_recent_viewed", this.object_name, doc._id
+		"after.insert.server.sharing": 
+			on: "server"
+			when: "after.insert"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				object_name = this.object_name
+				obj = Creator.getObject(object_name)
+				if obj.enable_share
+					collection = Creator.getCollection(object_name)
+					psCollection = Creator.getCollection("permission_shares")
+					selector = { space: doc.space, object_name: object_name }
+					psRecords = psCollection.find(selector, fields: { _id:1, filters: 1, organizations: 1, users: 1 })
+					psRecords.forEach (ps)->
+						filters = Creator.formatFiltersToMongo(ps.filters, { extend: false })
+						selector = { space: doc.space, _id: doc._id, $and: filters }
+						count = collection.find(selector).count()
+						if count
+							# 如果当前新增的记录有满足条件的共享规则存在，则把共享规则配置保存起来
+							push = { sharing: { "u": ps.users, "o": ps.organizations, "r": ps._id } }
+							collection.direct.update({ _id: doc._id }, {$push: push})
+
+		"after.update.server.sharing": 
+			on: "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				object_name = this.object_name
+				obj = Creator.getObject(object_name)
+				if obj.enable_share
+					collection = Creator.getCollection(object_name)
+					psCollection = Creator.getCollection("permission_shares")
+					selector = { space: doc.space, object_name: object_name }
+					psRecords = psCollection.find(selector, fields: { _id:1, filters: 1, organizations: 1, users: 1 })
+					collection.direct.update({ _id: doc._id }, { $unset: { "sharing" : 1 } })
+					psRecords.forEach (ps)->
+						filters = Creator.formatFiltersToMongo(ps.filters, { extend: false })
+						selector = { space: doc.space, _id: doc._id, $and: filters }
+						count = collection.find(selector).count()
+						if count
+							# 如果当前修改的记录有满足条件的共享规则存在，则把共享规则配置保存起来
+							push = { sharing: { "u": ps.users, "o": ps.organizations, "r": ps._id } }
+							collection.direct.update({ _id: doc._id }, {$push: push})
 
 	actions:
 
@@ -142,6 +202,19 @@ Creator.baseObject =
 			on: "record_more"
 			todo: "standard_delete"
 
+		standard_approve:
+			label: "发起审批"
+			visible: (object_name, record_id, record_permissions) ->
+				#TODO 是否有对应关系
+				#TODO 权限判断
+				object_workflow = _.find Creator.object_workflows, (ow) ->
+					return ow.object_name is object_name
+
+				return !!object_workflow
+			on: "record"
+			todo: ()->
+				Modal.show('initiate_approval', { object_name: this.object_name, record_id: this.record_id })
+
 		# "export":
 		# 	label: "Export"
 		# 	visible: false
@@ -150,4 +223,4 @@ Creator.baseObject =
 		# 		alert("please write code in baseObject to export data for " + this.object_name)
 
 
-		
+

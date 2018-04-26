@@ -10,18 +10,39 @@ Creator.Objects.tasks =
 			is_wide: true
 			searchable:true
 			index:true
-		assigned_to:
-			label: "责任人"
+
+		assignees:
+			label: "分派给"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-		start_date:
-			label: "开始时间"
+
+		due_date: 
+			label: "截止时间"
 			type: "datetime"
-			omit: true
-		end_date: 
-			label: "到期时间"
-			type: "datetime"
+			sortable: true
+
+		# start_date:
+		# 	label: "开始时间"
+		# 	type: "datetime"
+		# 	hidden: true
+
+		# end_date: 
+		# 	label: "完成时间"
+		# 	type: "datetime"
+		# 	hidden: true
+
+		state: 
+			label: "状态"
+			type: "select"
+			options: [
+				{label:"未开始", value:"not_started"}, 
+				{label:"进行中", value:"in_progress"}, 
+				{label: "已完成", value:"completed"}
+				{label:"暂停", value:"paused"}, 
+			]
+			sortable: true
+
 		related_to:
 			label: "相关项"
 			type: "lookup"
@@ -37,18 +58,34 @@ Creator.Objects.tasks =
 			type: "textarea"
 			is_wide: true
 
+		tags:
+			label: "标签"
+			type: "text"
+			multiple: true
+
+		# is_closed:
+		# 	label: "已完成"
+		# 	type: "boolean"
+
 	list_views:
-		default:
-			columns: ["name", "end_date", "assigned_to", "related_to"]
-		recent:
-			label: "最近查看"
+		# recent:
+		# 	label: "最近查看"
+		# 	filter_scope: "space"
+		my_open_tasks:
+			label: "待办任务"
 			filter_scope: "space"
-		my_tasks:
-			label: "我的任务"
+			filters: [["assignees", "=", "{userId}"], ["state", "<>", "completed"]]
+		my_closed_tasks:
+			label: "已办任务"
 			filter_scope: "space"
-			filters: [["assigned_to", "=", "{userId}"]]
+			filters: [["assignees", "=", "{userId}"], ["state", "=", "completed"]]
+		created_tasks:
+			label: "交办任务"
+			filter_scope: "space"
+			filters: [["owner", "=", "{userId}"]]
 		all:
 			label: "所有任务"
+			columns: ["name", "due_date", "state", "assignees", "related_to"]
 			filter_scope: "space"
 
 	permission_set:

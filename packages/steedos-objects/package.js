@@ -47,17 +47,19 @@ Package.onUse(function(api) {
 	api.addFiles('core.coffee');
 
 	api.addFiles('lib/add_simple_schema_validation_error.coffee');
+	api.addFiles('lib/field_simple_schema_validation_error.coffee')
 
 	api.addFiles('lib/eval.js');
 	api.addFiles('lib/convert.coffee');
 
-	api.addFiles('lib/formular.coffee', "client");
+	api.addFiles('lib/formular.coffee');
 	
 	api.addFiles('lib/object.coffee');
 	api.addFiles('lib/fields.coffee');
 	api.addFiles('lib/triggers.coffee');
 	api.addFiles('lib/permission_sets.coffee');
 	api.addFiles('lib/collections.coffee');
+	api.addFiles('lib/resources.coffee',  "client");
 
 
 	api.addFiles('models/base.coffee');

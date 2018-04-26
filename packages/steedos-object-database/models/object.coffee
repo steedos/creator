@@ -8,6 +8,7 @@ isRepeatedName = (doc)->
 Creator.Objects.objects =
 	name: "objects"
 	icon: "orders"
+	label: "对象"
 	fields:
 		name:
 			type: "text"
@@ -20,10 +21,8 @@ Creator.Objects.objects =
 		icon:
 			type: "lookup"
 			optionsFunction: ()->
-				# 将svg文件打开后，把xml内容转换为json格式(https://www.bejson.com/xml2json/)，然后执行此脚本获取icon标识：_.pluck(json.svg.symbol, "-id").join(",")
-				standard_svgs = "account,address,announcement,answer_best,answer_private,answer_public,approval,apps,apps_admin,article,asset_relationship,assigned_resource,avatar,avatar_loading,bot,business_hours,calibration,call,call_history,campaign,campaign_members,canvas,carousel,case,case_change_status,case_comment,case_email,case_log_a_call,case_milestone,case_transcript,client,cms,coaching,connected_apps,contact,contact_list,contract,contract_line_item,custom,custom_notification,dashboard,datadotcom,default,document,drafts,email,email_chatter,empty,endorsement,entitlement,entitlement_process,entitlement_template,entity,entity_milestone,environment_hub,event,feed,feedback,file,flow,folder,forecasts,generic_loading,goals,group_loading,groups,hierarchy,home,household,insights,investment_account,lead,lead_insights,lead_list,link,list_email,live_chat,location,log_a_call,macros,maintenance_asset,maintenance_plan,marketing_actions,merge,metrics,news,note,omni_supervisor,operating_hours,opportunity,opportunity_splits,orders,people,performance,person_account,photo,poll,portal,post,pricebook,process,product,product_consumed,product_item,product_item_transaction,product_request,product_request_line_item,product_required,product_transfer,question_best,question_feed,quick_text,quip,quip_sheet,quotes,recent,record,related_list,relationship,report,resource_absence,resource_capacity,resource_preference,resource_skill,reward,rtc_presence,sales_path,scan_card,service_appointment,service_contract,service_crew,service_crew_member,service_report,service_resource,service_territory,service_territory_location,service_territory_member,shipment,skill,skill_entity,skill_requirement,social,solution,sossession,task,task2,team_member,template,thanks,thanks_loading,timesheet,timesheet_entry,timeslot,today,topic,topic2,unmatched,user,work_order,work_order_item,work_type".split(",")
 				options = []
-				_.forEach standard_svgs, (svg)->
+				_.forEach Creator.resources.sldsIcons.standard, (svg)->
 					options.push {value: svg, label: svg, icon: svg}
 				return options
 		is_enable:
@@ -41,6 +40,9 @@ Creator.Objects.objects =
 			type: "boolean"
 			defaultValue: true
 			hidden: true
+		enable_share:
+			type: "boolean"
+			defaultValue: false
 		is_view:
 			type: 'boolean'
 			defaultValue: false
@@ -98,6 +100,35 @@ Creator.Objects.objects =
 			modifyAllRecords: true
 			viewAllRecords: true
 
+	actions:
+		copy_odata:
+			label: "复制OData网址"
+			visible: true
+			on: "record"
+			todo: (object_name, record_id, item_element)->
+				record = Creator.getObjectById(record_id)
+				#enable_api 属性未开放
+				if record?.enable_api || true
+					o_name = record?.name
+					path = SteedosOData.getODataPath(Session.get("spaceId"), o_name)
+					item_element.attr('data-clipboard-text', path);
+					if !item_element.attr('data-clipboard-new')
+						clipboard = new Clipboard(item_element[0]);
+						item_element.attr('data-clipboard-new', true)
+
+						clipboard.on('success',  (e) ->
+							toastr.success('复制成功');
+						)
+						clipboard.on('error',  (e) ->
+							toastr.error('复制失败');
+							console.error "e"
+						);
+						#fix 详细页面(网页LI 手机版view-action)第一次点击复制不执行
+						if item_element[0].tagName == 'LI' || item_element.hasClass('view-action')
+							item_element.trigger("click");
+				else
+					toastr.error('复制失败: 未启用API');
+
 
 	triggers:
 		"before.insert.server.objects":
@@ -107,13 +138,6 @@ Creator.Objects.objects =
 				if isRepeatedName(doc)
 					throw new Meteor.Error 500, "对象名称不能重复"
 				doc.custom = true
-
-		"before.update.server.objects":
-			on: "server"
-			when: "before.update"
-			todo: (userId, doc)->
-				if isRepeatedName(doc)
-					throw new Meteor.Error 500, "对象名称不能重复"
 
 		"before.update.server.objects":
 			on: "server"
@@ -134,8 +158,8 @@ Creator.Objects.objects =
 			when: "after.insert"
 			todo: (userId, doc)->
 				#新增object时，默认新建一个name字段
-				Creator.getCollection("object_fields").insert({object: doc._id, owner: userId, name: "name", space: doc.space, type: "text", required: true, index: true, searchable: true})
-				Creator.getCollection("object_listviews").insert({name: "all", space: doc.space, owner: userId, object_name: doc.name, shared: true, filter_scope: "space", columns: ["name"], is_default: true})
+				Creator.getCollection("object_fields").insert({object: doc.name, owner: userId, name: "name", space: doc.space, type: "text", required: true, index: true, searchable: true})
+				Creator.getCollection("object_listviews").insert({name: "all", space: doc.space, owner: userId, object_name: doc.name, shared: true, filter_scope: "space", columns: ["name"]})
 				Creator.getCollection("object_listviews").insert({name: "recent", space: doc.space, owner: userId, object_name: doc.name, shared: true, filter_scope: "space", columns: ["name"]})
 
 		"before.remove.server.objects":
@@ -154,16 +178,16 @@ Creator.Objects.objects =
 			when: "after.remove"
 			todo: (userId, doc)->
 				#删除object 后，自动删除fields、actions、triggers、permission_objects
-				Creator.getCollection("object_fields").direct.remove({object: doc._id})
+				Creator.getCollection("object_fields").direct.remove({object: doc.name})
 
-				Creator.getCollection("object_actions").direct.remove({object: doc._id})
+				Creator.getCollection("object_actions").direct.remove({object: doc.name})
 
-				Creator.getCollection("object_triggers").direct.remove({object: doc._id})
+				Creator.getCollection("object_triggers").direct.remove({object: doc.name})
 
 				Creator.getCollection("permission_objects").direct.remove({object_name: doc.name})
 
-				Creator.getCollection("object_listviews").direct.remove({space: doc.space, object_name: doc.name, is_default: true, owner: userId, shared: true, filter_scope: "space"})
-
+				Creator.getCollection("object_listviews").direct.remove({object_name: doc.name})
+				
 				#drop collection
 				console.log "drop collection", doc.name
 				try

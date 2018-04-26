@@ -7,13 +7,10 @@ Package.describe({
 });
 
 Npm.depends({
-	'icalendar': '0.7.1',
-	'ical.js': '1.2.2',
-	'MD5': '1.3.0',
-	'moment-timezone': '0.5.13',
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
-	"xml2js": "0.4.19"
+	"xml2js": "0.4.19",
+	"node-xlsx":"0.12.0"
 });
 
 Package.onUse(function(api) {
@@ -113,6 +110,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/object_listviews.coffee');
 	api.addFiles('models/permission_set.coffee');
 	api.addFiles('models/permission_objects.coffee');
+	api.addFiles('models/permission_share.coffee');
 
 	api.addFiles('models/app.coffee');
 	api.addFiles('models/space.coffee');
@@ -130,6 +128,8 @@ Package.onUse(function(api) {
 	api.addFiles('models/queue_import.coffee');
 	api.addFiles('models/settings.coffee');
 
+	api.addFiles('models/object_workflows.coffee');
+
 	api.addFiles('server/methods/bootstrap.coffee', 'server');
 
 	api.addFiles('server/methods/object_options.coffee', 'server');
@@ -142,6 +142,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/object_export2xml.coffee', 'server');
 	api.addFiles('server/methods/object_import_jobs.coffee', 'server');
 	api.addFiles('server/methods/related_objects_records.coffee', 'server');
+	api.addFiles('server/methods/object_workflows.coffee', 'server');
 
 	api.addFiles('server/publications/object.coffee', 'server');
 	api.addFiles('server/publications/object_tabular.coffee', 'server');
@@ -149,8 +150,13 @@ Package.onUse(function(api) {
 	api.addFiles('server/publications/user_tabular_settings.coffee', 'server');
 	api.addFiles('server/publications/related_objects_records.coffee', 'server');
 
-	api.addFiles('server/routes/s3.coffee', 'server');
+	api.addFiles('server/lib/permission_manager.coffee', 'server');
+	api.addFiles('server/lib/uuflow_manager.coffee', 'server');
 
+	api.addFiles('server/routes/s3.coffee', 'server');
+	api.addFiles('server/routes/api_workflow_drafts.coffee', 'server');
+
+	api.addFiles('server/routes/bootstrap.coffee','server');
 	api.addFiles('client/views/_helpers.coffee', 'client');
 
 	api.addFiles('client/layout/layout.html', 'client');
@@ -167,6 +173,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/layout/sidebar.coffee', 'client');
 	api.addFiles('client/layout/sidebar.less', 'client');
 
+	api.addFiles('client/mobile/admin.html', 'client');
+	api.addFiles('client/mobile/admin.coffee', 'client');
+	api.addFiles('client/mobile/admin.less', 'client');
 	api.addFiles('client/layout/creator_app_list_modal.html', 'client');
 	api.addFiles('client/layout/creator_app_list_modal.coffee', 'client');
 	api.addFiles('client/layout/creator_app_list_modal.less', 'client');
@@ -194,7 +203,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/mobile_report.html', 'client');
 	api.addFiles('client/mobile/mobile_report.less', 'client');
 	api.addFiles('client/mobile/mobile_report.coffee', 'client');
-	
+	api.addFiles('client/mobile/switch_space.html', 'client');
+	api.addFiles('client/mobile/switch_space.coffee', 'client');
+
+
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
@@ -207,6 +219,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/colResizable-1.6.js', 'client');
 	api.addFiles('client/jquery.ba-resize.js', 'client');
 
+	api.addFiles('client/views/home.html', 'client');
+	api.addFiles('client/views/home.coffee', 'client');
+	api.addFiles('client/views/home.less', 'client');
 	api.addFiles('client/views/list_wrapper.html', 'client');
 	api.addFiles('client/views/list_wrapper.coffee', 'client');
 	api.addFiles('client/views/list_wrapper.less', 'client');
@@ -220,6 +235,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/view.coffee', 'client');
 	api.addFiles('client/views/view.less', 'client');
 	api.addFiles('client/views/app_home.html', 'client');
+	
+	api.addFiles('client/views/filter_logic.html', 'client');
+	api.addFiles('client/views/filter_logic.coffee', 'client');
+	api.addFiles('client/views/filter_logic.less', 'client');
 
 	api.addFiles('client/views/report_content.html', 'client');
 	api.addFiles('client/views/report_content.coffee', 'client');
@@ -269,10 +288,14 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/odata_service.html', 'client');
 	api.addFiles('client/views/odata_service.coffee', 'client');
 
+	api.addFiles('client/views/initiate_approval.html', 'client');
+	api.addFiles('client/views/initiate_approval.coffee', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
 
 	api.addAssets('assets/logo.png', 'client');
+
+	api.export(['uuflowManager', 'permissionManager'], ['server']);
 
 });

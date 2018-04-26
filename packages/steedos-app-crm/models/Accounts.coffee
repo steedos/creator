@@ -5,13 +5,14 @@ Creator.Objects.accounts =
 	enable_files: true
 	enable_search: true
 	enable_tasks: true
-	enable_notes: true
+	enable_notes: false
 	enable_api: true
+	enable_shares: true
 	fields:
 		owner:
 			label: "所有人"
 			omit: false
-			disabled: true
+			readonly: true
 		priority:
 			label: "优先级"
 			type: "select"
@@ -46,13 +47,12 @@ Creator.Objects.accounts =
 			is_wide: true
 
 	list_views:
-		default:
-			columns: ["name", "priority", "owner", "modified"]
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
 		all:
 			label: "所有单位"
+			columns: ["name", "priority", "owner", "modified"]
 			filter_scope: "space"
 		mine:
 			label: "我的单位"

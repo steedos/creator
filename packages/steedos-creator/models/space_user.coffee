@@ -18,7 +18,7 @@ Creator.Objects.space_users =
 		user:
 			type: "master_detail"
 			reference_to: "users"
-			required: true
+			# required: true
 			omit: true
 		position:
 			type: "text"
@@ -48,17 +48,12 @@ Creator.Objects.space_users =
 			type: "text"
 		position:
 			type: "text"
-		hr:
-			type: "object"
-			omit: true
 		company:
 			type: "text"
-	list_views:
-		default:
-			columns: ["name", "organization", "position", "mobile", "email"]
-		recent:
-			filter_scope: "space"
+	list_views:	
 		all:
+			label: "所有人员"
+			columns: ["name", "organization", "position", "mobile", "email", "sort_no"]
 			filter_scope: "space"
 
 	permission_set:
@@ -70,9 +65,9 @@ Creator.Objects.space_users =
 			modifyAllRecords: false
 			viewAllRecords: true 
 		admin:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
+			modifyAllRecords: true
 			viewAllRecords: true 

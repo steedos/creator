@@ -19,7 +19,12 @@ Creator.Objects.apps =
 		icon:
 			type: "text"
 		icon_slds:
-			type: "text"
+			type: "lookup"
+			optionsFunction: ()->
+				options = []
+				_.forEach Creator.resources.sldsIcons.standard, (svg)->
+					options.push {value: svg, label: svg, icon: svg}
+				return options
 		objects:
 			label: "对象"
 			type: "lookup"
@@ -35,16 +40,14 @@ Creator.Objects.apps =
 		sort:
 			type: "number"
 			defaultValue: 9100
-		secret:
-			type: String
-			max: 16
-			min: 16
-			optional: true
+		is_creator:
+			type:"boolean"
+
 	list_views:
-		default:
-			columns: ["name"]
 		all:
+			label: "所有应用"
 			filter_scope: "space"
+			columns: ["name", "objects", "visible", "sort"]
 	permission_set:
 		user:
 			allowCreate: false

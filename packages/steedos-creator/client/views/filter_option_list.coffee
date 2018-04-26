@@ -15,6 +15,12 @@ Template.filter_option_list.helpers
 		object_name = Template.instance().data?.object_name
 		return Creator.getObject(object_name)
 
+	default_filter_logic: ()->
+		Session.get("filter_logic")
+
+	show_filter_logic: ()->
+		return Template.instance().showFilterLogic?.get()
+
 Template.filter_option_list.events 
 	'click .btn-filter-scope': (event, template)->
 		left = $(event.currentTarget).closest(".filter-list-container").offset().left
@@ -97,6 +103,28 @@ Template.filter_option_list.events
 	'click .remove-all-filters': (event, template)->
 		Session.set("filter_items", [])
 
+	'click .add_filter_logic': (e, t)->
+		filter_items = Session.get "filter_items"
+		arr = []
+		i = 0
+		while i < filter_items.length
+			arr.push(i + 1)
+			i++
+
+		val = arr.join(" AND ")
+		console.log "val", val
+		t.showFilterLogic.set(true)
+		Session.set("filter_logic", val)
+		
+
+	'click .remove_filter_logic': (e, t)->
+		Session.set("filter_logic", "")
+		t.showFilterLogic.set(false)
+
+	'keyup #filter-logic': (e, t)->
+		val = $(e.currentTarget).val()
+		Session.set("filter_logic", val)
+
 
 Template.filter_option_list.onCreated ->
 	self = this
@@ -107,9 +135,20 @@ Template.filter_option_list.onCreated ->
 			Blaze.remove self.optionbox
 	
 	#绑定事件从document委托到.wrapper中是为了避免过虑器中选人控件会解决该事件
-	$(document).on "click",".wrapper", self.destroyOptionbox
+	$(document).on "click",".content-wrapper, .oneHeader", self.destroyOptionbox
 
 	self.filterItems = new ReactiveVar()
+	self.showFilterLogic = new ReactiveVar()
+	self.autorun -> 
+		list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+		if list_view_obj
+			if list_view_obj.filter_logic
+				self.showFilterLogic.set(true)
+				Session.set("filter_logic", list_view_obj.filter_logic)
+			else
+				self.showFilterLogic.set(false)
+		else
+			self.showFilterLogic.set(false)
 
 	self.autorun ->
 		if Session.get("filter_items")
@@ -121,25 +160,56 @@ Template.filter_option_list.onCreated ->
 				return
 			filters?.forEach (filter) ->
 				filter.fieldlabel = fields[filter.field]?.label
-				filter.valuelabel = filter.value
-				if fields[filter.field]?.reference_to
+				filter.valuelabel = filter?.value
+				field = fields[filter.field]
+				if field?.type == 'lookup' or field?.type =='master_detail' or field?.type=='select'
 					reference_to_objects = []
-					if fields[filter.field].reference_to.constructor == Array
-						reference_to_objects = fields[filter.field].reference_to
-					else
-						reference_to_objects.push fields[filter.field].reference_to
-					
-					reference_to_objects.forEach (reference_to_object)->
-						reference_to_object = fields[filter.field].reference_to
-						name_field = Creator.getObject(reference_to_object).NAME_FIELD_KEY
-						Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
-							(error,result)->
-								if result
-									filter.valuelabel = result[name_field]
-									self.filterItems.set(filters)		
+					if field?.reference_to
+						if field.reference_to.constructor == Array
+							reference_to_objects = field.reference_to
+						else
+							reference_to_objects.push field.reference_to
+						reference_to_objects.forEach (reference_to_object)->
+							name_field = Creator.getObject(reference_to_object).NAME_FIELD_KEY
+							Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
+								(error,result)->
+									if result
+										filter.valuelabel = result
+										self.filterItems.set(filters)
+					if field?.optionsFunction or field?.options
+						if field.optionsFunction
+							options = field?.optionsFunction()
+						else
+							options = field.options
+						options_labels = []
+						_.each options,(option)->
+							if filter?.value
+								if _.indexOf(filter.value,option.value)>-1
+									options_labels.push option.label
+						filter.valuelabel = options_labels
 				else
 					self.filterItems.set(filters)	
+
 Template.filter_option_list.onRendered ->
+	$("#info_popover").dxPopover({
+		target: "#logic_logic",
+		showEvent: "mouseenter",
+		hideEvent: "mouseleave",
+		position: "top",
+		width: 300,
+		animation: { 
+			show: {
+				type: "pop",
+				from: {  scale: 0 },
+				to: { scale: 1 }
+			},
+			hide: {
+				type: "fade",
+				from: 1,
+				to: 0
+			}
+		}
+	});
 
 Template.filter_option_list.onDestroyed ->
 	$(document).off "click", ".wrapper", self.destroyOptionbox

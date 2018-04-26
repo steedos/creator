@@ -16,7 +16,8 @@ Creator.Objects.permission_objects =
 			reference_to: "permission_set"
 		object_name:
 			label: "对象",
-			type: "lookup"
+			type: "master_detail"
+			reference_to: "objects"
 			required: true
 			optionsFunction: ()->
 				_options = []
@@ -83,8 +84,7 @@ Creator.Objects.permission_objects =
 				fields = _object.fields
 				icon = _object.icon
 				_.forEach fields, (f, k)->
-					unless f.omit
-						_options.push {label: f.label || k, value: k, icon: icon}
+					_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
 		uneditable_fields:
 			type: "lookup"
@@ -118,11 +118,10 @@ Creator.Objects.permission_objects =
 					_options.push {label: _object.label || i, value: i, icon: _object.icon}
 				return _options
 
-	list_views:
-		default:
-			columns: ["name", "permission_set_id", "object_name", "allowCreate", "allowDelete", "allowEdit", "allowRead", "modifyAllRecords", "viewAllRecords"]
+	list_views:		
 		all:
 			label:"所有对象权限"
+			columns: ["name", "permission_set_id", "object_name", "allowCreate", "allowDelete", "allowEdit", "allowRead", "modifyAllRecords", "viewAllRecords"]
 			filter_scope: "space"
 
 	triggers:

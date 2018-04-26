@@ -22,6 +22,15 @@ initLayout = ()->
 		BlazeLayout.render Creator.getLayout(),
 			main: "homeMenu"
 
+FlowRouter.route '/home',
+	triggersEnter: [ checkUserSigned, initLayout ],
+	action: (params, queryParams)->
+		Tracker.autorun (c)->
+			if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+				c.stop()
+				firstApp = _.keys(Creator.Apps)[0]
+				FlowRouter.go '/app/' + firstApp
+
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
@@ -31,6 +40,7 @@ FlowRouter.route '/app',
 			app_id = Session.get("app_id")
 			if !app_id
 				app_id = "crm"
+
 			object_name = Session.get("object_name")
 			if object_name
 				FlowRouter.go "/app/" + app_id + "/" + object_name + "/grid"
@@ -55,6 +65,22 @@ FlowRouter.route '/app/:app_id',
 			Session.set("app_id", FlowRouter.getParam("app_id"))
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_app_home"
+
+FlowRouter.route '/admin',
+	triggersEnter: [ checkUserSigned, initLayout ],
+	action: (params, queryParams)->
+		if Steedos.isMobile()
+			if $(".content-wrapper #admin_menu").length == 0
+				Meteor.defer ->
+					Blaze.renderWithData(Template.adminMenu, {}, $(".content-wrapper")[0], $(".layout-placeholder")[0])
+
+FlowRouter.route '/admin/switchspace',
+	triggersEnter: [ checkUserSigned, initLayout ],
+	action: (params, queryParams)->
+		if Steedos.isMobile()
+			if $(".content-wrapper #switch_space").length == 0
+				Meteor.defer ->
+					Blaze.renderWithData(Template.switchSpace, {}, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 
 FlowRouter.route '/app/:app_id/search/:search_text',
 	triggersEnter: [ checkUserSigned, initLayout ],
@@ -130,38 +156,29 @@ objectRoutes.route '/view/:record_id',
 		object_name = FlowRouter.getParam("object_name")
 		record_id = FlowRouter.getParam("record_id")
 		data = {app_id: app_id, object_name: object_name, record_id: record_id}
+		ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
 		if Steedos.isMobile()
 			if $("#mobile_view_#{record_id}").length == 0
 				Meteor.defer ->
 					Blaze.renderWithData(Template.mobileView, data, $(".content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			Session.set("detail_info_visible", true)
-			ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
+			# ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
 #			Meteor.call "object_recent_viewed", FlowRouter.getParam("object_name"), FlowRouter.getParam("record_id")
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_view"
 
-# FlowRouter.route '/app/:app_id/:object_name/list',
-# 	triggersEnter: [ checkUserSigned, initLayout ],
-# 	action: (params, queryParams)->
-# 		if Session.get("object_name") != FlowRouter.getParam("object_name")
-# 			Session.set("list_view_id", null)
-# 		Session.set("app_id", FlowRouter.getParam("app_id"))
-# 		Session.set("object_name", FlowRouter.getParam("object_name"))
-# 		Session.set("list_view_visible", false)
-# 		Tracker.afterFlush ()->
-# 			Session.set("list_view_visible", true)
-# 		BlazeLayout.render Creator.getLayout(),
-# 			main: "creator_list"
-
-FlowRouter.route '/app/:app_id/:object_name/:template/',
+FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
+
 		Session.set("app_id", FlowRouter.getParam("app_id"))
 		Session.set("object_name", FlowRouter.getParam("object_name"))
+		Session.set("list_view_id", FlowRouter.getParam("list_view_id"))
 		Session.set("list_view_visible", false)
+
 		Tracker.afterFlush ()->
 			Session.set("list_view_visible", true)
 		
