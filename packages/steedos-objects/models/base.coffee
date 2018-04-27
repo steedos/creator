@@ -219,7 +219,7 @@ Creator.baseObject =
 					return false
 
 				r = Creator.getObjectRecord object_name, record_id
-				if r and r.instances and r.instances[0].state is 'completed'
+				if r and ( (r.instances and r.instances[0].state is 'completed') or (not r.instances) )
 					return true
 
 				return false
