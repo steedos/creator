@@ -47,15 +47,17 @@ Creator.baseObject =
 			index: true
 			hidden: true
 		instances:
-			type: "[Object]"
+			type: "grid"
 			omit: true
 			hidden: true
 		"instances.$._id":
 			type: "text"
 			omit:true
+			hidden: true
 		"instances.$.state":
 			type: "text"
 			omit:true
+			hidden: true
 		sharing:
 			label: "记录级权限"
 			type: ["Object"]
@@ -217,7 +219,7 @@ Creator.baseObject =
 					return false
 
 				r = Creator.getObjectRecord object_name, record_id
-				if r.instances and r.instances[0].state is 'completed'
+				if r and r.instances and r.instances[0].state is 'completed'
 					return true
 
 				return false
