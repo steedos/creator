@@ -225,6 +225,7 @@ Creator.getApp = (app_id)->
 	if !app_id
 		app_id = Session.get("app_id")
 	app = Creator.Apps[app_id]
+	Creator.deps?.app?.depend()
 	return app
 
 Creator.getVisibleApps = ()->
