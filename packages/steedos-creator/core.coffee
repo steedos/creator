@@ -465,7 +465,10 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 
 	related_object_names = _.difference related_object_names, unrelated_objects
 	return _.filter _object.related_objects, (related_object)->
-		return related_object_names.indexOf(related_object.object_name) > -1
+		related_object_name = related_object.object_name
+		isActive = related_object_names.indexOf(related_object_name) > -1
+		allowRead = Creator.getPermissions(related_object_name, spaceId, userId)?.allowRead
+		return isActive and allowRead
 
 Creator.getRelatedObjectNames = (object_name, spaceId, userId)->
 	related_objects = Creator.getRelatedObjects(object_name, spaceId, userId)
