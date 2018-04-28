@@ -2,9 +2,14 @@ if !Creator?
 	@Creator = {}
 Creator.Objects = {}
 Creator.Collections = {}
-
+Creator.deps = {
+	app: new Tracker.Dependency
+	object: new Tracker.Dependency
+};
 
 Creator.getObject = (object_name)->
+	if Meteor.isClient
+		Creator.deps?.object?.depend()
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
 	if object_name
