@@ -52,6 +52,7 @@ Creator.Objects.objects =
 		hidden:
 			type: "boolean"
 			omit: true
+			hidden: true
 		description:
 			label: "Description"
 			type: "textarea"

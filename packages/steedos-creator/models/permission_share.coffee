@@ -23,9 +23,6 @@ Creator.Objects.permission_shares =
 			label: "过滤条件"
 			type: "[Object]"
 			# omit: true
-		# "filters.$":
-		# 	blackbox: true
-		# 	omit: true
 		"filters.$.field": 
 			label: "字段名"
 			type: "text"

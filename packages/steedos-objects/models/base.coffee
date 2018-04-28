@@ -65,9 +65,6 @@ Creator.baseObject =
 			omit: true
 			hidden: true
 			blackbox: true
-		"sharing.$":
-			blackbox: true
-			omit: true
 		"sharing.$.u":
 			label: "授权用户"
 			type: "[text]"

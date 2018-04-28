@@ -85,7 +85,8 @@ Creator.Objects.permission_objects =
 				fields = _object.fields
 				icon = _object.icon
 				_.forEach fields, (f, k)->
-					_options.push {label: f.label || k, value: k, icon: icon}
+					if !f.hidden
+						_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
 		uneditable_fields:
 			type: "lookup"
@@ -101,7 +102,7 @@ Creator.Objects.permission_objects =
 				fields = _object.fields
 				icon = _object.icon
 				_.forEach fields, (f, k)->
-					unless f.omit
+					if !f.hidden and !f.omit
 						if _.indexOf(values.unreadable_fields, k) < 0 
 							_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
