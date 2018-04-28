@@ -2,6 +2,7 @@ Creator.Objects.object_recent_viewed =
 	name: "object_recent_viewed"
 	label: "最近查看"
 	icon: "forecasts"
+	hidden: true
 	fields: 
 #		record_id:
 #			type: "text"
