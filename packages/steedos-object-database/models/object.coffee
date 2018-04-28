@@ -42,7 +42,7 @@ Creator.Objects.objects =
 			hidden: true
 		enable_share:
 			type: "boolean"
-			defaultValue: true
+			defaultValue: false
 		enable_instances:
 			type: "boolean"
 		is_view:
@@ -52,7 +52,6 @@ Creator.Objects.objects =
 		hidden:
 			type: "boolean"
 			omit: true
-			hidden: true
 		description:
 			label: "Description"
 			type: "textarea"

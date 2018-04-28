@@ -166,9 +166,9 @@ Template.creator_list_wrapper.events
 	'click .reset-column-width': (event, template)->
 		list_view_id = Session.get("list_view_id")
 		object_name = Session.get("object_name")
+		grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 		Session.set "list_view_visible", false
-
-		Meteor.call 'reset_grid_width', object_name, list_view_id, (e, r)->
+		Meteor.call 'grid_settings', object_name, list_view_id, {}, (e, r)->
 			if e
 				console.log e
 			else

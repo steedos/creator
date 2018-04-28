@@ -9,6 +9,7 @@ Creator.baseObject =
 			defaultValue: "{userId}"
 		space:
 			type: "lookup"
+			label:"所属工作区"
 			reference_to: "spaces"
 			omit: true
 			index: true
@@ -44,18 +45,22 @@ Creator.baseObject =
 			omit: true
 		is_deleted:
 			type: "boolean"
+			label:"已删除"
 			omit: true
 			index: true
 			hidden: true
 		instances:
+			label:"申请单"
 			type: "grid"
 			omit: true
 			hidden: true
 		"instances.$._id":
+			label:"申请单ID"
 			type: "text"
 			omit:true
 			hidden: true
 		"instances.$.state":
+			label:"申请单状态"
 			type: "text"
 			omit:true
 			hidden: true
@@ -65,6 +70,10 @@ Creator.baseObject =
 			omit: true
 			hidden: true
 			blackbox: true
+		"sharing.$":
+			label: "授权条件"
+			blackbox: true
+			omit: true
 		"sharing.$.u":
 			label: "授权用户"
 			type: "[text]"

@@ -32,7 +32,7 @@ Creator.Object = (options)->
 	self.hidden = options.hidden
 	self.enable_api = (options.enable_api == undefined) or options.enable_api
 	self.custom = options.custom
-	self.enable_share = if _.isBoolean(options.enable_share) then options.enable_share else true
+	self.enable_share = options.enable_share
 	self.enable_instances = options.enable_instances
 
 	if (!options.fields)
