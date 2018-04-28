@@ -22,8 +22,12 @@ _changeClientObjects = (document)->
 				Creator.deps.object.changed();
 
 _removeClientObjects = (document)->
-	Creator.removeObject(document.name)
-	Creator.removeCollection(document.name)
+	_object = _.findWhere Creator.objectsByName, {_id: document._id}
+	Creator.removeObject(_object?.name)
+	Creator.removeCollection(_object?.name)
+	if Session.get("object_name") == _object?.name
+		FlowRouter.go(Steedos.absoluteUrl())
+	Creator.deps.object.changed();
 
 _removeClientApps = (document)->
 	delete Creator.Apps[document._id]
@@ -78,6 +82,7 @@ Meteor.startup ()->
 						_changeClientObjects newDocument
 				removed: (oldDocument)->
 					if objects_observer_init
+						console.log("removed oldDocument", oldDocument)
 						_removeClientObjects oldDocument
 			}
 			objects_observer_init = true

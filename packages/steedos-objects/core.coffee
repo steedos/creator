@@ -19,6 +19,7 @@ Creator.getObjectById = (object_id)->
 	return _.findWhere(Creator.objectsByName, {_id: object_id})
 
 Creator.removeObject = (object_name)->
+	console.log("removeObject", object_name)
 	delete Creator.Objects[object_name]
 	delete Creator.objectsByName[object_name]
 
