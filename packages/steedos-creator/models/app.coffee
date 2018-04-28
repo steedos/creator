@@ -45,7 +45,7 @@ Creator.Objects.apps =
 		is_creator:
 			type:"boolean"
 			label: "creator应用"
-			omit:true
+			hidden:true
 			defaultValue:true
 	list_views:
 		all:
