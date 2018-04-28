@@ -74,10 +74,12 @@ Creator.baseObject =
 			label: "授权条件"
 			blackbox: true
 			omit: true
+			hidden: true
 		"sharing.$.u":
 			label: "授权用户"
 			type: "[text]"
 			omit:true
+			hidden: true
 		"sharing.$.o":
 			label: "授权组织"
 			type: "[text]"
@@ -86,6 +88,7 @@ Creator.baseObject =
 			label: "来自规则"
 			type: "text"
 			omit:true
+			hidden: true
 	permission_set:
 		none:
 			allowCreate: false
