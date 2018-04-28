@@ -2,7 +2,6 @@ Creator.Objects.object_recent_viewed =
 	name: "object_recent_viewed"
 	label: "最近查看"
 	icon: "forecasts"
-	hidden: true
 	fields: 
 #		record_id:
 #			type: "text"
@@ -12,6 +11,7 @@ Creator.Objects.object_recent_viewed =
 #			index:true
 		record:
 			type: "lookup"
+			label:"记录"
 			omit: true
 			is_name: true
 			reference_to: ()->
