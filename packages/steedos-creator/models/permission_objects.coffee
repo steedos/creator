@@ -116,7 +116,8 @@ Creator.Objects.permission_objects =
 				related_object_names = _.uniq(_.pluck(related_objects, "object_name"))
 				_.forEach related_object_names, (i)->
 					_object = Creator.getObject(i)
-					_options.push {label: _object.label || i, value: i, icon: _object.icon}
+					if !_object.hidden
+						_options.push {label: _object.label || i, value: i, icon: _object.icon}
 				return _options
 
 	list_views:		

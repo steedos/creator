@@ -2,7 +2,6 @@ Creator.Objects.object_listviews =
 	name: "object_listviews"
 	label: "列表视图"
 	icon: "forecasts"
-	hidden: true
 	fields: 
 		name:
 			label: "列表视图名称"

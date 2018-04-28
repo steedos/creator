@@ -4,7 +4,6 @@ Creator.Objects.cms_files =
 	icon: "drafts"
 	enable_search: true
 	enable_api: true
-	hidden: true
 	fields:
 		name: 
 			label: "名称"
