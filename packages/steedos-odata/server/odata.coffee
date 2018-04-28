@@ -5,10 +5,8 @@ Meteor.startup ->
 
 	visitorParser = (visitor)->
 		parsedOpt = {}
-
 		if visitor.projection
 			parsedOpt.fields = visitor.projection
-
 		if visitor.hasOwnProperty('limit')
 			parsedOpt.limit = visitor.limit
 
@@ -172,15 +170,22 @@ Meteor.startup ->
 				else
 					createQuery.limit = 10
 				unreadable_fields = permissions.unreadable_fields || []
+				fields = Creator.getObject(key).fields
 				if createQuery.projection
 					projection = {}
 					_.keys(createQuery.projection).forEach (key)->
 						if _.indexOf(unreadable_fields, key) < 0
+						# 	if (fields[key].type == 'lookup' or fields[key].type == 'master_detail') and fields[key].multiple 
+						# 		projection[key] = 0
+						# 	else
 							projection[key] = 1
+					createQuery.projection = projection
 				if not createQuery.projection or !_.size(createQuery.projection)
 					readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
 					_.each readable_fields,(field)->
-						createQuery.projection[field] = 1
+						if field.indexOf('$')<0
+							if fields[field]?.multiple!= true
+								createQuery.projection[field] = 1
 				if not permissions.viewAllRecords
 					if object.enable_share
 						# 满足共享规则中的记录也要搜索出来
