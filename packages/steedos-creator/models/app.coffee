@@ -44,8 +44,9 @@ Creator.Objects.apps =
 			defaultValue: 9100
 		is_creator:
 			type:"boolean"
-			label: "已创建"
-
+			label: "creator应用"
+			omit:true
+			defaultValue:true
 	list_views:
 		all:
 			label: "所有应用"
