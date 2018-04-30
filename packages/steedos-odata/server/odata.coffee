@@ -175,10 +175,10 @@ Meteor.startup ->
 					projection = {}
 					_.keys(createQuery.projection).forEach (key)->
 						if _.indexOf(unreadable_fields, key) < 0
-						# 	if (fields[key].type == 'lookup' or fields[key].type == 'master_detail') and fields[key].multiple 
-						# 		projection[key] = 0
-						# 	else
-							projection[key] = 1
+							if (fields[key].type == 'lookup' or fields[key].type == 'master_detail') and fields[key].multiple 
+								projection[key] = 0
+							else
+								projection[key] = 1
 					createQuery.projection = projection
 				if not createQuery.projection or !_.size(createQuery.projection)
 					readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
@@ -304,13 +304,15 @@ Meteor.startup ->
 				recent_view_records_ids = _.uniq(recent_view_records_ids)
 				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
-				createQuery.query._id = {$in:recent_view_records_ids}
 				if key is 'cfs.files.filerecord'
 					createQuery.query['metadata.space'] = @urlParams.spaceId
 				else
 					createQuery.query.space = @urlParams.spaceId
 				if not createQuery.limit
 					createQuery.limit = 100
+				if createQuery.limit and recent_view_records_ids.length>createQuery.limit
+					recent_view_records_ids = _.first(recent_view_records_ids,createQuery.limit)
+				createQuery.query._id = {$in:recent_view_records_ids}
 				if @queryParams.$top isnt '0'
 					entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 				entities_index = []
