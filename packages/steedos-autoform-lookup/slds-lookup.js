@@ -622,7 +622,8 @@ Template.steedosLookups.events({
 		$input.val('');
 
 		if (template.uniSelectize.multiple && itemsUnselectedLength && this.value) {
-			template.uniSelectize.inputFocus();
+			// template.uniSelectize.inputFocus();
+			template.uniSelectize.open.set(false);
 		} else {
 			template.uniSelectize.open.set(false);
 		}
