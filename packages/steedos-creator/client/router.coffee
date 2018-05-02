@@ -17,6 +17,15 @@ set_sessions = (context, redirect)->
 	Session.set("object_name", context.params.object_name)
 	Session.set("record_id", context.params.record_id)
 
+checkObjectPermission = (context, redirect)->
+	Tracker.autorun (c)->
+		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+			c.stop()
+			object_name = context.params.object_name
+			objs = Creator.getVisibleAppsObjects()
+			if objs.indexOf(object_name) < 0
+				FlowRouter.go "/app"
+
 initLayout = ()->
 	if Steedos.isMobile() and (!$(".wrapper").length or !$("#home_menu").length)
 		BlazeLayout.render Creator.getLayout(),
@@ -99,7 +108,7 @@ FlowRouter.route '/app/:app_id/reports/view/:record_id',
 objectRoutes = FlowRouter.group
 	prefix: '/app/:app_id/:object_name',
 	name: 'objectRoutes',
-	triggersEnter: [checkUserSigned, set_sessions, initLayout]
+	triggersEnter: [checkUserSigned, checkObjectPermission, set_sessions, initLayout]
 
 objectRoutes.route '/list/switch',
 	action: (params, queryParams)->
@@ -156,7 +165,7 @@ objectRoutes.route '/view/:record_id',
 				main: "creator_view"
 
 FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
-	triggersEnter: [ checkUserSigned, initLayout ],
+	triggersEnter: [ checkUserSigned, checkObjectPermission, initLayout ],
 	action: (params, queryParams)->
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
