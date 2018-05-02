@@ -9,6 +9,7 @@ Creator.baseObject =
 			defaultValue: "{userId}"
 		space:
 			type: "lookup"
+			label:"所属工作区"
 			reference_to: "spaces"
 			omit: true
 			index: true
@@ -32,6 +33,7 @@ Creator.baseObject =
 			type: "datetime"
 			readonly: true
 			sortable: true
+			searchable: true
 			index: true
 			omit: true
 		modified_by:
@@ -43,36 +45,50 @@ Creator.baseObject =
 			omit: true
 		is_deleted:
 			type: "boolean"
+			label:"已删除"
 			omit: true
 			index: true
 			hidden: true
 		instances:
-			type: "[Object]"
+			label:"申请单"
+			type: "grid"
 			omit: true
 			hidden: true
 		"instances.$._id":
+			label:"申请单ID"
 			type: "text"
+			omit:true
+			hidden: true
 		"instances.$.state":
+			label:"申请单状态"
 			type: "text"
+			omit:true
+			hidden: true
 		sharing:
 			label: "记录级权限"
-			type: ["Object"]
-			# omit: true
+			type: "grid"
+			omit: true
 			hidden: true
 			blackbox: true
 		"sharing.$":
+			label: "授权条件"
 			blackbox: true
 			omit: true
+			hidden: true
 		"sharing.$.u":
 			label: "授权用户"
 			type: "[text]"
+			omit:true
+			hidden: true
 		"sharing.$.o":
 			label: "授权组织"
 			type: "[text]"
+			omit:true
 		"sharing.$.r":
 			label: "来自规则"
 			type: "text"
-
+			omit:true
+			hidden: true
 	permission_set:
 		none:
 			allowCreate: false
@@ -166,6 +182,12 @@ Creator.baseObject =
 
 	actions:
 
+		standard_query:
+			label: "查找"
+			visible: true
+			on: "list"
+			todo: "standard_query"
+
 		standard_new:
 			label: "新建"
 			visible: ()->
@@ -205,12 +227,18 @@ Creator.baseObject =
 		standard_approve:
 			label: "发起审批"
 			visible: (object_name, record_id, record_permissions) ->
-				#TODO 是否有对应关系
 				#TODO 权限判断
 				object_workflow = _.find Creator.object_workflows, (ow) ->
 					return ow.object_name is object_name
 
-				return !!object_workflow
+				if not object_workflow
+					return false
+
+				r = Creator.getObjectRecord object_name, record_id
+				if r and ( (r.instances and r.instances[0].state is 'completed') or (not r.instances) )
+					return true
+
+				return false
 			on: "record"
 			todo: ()->
 				Modal.show('initiate_approval', { object_name: this.object_name, record_id: this.record_id })

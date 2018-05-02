@@ -43,38 +43,50 @@ Creator.Objects.objects =
 		enable_share:
 			type: "boolean"
 			defaultValue: false
+		enable_instances:
+			type: "boolean"
 		is_view:
 			type: 'boolean'
 			defaultValue: false
 			omit: true
-		description: 
+		hidden:
+			label: "隐藏"
+			type: "boolean"
+			omit: true
+		description:
 			label: "Description"
 			type: "textarea"
 			is_wide: true
 		fields:
+			label: "字段"
 			blackbox: true
 			omit: true
 			hidden: true
 		list_views:
+			label: "列表视图"
 			blackbox: true
 			omit: true
 			hidden: true
 		actions:
+			label: "操作"
 			blackbox: true
 			omit: true
 			hidden: true
 		permission_set:
+			label: "权限设置"
 			blackbox: true
 			omit: true
 			hidden: true
 		triggers:
+			label: "触发器"
 			blackbox: true
 			omit: true
 			hidden: true
 		custom:
+			label: "规则"
 			type: "boolean"
 			omit: true
-		owner: 
+		owner:
 			hidden: true
 
 	list_views:
@@ -91,7 +103,7 @@ Creator.Objects.objects =
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -187,7 +199,7 @@ Creator.Objects.objects =
 				Creator.getCollection("permission_objects").direct.remove({object_name: doc.name})
 
 				Creator.getCollection("object_listviews").direct.remove({object_name: doc.name})
-				
+
 				#drop collection
 				console.log "drop collection", doc.name
 				try

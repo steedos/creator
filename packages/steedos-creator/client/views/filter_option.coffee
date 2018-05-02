@@ -18,13 +18,14 @@ Template.filter_option.helpers
 					type: "select"
 					defaultValue: ()->
 						return "name"
+					firstOption: ""
 					options: ()->
 						keys = Creator.getSchema(object_name)._firstLevelSchemaKeys
 						permission_fields = Creator.getFields(object_name)
 						schema = Creator.getSchema(object_name)._schema
 						keys = _.map keys, (key) ->
-							# hidden 类型的字段，不需要过滤
-							if object_fields[key].hidden
+							# hidden,grid 类型的字段，不需要过滤
+							if object_fields[key].hidden or object_fields[key].type == "grid"
 								return undefined
 							if _.indexOf(permission_fields, key) > -1
 								obj = _.pick(schema, key)
@@ -39,6 +40,7 @@ Template.filter_option.helpers
 					type: "select"
 					defaultValue: ()->
 						return "="
+					firstOption: ""
 					options: ()->
 						if object_fields[schema_key]
 							console.log "schema_key is:", schema_key
@@ -59,6 +61,10 @@ Template.filter_option.helpers
 			if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
 				schema.value.autoform.multiple = true
 				schema.value.type = [String]
+
+				if object_fields[schema_key].type == "select"
+					schema.value.autoform.type = "steedosLookups"
+					schema.value.autoform.showIcon = false
 
 			if schema.value.autoform
 				schema.value.autoform.readonly = false

@@ -2,6 +2,7 @@ Creator.Objects.object_listviews =
 	name: "object_listviews"
 	label: "列表视图"
 	icon: "forecasts"
+	hidden: true
 	fields: 
 		name:
 			label: "列表视图名称"
@@ -11,6 +12,7 @@ Creator.Objects.object_listviews =
 			required: true
 		label:
 			label: "显示名称"
+			type:'text'
 		object_name:
 			label: "对象",
 			type: "master_detail"
@@ -36,13 +38,14 @@ Creator.Objects.object_listviews =
 			label: "选择要显示的字段"
 			type: "lookup"
 			multiple: true
-			optionsFunction: ()->
+			depend_on: ["object_name"]
+			optionsFunction: (values)->
 				_options = []
-				_object = Creator.getObject(Session.get("object_name"))
-				fields = Creator.getFields(Session.get("object_name"))
+				_object = Creator.getObject(values?.object_name)
+				fields = Creator.getFields(values?.object_name)
 				icon = _object.icon
 				_.forEach fields, (f)->
-					if !_object.fields[f].hidden and !_object.fields[f].omit
+					if !_object.fields[f].hidden
 						label = _object.fields[f].label
 						_options.push {label:label || f, value: f, icon: icon}
 				return _options
@@ -51,19 +54,23 @@ Creator.Objects.object_listviews =
 			type: "grid"
 
 		"sort.$":
+			label: "排序条件"
 			blackbox: true
 			type: "Object"
 
 		"sort.$.field_name":
 			label: "字段"
 			type: "lookup"
+			depend_on: ["object_name"]
 			optionsFunction: (values)->
 				_options = []
-				_object = Creator.getObject()
-				fields = _object.fields
+				_object = Creator.getObject(values?.object_name)
+				fields = Creator.getFields(values?.object_name)
 				icon = _object.icon
-				_.forEach fields, (f, k)->
-					_options.push {label: f.label || k, value: k, icon: icon}
+				_.forEach fields, (f)->
+					if !_object.fields[f].hidden
+						label = _object.fields[f].label
+						_options.push {label: label || f, value: f, icon: icon}
 				return _options
 
 		"sort.$.order":
@@ -76,16 +83,20 @@ Creator.Objects.object_listviews =
 			type: "boolean"
 			# hidden: true
 		filters:
+			label: "过滤器"
 			type: "[Object]"
 			omit: true
 		"filters.$":
+			label: "过滤条件"
 			blackbox: true
 			omit: true
 		filter_logic:
+			label: "过滤逻辑"
 			type: String
 			omit: true
 
 		is_default:
+			label: "是否为默认视图"
 			type: "boolean"
 			omit: true
 			defaultValue: false
@@ -131,7 +142,7 @@ Creator.Objects.object_listviews =
 				
 	list_views:
 		all:
-			columns: ["name", "shared", "modified"]
+			columns: ["name","label", "shared", "modified"]
 			label:'全部列表视图'
 			filter_scope: "space"
 

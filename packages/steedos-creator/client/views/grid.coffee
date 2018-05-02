@@ -1,6 +1,29 @@
 dxDataGridInstance = null
 
-_itemClick = (e, curObjectName)->
+_standardQuery = (curObjectName)->
+	standard_query = Session.get("standard_query")
+	object_fields = Creator.getObject(curObjectName).fields
+	if !standard_query or !standard_query.query or !_.size(standard_query.query) or standard_query.object_name != curObjectName
+		delete Session.keys["standard_query"]
+		return;
+	else
+		object_name = standard_query.object_name
+		query = standard_query.query
+		query_arr = []
+		_.each query, (val, key)->
+			if object_fields[key]
+				if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+					query_arr.push([key, ">=", val])
+				else
+					query_arr.push([key, "=", val])
+			else
+				key = key.replace(/(_endLine)$/, "")
+				if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+					query_arr.push([key, "<=", val])
+
+		return Creator.formatFiltersToDev(query_arr)
+	
+_itemClick = (e, curObjectName, list_view_id)->
 	record = e.data
 	if !record
 		return
@@ -30,7 +53,7 @@ _itemClick = (e, curObjectName)->
 			Session.set("action_save_and_insert", true)
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
-				Creator.executeAction objectName, action, recordId, action_record_title, ()->
+				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
 					dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
@@ -92,7 +115,7 @@ _expandFields = (object_name, columns)->
 	_.each columns, (n)->
 		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
 			if fields[n].optionsFunction
-				ref = fields[n].optionsFunction().getProperty("value")
+				ref = fields[n].optionsFunction({}).getProperty("value")
 			else  
 				ref = fields[n].reference_to
 				if _.isFunction(ref)
@@ -222,7 +245,17 @@ Template.creator_grid.onRendered ->
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name)
-			
+
+				standardQuery = _standardQuery(object_name)
+				if standardQuery and standardQuery.length
+					if filter
+						filter = [filter, "and", standardQuery]
+					else
+						filter = standardQuery
+
+				if !filter
+					filter = ["_id", "<>", -1]
+
 			curObjectName = if is_related then related_object_name else object_name
 
 			selectColumns = Tracker.nonreactive ()->
@@ -242,8 +275,9 @@ Template.creator_grid.onRendered ->
 				if Session.get("page_index")
 					if Session.get("page_index").object_name == curObjectName
 						page_index = Session.get("page_index").page_index
-						delete Session.keys["page_index"]
 						return page_index
+					else
+						delete Session.keys["page_index"]
 				else
 					return 0
 
@@ -297,7 +331,7 @@ Template.creator_grid.onRendered ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
 			# console.log "selectColumns", selectColumns
-			# console.log "filter", filter
+			console.log "filter", filter
 			# console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
@@ -373,7 +407,13 @@ Template.creator_grid.onRendered ->
 								if val.constructor == Object
 									r.values[index] = val.name
 								else if val.constructor == Array
-									r.values[index] = val.getProperty("name").join(",")
+									_val = [];
+									_.each val, (_v)->
+										if _.isString(_v)
+											_val.push _v
+										else if _.isObject(_v)
+											_val.push(_v.name)
+									r.values[index] = _val.join(",")
 								else if val.constructor == Date
 									utcOffset = moment().utcOffset() / 60
 									val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')

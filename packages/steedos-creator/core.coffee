@@ -49,7 +49,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 			throw new Meteor.Error 500, "the params userId and spaceId is required for the function Creator.getUserContext"
 			return null
 		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1}
-		# check if user in the space 
+		# check if user in the space
 		su = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: suFields})
 		if !su
 			spaceId = null
@@ -63,7 +63,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 				spaceId = su.space
 			else
 				return null
-		
+
 		USER_CONTEXT = {}
 		USER_CONTEXT.userId = userId
 		USER_CONTEXT.spaceId = spaceId
@@ -147,7 +147,7 @@ Creator.getObjectRelateds = (object_name)->
 	if Meteor.isClient
 		if !object_name
 			object_name = Session.get("object_name")
-	
+
 	related_objects = []
 	# _object = Creator.getObject(object_name)
 	# 因Creator.getObject函数内部要调用该函数，所以这里不可以调用Creator.getObject取对象，只能调用Creator.Objects来取对象
@@ -163,13 +163,15 @@ Creator.getObjectRelateds = (object_name)->
 					related_objects.splice(0, 0, {object_name:related_object_name, foreign_key: related_field_name})
 				else
 					related_objects.push {object_name:related_object_name, foreign_key: related_field_name}
-	
+
 	if _object.enable_files
 		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
 	if _object.enable_tasks
 		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
 	if _object.enable_notes
 		related_objects.push {object_name:"notes", foreign_key: "related_to"}
+	if _object.enable_instances
+		related_objects.push {object_name:"instances", foreign_key: "instances"}
 
 	return related_objects
 
@@ -221,6 +223,7 @@ Creator.getApp = (app_id)->
 	if !app_id
 		app_id = Session.get("app_id")
 	app = Creator.Apps[app_id]
+	Creator.deps?.app?.depend()
 	return app
 
 Creator.getVisibleApps = ()->
@@ -233,16 +236,78 @@ Creator.getVisibleApps = ()->
 Creator.getVisibleAppsObjects = ()->
 	apps = Creator.getVisibleApps()
 	objects = []
+	tempObjects = []
 	_.forEach apps, (app)->
-		objects = objects.concat(app.objects)
+		tempObjects = _.filter app.objects, (obj)->
+			return !obj.hidden
+		objects = objects.concat(tempObjects)
 	return _.uniq objects
 
 Creator.getAppsObjects = ()->
 	objects = []
+	tempObjects = []
 	_.forEach Creator.Apps, (app)->
-		objects = objects.concat(app.objects)
+		tempObjects = _.filter app.objects, (obj)->
+			return !obj.hidden
+		objects = objects.concat(tempObjects)
 	return _.uniq objects
 
+Creator.validateFilters = (filters, logic)->
+	filter_items = _.map filters, (obj) ->
+		if _.isEmpty(obj)
+			return false
+		else
+			return obj
+	filter_items = _.compact(filter_items)
+	errorMsg = ""
+	filter_length = filter_items.length
+	if logic
+		# 格式化filter
+		logic = logic.replace(/\n/g, "").replace(/\s+/g, " ")
+
+		# 判断特殊字符
+		if /[._\-!+]+/ig.test(logic)
+			errorMsg = "含有特殊字符。"
+
+		if !errorMsg
+			index = logic.match(/\d+/ig)
+			if !index
+				errorMsg = "有些筛选条件进行了定义，但未在高级筛选条件中被引用。"
+			else
+				index.forEach (i)->
+					if i < 1 or i > filter_length
+						errorMsg = "您的筛选条件引用了未定义的筛选器：#{i}。"
+
+				flag = 1
+				while flag <= filter_length
+					if !index.includes("#{flag}")
+						errorMsg = "有些筛选条件进行了定义，但未在高级筛选条件中被引用。"
+					flag++;
+
+		if !errorMsg
+			# 判断是否有非法英文字符
+			word = logic.match(/[a-zA-Z]+/ig)
+			if word
+				word.forEach (w)->
+					if !/^(and|or)$/ig.test(w)
+						errorMsg = "检查您的高级筛选条件中的拼写。"
+
+		if !errorMsg
+			# 判断格式是否正确
+			try
+				Creator.eval(logic.replace(/and/ig, "&&").replace(/or/ig, "||"))
+			catch e
+				errorMsg = "您的筛选器中含有特殊字符"
+
+			if /(AND)[^()]+(OR)/ig.test(logic) ||  /(OR)[^()]+(AND)/ig.test(logic)
+				errorMsg = "您的筛选器必须在连续性的 AND 和 OR 表达式前后使用括号。"
+	if errorMsg
+		console.log "error", errorMsg
+		if Meteor.isClient
+			toastr.error(errorMsg)
+		return false
+	else
+		return true
 
 # "=", "<>", ">", ">=", "<", "<=", "startswith", "contains", "notcontains".
 ###
@@ -251,7 +316,7 @@ options参数：
 	userId-- 当前登录用户
 	spaceId-- 当前所在工作区
 extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
-### 
+###
 Creator.formatFiltersToMongo = (filters, options)->
 	unless filters.length
 		return
@@ -299,7 +364,7 @@ options参数：
 	userId-- 当前登录用户
 	spaceId-- 当前所在工作区
 extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
-### 
+###
 Creator.formatFiltersToDev = (filters, options)->
 	unless filters.length
 		return
@@ -330,14 +395,52 @@ Creator.formatFiltersToDev = (filters, options)->
 
 			if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
 				sub_selector.pop()
-			selector.push sub_selector
+			selector.push sub_selector, "and"
 		else
 			selector.push [field, option, value], "and"
-	
+
 	if selector[selector.length - 1] == "and"
 		selector.pop()
 
 	return selector
+
+###
+options参数：
+	extend-- 是否需要把当前用户基本信息加入公式，即让公式支持Creator.USER_CONTEXT中的值，默认为true
+	userId-- 当前登录用户
+	spaceId-- 当前所在工作区
+extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
+###
+Creator.formatLogicFiltersToDev = (filters, filter_logic, options)->
+	format_logic = filter_logic.replace(/\(\s+/ig, "(").replace(/\s+\)/ig, ")").replace(/\(/g, "[").replace(/\)/g, "]").replace(/\s+/g, ",").replace(/(and|or)/ig, "'$1'")
+	format_logic = format_logic.replace(/(\d)+/ig, (x)->
+		_f = filters[x-1]
+		field = _f.field
+		option = _f.operation
+		if Meteor.isClient
+			value = Creator.evaluateFormula(_f.value)
+		else
+			value = Creator.evaluateFormula(_f.value, null, options)
+		sub_selector = []
+		if _.isArray(value) == true
+			if option == "="
+				_.each value, (v)->
+					sub_selector.push [field, option, v], "or"
+			else if option == "<>"
+				_.each value, (v)->
+					sub_selector.push [field, option, v], "and"
+			else
+				_.each value, (v)->
+					sub_selector.push [field, option, v], "or"
+			if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
+				sub_selector.pop()
+		else
+			sub_selector = [field, option, value]
+		console.log "sub_selector", sub_selector
+		return JSON.stringify(sub_selector)
+	)
+	format_logic = "[#{format_logic}]"
+	return Creator.eval(format_logic)
 
 Creator.getRelatedObjects = (object_name, spaceId, userId)->
 	if Meteor.isClient
@@ -363,7 +466,10 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 
 	related_object_names = _.difference related_object_names, unrelated_objects
 	return _.filter _object.related_objects, (related_object)->
-		return related_object_names.indexOf(related_object.object_name) > -1
+		related_object_name = related_object.object_name
+		isActive = related_object_names.indexOf(related_object_name) > -1
+		allowRead = Creator.getPermissions(related_object_name, spaceId, userId)?.allowRead
+		return isActive and allowRead
 
 Creator.getRelatedObjectNames = (object_name, spaceId, userId)->
 	related_objects = Creator.getRelatedObjects(object_name, spaceId, userId)
@@ -389,7 +495,7 @@ Creator.getActions = (object_name, spaceId, userId)->
 
 	actions = _.filter actions, (action)->
 		return _.indexOf(disabled_actions, action.name) < 0
-	
+
 	return actions
 
 ///
@@ -418,7 +524,7 @@ Creator.getListViews = (object_name, spaceId, userId)->
 		if item_name != "default"
 			if _.indexOf(disabled_list_views, item_name) < 0 || item.owner == userId
 				list_views.push item
-	
+
 	return list_views
 
 # 前台理论上不应该调用该函数，因为字段的权限都在Creator.getObject(object_name).fields的相关属性中有标识了
@@ -484,7 +590,7 @@ Creator.getFieldsWithoutOmit = (schema, keys) ->
 		field = _.pick(schema, key)
 		if field[key].autoform?.omit
 			return false
-		else 
+		else
 			return key
 	)
 	keys = _.compact(keys)
@@ -538,7 +644,7 @@ Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 					childKeys.push undefined
 				fields.push childKeys
 				i += 2
-	
+
 	return fields
 
 
@@ -568,5 +674,5 @@ if Meteor.isServer
 
 		if Creator.getObject(object_name).enable_files
 			related_object_names.push "cms_files"
-		
+
 		return related_object_names

@@ -10,22 +10,19 @@ Creator.Objects.permission_shares =
 			searchable:true
 			index:true
 		object_name: 
-			label: "对象名"
+			label: "对象"
 			type: "lookup"
 			optionsFunction: ()->
 				_options = []
-				_.forEach Creator.Objects, (o, k)->
-					if o.enable_share
+				_.forEach Creator.objectsByName, (o, k)->
+					if o.enable_share and !o.hidden
 						_options.push { label: o.label, value: k, icon: o.icon }
 				return _options
 			required: true
 		filters: 
 			label: "过滤条件"
-			type: "[Object]"
+			type: "grid"
 			# omit: true
-		# "filters.$":
-		# 	blackbox: true
-		# 	omit: true
 		"filters.$.field": 
 			label: "字段名"
 			type: "text"

@@ -34,7 +34,7 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.rows = field.rows || 3
 		else if field.type == "date"
 			fs.type = Date
-			fs.autoform.afFieldInput = 
+			fs.autoform.afFieldInput =
 				type: "bootstrap-datetimepicker"
 				dateTimePickerOptions:
 					format: "YYYY-MM-DD"
@@ -43,7 +43,7 @@ Creator.getObjectSchema = (obj) ->
 			# 	format: "YYYY-MM-DD"
 		else if field.type == "datetime"
 			fs.type = Date
-			fs.autoform.afFieldInput = 
+			fs.autoform.afFieldInput =
 				type: "bootstrap-datetimepicker"
 				dateTimePickerOptions:
 					format: "YYYY-MM-DD HH:mm"
@@ -151,19 +151,22 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = String
 			if field.multiple
 				fs.type = [String]
-			fs.autoform.type = "select"
-			fs.autoform.options = field.options
-			fs.autoform.firstOption = ""
+				fs.autoform.type = "steedosLookups"
+				fs.autoform.showIcon = false
+				fs.autoform.options = field.options
+			else
+				fs.autoform.type = "select"
+				fs.autoform.options = field.options
+				fs.autoform.firstOption = ""
 		else if field.type == "currency"
 			fs.type = Number
 		else if field.type == "number"
 			fs.type = Number
 			fs.autoform.type = "steedosNumber"
 			fs.autoform.precision = field.precision || 18
-			if !field.scale && field.scale !=0
-				fs.autoform.scale = 2
-			else
+			if field?.scale
 				fs.autoform.scale = field.scale
+				fs.decimal = true
 		else if field.type == "boolean"
 			fs.type = Boolean
 			fs.autoform.type = "boolean-checkbox"
@@ -189,6 +192,13 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = 'filesize'
 		else if field.type == "Object"
 			fs.type = Object
+		else if field.type == "grid"
+			fs.type = Array
+			fs.autoform.editable = true
+			fs.autoform.type = "table"
+
+			schema[field_name + ".$"] =
+				type: Object
 		else
 			fs.type = field.type
 
@@ -237,14 +247,6 @@ Creator.getObjectSchema = (obj) ->
 		else if field.sortable
 			fs.index = true
 
-		if field.type == "grid"
-			fs.type = Array
-			fs.autoform.editable = true
-			fs.autoform.type = "table"
-			
-			schema[field_name + ".$"] = 
-				type: Object
-		
 		schema[field_name] = fs
 
 	return schema

@@ -17,9 +17,6 @@ AutoForm.addInputType('steedosLookups', {
 
 		val = this.val();
 
-		console.log("look valueOut", val)
-		console.log("this", this)
-
 		if(this[0] && this[0].dataset.init === "0"){
 			val = this[0].dataset.oldValue
 		}
@@ -111,6 +108,13 @@ Template.steedosLookups.onRendered(function () {
         template.uniSelectize.optionsMethodParams.set(params);
     });
 
+    template.autorun(function () {
+		var data = Template.currentData();
+		if (data.items && _.isArray(data.items) && !_.isEmpty(data.items)) {
+			template.uniSelectize.setItems(data.items, data.value);
+		}
+	});
+
 	template.autorun(function () {
 		var data = Template.currentData();
 		var formId = AutoForm.getFormId();
@@ -130,9 +134,8 @@ Template.steedosLookups.onRendered(function () {
 
 			if(_.isFunction(optionsFunction)){
 				options = optionsFunction(_values)
+				template.uniSelectize.setItems(options, value);
 			}
-
-			template.uniSelectize.setItems(options, value);
 		}
 	});
 
@@ -371,8 +374,14 @@ Template.steedosLookups.helpers({
 		return Template.instance().data.atts.disabled
 	},
 
+	isShowIcon: function () {
+		if(Template.instance().data.atts.showIcon === false)
+			return false
+		return true;
+	},
+
 	getIcon: function (icon) {
-		return this.icon || icon || Template.instance().uniSelectize.defaultIcon.get() || 'link'
+		return this.icon || icon || Template.instance().uniSelectize.defaultIcon.get() || 'document'
 	},
 
 	showObjectSwitche: function () {
@@ -613,7 +622,8 @@ Template.steedosLookups.events({
 		$input.val('');
 
 		if (template.uniSelectize.multiple && itemsUnselectedLength && this.value) {
-			template.uniSelectize.inputFocus();
+			// template.uniSelectize.inputFocus();
+			template.uniSelectize.open.set(false);
 		} else {
 			template.uniSelectize.open.set(false);
 		}
