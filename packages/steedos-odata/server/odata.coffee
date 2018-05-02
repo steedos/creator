@@ -168,16 +168,14 @@ Meteor.startup ->
 					else if Steedos.isLegalVersion(@urlParams.spaceId,"workflow.standard") and limit>1000 and !Steedos.isLegalVersion(@urlParams.spaceId,"workflow.enterprise") and !Steedos.isLegalVersion(@urlParams.spaceId,"workflow.professional")
 							createQuery.limit = 1000
 				else
-					createQuery.limit = 10
+					createQuery.limit = 1000
 				unreadable_fields = permissions.unreadable_fields || []
 				fields = Creator.getObject(key).fields
 				if createQuery.projection
 					projection = {}
 					_.keys(createQuery.projection).forEach (key)->
 						if _.indexOf(unreadable_fields, key) < 0
-							if (fields[key].type == 'lookup' or fields[key].type == 'master_detail') and fields[key].multiple 
-								console.log 
-							else
+							if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
 								projection[key] = 1
 					createQuery.projection = projection
 				if not createQuery.projection or !_.size(createQuery.projection)
@@ -202,10 +200,10 @@ Meteor.startup ->
 				entities = []
 				if @queryParams.$top isnt '0'
 					entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
-				#scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
+				scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
 				if entities
 					dealWithExpand(createQuery, entities, key)
-					scannedCount = entities.length
+					#scannedCount = entities.length
 					body = {}
 					headers = {}
 					body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key)
@@ -320,9 +318,7 @@ Meteor.startup ->
 					projection = {}
 					_.keys(createQuery.projection).forEach (key)->
 						if _.indexOf(unreadable_fields, key) < 0
-							if (fields[key].type == 'lookup' or fields[key].type == 'master_detail') and fields[key].multiple 
-								console.log 
-							else
+							if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
 								projection[key] = 1
 					createQuery.projection = projection
 				if @queryParams.$top isnt '0'
@@ -486,9 +482,7 @@ Meteor.startup ->
 						projection = {}
 						_.keys(createQuery.projection).forEach (key)->
 							if _.indexOf(unreadable_fields, key) < 0
-								if (fields[key].type == 'lookup' or fields[key].type == 'master_detail') and fields[key].multiple 
-									console.log 
-								else
+								if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
 									projection[key] = 1
 						createQuery.projection = projection
 					if not createQuery.projection or !_.size(createQuery.projection)
