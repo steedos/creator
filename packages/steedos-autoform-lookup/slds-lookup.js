@@ -108,6 +108,13 @@ Template.steedosLookups.onRendered(function () {
         template.uniSelectize.optionsMethodParams.set(params);
     });
 
+    template.autorun(function () {
+		var data = Template.currentData();
+		if (data.items && _.isArray(data.items) && !_.isEmpty(data.items)) {
+			template.uniSelectize.setItems(data.items, data.value);
+		}
+	});
+
 	template.autorun(function () {
 		var data = Template.currentData();
 		var formId = AutoForm.getFormId();
