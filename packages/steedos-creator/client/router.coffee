@@ -22,30 +22,17 @@ initLayout = ()->
 		BlazeLayout.render Creator.getLayout(),
 			main: "homeMenu"
 
-FlowRouter.route '/home',
-	triggersEnter: [ checkUserSigned, initLayout ],
-	action: (params, queryParams)->
-		Tracker.autorun (c)->
-			if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-				c.stop()
-				firstApp = _.keys(Creator.Apps)[0]
-				FlowRouter.go '/app/' + firstApp
-
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
 		if Steedos.isMobile()
 			FlowRouter.go '/app/menu'
 		else
-			app_id = Session.get("app_id")
-			if !app_id
-				app_id = "crm"
-
-			object_name = Session.get("object_name")
-			if object_name
-				FlowRouter.go "/app/" + app_id + "/" + object_name + "/grid"
-			else
-				FlowRouter.go "/app/" + app_id
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					firstApp = _.keys(Creator.Apps)[0]
+					FlowRouter.go '/app/' + firstApp
 
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned, initLayout ],
