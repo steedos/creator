@@ -280,7 +280,7 @@ UserCostTime::startStat = () ->
 
 			approve.owner = userId
 
-			console.log "approve", approve
+			# console.log "approve", approve
 
 			statCollection = Creator.Collections["instances_statistic"]
 			exist_obj = statCollection.findOne({
