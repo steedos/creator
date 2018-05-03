@@ -17,6 +17,15 @@ set_sessions = (context, redirect)->
 	Session.set("object_name", context.params.object_name)
 	Session.set("record_id", context.params.record_id)
 
+checkAppPermission = (context, redirect)->
+	Tracker.autorun (c)->
+		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+			c.stop()
+			app_id = context.params.app_id
+			apps = _.pluck(Creator.getVisibleApps(),"_id")
+			if apps.indexOf(app_id) < 0
+				FlowRouter.go "/app"
+
 checkObjectPermission = (context, redirect)->
 	Tracker.autorun (c)->
 		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
@@ -40,8 +49,9 @@ FlowRouter.route '/app',
 			Tracker.autorun (c)->
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
 					c.stop()
-					firstApp = _.keys(Creator.Apps)[0]
-					FlowRouter.go '/app/' + firstApp
+					apps = Creator.getVisibleApps()
+					firstApp = apps[0]
+					FlowRouter.go '/app/' + firstApp?._id
 
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned, initLayout ],
@@ -49,7 +59,7 @@ FlowRouter.route '/app/menu',
 		return
 
 FlowRouter.route '/app/:app_id',
-	triggersEnter: [ checkUserSigned, initLayout ],
+	triggersEnter: [ checkUserSigned, checkAppPermission, initLayout ],
 	action: (params, queryParams)->
 		if Steedos.isMobile() 
 			if $(".content-wrapper #object_menu").length == 0
