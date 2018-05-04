@@ -66,5 +66,6 @@
 	"creator_list_view_permissions_lost": "You do not have permission to access this view",
 
 	"creator_report_drill_down_label": "Drill Down Data",
-	"creator_report_drill_down_total_label": "Total"
+	"creator_report_drill_down_total_label": "Total",
+	"creator_listview_update":"list view updated"
 }
