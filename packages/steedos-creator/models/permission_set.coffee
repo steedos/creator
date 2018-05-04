@@ -1,7 +1,7 @@
 Creator.Objects.permission_set = 
 	name: "permission_set"
 	label: "权限组"
-	icon: "user"
+	icon: "groups"
 	fields: 
 		name:
 			label: "名称"

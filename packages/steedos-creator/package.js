@@ -149,6 +149,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/publications/object_listviews.coffee', 'server');
 	api.addFiles('server/publications/user_tabular_settings.coffee', 'server');
 	api.addFiles('server/publications/related_objects_records.coffee', 'server');
+	api.addFiles('server/publications/space_user_info.coffee', 'server');
 
 	api.addFiles('server/lib/permission_manager.coffee', 'server');
 	api.addFiles('server/lib/uuflow_manager.coffee', 'server');
@@ -172,6 +173,8 @@ Package.onUse(function(api) {
 	api.addFiles('client/layout/sidebar.html', 'client');
 	api.addFiles('client/layout/sidebar.coffee', 'client');
 	api.addFiles('client/layout/sidebar.less', 'client');
+	api.addFiles('client/layout/loading.html', 'client');
+	api.addFiles('client/layout/loading.less', 'client');
 
 	api.addFiles('client/mobile/admin.html', 'client');
 	api.addFiles('client/mobile/admin.coffee', 'client');
@@ -251,6 +254,10 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/report_settings.coffee', 'client');
 	api.addFiles('client/views/report_settings.less', 'client');
 
+	api.addFiles('client/views/reset_password.html', 'client');
+	api.addFiles('client/views/reset_password.coffee', 'client');
+	api.addFiles('client/views/reset_password.less', 'client');
+
 	api.addFiles('client/views/table_cell.html', 'client');
 	api.addFiles('client/views/table_cell.coffee', 'client');
 	api.addFiles('client/views/table_cell.less', 'client');
@@ -294,6 +301,10 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/views/initiate_approval.html', 'client');
 	api.addFiles('client/views/initiate_approval.coffee', 'client');
+
+	api.addFiles('client/views/user.html', 'client');
+	api.addFiles('client/views/user.coffee', 'client');
+	api.addFiles('client/views/user.less', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');

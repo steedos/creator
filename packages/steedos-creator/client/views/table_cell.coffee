@@ -46,7 +46,7 @@ Template.creator_table_cell.onRendered ->
 					cellTemplate: (container, options) ->
 						field_name = _field.name + ".$." + column
 						field_name = field_name.replace(/\$\./,"")
-						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name, isTable: true}
+						cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true}
 						Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 				return columnItem
 			
@@ -159,7 +159,7 @@ Template.creator_table_cell.helpers
 						utcOffset = moment().utcOffset() / 60
 						val = moment(this.val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
 					else if _field.type == "date"
-						val = moment(this.val).add(utcOffset, "hours").format('YYYY-MM-DD')
+						val = moment.utc(this.val).format('YYYY-MM-DD')
 				else
 					if _field.type == "datetime"
 						val = moment(this.val).format('YYYY-MM-DD H:mm')
@@ -227,6 +227,6 @@ Template.creator_table_cell.helpers
 		return true
 
 	showEditIcon: ()->
-		if this.isTable
+		if this.hideIcon
 			return false
 		return true
