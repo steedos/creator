@@ -52,16 +52,16 @@ getSimpleSchema = (object_name)->
 
 Template.CreatorObjectModal.onCreated ()->
 	if @data.formId
-		throw new Meteor.error("500", "缺少参数formId")
+		throw new Meteor.Error("500", "缺少参数formId")
 
 	if @data.collection
-		throw new Meteor.error("500", "缺少参数collection")
+		throw new Meteor.Error("500", "缺少参数collection")
 
 	if @data.object_name
-		throw new Meteor.error("500", "缺少参数object_name")
+		throw new Meteor.Error("500", "缺少参数object_name")
 
 	if @data.operation
-		throw new Meteor.error("500", "缺少参数operation")
+		throw new Meteor.Error("500", "缺少参数operation")
 
 Template.CreatorObjectModal.onRendered ()->
 	template = @
