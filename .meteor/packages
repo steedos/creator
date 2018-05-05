@@ -98,7 +98,7 @@ steedos:ionicons@0.1.7
 steedos:objects
 steedos:sso
 steedos:app-crm
-#steedos:app-informations
+steedos:app-informations
 steedos:app-admin
 steedos:app-cms
 steedos:app-workflow
@@ -120,7 +120,7 @@ steedos:logger@0.0.2
 
 steedos:object-database
 
-# steedos:app-archive
+steedos:app-archive
 
 steedos:instance-record-queue
 
