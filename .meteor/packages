@@ -124,5 +124,6 @@ steedos:app-archive
 steedos:instance-record-queue
 
 steedos:instances-statistics
+steedos:workflow
 
 http@1.2.9
