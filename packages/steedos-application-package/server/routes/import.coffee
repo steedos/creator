@@ -53,7 +53,7 @@ import_app_package = (userId, space_id, imp_data)->
 				if !_.include(_.keys(Creator.Apps), app_id) && !_.include(imp_app_ids, app_id)
 					throw new Meteor.Error("500", "权限组'#{permission_set.name}'的授权应用'#{app_id}'不存在")
 
-	# 6 permission_objects校验：判断权限集中指定的object是否存在
+	# 6 permission_objects校验：判断权限集中指定的object是否存在；判断权限组标识是是否有效
 	if _.isArray(imp_data.permission_objects) && imp_data.permission_objects.length > 0
 		_.each imp_data.permission_objects, (permission_object)->
 			if !permission_object.object_name || !_.isString(permission_object.object_name)
