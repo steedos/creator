@@ -5,6 +5,7 @@ Creator.Objects.application_package =
 	fields:
 		name:
 			type: "text"
+			label: "名称"
 		apps:
 			type: "lookup"
 			label: "应用"
