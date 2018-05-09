@@ -24,6 +24,7 @@ checkAppPermission = (context, redirect)->
 			app_id = context.params.app_id
 			apps = _.pluck(Creator.getVisibleApps(),"_id")
 			if apps.indexOf(app_id) < 0
+				Session.set("app_id", null)
 				FlowRouter.go "/app"
 
 checkObjectPermission = (context, redirect)->
@@ -33,6 +34,7 @@ checkObjectPermission = (context, redirect)->
 			object_name = context.params.object_name
 			allowRead = Creator.getObject(object_name)?.permissions?.get()?.allowRead
 			unless allowRead
+				Session.set("object_name", null)
 				FlowRouter.go "/app"
 
 initLayout = ()->
@@ -43,10 +45,10 @@ initLayout = ()->
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
-		if Steedos.isMobile()
-			FlowRouter.go '/app/menu'
-		else
-			Tracker.autorun (c)->
+		Tracker.autorun (c)->
+			if Session.get("app_id")
+				FlowRouter.go '/app/' + Session.get("app_id")
+			else
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
 					c.stop()
 					apps = Creator.getVisibleApps()
@@ -61,14 +63,15 @@ FlowRouter.route '/app/menu',
 FlowRouter.route '/app/:app_id',
 	triggersEnter: [ checkUserSigned, checkAppPermission, initLayout ],
 	action: (params, queryParams)->
-		if Steedos.isMobile() 
-			if $(".mobile-content-wrapper #object_menu").length == 0
-				app_id = FlowRouter.getParam("app_id")
-				data = {app_id: app_id}
-				Meteor.defer ->
-					Blaze.renderWithData(Template.objectMenu, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+		Session.set("app_id", FlowRouter.getParam("app_id"))
+		if Steedos.isMobile()
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $(".mobile-content-wrapper #object_menu").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template.objectMenu, {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 		else
-			Session.set("app_id", FlowRouter.getParam("app_id"))
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_app_home"
 
@@ -76,17 +79,23 @@ FlowRouter.route '/admin',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
 		if Steedos.isMobile()
-			if $(".mobile-content-wrapper #admin_menu").length == 0
-				Meteor.defer ->
-					Blaze.renderWithData(Template.adminMenu, {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $(".mobile-content-wrapper #admin_menu").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template.adminMenu, {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 
 FlowRouter.route '/admin/switchspace',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
 		if Steedos.isMobile()
-			if $(".mobile-content-wrapper #switch_space").length == 0
-				Meteor.defer ->
-					Blaze.renderWithData(Template.switchSpace, {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $(".mobile-content-wrapper #switch_space").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template.switchSpace, {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 
 FlowRouter.route '/app/:app_id/search/:search_text',
 	triggersEnter: [ checkUserSigned, initLayout ],
@@ -108,9 +117,12 @@ FlowRouter.route '/app/:app_id/reports/view/:record_id',
 		Session.set("object_name", "reports")
 		Session.set("record_id", record_id)
 		if Steedos.isMobile()
-			if $("#report_view_id").length == 0
-				Meteor.defer ->
-					Blaze.renderWithData(Template.reportView, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $("#report_view_id").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template.reportView, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			BlazeLayout.render Creator.getLayout(),
 				main: "creator_report"
@@ -137,8 +149,11 @@ objectRoutes.route '/:list_view_id/list',
 		data = {app_id: app_id, object_name: object_name, list_view_id: list_view_id}
 		Session.set("reload_dxlist", false)
 		if Steedos.isMobile() and $("#mobile_list_#{object_name}").length == 0
-			Meteor.defer ->
-				Blaze.renderWithData(Template.mobileList, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					Meteor.defer ->
+						Blaze.renderWithData(Template.mobileList, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 
 objectRoutes.route '/:record_id/:related_object_name/grid',
 	action: (params, queryParams)->
@@ -148,9 +163,12 @@ objectRoutes.route '/:record_id/:related_object_name/grid',
 		related_object_name = FlowRouter.getParam("related_object_name")
 		data = {app_id: app_id, object_name: object_name, record_id: record_id, related_object_name: related_object_name}
 		if Steedos.isMobile()
-			if $("#related_object_list_#{related_object_name}").length == 0
-				Meteor.defer ->
-					Blaze.renderWithData(Template.relatedObjectList, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $("#related_object_list_#{related_object_name}").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template.relatedObjectList, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			Session.set 'related_object_name', related_object_name
 			BlazeLayout.render Creator.getLayout(),
@@ -164,9 +182,12 @@ objectRoutes.route '/view/:record_id',
 		data = {app_id: app_id, object_name: object_name, record_id: record_id}
 		ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
 		if Steedos.isMobile()
-			if $("#mobile_view_#{record_id}").length == 0
-				Meteor.defer ->
-					Blaze.renderWithData(Template.mobileView, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $("#mobile_view_#{record_id}").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template.mobileView, data, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 		else
 			Session.set("detail_info_visible", true)
 			if object_name == "users"

@@ -14,6 +14,8 @@ _standardQuery = (curObjectName)->
 			if object_fields[key]
 				if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
 					query_arr.push([key, ">=", val])
+				else if ["text", "textarea", "html"].includes(object_fields[key].type)
+					query_arr.push([key, "contains", val])
 				else
 					query_arr.push([key, "=", val])
 			else
@@ -172,7 +174,7 @@ _columns = (object_name, columns, list_view_id, is_related)->
 
 		list_view = Creator.getListView(object_name, list_view_id)
 
-		list_view_sort = Creator.transformSortToDX(list_view.sort)
+		list_view_sort = Creator.transformSortToDX(list_view?.sort)
 
 		if column_sort_settings and column_sort_settings.length > 0
 			console.log("settings sort...")
@@ -340,7 +342,7 @@ Template.creator_grid.onRendered ->
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
 			# fileName
-			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id).label
+			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
@@ -396,6 +398,14 @@ Template.creator_grid.onRendered ->
 						errorHandler: (error) ->
 							if error.httpStatus == 404 || error.httpStatus == 400
 								error.message = t "creator_odata_api_not_found"
+							else if error.httpStatus == 401
+								error.message = t "creator_odata_unexpected_character"
+							else if error.httpStatus == 403
+								error.message = t "creator_odata_user_privileges"
+							else if error.httpStatus == 500
+								if error.message == "Unexpected character at 106"
+									error.message = t "creator_odata_unexpected_character"
+							toastr.error(error.message)
 					select: selectColumns
 					filter: filter
 					expand: expand_fields

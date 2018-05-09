@@ -178,3 +178,58 @@ body {
 		cursor: pointer;
 	}
 }
+
+@media screen and (max-width: 767px) {
+	.slds-modal.modal-dialog {
+		.slds-modal__container {
+			margin: 0;
+			padding: 0;
+
+			.slds-modal__header {
+				background: #1075a9;
+				border-radius: 0;
+				padding: 0;
+				height: 44px;
+				max-height: 44px;
+				border: none;
+
+				button {
+					padding: 12px;
+					min-width: 44px;
+					width: auto;
+					color: #cae4fb;
+					height: 100%;
+					line-height: unset;
+					text-align: left;
+					background: transparent;
+					border: none;
+					font-size: 15px;
+
+					&:active {
+						background: rgba(0, 0, 0, 0.3);
+					}
+				}
+
+				h2.slds-text-heading--medium {
+					font-size: 20px;
+					line-height: 44px;
+					color: #fff;
+					font-weight: 700;
+					font-size: 16px;
+					position: absolute;
+					left: 65px;
+					right: 65px;
+					text-align: center;
+				}
+			}
+
+			.slds-modal__content {
+				flex: 1
+			}
+
+			.slds-modal__footer {
+				display: none;
+			}
+		}
+	}
+}

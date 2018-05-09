@@ -1,6 +1,7 @@
 Template.mobileView.onCreated ->
 	this.action_collection = new ReactiveVar()
 	this.action_collection_name = new ReactiveVar()
+	this.action_fields = new ReactiveVar()
 
 Template.mobileView.onRendered ->
 	self = this
@@ -168,6 +169,9 @@ Template.mobileView.helpers
 	collectionName: ()->
 		return Template.instance()?.action_collection_name.get()
 
+	fields: ()->
+		return Template.instance().action_fields.get()
+
 	actions: ()->
 		record_id = Template.instance().data.record_id
 		object_name = Template.instance().data.object_name
@@ -212,14 +216,17 @@ Template.mobileView.events
 
 	'click .action-manage': (event, template)->
 		template.$(".view-action-mask").css({"opacity": "1", "display": "block"})
+		template.$(".view-action-actionsheet").css({"opacity": "1", "display": "block"})
 		template.$(".view-action-actionsheet").addClass("weui-actionsheet_toggle")
 
 	'click .weui-actionsheet__cell': (event, template)->
 		template.$(".view-action-mask").css({"opacity": "0", "display": "none"})
+		template.$(".view-action-actionsheet").css({"opacity": "0", "display": "none"})
 		template.$(".view-action-actionsheet").removeClass("weui-actionsheet_toggle")
 
 	'click .view-action-mask': (event, template)->
 		template.$(".view-action-mask").css({"opacity": "0", "display": "none"})
+		template.$(".view-action-actionsheet").css({"opacity": "0", "display": "none"})
 		template.$(".view-action-actionsheet").removeClass("weui-actionsheet_toggle")
 
 	'click .add-related-record': (event, template)->
@@ -251,6 +258,19 @@ Template.mobileView.events
 
 	'click .group-section-control': (event, template)->
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
+
+	'click .view-page-block-item': (event, template)->
+		field = this.toString()
+		record_id = Template.instance().data.record_id
+		object_name = Template.instance().data.object_name
+		object = Creator.getObject(object_name)
+		record = Creator.getObjectRecord(object_name, record_id)
+		template.action_collection.set("Creator.Collections." + object_name)
+		template.action_collection_name.set(object.label)
+		template.action_fields.set(field)
+		Session.set "cmDoc", record
+		Meteor.defer ->
+			$(".btn-edit-cellrecord").click()
 
 AutoForm.hooks addRelatedRecord:
 	onSuccess: (formType, result)->

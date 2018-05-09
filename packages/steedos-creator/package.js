@@ -44,7 +44,7 @@ Package.onUse(function(api) {
 	api.use('kadira:flow-router@2.10.1');
 
 	api.use('steedos:autoform-bs-datetimepicker@1.0.6');
-	api.use('tsega:bootstrap3-datetimepicker@4.17.37');
+	api.use('steedos:bootstrap3-datetimepicker@4.17.47');
 	api.use('steedos:autoform-bs-minicolors@1.0.0');
 
 	api.use('meteorhacks:ssr@2.2.0');
@@ -130,8 +130,6 @@ Package.onUse(function(api) {
 
 	api.addFiles('models/object_workflows.coffee');
 
-	api.addFiles('server/methods/bootstrap.coffee', 'server');
-
 	api.addFiles('server/methods/object_options.coffee', 'server');
 	api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
 	api.addFiles('server/methods/object_recent_record.coffee', 'server');
@@ -175,6 +173,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/layout/sidebar.less', 'client');
 	api.addFiles('client/layout/loading.html', 'client');
 	api.addFiles('client/layout/loading.less', 'client');
+	
 
 	api.addFiles('client/mobile/admin.html', 'client');
 	api.addFiles('client/mobile/admin.coffee', 'client');
@@ -191,9 +190,6 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/object_menu.coffee', 'client');
 	api.addFiles('client/mobile/object_menu.less', 'client');
 	api.addFiles('client/mobile/common.less', 'client');
-	api.addFiles('client/mobile/mobile_list.html', 'client');
-	api.addFiles('client/mobile/mobile_list.less', 'client');
-	api.addFiles('client/mobile/mobile_list.coffee', 'client');
 	api.addFiles('client/mobile/list_switch.html', 'client');
 	api.addFiles('client/mobile/list_switch.less', 'client');
 	api.addFiles('client/mobile/list_switch.coffee', 'client');
@@ -208,6 +204,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/mobile/mobile_report.coffee', 'client');
 	api.addFiles('client/mobile/switch_space.html', 'client');
 	api.addFiles('client/mobile/switch_space.coffee', 'client');
+	api.addFiles('client/mobile/object_list.html', 'client');
+	api.addFiles('client/mobile/object_list.coffee', 'client');
+	api.addFiles('client/mobile/object_list.less', 'client');
 
 
 

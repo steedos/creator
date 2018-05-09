@@ -18,10 +18,7 @@
 						</h2>
 					{{else}}
 						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" data-dismiss="modal">
-							<svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-								<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#close" />
-							</svg>
-							<span class="slds-assistive-text">Close</span>
+							{{> steedos_button_icon class="slds-button__icon slds-button__icon_large" source="utility-sprite" name="close" title="Close"}}
 						</button>
 						<h2 class="title slds-text-heading--medium">
 							<h2 class="slds-text-heading--medium">{{{title}}}</h2>
@@ -34,16 +31,9 @@
 						{{#if $and cmCollection cmOperation}}
 							<p>{{{prompt}}}</p>
 							{{#if shouldUpdateQuickForm}}
-								{{#if isUseMethod}}
-									{{#autoForm title=cmTitle id=cmFormId schema=schema doc=cmDoc buttonContent=false template=cmTemplate label-class=cmLabelClass input-col-class=cmInputColClass buttonClasses=cmButtonClasses meteormethod=cmMeteorMethod type=cmAutoformType}}
-										{{>CreatorFormField schemaFields=schemaFields}}
-									{{/autoForm}}
-								{{else}}
-									{{#autoForm title=cmTitle id=cmFormId collection=cmCollection doc=cmDoc buttonContent=false template=cmTemplate label-class=cmLabelClass input-col-class=cmInputColClass buttonClasses=cmButtonClasses meteormethod=cmMeteorMethod type=cmAutoformType}}
-										{{>CreatorFormField schemaFields=schemaFields}}
-									{{/autoForm}}
-								{{/if}}
-					
+								{{#autoForm title=cmTitle id=cmFormId schema=schema doc=cmDoc buttonContent=false template=cmTemplate label-class=cmLabelClass input-col-class=cmInputColClass buttonClasses=cmButtonClasses meteormethod=cmMeteorMethod type=cmAutoformType}}
+									{{>CreatorFormField schemaFields=schemaFields}}
+								{{/autoForm}}
 							{{/if}}
 						{{/if}}
 					{{/if}}
