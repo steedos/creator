@@ -16,7 +16,7 @@ Template.adminMenu.helpers
 		return Creator.getCollection("users").findOne()?.name
 
 	logoutUrL: ()->
-		return Steedos.absoluteUrl("/steedos/logout")
+		return Creator.getRelativeUrl("/steedos/logout")
 
 	spaceName: ->
 		if Session.get("spaceId")
@@ -35,7 +35,7 @@ Template.adminMenu.events
 			if lastUrl
 				FlowRouter.go lastUrl
 			else
-				FlowRouter.go '/app/menu'
+				FlowRouter.go '/app'
 	
 	'click .btn-switch-space': (event, template)->
 		FlowRouter.go '/admin/switchspace'

@@ -16,7 +16,10 @@ Template.filter_option_list.helpers
 		return Creator.getObject(object_name)
 
 	filter_logic: ()->
-		Session.get("filter_logic")
+		return Session.get("filter_logic")
+
+	isFilterLogicEmpty: ()->
+		return Session.get("filter_logic") == undefined or Session.get("filter_logic") == null
 
 Template.filter_option_list.events 
 	'click .btn-filter-scope': (event, template)->
@@ -92,6 +95,8 @@ Template.filter_option_list.events
 
 	'click .add-filter': (event, template)->
 		filter_items = Session.get("filter_items")
+		unless filter_items
+			filter_items = []
 		filter_items.push({})
 		Session.set("filter_items", filter_items)
 		Meteor.defer ->
@@ -114,7 +119,7 @@ Template.filter_option_list.events
 		
 
 	'click .remove_filter_logic': (e, t)->
-		Session.set("filter_logic", "")
+		Session.set("filter_logic", undefined)
 
 	'keyup #filter-logic': (e, t)->
 		val = $(e.currentTarget).val()

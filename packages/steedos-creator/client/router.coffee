@@ -40,7 +40,7 @@ checkObjectPermission = (context, redirect)->
 initLayout = ()->
 	if Steedos.isMobile() and (!$(".wrapper").length or !$("#home_menu").length)
 		BlazeLayout.render Creator.getLayout(),
-			main: "homeMenu"
+			main: "objectMenu"
 
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
