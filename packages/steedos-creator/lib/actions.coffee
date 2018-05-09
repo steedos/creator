@@ -77,6 +77,8 @@ if Meteor.isClient
 							if record_id == Session.get("record_id") and !Steedos.isMobile()
 								appid = Session.get("app_id")
 								unless list_view_id
+									list_view_id = Session.get("list_view_id")
+								unless list_view_id
 									list_view_id = "all"
 								FlowRouter.go "/app/#{appid}/#{object_name}/grid/#{list_view_id}"
 							if call_back and typeof call_back == "function"
