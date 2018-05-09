@@ -1,4 +1,8 @@
-InstanceRecordQueue.collection = new Mongo.Collection('instance_record_queue');
+Meteor.startup(function () {
+	console.log("creator.instance_record_queue");
+	InstanceRecordQueue.collection = new Mongo.Collection('instance_record_queue');
+	db.instance_record_queue = InstanceRecordQueue.collection
+});
 
 var _validateDocument = function(doc) {
 
