@@ -34,7 +34,12 @@ Creator.Object = (options)->
 	self.custom = options.custom
 	self.enable_share = options.enable_share
 	self.enable_instances = options.enable_instances
-
+	if options.details_template
+		self.details_template = options.details_template
+	if options.in_details_action
+		self.in_details_action = options.in_details_action
+	if options.details_template_show
+		self.details_template_show = options.details_template_show
 	if (!options.fields)
 		throw new Error('Creator.Object options must specify name');
 

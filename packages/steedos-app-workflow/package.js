@@ -11,7 +11,8 @@ Npm.depends({
 });
 
 Package.onUse(function(api) {
-
+	api.use('kadira:flow-router@2.10.1');
+	api.use('underscore@1.0.10');
 	api.use('steedos:creator@0.0.5');
 	api.use('coffeescript@1.11.1_4');
 
@@ -25,6 +26,8 @@ Package.onUse(function(api) {
 	api.addFiles('models/flows.coffee');
 	api.addFiles('models/statistic_instance.coffee');
 	api.addFiles('models/categories.coffee');
+
+	api.addFiles('client/router.coffee', 'client');
 
 	// api.addFiles('cfs/instances.coffee', 'server');
 })

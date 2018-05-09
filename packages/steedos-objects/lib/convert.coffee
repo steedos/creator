@@ -161,4 +161,24 @@ Meteor.startup ()->
 					catch error
 						console.error "convert error #{object.name} -> #{field.name}", error
 
+		if Meteor.isClient
+			if object._in_details_action && _.isString(object._in_details_action)
+				try
+					object.in_details_action = Creator.eval("(#{object._in_details_action})")
+				catch error
+					console.error "convert error #{object.name} -> #{object._in_details_action}", error
+
+			if object._details_template_show && _.isString(object._details_template_show)
+				try
+					object.details_template_show = Creator.eval("(#{object._details_template_show})")
+				catch error
+					console.error "convert error #{object.name} -> #{object._details_template_show}", error
+
+
+		if Meteor.isServer
+			if object.in_details_action && _.isFunction(object.in_details_action)
+				object._in_details_action = object.in_details_action.toString()
+
+			if object.details_template_show && _.isFunction(object.details_template_show)
+				object._details_template_show = object.details_template_show.toString()
 

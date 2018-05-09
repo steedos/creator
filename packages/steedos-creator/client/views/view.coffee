@@ -171,6 +171,18 @@ Template.creator_view.helpers
 	allowCreate: ()->
 		return Creator.getPermissions(this.object_name).allowCreate
 
+	details_template: ()->
+		return Creator.getObject(this.object_name).details_template
+
+	details_template_show: ()->
+		details_template_show = Creator.getObject(this.object_name)?.details_template_show
+		if !details_template_show
+			return true
+		else if _.isFunction(details_template_show)
+			return details_template_show()
+		else
+			return true
+
 	detail_info_visible: ()->
 		return Session.get("detail_info_visible")
 

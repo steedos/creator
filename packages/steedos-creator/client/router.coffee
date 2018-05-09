@@ -42,6 +42,14 @@ initLayout = ()->
 		BlazeLayout.render Creator.getLayout(),
 			main: "objectMenu"
 
+#FlowRouter.route "/app/workflow/instances/view/:record_id",
+#	action:(params, queryParams)->
+#		console.log("app.workflow.instances.view....")
+#		Session.set("instanceId", params.record_id);
+#		BlazeLayout.render Creator.getLayout(),
+#			main: "instance_view"
+
+
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
@@ -181,6 +189,14 @@ objectRoutes.route '/view/:record_id',
 		record_id = FlowRouter.getParam("record_id")
 		data = {app_id: app_id, object_name: object_name, record_id: record_id}
 		ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
+
+
+		object = Creator.getObject(object_name)
+		console.log("object.in_details_action...............")
+		if object?.in_details_action && _.isFunction(object.in_details_action)
+			console.log("run object.in_details_action...............")
+			object.in_details_action(params, queryParams)
+
 		if Steedos.isMobile()
 			Tracker.autorun (c)->
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
