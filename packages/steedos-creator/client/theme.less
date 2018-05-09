@@ -118,7 +118,16 @@ body {
 			padding: 1em 0.5em;
 		}
 	}
+
+	.slds-modal__header {
+		background-color: #F4F4F4;
+		border-bottom: 1px solid #D5D5DA;
+		color: #878687;
+	}
 	
+	.slds-modal__footer {
+		border-top: 1px solid #D5D5D5;
+	}
 }
 
 .steedos.fixed.skin-blue-light-disabled {
@@ -199,7 +208,7 @@ body {
 					width: auto;
 					color: #cae4fb;
 					height: 100%;
-					line-height: unset;
+					line-height: 0;
 					text-align: left;
 					background: transparent;
 					border: none;
@@ -224,7 +233,8 @@ body {
 			}
 
 			.slds-modal__content {
-				flex: 1
+				flex: 1;
+				padding: 1rem 0;
 			}
 
 			.slds-modal__footer {
