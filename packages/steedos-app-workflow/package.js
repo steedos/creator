@@ -27,6 +27,9 @@ Package.onUse(function(api) {
 	api.addFiles('models/statistic_instance.coffee');
 	api.addFiles('models/categories.coffee');
 
+	api.addFiles('client/instance_view.css', 'client');
+
+	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
 
 	// api.addFiles('cfs/instances.coffee', 'server');

@@ -36,8 +36,10 @@ Creator.Object = (options)->
 	self.enable_instances = options.enable_instances
 	if options.details_template
 		self.details_template = options.details_template
-	if options.in_details_action
-		self.in_details_action = options.in_details_action
+	if options.enter_details_route
+		self.enter_details_route = options.enter_details_route
+	if options.exit_details_route
+		self.exit_details_route = options.exit_details_route
 	if options.details_template_show
 		self.details_template_show = options.details_template_show
 	if (!options.fields)

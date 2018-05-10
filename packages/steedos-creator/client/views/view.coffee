@@ -1,4 +1,9 @@
 Template.creator_view.onCreated ->
+	this.autorun ->
+		Session.get("record_id")
+		object = Creator.getObject(Session.get("object_name"))
+		if object?.enter_details_route && _.isFunction(object.enter_details_route)
+			object.enter_details_route()
 
 Template.creator_view.onRendered ->
 	this.autorun ->

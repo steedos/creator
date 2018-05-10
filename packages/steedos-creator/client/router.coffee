@@ -193,13 +193,6 @@ objectRoutes.route '/view/:record_id',
 		data = {app_id: app_id, object_name: object_name, record_id: record_id}
 		ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
 
-
-		object = Creator.getObject(object_name)
-		console.log("object.in_details_action...............")
-		if object?.in_details_action && _.isFunction(object.in_details_action)
-			console.log("run object.in_details_action...............")
-			object.in_details_action(params, queryParams)
-
 		if Steedos.isMobile()
 			Tracker.autorun (c)->
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
@@ -215,6 +208,13 @@ objectRoutes.route '/view/:record_id',
 				main = "creator_view"
 			BlazeLayout.render Creator.getLayout(),
 				main: main
+	triggersExit: [ (context, redirect)->
+		object_name = context.params.object_name
+		object = Creator.getObject(object_name)
+		if object?.exit_details_route && _.isFunction(object.exit_details_route)
+			console.log("run object.exit_details_route...............")
+			object.exit_details_route(context, redirect)
+	]
 
 FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 	triggersEnter: [ checkUserSigned, checkObjectPermission, initLayout ],
@@ -229,6 +229,6 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 
 		Tracker.afterFlush ()->
 			Session.set("list_view_visible", true)
-		
+
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_list_wrapper"

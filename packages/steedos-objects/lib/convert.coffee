@@ -162,11 +162,17 @@ Meteor.startup ()->
 						console.error "convert error #{object.name} -> #{field.name}", error
 
 		if Meteor.isClient
-			if object._in_details_action && _.isString(object._in_details_action)
+			if object._enter_details_route && _.isString(object._enter_details_route)
 				try
-					object.in_details_action = Creator.eval("(#{object._in_details_action})")
+					object.enter_details_route = Creator.eval("(#{object._enter_details_route})")
 				catch error
-					console.error "convert error #{object.name} -> #{object._in_details_action}", error
+					console.error "convert error #{object.name} -> #{object._enter_details_route}", error
+
+			if object._exit_details_route && _.isString(object._exit_details_route)
+				try
+					object.exit_details_route = Creator.eval("(#{object._exit_details_route})")
+				catch error
+					console.error "convert error #{object.name} -> #{object._exit_details_route}", error
 
 			if object._details_template_show && _.isString(object._details_template_show)
 				try
@@ -174,11 +180,12 @@ Meteor.startup ()->
 				catch error
 					console.error "convert error #{object.name} -> #{object._details_template_show}", error
 
-
 		if Meteor.isServer
-			if object.in_details_action && _.isFunction(object.in_details_action)
-				object._in_details_action = object.in_details_action.toString()
+			if object.enter_details_route && _.isFunction(object.enter_details_route)
+				object._enter_details_route = object.enter_details_route.toString()
+
+			if object.exit_details_route && _.isFunction(object.exit_details_route)
+				object._exit_details_route = object.exit_details_route.toString()
 
 			if object.details_template_show && _.isFunction(object.details_template_show)
 				object._details_template_show = object.details_template_show.toString()
-
