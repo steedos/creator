@@ -35,13 +35,13 @@ Template.adminMenu.events
 			if lastUrl
 				FlowRouter.go lastUrl
 			else
-				FlowRouter.go '/app/menu'
+				FlowRouter.go '/app'
 	
 	'click .btn-switch-space': (event, template)->
 		FlowRouter.go '/admin/switchspace'
 
 	'click .btn-change-password': (event, template)->
-		Modal.show("reset_password_modal")
+		$("#reset_password_modal").modal "show"
 
 	'click .btn-change-avatar': (event, template)->
 		template.$("#mobile-avator-upload").click()
