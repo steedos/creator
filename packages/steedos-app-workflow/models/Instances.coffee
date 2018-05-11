@@ -143,7 +143,9 @@ Creator.Objects.instances =
 		state:
 			type: "string"
 			label:"申请单状态"
-
+		finish_date:
+			type: "datetime"
+			label:"结束时间"
 		record_ids:
 			label:"记录ID"
 			type: "grid"
@@ -172,6 +174,11 @@ Creator.Objects.instances =
 			label: "已办文件"
 			filter_scope: "space"
 			filters: [["outbox_users", "=", "{userId}"]]
+		monitor:
+			columns: ["name", "applicant", "applicant_organization", "modified"]
+			label: "监控箱"
+			filter_scope: "space"
+			filters: [["state", "=", ["pending", "completed"]]]
 
 	permission_set:
 		user:
@@ -192,115 +199,120 @@ Creator.Objects.instances =
 	actions:
 		new_instance:
 			label: "新建草稿"
-			visible: true
+			visible: ()->
+				InstanceActions.new.visible()
 			on: "list"
-			todo: (object_name)->
-				Modal.show("flow_list_box_modal")
+			todo: (object_name, record_id, fields)->
+				InstanceActions.new.todo(object_name, record_id, fields)
 		submit_instance:
 			label: "发送"
 			visible: ()->
-				return Session.get("list_view_id") == "inbox" && Session.get("instanceId")
+				InstanceActions.submit.visible()
 			on: "record"
 			todo: (object_name, record_id, fields)->
-				InstanceManager.btnInstanceSubmit()
+				InstanceActions.submit.todo(object_name, record_id, fields)
+		delete_instance:
+			label: "删除"
+			visible: ()->
+				InstanceActions.delete.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.delete.todo(object_name, record_id, fields)
+		terminate_instance:
+			label: "取消申请"
+			visible: ()->
+				InstanceActions.terminate.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.terminate.todo(object_name, record_id, fields)
+		reassign_instance:
+			label: "转签核"
+			visible: ()->
+				InstanceActions.reassign.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.reassign.todo(object_name, record_id, fields)
+		relocate_instance:
+			label: "重定位"
+			visible: ()->
+				InstanceActions.relocate.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.relocate.todo(object_name, record_id, fields)
 		cc_instance:
 			label: "传阅"
 			visible: ()->
-				return Session.get("list_view_id") == "inbox" && Session.get("instanceId")
+				InstanceActions.cc.visible()
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				Modal.show('instance_cc_modal');
+				InstanceActions.cc.todo(object_name, record_id, fields)
 		save_instance:
 			label: "保存"
 			visible: ()->
-				return Session.get("list_view_id") == "inbox" && Session.get("instanceId")
+				InstanceActions.save.visible()
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				element = $(".btn-instance-update")
-				if !InstanceEvent.run(element, "instance-before-save")
-					return ;
-
-				InstanceManager.saveIns();
-				Session.set("instance_change", false);
+				InstanceActions.save.todo(object_name, record_id, fields)
 		return_instance:
 			label: "退回"
 			visible: ()->
-				return Session.get("list_view_id") == "inbox" && Session.get("instanceId")
+				InstanceActions.return.visible()
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				InstanceManager.returnIns()
+				InstanceActions.return.todo(object_name, record_id, fields)
+		retrieve_instance:
+			label: "取回"
+			visible: ()->
+				InstanceActions.retrieve.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.retrieve.todo(object_name, record_id, fields)
+		traces_instance:
+			label: "签核历程"
+			visible: ()->
+				InstanceActions.traces.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.traces.todo(object_name, record_id, fields)
+		related_instance:
+			label: "关联文件"
+			visible: ()->
+				InstanceActions.related.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.related.todo(object_name, record_id, fields)
 		print_instance:
 			label: "打印"
 			visible: ()->
-				if Meteor.isCordova
-					return false
-				return true
+				InstanceActions.print.visible()
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				if window.navigator.userAgent.toLocaleLowerCase().indexOf("chrome") < 0
-					toastr.warning(TAPi18n.__("instance_chrome_print_warning"))
-				else
-					btn_instance_update = $('.btn-instance-update')[0]
-					if btn_instance_update
-						btn_instance_update.click()
-					uobj = {}
-					uobj["box"] = Session.get("box")
-					uobj["X-User-Id"] = Meteor.userId()
-					uobj["X-Auth-Token"] = Accounts._storedLoginToken()
-					Steedos.openWindow(Steedos.absoluteUrl("workflow/space/" + Session.get("spaceId") + "/print/" + record_id + "?" + $.param(uobj)), "",'width=900,height=750,scrollbars=yes,EnableViewPortScale=yes,toolbarposition=top,transitionstyle=fliphorizontal,menubar=yes,closebuttoncaption=  x  ')
+				InstanceActions.print.todo(object_name, record_id, fields)
 		forward_instance:
 			label: "转发"
 			visible: ()->
-				if Meteor.settings.public?.workflow?.disableInstanceForward
-					return false
-
-				ins = WorkflowManager.getInstance()
-				if !ins
-					return false
-
-				# 传阅的申请单不允许转发
-				if (InstanceManager.isCC(ins))
-					return false
-
-				# 待审核箱不显示转发
-				if InstanceManager.isInbox()
-					return false
-
-				if ins.state != "draft"
-					return true
-				else
-					return false
+				InstanceActions.forward.visible()
 			on: "record"
-			todo: ()->
-				Modal.show("forward_select_flow_modal", {action_type:"forward"})
+			todo: (object_name, record_id, fields)->
+				InstanceActions.forward.todo(object_name, record_id, fields)
+		distribute_instance:
+			label: "分发"
+			visible: ()->
+				InstanceActions.distribute.visible()
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				InstanceActions.distribute.todo(object_name, record_id, fields)
 		remind_instance:
 			label: "催办"
 			visible: ()->
-				return Session.get("list_view_id") == "inbox" && Session.get("instanceId")
+				InstanceActions.remind.visible()
 			on: "record"
-			todo: ()->
-				param = { action_types: new ReactiveVar([]) }
-				Modal.show 'remind_modal', param
+			todo: (object_name, record_id, fields)->
+				InstanceActions.remind.todo(object_name, record_id, fields)
 		instance_workflow_chart:
 			label: "流程图"
 			visible: ()->
-				return Session.get("list_view_id") == "inbox" && Session.get("instanceId")
+				InstanceActions.workflow_chart.visible()
 			on: "record"
 			todo:(object_name, record_id, fields)->
-				if Steedos.isIE()
-					toastr.warning t("instance_workflow_chart_ie_warning")
-					return
-				ins = WorkflowManager.getInstance()
-				flow = db.flows.findOne(ins.flow)
-				Steedos.openWindow(Steedos.absoluteUrl("/packages/steedos_workflow-chart/assets/index.html?instance_id=#{ins._id}&title=#{encodeURIComponent(encodeURIComponent(flow.name))}"),'workflow_chart')
-		view_instance:
-			label: "查看申请单"
-			visible: false
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				uobj = {}
-				uobj["box"] = 'monitor'
-				uobj["X-User-Id"] = Meteor.userId()
-				uobj["X-Auth-Token"] = Accounts._storedLoginToken()
-				workflowUrl = window.location.protocol + '//' + window.location.hostname + '/'
-				Steedos.openWindow(workflowUrl + "workflow/space/" + Session.get("spaceId") + "/print/" + record_id + "?" + $.param(uobj), "",'width=900,height=750,scrollbars=yes,EnableViewPortScale=yes,toolbarposition=top,transitionstyle=fliphorizontal,menubar=yes,closebuttoncaption=  x  ')
+				InstanceActions.workflow_chart.todo(object_name, record_id, fields)
