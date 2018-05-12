@@ -1,6 +1,10 @@
 Meteor.startup(function () {
 	console.log("creator.instance_record_queue");
-	InstanceRecordQueue.collection = new Mongo.Collection('instance_record_queue');
+	if(db.instance_record_queue){
+		InstanceRecordQueue.collection = db.instance_record_queue;
+	}else{
+		InstanceRecordQueue.collection = new Mongo.Collection('instance_record_queue');
+	}
 	db.instance_record_queue = InstanceRecordQueue.collection
 });
 
