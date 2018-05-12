@@ -125,5 +125,6 @@ steedos:instance-record-queue
 
 steedos:instances-statistics
 steedos:workflow
+steedos:webkit-notification
 sach:flow-db-admin
 http@1.2.9
