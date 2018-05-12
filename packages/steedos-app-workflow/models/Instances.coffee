@@ -25,7 +25,6 @@ Creator.Objects.instances =
 			instance = WorkflowManager.getInstance()
 
 			if !instance || !instance.traces
-				console.log("sub instance ready.....fasle 1")
 				return false;
 
 			if instance.flow_version && instance.form_version
@@ -34,19 +33,20 @@ Creator.Objects.instances =
 				form_version = db.form_versions.findOne({_id: instance.form_version})
 
 				if !flow_version || !form_version
-					console.log("sub instance ready.....fasle 2")
 					return false;
 
 			if instance
 				if Session.get("box") == "inbox"
 					if InstanceManager.isInbox()
 						return true
+					else if instance.state == 'draft'
+						Session.set("list_view_id", "draft")
 					else
-						FlowRouter.go("/workflow/space/" + Session.get("spaceId") + "/" + Session.get("box") + "/")
+						FlowRouter.go("/app/workflow/instances/grid/#{Session.get("box")}")
 				else
 					return true
 			else # 订阅完成 instance 不存在，则认为instance 已经被删除
-				FlowRouter.go("/workflow/space/" + Session.get("spaceId") + "/" + Session.get("box") + "/")
+				FlowRouter.go("/app/workflow/instances/grid/#{Session.get("box")}")
 		return false
 	fields:
 		name:
