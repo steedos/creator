@@ -159,11 +159,6 @@ Creator.Objects.instances =
 			hidden:true
 
 	list_views:
-		draft:
-			label: "草稿文件"
-			columns: ["name", "applicant", "applicant_organization", "modified"]
-			filter_scope: "space"
-			filters: [["submitter", "=", "{userId}"], ["state", "=", "draft"]]
 		inbox:
 			columns: ["name", "applicant", "applicant_organization", "modified"]
 			label: "待办文件"
@@ -184,6 +179,11 @@ Creator.Objects.instances =
 			label: "监控箱"
 			filter_scope: "space"
 			filters: [["state", "=", ["pending", "completed"]]]
+		draft:
+			label: "草稿文件"
+			columns: ["name", "applicant", "applicant_organization", "modified"]
+			filter_scope: "space"
+			filters: [["submitter", "=", "{userId}"], ["state", "=", "draft"]]
 
 	permission_set:
 		user:
