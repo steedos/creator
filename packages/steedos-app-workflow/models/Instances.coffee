@@ -169,6 +169,11 @@ Creator.Objects.instances =
 			label: "待办文件"
 			filter_scope: "space"
 			filters: [["inbox_users", "=", "{userId}"]]
+		pending:
+			columns: ["name", "applicant", "applicant_organization", "modified"]
+			label: "传阅待办"
+			filter_scope: "space"
+			filters: [["cc_users", "=", "{userId}"]]
 		outbox:
 			columns: ["name", "applicant", "applicant_organization", "modified"]
 			label: "已办文件"
