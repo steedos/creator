@@ -29,7 +29,7 @@ Creator.Objects.vip_card =
 			type:'number'
 		store:
 			label:'办卡门店'
-			type:'master_detail'
+			type:'lookup'
 			reference_to:'vip_store'
 		apply_stores:
 			label:'适用门店'

@@ -10,7 +10,7 @@ Creator.Objects.vip_store =
 			label:'简介'
 			type:'text'
 		location:
-			label:'地址'
+			label:'位置'
 			type:'location'
 		contact:
 			type:'lookup'
@@ -21,7 +21,7 @@ Creator.Objects.vip_store =
 			label:'联系电话'
 		business_hours:
 			type:'text'
-			label:'营业时间'	
+			label:'营业时间'
 		address:
 			type:'text'
 			label:'地址'
@@ -35,8 +35,7 @@ Creator.Objects.vip_store =
 			columns: ["name", "location", "phone","address","business_hours","merchant"]
 			filter_scope: "space"
 	triggers:
-		"before.insert.server.store": 
+		"before.insert.server.store":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				doc.merchant = Session.get("spaceId")

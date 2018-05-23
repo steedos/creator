@@ -49,4 +49,4 @@ Creator.Objects.post =
 		all:
 			label: "所有信息"
 			columns: ["name","summary", "comment_count", "star_count","forward_count"]
-			filter_scope: "space"	
+			filter_scope: "space"
