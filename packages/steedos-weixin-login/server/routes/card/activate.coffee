@@ -13,6 +13,11 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/activate', (req, res, next) ->
 	if !space_user
 		WXMini.addUserToSpace(userId, spaceId, data.name)
 
+	#获取商户下的所有门店
+	space_store = Creator.getCollection("vip_store").find({space: spaceId}, {fields: {_id: 1}}).fetch()
+	#适用门店默认为所有门店
+	apply_stores = _.pluck(space_store, "_id")
+
 	now = new Date()
 
 	###开通商户下的会员卡###
@@ -25,7 +30,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/activate', (req, res, next) ->
 		discount: 1
 		balance: 0.00
 		store: storeId
-		apply_stores: [storeId]
+		apply_stores: apply_stores
 		start_time: new Date()
 		introducer: data.introducer
 		owner: userId
@@ -33,6 +38,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/activate', (req, res, next) ->
 		modified_by: userId
 		created: now
 		modified: now
+		is_actived: true #默认激活
 	}
 
 	Creator.getCollection("vip_card").direct.insert(doc)
