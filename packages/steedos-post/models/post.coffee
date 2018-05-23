@@ -45,6 +45,10 @@ Creator.Objects.post =
 			label:'门店'
 			type:'master_detail'
 			reference_to:'vip_store'
+		images:
+			label: '图片'
+			type: 'image'
+			multiple : true
 	list_views:
 		all:
 			label: "所有信息"
