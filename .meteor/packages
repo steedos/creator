@@ -129,3 +129,6 @@ steedos:instances-statistics
 http@1.2.9
 
 steedos:weixin-login
+
+steedos:vip-post
+steedos:vip-card
