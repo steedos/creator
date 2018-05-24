@@ -200,8 +200,8 @@ steedos:useraccounts-core@1.14.2_6
 steedos:useraccounts-flow-routing@1.14.2_4
 steedos:vip-card@0.0.1
 steedos:vip-post@0.0.1
-steedos:weixin-aes@0.0.1
 steedos:weixin@0.0.1
+steedos:weixin-aes@0.0.1
 summernote:standalone@0.7.3
 summernote:summernote@0.8.1
 tap:i18n@1.8.2
