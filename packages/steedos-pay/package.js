@@ -20,11 +20,11 @@ Package.onUse(function (api) {
     api.use('steedos:creator@0.0.4');
 
     api.addFiles('models/billing_record.coffee');
-    api.addFiles('server/lib/util.js');
-    api.addFiles('server/lib/wxpay.js');
-    api.addFiles('server/lib/pay_manager.coffee');
-    api.addFiles('server/routes/api_steedos_weixin_card_recharge.coffee');
-    api.addFiles('server/routes/api_steedos_weixin_card_recharge_notify.coffee');
+    api.addFiles('server/lib/util.js', 'server');
+    api.addFiles('server/lib/wxpay.js', 'server');
+    api.addFiles('server/lib/pay_manager.coffee', 'server');
+    api.addFiles('server/routes/api_steedos_weixin_card_recharge.coffee', 'server');
+    api.addFiles('server/routes/api_steedos_weixin_card_recharge_notify.coffee', 'server');
 
     api.export(['payManager'], ['server']);
 })
