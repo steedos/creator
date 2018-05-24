@@ -9,11 +9,13 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         body = req.body
         console.log 'body: ', body
         totalFee = body.totalFee
+        storeId = body.storeId
 
         sub_appid = req.headers['appid']
         spaceId = req.headers['x-space-id']
 
         check totalFee, Number
+        check storeId, String
         check sub_appid, String
         check spaceId, String
 
@@ -38,14 +40,15 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             partner_key: Meteor.settings.billing.partner_key #微信商户平台API密钥
         })
 
+        out_trade_no = moment().format('YYYYMMDDHHmmssSSS')
+
         orderData = {
             body: order_body,
-            out_trade_no: moment().format('YYYYMMDDHHmmssSSS'),
+            out_trade_no: out_trade_no,
             total_fee: totalFee,
             spbill_create_ip: '127.0.0.1',
             notify_url: Meteor.absoluteUrl() + 'api/steedos/weixin/card/recharge/notify',
             trade_type: 'JSAPI', # 小程序取值如下：JSAPI
-            product_id: moment().format('YYYYMMDDHHmmssSSS'),
             attach: JSON.stringify(attach),
             sub_appid: sub_appid,
             sub_mch_id: sub_mch_id,
@@ -65,6 +68,8 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                         total_fee: totalFee
                         owner: user_id
                         space: spaceId
+                        store: storeId
+                        out_trade_no: out_trade_no
                     }
 
                     Creator.getCollection('billing_record').insert(obj)

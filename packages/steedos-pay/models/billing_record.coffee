@@ -22,5 +22,10 @@ Creator.Objects.billing_record =
             omit: true
             hidden: true
 
+        out_trade_no:
+            label: "商户单号"
+            type: "text"
+            omit: true
+            hidden: true
 
 
