@@ -33,6 +33,9 @@ Creator.Objects.vip_store =
 			label: '照片'
 			type: 'image'
 			multiple : true
+		mch_id:
+			type: 'text'
+			label: '商户号'
 	list_views:
 		all:
 			label: "所有门店"
