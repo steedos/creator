@@ -1,6 +1,6 @@
 // var util = require('./util');
 import util from './util.js';
-// var request = require('request');
+var request = Npm.require('request');
 var md5 = Npm.require('MD5');
 
 exports = module.exports = WXPay;
@@ -18,7 +18,7 @@ function WXPay() {
 	};
 };
 
-WXPay.mix = function() {
+WXPay.mix = function () {
 
 	switch (arguments.length) {
 		case 1:
@@ -42,18 +42,18 @@ WXPay.mix = function() {
 };
 
 
-WXPay.mix('option', function(option) {
+WXPay.mix('option', function (option) {
 	for (var k in option) {
 		this.options[k] = option[k];
 	}
 });
 
 
-WXPay.mix('sign', function(param) {
+WXPay.mix('sign', function (param) {
 
-	var querystring = Object.keys(param).filter(function(key) {
+	var querystring = Object.keys(param).filter(function (key) {
 		return param[key] !== undefined && param[key] !== '' && ['pfx', 'partner_key', 'sign', 'key'].indexOf(key) < 0;
-	}).sort().map(function(key) {
+	}).sort().map(function (key) {
 		return key + '=' + param[key];
 	}).join("&") + "&key=" + this.options.partner_key;
 
@@ -61,30 +61,38 @@ WXPay.mix('sign', function(param) {
 });
 
 
-WXPay.mix('createUnifiedOrder', function(opts, fn) {
+WXPay.mix('createUnifiedOrder', function (opts, fn) {
 
 	opts.nonce_str = opts.nonce_str || util.generateNonceString();
 	util.mix(opts, this.wxpayID);
 	opts.sign = this.sign(opts);
 
-	request({
-		url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
-		method: 'POST',
-		body: util.buildXML(opts),
-		agentOptions: {
-			pfx: this.options.pfx,
-			passphrase: this.options.mch_id
-		}
-	}, function(err, response, body) {
-		util.parseXML(body, fn);
-	});
+	var resData = Meteor.wrapAsync(function (that, opts, cb) {
+		request({
+			url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
+			method: 'POST',
+			body: util.buildXML(opts),
+			agentOptions: {
+				pfx: that.options.pfx,
+				passphrase: that.options.mch_id
+			}
+		}, function (err, response, body) {
+			cb(err, response, body)
+			if (err) {
+				console.error(err.stack);
+			}
+			return;
+		});
+	})(this, opts);
+
+	util.parseXML(resData.body, fn);
 });
 
-WXPay.mix('getBrandWCPayRequestParams', function(order, fn) {
+WXPay.mix('getBrandWCPayRequestParams', function (order, fn) {
 
 	order.trade_type = "JSAPI";
 	var _this = this;
-	this.createUnifiedOrder(order, function(err, data) {
+	this.createUnifiedOrder(order, function (err, data) {
 		var reqparam = {
 			appId: _this.options.appid,
 			timeStamp: Math.floor(Date.now() / 1000) + "",
@@ -97,16 +105,16 @@ WXPay.mix('getBrandWCPayRequestParams', function(order, fn) {
 	});
 });
 
-WXPay.mix('createMerchantPrepayUrl', function(param) {
+WXPay.mix('createMerchantPrepayUrl', function (param) {
 
 	param.time_stamp = param.time_stamp || Math.floor(Date.now() / 1000);
 	param.nonce_str = param.nonce_str || util.generateNonceString();
 	util.mix(param, this.wxpayID);
 	param.sign = this.sign(param);
 
-	var query = Object.keys(param).filter(function(key) {
+	var query = Object.keys(param).filter(function (key) {
 		return ['sign', 'mch_id', 'product_id', 'appid', 'time_stamp', 'nonce_str'].indexOf(key) >= 0;
-	}).map(function(key) {
+	}).map(function (key) {
 		return key + "=" + encodeURIComponent(param[key]);
 	}).join('&');
 
@@ -114,18 +122,18 @@ WXPay.mix('createMerchantPrepayUrl', function(param) {
 });
 
 
-WXPay.mix('useWXCallback', function(fn) {
+WXPay.mix('useWXCallback', function (fn) {
 
-	return function(req, res, next) {
+	return function (req, res, next) {
 		var _this = this;
-		res.success = function() {
+		res.success = function () {
 			res.end(util.buildXML({
 				xml: {
 					return_code: 'SUCCESS'
 				}
 			}));
 		};
-		res.fail = function() {
+		res.fail = function () {
 			res.end(util.buildXML({
 				xml: {
 					return_code: 'FAIL'
@@ -133,9 +141,9 @@ WXPay.mix('useWXCallback', function(fn) {
 			}));
 		};
 
-		util.pipe(req, function(err, data) {
+		util.pipe(req, function (err, data) {
 			var xml = data.toString('utf8');
-			util.parseXML(xml, function(err, msg) {
+			util.parseXML(xml, function (err, msg) {
 				req.wxmessage = msg;
 				fn.apply(_this, [msg, req, res, next]);
 			});
@@ -144,7 +152,7 @@ WXPay.mix('useWXCallback', function(fn) {
 });
 
 
-WXPay.mix('queryOrder', function(query, fn) {
+WXPay.mix('queryOrder', function (query, fn) {
 
 	if (!(query.transaction_id || query.out_trade_no)) {
 		fn(null, {
@@ -163,13 +171,13 @@ WXPay.mix('queryOrder', function(query, fn) {
 		body: util.buildXML({
 			xml: query
 		})
-	}, function(err, res, body) {
+	}, function (err, res, body) {
 		util.parseXML(body, fn);
 	});
 });
 
 
-WXPay.mix('closeOrder', function(order, fn) {
+WXPay.mix('closeOrder', function (order, fn) {
 
 	if (!order.out_trade_no) {
 		fn(null, {
@@ -188,13 +196,13 @@ WXPay.mix('closeOrder', function(order, fn) {
 		body: util.buildXML({
 			xml: order
 		})
-	}, function(err, res, body) {
+	}, function (err, res, body) {
 		util.parseXML(body, fn);
 	});
 });
 
 
-WXPay.mix('refund', function(order, fn) {
+WXPay.mix('refund', function (order, fn) {
 	if (!(order.transaction_id || order.out_refund_no)) {
 		fn(null, {
 			return_code: 'FAIL',
@@ -216,7 +224,7 @@ WXPay.mix('refund', function(order, fn) {
 			pfx: this.options.pfx,
 			passphrase: this.options.mch_id
 		}
-	}, function(err, response, body) {
+	}, function (err, response, body) {
 		util.parseXML(body, fn);
 	});
 });

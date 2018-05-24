@@ -1,6 +1,6 @@
 Cookies = Npm.require("cookies")
 
-@payManager = {}
+payManager = {}
 
 payManager.check_authorization = (req, res) ->
 	query = req.query
@@ -12,6 +12,11 @@ payManager.check_authorization = (req, res) ->
 		cookies = new Cookies( req, res )
 		userId = cookies.get("X-User-Id")
 		authToken = cookies.get("X-Auth-Token")
+
+	# then headers
+	if req.headers
+		userId = req.headers["x-user-id"]
+		authToken = req.headers["x-auth-token"]
 
 	if not userId or not authToken
 		throw new Meteor.Error 401, 'Unauthorized'

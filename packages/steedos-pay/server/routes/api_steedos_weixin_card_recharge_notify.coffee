@@ -1,15 +1,19 @@
 import WXPay from '../lib/wxpay.js'
 
-JsonRoutes.add 'post', '/api/billing/recharge/notify', (req, res, next) ->
+JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, next) ->
+	console.log 'recharge-notify: '
 	try
 		body = ""
 		req.on('data', (chunk)->
 			body += chunk
 		)
 		req.on('end', Meteor.bindEnvironment((()->
+				console.log body
 				xml2js = Npm.require('xml2js')
 				parser = new xml2js.Parser({ trim:true, explicitArray:false, explicitRoot:false })
-				parser.parseString(body, (err, result)->
+				parser.parseString(body, (err, result) ->
+						console.log '===================='
+						console.log result
 						# 特别提醒：商户系统对于支付结果通知的内容一定要做签名验证,并校验返回的订单金额是否与商户侧的订单金额一致，防止数据泄漏导致出现“假通知”，造成资金损失
 						wxpay = WXPay({
 							appid: Meteor.settings.billing.appid,
@@ -19,7 +23,9 @@ JsonRoutes.add 'post', '/api/billing/recharge/notify', (req, res, next) ->
 						sign = wxpay.sign(_.clone(result))
 						attach = JSON.parse(result.attach)
 						record_id = attach.record_id
-						bpr = Creator.getCollection('billing_record').findOne(code_url_id)
+						bpr = Creator.getCollection('billing_record').findOne(record_id)
+						console.log "222222222222"
+						console.log bpr
 						if bpr and bpr.total_fee is Number(result.total_fee) and sign is result.sign
 							Creator.getCollection('billing_record').update({_id: record_id}, {$set: {paid: true}})
 

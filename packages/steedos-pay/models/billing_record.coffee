@@ -16,5 +16,11 @@ Creator.Objects.billing_record =
             omit: true
             hidden: true
 
+        total_fee:
+            label: "金额"
+            type: "number"
+            omit: true
+            hidden: true
+
 
 

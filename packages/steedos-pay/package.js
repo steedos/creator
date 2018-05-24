@@ -12,13 +12,19 @@ Npm.depends({
     "request": "2.87.0"
 });
 
-Package.onUse(function(api) {
+Package.onUse(function (api) {
 
+    api.use('ecmascript');
     api.use('coffeescript@1.11.1_4');
+    api.use('simple:json-routes@2.1.0');
     api.use('steedos:creator@0.0.4');
+
     api.addFiles('models/billing_record.coffee');
     api.addFiles('server/lib/util.js');
     api.addFiles('server/lib/wxpay.js');
-    api.addFiles('server/routes/api_billing_recharge.coffee');
-    api.addFiles('server/routes/api_billing_recharge_notify.coffee');
+    api.addFiles('server/lib/pay_manager.coffee');
+    api.addFiles('server/routes/api_steedos_weixin_card_recharge.coffee');
+    api.addFiles('server/routes/api_steedos_weixin_card_recharge_notify.coffee');
+
+    api.export(['payManager'], ['server']);
 })
