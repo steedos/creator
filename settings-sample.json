@@ -33,5 +33,11 @@
         "appSecret": {
             "应用ID": "应用secret"
         }
+    },
+    // 微信支付
+    "billing": {
+        "appid": "公众账号ID",
+        "mch_id": "商户号",
+        "partner_key": "API密钥"
     }
 }
