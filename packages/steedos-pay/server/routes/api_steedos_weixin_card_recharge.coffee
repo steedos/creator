@@ -11,9 +11,11 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         totalFee = body.totalFee
 
         sub_appid = req.headers['appid']
+        spaceId = req.headers['x-space-id']
 
         check totalFee, Number
         check sub_appid, String
+        check spaceId, String
 
         returnData = {}
 
@@ -61,6 +63,8 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                         paid: false
                         info: result
                         total_fee: totalFee
+                        owner: user_id
+                        space: spaceId
                     }
 
                     Creator.getCollection('billing_record').insert(obj)
