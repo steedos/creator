@@ -51,6 +51,12 @@ Creator.Objects.space_users =
 			type: "text"
 		company:
 			type: "text"
+		profile:
+			label: "用户身份"
+			type: "select"
+			defaultValue: "user"
+			options: ()->
+				return [{label: "员工", value: "user"}, {label: "会员", value: "member"}, {label: "游客", value: "guest"}]
 	list_views:	
 		all:
 			label: "所有人员"
