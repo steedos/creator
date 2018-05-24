@@ -1,5 +1,5 @@
 Package.describe({
-	name: 'steedos:weixin-login',
+	name: 'steedos:weixin',
 	version: '0.0.1',
 	summary: 'Steedos weixin Decryption data',
 	git: ''
@@ -19,7 +19,8 @@ Package.onUse(function(api) {
 	api.use('steedos:weixin-aes');
 
 	api.addFiles('lib/wx_mini.coffee', 'server');
-	api.addFiles('server/routes/login.coffee', 'server');
+	api.addFiles('server/routes/mini-sso.coffee', 'server');
+	// api.addFiles('server/routes/login.coffee', 'server');
 	api.addFiles('server/routes/getPhoneNumber.coffee', 'server');
 	api.addFiles('server/routes/card/activate.coffee', 'server');
 	api.addFiles('server/routes/card/getUserCards.coffee', 'server');
