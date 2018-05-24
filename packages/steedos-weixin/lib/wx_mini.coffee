@@ -52,11 +52,12 @@ WXMini.newOrganization = (userId, spaceId, orgName)->
 	orgId = Creator.getCollection("organizations").direct.insert(org)
 	return orgId
 
-WXMini.newSpaceUser = (userId, spaceId, orgId, userName)->
+WXMini.newSpaceUser = (userId, spaceId, orgId, userName, profile)->
 	now = new Date
 	spaceUser = {
 		user: userId
 		space: spaceId
+		profile: profile
 		organization: orgId
 		organizations: [orgId]
 		user_accepted: true
