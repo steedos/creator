@@ -83,6 +83,11 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 						user_id: old_user_id
 						auth_token: old_auth_token
 					}
+					Creator.getCollection("users").direct.update({
+						_id: old_user_id,
+						"services.resume.loginTokens.app_id": appId,
+						"services.resume.loginTokens.open_id": openid
+					}, {$set: {"services.resume.loginTokens.$.session_key": sessionKey}})
 				else
 					authToken = setNewToken(old_user_id, appId, openid, sessionKey)
 					ret_data = {
