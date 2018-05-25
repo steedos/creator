@@ -27,6 +27,7 @@ Creator.Objects.vip_card =
 		balance:
 			label:'余额'
 			type:'number'
+			scale: 2
 		store:
 			label:'办卡门店'
 			type:'lookup'

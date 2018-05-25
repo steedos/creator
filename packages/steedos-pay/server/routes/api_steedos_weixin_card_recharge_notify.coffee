@@ -21,11 +21,14 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 						record_id = attach.record_id
 						billRecord = Creator.getCollection('billing_record').findOne(record_id)
 						if billRecord and billRecord.total_fee is Number(result.total_fee) and sign is result.sign
-							Creator.getCollection('billing_record').update({_id: record_id}, {$set: {paid: true}})
+							Creator.getCollection('billing_record').update({ _id: record_id }, { $set: { paid: true } })
+							amount = billRecord.total_fee/100
+							cardId = billRecord.card
+							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount } })
 							Creator.getCollection('vip_billing').insert({
-								amount: billRecord.total_fee/100
+								amount: amount
 								store: billRecord.store
-								card: billRecord.card
+								card: cardId
 								description: "会员卡充值"
 							})
 
