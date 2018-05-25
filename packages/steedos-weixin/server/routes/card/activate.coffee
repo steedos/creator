@@ -13,7 +13,7 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 	if !space_user
 		WXMini.addUserToSpace(userId, spaceId, data.name, "member")
 	else
-		Creator.getCollection("space_users").update({_id: space_user._id}, {$set: {profile: "member"}})
+		Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member"}})
 
 	#获取商户下的所有门店
 	space_store = Creator.getCollection("vip_store").find({space: spaceId}, {fields: {_id: 1}}).fetch()
