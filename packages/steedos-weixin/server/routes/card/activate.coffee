@@ -50,7 +50,8 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 		$set: {
 			"profile.sex": data.sex,
 			"profile.birthdate": data.birthdate,
-			mobile: data.phoneNumber
+			mobile: data.phoneNumber,
+			name: data.name
 		}
 	})
 	Creator.getCollection("space_users").direct.update({

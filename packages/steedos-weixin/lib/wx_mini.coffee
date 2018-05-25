@@ -6,12 +6,13 @@ WXMini.newUser = (appId, openid, unionid, name, locale, phoneNumber)->
 	user = {
 		_id: user_id
 		steedos_id: phoneNumber || user_id
-		name: name
 		locale: locale
 		is_deleted: false
 		created: now
 		modified: now
 	}
+	if name
+		user.name = name
 	user.services = {weixin: {openid: []}}
 	if openid
 		user.services.weixin.openid.push {_id: openid, appid: appId}

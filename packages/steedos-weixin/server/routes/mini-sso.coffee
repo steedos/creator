@@ -63,11 +63,10 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 		}, {fields: {_id: 1}})
 
 		if !user_openid
-			name = (new Date()).getTime() + "_" + _.random(0, 100)
 			unionid = ""
 			locale = "zh-cn"
 			phoneNumber = ""
-			userId = WXMini.newUser(appId, openid, unionid, name, locale, phoneNumber)
+			userId = WXMini.newUser(appId, openid, unionid, "", locale, phoneNumber)
 
 			authToken = setNewToken(userId, appId, openid)
 
@@ -123,6 +122,13 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 			"services.weixin.openid.appid": appId,
 			"services.weixin.openid._id": openid
 		}, {$set: {"services.weixin.openid.$.session_key": sessionKey}})
+
+		user = Creator.getCollection("users").findOne({_id: ret_data.user_id}, {fields: {name: 1, profile: 1, mobile: 1}})
+
+		ret_data.name = user.name
+		ret_data.mobile = user.mobile
+		ret_data.sex = user.profile?.sex
+		ret_data.birthdate = user.profile?.birthdate
 
 		JsonRoutes.sendResult res, {
 			code: 200,
