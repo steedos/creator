@@ -70,7 +70,7 @@ WXMini.newSpaceUser = (userId, spaceId, orgId, userName, profile)->
 	spaceUserId = Creator.getCollection("space_users").direct.insert(spaceUser)
 	return spaceUserId
 
-WXMini.addUserToSpace = (userId, spaceId, userName)->
+WXMini.addUserToSpace = (userId, spaceId, userName, profile)->
 	console.log("addUserToSpace", userId, spaceId, userName)
 	space = Creator.getCollection("spaces").findOne({_id: spaceId})
 	if space
@@ -79,7 +79,7 @@ WXMini.addUserToSpace = (userId, spaceId, userName)->
 		if root_org
 			Creator.getCollection("organizations").direct.update({_id: root_org._id}, {$push: {users: userId}})
 			# 新增一条space_user
-			WXMini.newSpaceUser(userId, spaceId, root_org._id, userName)
+			WXMini.newSpaceUser(userId, spaceId, root_org._id, userName, profile)
 		else
 			throw new Meteor.Error(500, "工作区#{spaceId}，未找到根部门")
 	else

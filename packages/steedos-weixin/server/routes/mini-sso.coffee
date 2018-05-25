@@ -47,6 +47,8 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 
 		sessionKey = wxSession.session_key
 
+		console.log("sessionKey", sessionKey)
+
 		openid = wxSession.openid
 
 		#	unionid = wxSession.unionid
@@ -87,7 +89,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 						_id: old_user_id,
 						"services.resume.loginTokens.app_id": appId,
 						"services.resume.loginTokens.open_id": openid
-					}, {$set: {"services.resume.loginTokens.$.session_key": sessionKey}})
+					}, {$set: {"services.resume.loginTokens.$.session_key": sessionKey}}, {multi: true})
 				else
 					authToken = setNewToken(old_user_id, appId, openid, sessionKey)
 					ret_data = {
@@ -118,7 +120,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 					root_org = Creator.getCollection("organizations").findOne({space: space_id, is_company: true}, {fields: {_id: 1}})
 					if !root_org
 						throw new Meteor.Error(500, "无效的工作区Id:#{space_id}")
-					WXMini.newSpaceUser(ret_data.user_id, space_id, root_org._id, (new Date()).getTime() + "_" + _.random(0, 100), "guest")
+					WXMini.addUserToSpace(ret_data.user_id, space_id, (new Date()).getTime() + "_" + _.random(0, 100), "guest")
 					ret_data.profile = "guest"
 
 		JsonRoutes.sendResult res, {
