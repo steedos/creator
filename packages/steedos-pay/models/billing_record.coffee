@@ -28,4 +28,14 @@ Creator.Objects.billing_record =
             omit: true
             hidden: true
 
+        store:
+            label:'门店'
+            type:'lookup'
+            reference_to:'vip_store'
+
+        card:
+            label:'会员卡'
+            type:'master_detail'
+            reference_to:'vip_card'
+
 

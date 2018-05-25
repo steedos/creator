@@ -9,15 +9,26 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         body = req.body
         console.log 'body: ', body
         totalFee = body.totalFee
-        storeId = body.storeId
+        cardId = body.cardId
 
         sub_appid = req.headers['appid']
-        spaceId = req.headers['x-space-id']
 
         check totalFee, Number
-        check storeId, String
+        check cardId, String
         check sub_appid, String
-        check spaceId, String
+
+        card = Creator.getCollection('vip_card').findOne(cardId, { fields: { space: 1, store: 1 } })
+
+        if not card
+            throw new Meteor.Error('error', "未找到会员卡")
+
+        store = Creator.getCollection('vip_store').findOne(card.store, { fields: { mch_id: 1 } })
+
+        if not store
+            throw new Meteor.Error('error', "未找到门店")
+
+        # sub_mch_id = '1504795791'
+        sub_mch_id = store.mch_id
 
         returnData = {}
 
@@ -31,8 +42,6 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         current_user_info.services.weixin.openid.forEach (o) ->
             if not sub_openid and o.appid is sub_appid
                 sub_openid = o._id
-
-        sub_mch_id = '1504795791'
 
         wxpay = WXPay({
             appid: Meteor.settings.billing.appid,
@@ -55,8 +64,6 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             sub_openid: sub_openid
         }
 
-        console.log 'orderData: ', orderData
-
         result = wxpay.createUnifiedOrder(orderData, Meteor.bindEnvironment(((err, result) ->
                 if err
                     console.error err.stack
@@ -67,8 +74,9 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                         info: result
                         total_fee: totalFee
                         owner: user_id
-                        space: spaceId
-                        store: storeId
+                        space: card.space
+                        store: card.store
+                        card: card._id
                         out_trade_no: out_trade_no
                     }
 

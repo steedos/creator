@@ -18,6 +18,7 @@ Package.onUse(function (api) {
     api.use('coffeescript@1.11.1_4');
     api.use('simple:json-routes@2.1.0');
     api.use('steedos:creator@0.0.4');
+    api.use('steedos:vip-card@0.0.1');
 
     api.addFiles('models/billing_record.coffee');
     api.addFiles('server/lib/util.js', 'server');

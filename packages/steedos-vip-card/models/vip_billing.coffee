@@ -6,6 +6,7 @@ Creator.Objects.vip_billing =
 		amount:
 			label:'消费金额'
 			type:'number'
+			scale: 2
 		location:
 			label:'位置'
 			type:'location'
