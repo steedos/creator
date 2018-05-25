@@ -1,7 +1,6 @@
 import WXPay from '../lib/wxpay.js'
 
 JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, next) ->
-	console.log 'recharge-notify: '
 	try
 		body = ""
 		req.on('data', (chunk)->

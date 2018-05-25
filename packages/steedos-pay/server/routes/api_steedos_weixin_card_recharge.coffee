@@ -7,7 +7,6 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         user_id = current_user_info._id
 
         body = req.body
-        console.log 'body: ', body
         totalFee = body.totalFee
         cardId = body.cardId
 
