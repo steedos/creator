@@ -1,8 +1,8 @@
-JsonRoutes.add 'post', '/api/steedos/weixin/card/activate', (req, res, next) ->
-	spaceId = req.query.spaceId
+JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
+	spaceId = req.query.space_id
 
 	#办卡门店
-	storeId = req.query.storeId
+	storeId = req.query.store_id
 
 	userId = Steedos.getUserIdFromAuthToken(req, res);
 

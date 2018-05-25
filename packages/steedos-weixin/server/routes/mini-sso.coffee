@@ -13,13 +13,12 @@ getWeiXinSession = (appId, secret, code, cb)->
 
 getWeiXinSessionAsync = Meteor.wrapAsync(getWeiXinSession);
 
-setNewToken = (userId, appId, openid, sessionKey)->
+setNewToken = (userId, appId, openid)->
 	authToken = Accounts._generateStampedLoginToken()
 	token = authToken.token
 	hashedToken = Accounts._hashStampedToken authToken
 	hashedToken.app_id = appId
 	hashedToken.open_id = openid
-	hashedToken.session_key = sessionKey
 	hashedToken.token = token
 	Accounts._insertHashedLoginToken userId, hashedToken
 	return token
@@ -70,7 +69,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 			phoneNumber = ""
 			userId = WXMini.newUser(appId, openid, unionid, name, locale, phoneNumber)
 
-			authToken = setNewToken(userId, appId, openid, sessionKey)
+			authToken = setNewToken(userId, appId, openid)
 
 			ret_data = {
 				open_id: openid
@@ -85,20 +84,15 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 						user_id: old_user_id
 						auth_token: old_auth_token
 					}
-					Creator.getCollection("users").direct.update({
-						_id: old_user_id,
-						"services.resume.loginTokens.app_id": appId,
-						"services.resume.loginTokens.open_id": openid
-					}, {$set: {"services.resume.loginTokens.$.session_key": sessionKey}}, {multi: true})
 				else
-					authToken = setNewToken(old_user_id, appId, openid, sessionKey)
+					authToken = setNewToken(old_user_id, appId, openid)
 					ret_data = {
 						open_id: openid
 						user_id: old_user_id
 						auth_token: authToken
 					}
 			else
-				authToken = setNewToken(user_openid._id, appId, openid, sessionKey)
+				authToken = setNewToken(user_openid._id, appId, openid)
 				ret_data = {
 					open_id: openid
 					user_id: user_openid._id
@@ -122,6 +116,13 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 						throw new Meteor.Error(500, "无效的工作区Id:#{space_id}")
 					WXMini.addUserToSpace(ret_data.user_id, space_id, (new Date()).getTime() + "_" + _.random(0, 100), "guest")
 					ret_data.profile = "guest"
+
+		#设置sessionKey
+		Creator.getCollection("users").direct.update({
+			_id: ret_data.user_id,
+			"services.weixin.openid.appid": appId,
+			"services.weixin.openid._id": openid
+		}, {$set: {"services.weixin.openid.$.session_key": sessionKey}})
 
 		JsonRoutes.sendResult res, {
 			code: 200,

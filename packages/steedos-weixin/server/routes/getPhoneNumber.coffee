@@ -10,11 +10,11 @@ JsonRoutes.add 'post', '/api/steedos/weixin/get_phone_number', (req, res, next) 
 		user = Creator.getCollection("users").findOne({_id: userId}, {fields: {services: 1}})
 
 		if user
-			loginTokens = user.services?.resume?.loginTokens
-			console.log("find token", JSON.stringify(loginTokens))
-			if loginTokens
-				open_token = _.find(loginTokens, (t)->
-					return t.app_id is appId
+			openids = user.services?.weixin?.openid
+			console.log("find token", JSON.stringify(openids))
+			if openids
+				open_token = _.find(openids, (t)->
+					return t.appid is appId
 				)
 				if open_token
 					sessionKey = open_token.session_key
@@ -23,6 +23,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/get_phone_number', (req, res, next) 
 
 
 		if iv && encryptedData && appId
+			console.log "sessionKey", sessionKey
 			pc = new Creator.WXBizDataCrypt(appId, sessionKey)
 			data = pc.decryptData(encryptedData, iv)
 			console.log("data", data)
