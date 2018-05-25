@@ -30,6 +30,8 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 								store: billRecord.store
 								card: cardId
 								description: "会员卡充值"
+								owner: billRecord.owner
+								space: billRecord.space
 							})
 
 				)
