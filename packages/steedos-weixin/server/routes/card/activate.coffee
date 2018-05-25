@@ -9,9 +9,11 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/activate', (req, res, next) ->
 	data = req.body
 
 	#用户没有已经加入商户工作区时，先加入
-	space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId})
+	space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
 	if !space_user
-		WXMini.addUserToSpace(userId, spaceId, data.name)
+		WXMini.addUserToSpace(userId, spaceId, data.name, "member")
+	else
+		Creator.getCollection("space_users").update({_id: space_user._id}, {$set: {profile: "member"}})
 
 	#获取商户下的所有门店
 	space_store = Creator.getCollection("vip_store").find({space: spaceId}, {fields: {_id: 1}}).fetch()
@@ -27,7 +29,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/activate', (req, res, next) ->
 		card_number: now.getTime()
 		points: 0
 		grade: "普通"
-		discount: 1
+		discount: 10.00
 		balance: 0.00
 		store: storeId
 		apply_stores: apply_stores
