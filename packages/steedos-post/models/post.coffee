@@ -59,11 +59,48 @@ Creator.Objects.post =
 				{label:'帮助',value:'help'},
 				{label:'招聘',value:'jobs'},
 				{label:'线上课程',value:'course'},
-				{label:'优惠活动',value:'promotion'},
-				{label:'社区',value:'community'}
+				{label:'优惠卷',value:'coupon'},
+				{label:'社区',value:'community'},
+				{label:'红包',value:'red_packet'}
 			]
 	list_views:
 		all:
 			label: "所有信息"
 			columns: ["name","summary", "comment_count", "star_count","forward_count"]
 			filter_scope: "space"
+		announcements:
+			label:"公告"
+			filter_scope:'space'
+			filters: [["type", "=", "announcements"]]
+		about:
+			label:"关于"
+			filter_scope:'space'
+			filters: [["type", "=", "about"]]
+		news:
+			label:"新闻"
+			filter_scope:'space'
+			filters: [["type", "=", "news"]]
+		help:
+			label:"帮助"
+			filter_scope:'space'
+			filters: [["type", "=", "help"]]
+		jobs:
+			label:"招聘"
+			filter_scope:'space'
+			filters: [["type", "=", "jobs"]]
+		course:
+			label:"线上课程"
+			filter_scope:'space'
+			filters: [["type", "=", "course"]]
+		coupon:
+			label:"优惠卷"
+			filter_scope:'space'
+			filters: [["type", "=", "coupon"]]
+		community:
+			label:"社区"
+			filter_scope:'space'
+			filters: [["type", "=", "community"]]
+		red_packet:
+			label:'红包'
+			filter_scope:'space'
+			filters: [["type", "=", "red_packet"]]
