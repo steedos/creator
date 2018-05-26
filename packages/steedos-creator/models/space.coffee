@@ -45,7 +45,12 @@ Creator.Objects.spaces =
 			type: "lookup"
 			reference_to: "apps"
 			multiple: true
-
+		avatar:
+			label:'头像'
+			type:'image'
+		cover:
+			label:'封面照片'
+			type:'image'
 	list_views:		
 		all:
 			label:"所有"
