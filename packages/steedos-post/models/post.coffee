@@ -49,6 +49,19 @@ Creator.Objects.post =
 			label: '图片'
 			type: 'image'
 			multiple : true
+		type:
+			label:'所属分类'
+			type:'select'
+			options:[
+				{label:'公告',value:'announcements'},
+				{label:'关于',value:'about'},
+				{label:'新闻',value:'news'},
+				{label:'帮助',value:'help'},
+				{label:'招聘',value:'jobs'},
+				{label:'线上课程',value:'course'},
+				{label:'优惠活动',value:'promotion'},
+				{label:'社区',value:'community'}
+			]
 	list_views:
 		all:
 			label: "所有信息"

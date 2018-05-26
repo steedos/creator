@@ -19,7 +19,7 @@ Creator.Objects.vip_card =
 				{label: "白银", value: "白银"},
 				{label: "黄金", value: "黄金"},
 				{label: "铂金", value: "铂金"},
-				{label: "砖石", value: "砖石"}
+				{label: "钻石", value: "钻石"}
 			]
 		discount:
 			label:'折扣'
@@ -88,3 +88,4 @@ Creator.Objects.vip_card =
 			filters: [["user", "=", "{userId}"]]
 			filter_scope: "space"
 			columns: ["card_number", "points", "grade","balance","store","apply_stores"]
+		
