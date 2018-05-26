@@ -27,26 +27,21 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             throw new Meteor.Error('error', "未找到门店")
 
         # sub_mch_id = '1504795791'
-        sub_mch_id = store.mch_id
+        sub_mch_id = store.mch_id # 由于此字段非必填，所以当此字段值为空时 支付到steedos
+        console.log 'sub_mch_id: ', sub_mch_id
 
         returnData = {}
 
-        listprices = 0
         order_body = '会员充值'
 
         attach = {}
         attach.record_id = Creator.getCollection('billing_record')._makeNewID()
+        attach.sub_mch_id = sub_mch_id
 
         sub_openid = ''
         current_user_info.services.weixin.openid.forEach (o) ->
             if not sub_openid and o.appid is sub_appid
                 sub_openid = o._id
-
-        wxpay = WXPay({
-            appid: Meteor.settings.billing.appid,
-            mch_id: Meteor.settings.billing.mch_id,
-            partner_key: Meteor.settings.billing.partner_key #微信商户平台API密钥
-        })
 
         out_trade_no = moment().format('YYYYMMDDHHmmssSSS')
 
@@ -57,11 +52,31 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             spbill_create_ip: '127.0.0.1',
             notify_url: Meteor.absoluteUrl() + 'api/steedos/weixin/card/recharge/notify',
             trade_type: 'JSAPI', # 小程序取值如下：JSAPI
-            attach: JSON.stringify(attach),
-            sub_appid: sub_appid,
-            sub_mch_id: sub_mch_id,
-            sub_openid: sub_openid
+            attach: JSON.stringify(attach)
         }
+
+        if _.isEmpty(sub_mch_id)
+            console.log '支付给普通商户'
+            # 支付给普通商户
+            wxpay = WXPay({
+                appid: sub_appid, # 小程序ID
+                mch_id: Meteor.settings.billing.normal_mch.mch_id,
+                partner_key: Meteor.settings.billing.normal_mch.partner_key #微信商户平台API密钥
+            })
+            orderData.openid = sub_openid
+        else
+            console.log '支付给特约商户'
+            # 支付给特约商户
+            wxpay = WXPay({
+                appid: Meteor.settings.billing.service_mch.appid, # 公众号ID
+                mch_id: Meteor.settings.billing.service_mch.mch_id,
+                partner_key: Meteor.settings.billing.service_mch.partner_key #微信商户平台API密钥
+            })
+            orderData.sub_appid = sub_appid
+            orderData.sub_mch_id = sub_mch_id
+            orderData.sub_openid = sub_openid
+
+        console.log orderData
 
         result = wxpay.createUnifiedOrder(orderData, Meteor.bindEnvironment(((err, result) ->
                 if err
