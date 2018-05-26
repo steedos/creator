@@ -7,6 +7,10 @@ Creator.Objects.vip_card =
 			label:"卡号"
 			type:'text'
 			is_name:true
+		category_name:
+			label:'名称'
+			type:'lookup'
+			reference_to:'vip_category'
 		points:
 			label:'积分'
 			type:'number'
