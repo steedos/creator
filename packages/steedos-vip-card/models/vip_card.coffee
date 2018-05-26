@@ -7,7 +7,6 @@ Creator.Objects.vip_card =
 			label:"卡号"
 			type:'text'
 			is_name:true
-			required:true
 		points:
 			label:'积分'
 			type:'number'
@@ -88,4 +87,20 @@ Creator.Objects.vip_card =
 			filters: [["user", "=", "{userId}"]]
 			filter_scope: "space"
 			columns: ["card_number", "points", "grade","balance","store","apply_stores"]
-		
+	triggers:
+		"before.insert.server.vip_card":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				if doc?.card_number
+					count = Creator.getCollection("vip_card").find({space:doc.space,card_number:doc.card_number}).count()
+					if count
+						throw new Meteor.Error 500, "卡号不能重复"
+		"before.update.server.vip_card":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if modifier?.$set?.card_number
+					count = Creator.getCollection("vip_card").find({space:doc.space,card_number:modifier.$set.card_number}).count()
+					if count
+						throw new Meteor.Error 500, "卡号不能重复"		

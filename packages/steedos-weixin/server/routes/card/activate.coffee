@@ -21,12 +21,17 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 	apply_stores = _.pluck(space_store, "_id")
 
 	now = new Date()
-
+	random_number = parseInt(Math.random()*1000000)
+	card_number = "88" + random_number
+	while card_number.indexOf('4')>0 or count>0
+		random_number = parseInt(Math.random()*1000000)
+		card_number = "88" + random_number
+		count = Creator.getCollection("vip_card").find({space:spaceId,card_number:card_number}).count()
 	###开通商户下的会员卡###
 	doc = {
 		user: userId
 		space: spaceId
-		card_number: now.getTime()
+		card_number: card_number
 		points: 0
 		grade: "普通"
 		discount: 10.00
