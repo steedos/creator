@@ -246,6 +246,11 @@ Creator.getObjectSchema = (obj) ->
 				fs.autoform.type = 'fileUpload'
 				fs.autoform.collection = 'images'
 				fs.autoform.accept = 'image/*'
+		else if field.type == "location"
+			fs.type = Object
+			fs.autoform.type = "location"
+			fs.autoform.system = field.system || "wgs84"
+			fs.blackbox = true
 		else
 			fs.type = field.type
 

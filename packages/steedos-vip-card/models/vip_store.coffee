@@ -12,6 +12,7 @@ Creator.Objects.vip_store =
 		location:
 			label:'位置'
 			type:'location'
+			system: 'gcj02'
 		contact:
 			type:'lookup'
 			reference_to:'users'
