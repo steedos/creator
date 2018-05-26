@@ -56,7 +56,6 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         }
 
         if _.isEmpty(sub_mch_id)
-            console.log '支付给普通商户'
             # 支付给普通商户
             wxpay = WXPay({
                 appid: sub_appid, # 小程序ID
@@ -65,7 +64,6 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             })
             orderData.openid = sub_openid
         else
-            console.log '支付给特约商户'
             # 支付给特约商户
             wxpay = WXPay({
                 appid: Meteor.settings.billing.service_mch.appid, # 公众号ID
@@ -75,8 +73,6 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             orderData.sub_appid = sub_appid
             orderData.sub_mch_id = sub_mch_id
             orderData.sub_openid = sub_openid
-
-        console.log orderData
 
         result = wxpay.createUnifiedOrder(orderData, Meteor.bindEnvironment(((err, result) ->
                 if err
