@@ -21,6 +21,12 @@ Creator.Objects.vip_billing =
 		description:
 			label:'备注'
 			type:'textarea'
+		balance:
+			label: '余额'
+			type: 'number'
+			scale: 2
+			omit: true
+			hidden: true
 	list_views:
 		all:
 			label: "消费记录"

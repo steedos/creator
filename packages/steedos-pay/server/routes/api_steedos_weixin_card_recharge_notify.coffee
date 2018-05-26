@@ -37,6 +37,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 							amount = billRecord.total_fee/100
 							cardId = billRecord.card
 							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount } })
+							newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
 							Creator.getCollection('vip_billing').insert({
 								amount: amount
 								store: billRecord.store
@@ -44,6 +45,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 								description: "会员卡充值"
 								owner: billRecord.owner
 								space: billRecord.space
+								balance: newestCard.balance
 							})
 						else
 							console.error "recharge notify failed"
