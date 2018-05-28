@@ -39,6 +39,7 @@ JsonRoutes.add 'post', '/api/mini/vip/store_register', (req, res, next) ->
 		now = new Date()
 		#创建店铺
 		doc = {
+			_id: spaceId #初始化的 store_id 和  space_id 相同
 			name: store_name
 			location: location
 			contact: userId
