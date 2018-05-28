@@ -19,6 +19,11 @@ JsonRoutes.add 'post', '/api/steedos/payway/balance', (req, res, next) ->
 
         amount = -totalFee/100
 
+        card = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
+
+        if card.balance < totalFee/100
+            throw new Meteor.Error('error', "余额不足")
+
         Creator.getCollection('vip_card').update(cardId, { $inc: { balance: amount } })
 
         newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1, store: 1, space: 1 } })
@@ -41,5 +46,5 @@ JsonRoutes.add 'post', '/api/steedos/payway/balance', (req, res, next) ->
         console.error e.stack
         JsonRoutes.sendResult res,
             code: 200
-            data: { errors: [ { errorMessage: e.message } ] }
+            data: { errors: [ { errorMessage: e.reason || e.message } ] }
 
