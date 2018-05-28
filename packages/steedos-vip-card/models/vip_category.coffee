@@ -20,6 +20,9 @@ Creator.Objects.vip_category =
 			label:'售价'
 			type:'currency'
 			required:true
+		summary:
+			label:'简介'
+			type:'textarea'
 		# state:
 		# 	label:'状态'
 		# 	type:'select'
