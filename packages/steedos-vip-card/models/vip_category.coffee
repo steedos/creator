@@ -23,6 +23,9 @@ Creator.Objects.vip_category =
 		summary:
 			label:'简介'
 			type:'textarea'
+		valid_period:
+			label:"有效期"
+			type:'number'
 		# state:
 		# 	label:'状态'
 		# 	type:'select'
