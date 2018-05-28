@@ -25,6 +25,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/routes/card/activate.coffee', 'server');
 	api.addFiles('server/routes/card/getUserCards.coffee', 'server');
 	api.addFiles('server/routes/card/store_register.coffee', 'server');
+	api.addFiles('server/routes/update_user.coffee', 'server');
 });
 
 Package.onTest(function(api) {
