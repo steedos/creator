@@ -51,6 +51,13 @@ Creator.Objects.spaces =
 		cover:
 			label:'封面照片'
 			type:'image'
+		location:
+			label:'地址'
+			type:'location'
+			system: 'gcj02'
+		phone:
+			label:'联系电话'
+			type:'text'
 	list_views:		
 		all:
 			label:"所有"

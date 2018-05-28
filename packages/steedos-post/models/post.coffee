@@ -59,7 +59,7 @@ Creator.Objects.post =
 				{label:'帮助',value:'help'},
 				{label:'招聘',value:'jobs'},
 				{label:'线上课程',value:'course'},
-				{label:'优惠卷',value:'coupon'},
+				{label:'优惠券',value:'coupon'},
 				{label:'社区',value:'community'},
 				{label:'红包',value:'red_packet'}
 			]
