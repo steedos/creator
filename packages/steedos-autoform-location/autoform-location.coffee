@@ -12,7 +12,7 @@ AutoForm.addInputType "location", {
 	template: "location"
 	valueOut: ()->
 		element = this[0]
-		val = JSON.parse(element.dataset.value)
+		val = JSON.parse(element.dataset.value) || {}
 		val.address = $("#" + element.dataset.address).val()
 		return val
 	contextAdjust: (context) ->
