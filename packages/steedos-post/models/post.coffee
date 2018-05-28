@@ -63,6 +63,15 @@ Creator.Objects.post =
 				{label:'社区',value:'community'},
 				{label:'红包',value:'red_packet'}
 			]
+		mini_type:
+			label:'内容样式'
+			type:'select'
+			options:[
+				{label:'文章',value:'article'},
+				{label:'照片',value:'photo'},
+				{label:'视频',value:'video'},
+				{label:'音乐',value:'music'}
+			]
 	list_views:
 		all:
 			label: "所有信息"
