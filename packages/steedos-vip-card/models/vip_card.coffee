@@ -50,6 +50,11 @@ Creator.Objects.vip_card =
 			label:'持卡人'
 			type:'master_detail'
 			reference_to:'users'
+		menbers:
+			label:'共享成员'
+			type:'lookup'
+			reference_to:'users'
+			multiple:true
 		introducer:
 			label:'推荐人'
 			type:'lookup'
