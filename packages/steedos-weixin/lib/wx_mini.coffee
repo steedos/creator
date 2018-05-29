@@ -24,7 +24,10 @@ WXMini.newUser = (appId, openid, unionid, name, locale, phoneNumber)->
 
 WXMini.newSpace = (userId, spaceName)->
 	now = new Date
+	space_id = Creator.getCollection("spaces")._makeNewID()
 	space = {
+		_id: space_id
+		space: space_id
 		name: spaceName
 		owner: userId
 		admins: [userId]
@@ -34,8 +37,8 @@ WXMini.newSpace = (userId, spaceName)->
 		modified: now
 		modified_by: userId
 	}
-	spaceId = Creator.getCollection("spaces").direct.insert(space)
-	return spaceId
+	Creator.getCollection("spaces").direct.insert(space)
+	return space_id
 
 WXMini.newOrganization = (userId, spaceId, orgName)->
 	now = new Date
