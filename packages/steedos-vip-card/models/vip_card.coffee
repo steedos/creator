@@ -110,6 +110,7 @@ Creator.Objects.vip_card =
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
 				if modifier?.$set?.card_number
-					count = Creator.getCollection("vip_card").find({space:doc.space,card_number:modifier.$set.card_number}).count()
-					if count
-						throw new Meteor.Error 500, "卡号不能重复"		
+					if modifier.$set.card_number!=doc.card_number
+						count = Creator.getCollection("vip_card").find({space:doc.space,card_number:modifier.$set.card_number}).count()
+						if count
+							throw new Meteor.Error 500, "卡号不能重复"		
