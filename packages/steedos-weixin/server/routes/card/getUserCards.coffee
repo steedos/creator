@@ -9,7 +9,7 @@ JsonRoutes.add 'get', '/api/steedos/weixin/cards', (req, res, next) ->
 #	user_spaces = _.pluck(space_users, "space")
 
 	#获取用户会员卡信息
-	user_cards = Creator.getCollection("vip_card").find({user: userId}, {fields: {_id: 1, card_number: 1, user: 1, grade: 1, space: 1, balance: 1}})
+	user_cards = Creator.getCollection("vip_card").find({user: userId}, {fields: {_id: 1, card_number: 1, user: 1, grade: 1, space: 1, balance: 1,card_name:1}})
 
 	data = {cards: []}
 
@@ -17,7 +17,7 @@ JsonRoutes.add 'get', '/api/steedos/weixin/cards', (req, res, next) ->
 	user_cards.forEach (card)->
 		allBalance += card.balance
 		space = Creator.getCollection("spaces").findOne({_id: card.space})
-		data.cards.push {_id: card._id, card_number: card.card_number, grade: card.grade, name: space?.name, space: card.space}
+		data.cards.push {_id: card._id, card_number: card.card_number, grade: card.grade, name: card.card_name, space: card.space}
 	data.allBalance = allBalance
 
 	JsonRoutes.sendResult res, {
