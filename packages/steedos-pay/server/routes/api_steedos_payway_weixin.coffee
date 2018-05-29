@@ -32,7 +32,7 @@ JsonRoutes.add 'post', '/api/steedos/payway/weixin', (req, res, next) ->
 
         returnData = {}
 
-        order_body = '会员充值'
+        order_body = '店内消费'
 
         attach = {}
         attach.record_id = Creator.getCollection('billing_record')._makeNewID()
@@ -50,7 +50,7 @@ JsonRoutes.add 'post', '/api/steedos/payway/weixin', (req, res, next) ->
             out_trade_no: out_trade_no,
             total_fee: totalFee,
             spbill_create_ip: '127.0.0.1',
-            notify_url: Meteor.absoluteUrl() + 'api/steedos/weixin/card/recharge/notify',
+            notify_url: Meteor.absoluteUrl() + 'api/steedos/payway/weixin/notify',
             trade_type: 'JSAPI', # 小程序取值如下：JSAPI
             attach: JSON.stringify(attach)
         }
@@ -117,4 +117,58 @@ JsonRoutes.add 'post', '/api/steedos/payway/weixin', (req, res, next) ->
         JsonRoutes.sendResult res,
             code: 200
             data: { errors: [ { errorMessage: e.message } ] }
+
+
+JsonRoutes.add 'post', '/api/steedos/payway/weixin/notify', (req, res, next) ->
+	try
+		body = ""
+		req.on('data', (chunk)->
+			body += chunk
+		)
+		req.on('end', Meteor.bindEnvironment((()->
+				xml2js = Npm.require('xml2js')
+				parser = new xml2js.Parser({ trim:true, explicitArray:false, explicitRoot:false })
+				parser.parseString(body, (err, result) ->
+						# 特别提醒：商户系统对于支付结果通知的内容一定要做签名验证,并校验返回的订单金额是否与商户侧的订单金额一致，防止数据泄漏导致出现“假通知”，造成资金损失
+						attach = JSON.parse(result.attach)
+						record_id = attach.record_id
+						sub_mch_id = attach.sub_mch_id
+
+						if _.isEmpty(sub_mch_id)
+							# 支付给普通商户
+							wxpay = WXPay({
+								appid: Meteor.settings.billing.normal_mch.appid,
+								mch_id: Meteor.settings.billing.normal_mch.mch_id,
+								partner_key: Meteor.settings.billing.normal_mch.partner_key #微信商户平台API密钥
+							})
+						else
+							# 支付给特约商户
+							wxpay = WXPay({
+								appid: Meteor.settings.billing.service_mch.appid,
+								mch_id: Meteor.settings.billing.service_mch.mch_id,
+								partner_key: Meteor.settings.billing.service_mch.partner_key #微信商户平台API密钥
+							})
+
+						billRecord = Creator.getCollection('billing_record').findOne(record_id)
+						sign = wxpay.sign(_.clone(result))
+						if billRecord and billRecord.total_fee is Number(result.total_fee) and sign is result.sign
+							Creator.getCollection('billing_record').update({ _id: record_id }, { $set: { paid: true } })
+							point = parseInt(billRecord.total_fee/100)
+							Creator.getCollection('vip_card').update({ _id: billRecord.card }, { $inc: { points: point } })
+
+						else
+							console.error "recharge notify failed"
+
+				)
+			), (err)->
+				console.error err.stack
+				console.log 'Failed to bind environment'
+			)
+		)
+
+	catch e
+		console.error e.stack
+
+	res.writeHead(200, {'Content-Type': 'application/xml'})
+	res.end('<xml><return_code><![CDATA[SUCCESS]]></return_code></xml>')
 
