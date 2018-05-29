@@ -154,8 +154,18 @@ Meteor.startup ->
 					else
 						createQuery.query.space = @urlParams.spaceId
 
-					if Creator.isCommonSpace(@urlParams.spaceId) && Creator.isSpaceAdmin(@urlParams.spaceId, @userId)
-						delete createQuery.query.space
+					if Creator.isCommonSpace(@urlParams.spaceId)
+						if Creator.isSpaceAdmin(@urlParams.spaceId, @userId)
+							if key is 'spaces'
+								delete createQuery.query._id
+							else
+								delete createQuery.query.space
+						else
+							user_spaces = Creator.getCollection("space_users").find({user: @userId}, {fields: {space: 1}}).fetch()
+							if key is 'spaces'
+								createQuery.query._id = {$in: _.pluck(user_spaces, 'space')}
+							else
+								createQuery.query.space = {$in: _.pluck(user_spaces, 'space')}
 
 					if not createQuery.sort or !_.size(createQuery.sort)
 						createQuery.sort = { modified: -1 }
@@ -204,7 +214,6 @@ Meteor.startup ->
 							createQuery.query["$or"] = shares
 						else
 							createQuery.query.owner = @userId
-
 					entities = []
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
@@ -233,6 +242,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,"get")
 					}
 			catch e
+				console.error e.stack
 				body = {}
 				error = {}
 				error['message'] = e.message
