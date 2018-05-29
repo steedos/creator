@@ -52,11 +52,9 @@ Creator.Objects.post =
 		video:
 			label: '视频'
 			type: 'video'
-			multiple : true
 		audio:
 			label: '音频'
 			type: 'audio'
-			multiple : true
 		type:
 			label:'所属分类'
 			type:'select'
