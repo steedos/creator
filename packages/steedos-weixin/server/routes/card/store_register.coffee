@@ -9,7 +9,7 @@ JsonRoutes.add 'post', '/api/mini/vip/store_register', (req, res, next) ->
 		userId = Steedos.getUserIdFromAuthToken(req, res);
 
 		if !userId
-			throw new Meteor.Erro(500, "No permission")
+			throw new Meteor.Error(500, "No permission")
 
 		if !store_name
 			throw new Meteor.Error(500, "店铺名称为必填")

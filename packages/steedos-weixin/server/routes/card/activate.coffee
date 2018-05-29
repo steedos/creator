@@ -8,7 +8,7 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 		userId = Steedos.getUserIdFromAuthToken(req, res);
 
 		if !userId
-			throw new Meteor.Erro(500, "No permission")
+			throw new Meteor.Error(500, "No permission")
 
 		data = req.body
 

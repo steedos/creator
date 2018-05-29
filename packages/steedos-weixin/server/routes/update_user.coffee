@@ -2,28 +2,35 @@ JsonRoutes.add 'put', '/mini/vip/user', (req, res, next) ->
 	try
 		userId = Steedos.getUserIdFromAuthToken(req, res);
 		if !userId
-			throw new Meteor.Erro(500, "No permission")
+			throw new Meteor.Error(500, "No permission")
 
 		data = req.body
 
+		updateDoc = {}
+
 		if !data.name
-			throw new Meteor.Erro(500, "姓名为必填")
+			throw new Meteor.Error(500, "姓名为必填")
 
-		if !data.phoneNumber
-			throw new Meteor.Erro(500, "手机号为必填")
+		updateDoc.name = data.name
 
+		if data.phoneNumber
+			updateDoc.mobile = data.phoneNumber
+
+		if data.sex
+			updateDoc["profile.sex"] = data.sex
+
+		if data.birthdate
+			updateDoc["profile.birthdate"] = data.birthdate
+		
 		# 将用户填写的信息同步到user表
 		Creator.getCollection("users").direct.update({_id: userId}, {
-			$set: {
-				"profile.sex": data.sex,
-				"profile.birthdate": data.birthdate,
-				mobile: data.phoneNumber,
-				name: data.name
-			}
+			$set: updateDoc
 		})
-		Creator.getCollection("space_users").direct.update({
-			user: userId
-		}, {$set: {mobile: data.phoneNumber}}, {multi: true})
+		
+		if data.phoneNumber
+			Creator.getCollection("space_users").direct.update({
+				user: userId
+			}, {$set: {mobile: data.phoneNumber}}, {multi: true})
 
 		JsonRoutes.sendResult res, {
 			code: 200,
