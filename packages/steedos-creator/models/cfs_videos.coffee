@@ -1,5 +1,5 @@
 files_store
-store_name = "images"
+store_name = "videos"
 
 if Meteor.settings.public.cfs?.store == "OSS"
   if Meteor.isClient
@@ -58,7 +58,7 @@ cfs[store_name] = new FS.Collection store_name,
     stores: [files_store],
     filter: {
       allow: {
-        contentTypes: ['image/*'] # allow only images in this FS.Collection
+        contentTypes: ['video/*'] # allow only images in this FS.Collection
       }
     }
 
