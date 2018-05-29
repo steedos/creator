@@ -12,12 +12,12 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 
 		data = req.body
 
-		#用户没有已经加入商户工作区时，先加入
-		space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
-		if !space_user
-			WXMini.addUserToSpace(userId, spaceId, data.name, "member")
-		else
-			Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member"}})
+		# #用户没有已经加入商户工作区时，先加入
+		# space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
+		# if !space_user
+		# 	WXMini.addUserToSpace(userId, spaceId, data.name, "member")
+		# else
+		# 	Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member"}})
 
 		#获取商户下的所有门店
 		space_store = Creator.getCollection("vip_store").find({space: spaceId}, {fields: {_id: 1}}).fetch()
@@ -36,9 +36,10 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 			user: userId
 			space: spaceId
 			card_number: card_number
+			card_name:data.name
 			points: 0
-			grade: "普通"
-			discount: 10.00
+			#grade: "普通"
+			#discount: 10.00
 			balance: 0.00
 			store: storeId
 			apply_stores: apply_stores
@@ -49,28 +50,28 @@ JsonRoutes.add 'post', '/api/mini/vip/card_activate', (req, res, next) ->
 			modified_by: userId
 			created: now
 			modified: now
-			is_actived: true #默认激活
+			is_actived: false #默认激活
 		}
 
-		Creator.getCollection("vip_card").direct.insert(doc)
+		card_id = Creator.getCollection("vip_card").direct.insert(doc)
 
-		# 将用户填写的信息同步到user表
-		Creator.getCollection("users").direct.update({_id: userId}, {
-			$set: {
-				"profile.sex": data.sex,
-				"profile.birthdate": data.birthdate,
-				mobile: data.phoneNumber,
-				name: data.name
-			}
-		})
-		Creator.getCollection("space_users").direct.update({
-			user: userId,
-			space: spaceId
-		}, {$set: {mobile: data.phoneNumber}})
+		# # 将用户填写的信息同步到user表
+		# Creator.getCollection("users").direct.update({_id: userId}, {
+		# 	$set: {
+		# 		"profile.sex": data.sex,
+		# 		"profile.birthdate": data.birthdate,
+		# 		mobile: data.phoneNumber,
+		# 		name: data.name
+		# 	}
+		# })
+		# Creator.getCollection("space_users").direct.update({
+		# 	user: userId,
+		# 	space: spaceId
+		# }, {$set: {mobile: data.phoneNumber}})
 
 		JsonRoutes.sendResult res, {
 			code: 200,
-			data: {}
+			data: {card_id:card_id}
 		}
 	catch e
 		console.error e.stack
