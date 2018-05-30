@@ -27,6 +27,7 @@ JsonRoutes.add 'post', '/api/steedos/payway/balance', (req, res, next) ->
         Creator.getCollection('vip_order').insert({
             name: '店内消费'
             amount: -amount
+            amount_paid: -amount
             store: card.store
             card: cardId
             owner: user_id
