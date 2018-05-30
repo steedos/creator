@@ -1,6 +1,6 @@
 Creator.Objects.billing_record =
     name: "billing_record"
-    label: "订单"
+    label: "微信订单"
     icon: "apps"
     fields:
         paid:
@@ -9,7 +9,7 @@ Creator.Objects.billing_record =
             omit: true
             hidden: true
 
-        info:
+        weixin_info:
             label: "订单信息"
             type: "object"
             blackbox: true
@@ -23,19 +23,14 @@ Creator.Objects.billing_record =
             hidden: true
 
         out_trade_no:
-            label: "商户单号"
-            type: "text"
-            omit: true
-            hidden: true
+            label: "订单"
+            type: "master_detail"
+            reference_to:'vip_order'
 
-        store:
-            label:'门店'
-            type:'lookup'
-            reference_to:'vip_store'
+        paid_by: # alipay, weixin, bank, cash
+            label: '支付方式'
+            type: 'text'
 
-        card:
-            label:'会员卡'
-            type:'master_detail'
-            reference_to:'vip_card'
+        
 
 
