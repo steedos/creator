@@ -54,6 +54,20 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 
 		storeId = Creator.getCollection("vip_store").insert(doc)
 
+		#创建默认卡项: 商户开通的时候，自动生成一种会员卡（卡项），{商户名称}会员卡， _id = space_id #77
+		default_vip_category = {
+			_id: spaceId
+			name: "#{space_name}会员卡"
+			price: 0.00
+			space: spaceId
+			owner: userId
+			created_by: userId
+			modified_by: userId
+			created: now
+			modified: now
+		}
+		Creator.getCollection("vip_category").insert(default_vip_category)
+
 		JsonRoutes.sendResult res, {
 			code: 200,
 			data: {
