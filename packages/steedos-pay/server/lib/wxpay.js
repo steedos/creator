@@ -62,11 +62,9 @@ WXPay.mix('sign', function (param) {
 
 
 WXPay.mix('createUnifiedOrder', function (opts, fn) {
-	console.log(opts);
 	opts.nonce_str = opts.nonce_str || util.generateNonceString();
 	util.mix(opts, this.wxpayID);
 	opts.sign = this.sign(opts);
-	console.log(opts);
 	var resData = Meteor.wrapAsync(function (that, opts, cb) {
 		request({
 			url: "https://api.mch.weixin.qq.com/pay/unifiedorder",

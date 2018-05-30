@@ -28,7 +28,6 @@ Package.onUse(function (api) {
     api.addFiles('server/routes/api_steedos_weixin_card_recharge.coffee', 'server');
     api.addFiles('server/routes/api_steedos_weixin_card_recharge_notify.coffee', 'server');
     api.addFiles('server/routes/api_steedos_payway_balance.coffee', 'server');
-    api.addFiles('server/routes/api_steedos_payway_weixin.coffee', 'server');
 
     api.export(['payManager'], ['server']);
 })

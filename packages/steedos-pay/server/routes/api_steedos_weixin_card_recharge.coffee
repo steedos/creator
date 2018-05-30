@@ -7,21 +7,24 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         user_id = current_user_info._id
 
         body = req.body
-        totalFee = body.totalFee
-        cardId = body.cardId
+        amount = body.amount
+        order_id = body.order_id
 
         sub_appid = req.headers['appid']
 
-        check totalFee, Number
-        check cardId, String
+        check amount, Number
+        check order_id, String
         check sub_appid, String
 
-        card = Creator.getCollection('vip_card').findOne(cardId, { fields: { space: 1, store: 1 } })
+        order = Creator.getCollection('vip_order').findOne(order_id, { fields: { space: 1, store: 1, amount: 1, amount_paid: 1 } })
 
-        if not card
-            throw new Meteor.Error('error', "未找到会员卡")
+        if not order
+            throw new Meteor.Error('error', "未找到订单")
 
-        store = Creator.getCollection('vip_store').findOne(card.store, { fields: { mch_id: 1 } })
+        store = Creator.getCollection('vip_store').findOne(order.store, { fields: { mch_id: 1 } })
+
+        if  amount > (order.amount - order.amount_paid)
+            throw new Meteor.Error('error', "付款金额超出剩余应付款金额")
 
         if not store
             throw new Meteor.Error('error', "未找到门店")
@@ -43,11 +46,11 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
             if not sub_openid and o.appid is sub_appid
                 sub_openid = o._id
 
-        out_trade_no = moment().format('YYYYMMDDHHmmssSSS')
+        totalFee = parseInt(amount*100)
 
         orderData = {
             body: order_body,
-            out_trade_no: out_trade_no,
+            out_trade_no: order_id,
             total_fee: totalFee,
             spbill_create_ip: '127.0.0.1',
             notify_url: Meteor.absoluteUrl() + 'api/steedos/weixin/card/recharge/notify',
@@ -81,16 +84,16 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                     obj = {
                         _id: attach.record_id
                         paid: false
-                        info: result
+                        weixin_info: result
                         total_fee: totalFee
                         owner: user_id
-                        space: card.space
-                        store: card.store
-                        card: card._id
-                        out_trade_no: out_trade_no
+                        space: order.space
+                        out_trade_no: order_id
                     }
 
                     Creator.getCollection('billing_record').insert(obj)
+
+                    Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'pending' } })
 
                     returnData.timeStamp = Math.floor(Date.now() / 1000) + ""
                     returnData.nonceStr = util.generateNonceString()

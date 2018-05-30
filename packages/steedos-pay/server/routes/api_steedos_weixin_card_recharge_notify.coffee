@@ -34,19 +34,13 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 						sign = wxpay.sign(_.clone(result))
 						if billRecord and billRecord.total_fee is Number(result.total_fee) and sign is result.sign
 							Creator.getCollection('billing_record').update({ _id: record_id }, { $set: { paid: true } })
-							amount = billRecord.total_fee/100
-							cardId = billRecord.card
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount } })
-							newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
-							Creator.getCollection('vip_billing').insert({
-								amount: amount
-								store: billRecord.store
-								card: cardId
-								description: "会员卡充值"
-								owner: billRecord.owner
-								space: billRecord.space
-								balance: newestCard.balance
-							})
+							amount_paid = billRecord.total_fee/100
+							order_id = billRecord.out_trade_no
+							Creator.getCollection('vip_order').update({ _id: order_id }, { $inc: { amount_paid: amount_paid } })
+							order = Creator.getCollection('vip_order').findOne(order_id, { fields: { amount: 1, amount_paid: 1 } })
+							if order.amount is order.amount_paid
+								Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'completed' } })
+
 						else
 							console.error "recharge notify failed"
 
