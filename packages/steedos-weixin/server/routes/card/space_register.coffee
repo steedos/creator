@@ -1,4 +1,4 @@
-JsonRoutes.add 'post', '/api/mini/vip/store_register', (req, res, next) ->
+JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 	try
 		store_name = req.body.store_name
 		space_name = req.body.space_name || store_name
