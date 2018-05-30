@@ -19,10 +19,21 @@ JsonRoutes.add 'post', '/api/steedos/payway/balance', (req, res, next) ->
 
         amount = -totalFee/100
 
-        card = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
+        card = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1, store: 1, space: 1 } })
 
         if card.balance < totalFee/100
             throw new Meteor.Error('error', "余额不足")
+
+        Creator.getCollection('vip_order').insert({
+            name: '店内消费'
+            amount: -amount
+            store: card.store
+            card: cardId
+            owner: user_id
+            space: card.space
+            status: 'completed'
+            type: 'pay'
+        })
 
         Creator.getCollection('vip_card').update(cardId, { $inc: { balance: amount } })
 

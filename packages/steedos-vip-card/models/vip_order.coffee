@@ -73,9 +73,6 @@ Creator.Objects.vip_order =
             on: "server"
             when: "after.update"
             todo: (userId, doc, fieldNames, modifier, options)->
-                console.log modifier
-                console.log '------------------'
-                console.log doc
                 if modifier.$set?.status is 'completed' and this.previous.status isnt 'completed'
                     if doc.type is 'recharge'
                         console.log 'recharge'
