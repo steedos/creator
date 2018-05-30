@@ -85,6 +85,9 @@ steedos:cfs-s3
 steedos:cfs-standard-packages
 steedos:cfs-ui
 
+steedos:e164-phones-countries
+steedos:i18n-iso-countries
+
 steedos:oauth2-server
 
 smoral:sweetalert@1.1.1
