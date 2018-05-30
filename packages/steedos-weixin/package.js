@@ -23,6 +23,7 @@ Package.onUse(function(api) {
 	// api.addFiles('server/routes/login.coffee', 'server');
 	api.addFiles('server/routes/getPhoneNumber.coffee', 'server');
 	api.addFiles('server/routes/card/activate.coffee', 'server');
+	api.addFiles('server/routes/card/card_init.coffee', 'server');
 	api.addFiles('server/routes/card/getUserCards.coffee', 'server');
 	api.addFiles('server/routes/card/space_register.coffee', 'server');
 	api.addFiles('server/routes/update_user.coffee', 'server');
