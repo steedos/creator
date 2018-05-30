@@ -23,7 +23,7 @@ JsonRoutes.add 'put', '/mini/vip/user', (req, res, next) ->
 			updateDoc["profile.birthdate"] = data.birthdate
 		
 		# 将用户填写的信息同步到user表
-		Creator.getCollection("users").direct.update({_id: userId}, {
+		WXMini.updateUser(userId, {
 			$set: updateDoc
 		})
 		

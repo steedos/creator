@@ -10,7 +10,7 @@ JsonRoutes.add 'put', '/api/mini/vip/card_activate', (req, res, next) ->
 		card_id = req.query.card_id
 		data = req.body
 		# 将用户填写的信息同步到user表
-		Creator.getCollection("users").direct.update({_id: userId}, {
+		WXMini.updateUser(userId, {
 			$set: {
 				"profile.sex": data.sex,
 				"profile.birthdate": data.birthdate,
@@ -18,6 +18,7 @@ JsonRoutes.add 'put', '/api/mini/vip/card_activate', (req, res, next) ->
 				name: data.name
 			}
 		})
+
 		Creator.getCollection("space_users").direct.update({
 			user: userId,
 			space: spaceId

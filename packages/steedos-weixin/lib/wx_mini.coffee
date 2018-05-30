@@ -90,3 +90,9 @@ WXMini.addUserToSpace = (userId, spaceId, userName, profile)->
 	else
 		throw new Meteor.Error(500, "无效的space: #{spaceId}")
 
+WXMini.updateUser = (userId, options)->
+	if options.$set.mobile
+		options.$set.phone = {number: "+86" + options.$set.mobile}
+	Creator.getCollection("users").direct.update({_id: userId}, options)
+
+

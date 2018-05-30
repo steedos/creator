@@ -31,11 +31,12 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 		console.log("userId", userId)
 
 		#同步用户手机号
-		Creator.getCollection("users").direct.update({_id: userId}, {
+		WXMini.updateUser(userId, {
 			$set: {
 				mobile: mobile
 			}
 		})
+
 		now = new Date()
 		#创建店铺
 		doc = {
