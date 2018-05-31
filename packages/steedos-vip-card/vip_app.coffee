@@ -7,14 +7,13 @@ Creator.Apps.vip =
 	is_creator:true
 	objects: [
 		"space_users"
-		"vip_store",
 		"vip_card",
-		"post",
+		"post",,
+		"vip_order"
 		"vip_billing",
 		"vip_points",
 		"vip_coupon",
 		"vip_wifi",
 		"vip_category"
 		"vip_billing",
-		"vip_card",
-		"vip_order"]
+		"vip_store"]
