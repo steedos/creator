@@ -1,6 +1,6 @@
 Creator.Objects.vip_wifi =
 	name: "vip_wifi"
-	label: "门店Wifi"
+	label: "Wifi"
 	icon: "apps"
 	fields:
 		SSID:

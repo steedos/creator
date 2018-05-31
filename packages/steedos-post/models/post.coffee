@@ -1,6 +1,6 @@
 Creator.Objects.post =
 	name: "post"
-	label: "热点信息"
+	label: "动态"
 	icon: "apps"
 	enable_files:true
 	fields:
@@ -56,18 +56,18 @@ Creator.Objects.post =
 			label: '音频'
 			type: 'audio'
 		type:
-			label:'所属分类'
+			label:'信息分类'
 			type:'select'
 			options:[
-				{label:'公告',value:'announcements'},
-				{label:'关于',value:'about'},
-				{label:'新闻',value:'news'},
-				{label:'帮助',value:'help'},
-				{label:'招聘',value:'jobs'},
+				{label:'公告通知',value:'announcements'},
+				{label:'关于我们',value:'about'},
+				{label:'新闻动态',value:'news'},
+				{label:'会员指南',value:'help'},
+				{label:'招兵买马',value:'jobs'},
 				{label:'线上课程',value:'course'},
-				{label:'优惠券',value:'coupon'},
-				{label:'社区',value:'community'},
-				{label:'红包',value:'red_packet'}
+				# {label:'优惠券',value:'coupon'},
+				# {label:'社区',value:'community'},
+				# {label:'红包',value:'red_packet'}
 			]
 		mini_type:
 			label:'内容样式'

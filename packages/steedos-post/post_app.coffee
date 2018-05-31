@@ -1,6 +1,6 @@
 Creator.Apps.post = 
 	url: "/app/post"
-	name: "热点信息"
+	name: "信息发布"
 	icon: "ion-ios-people-outline" 
 	icon_slds: "document" 
 	visible:true 
