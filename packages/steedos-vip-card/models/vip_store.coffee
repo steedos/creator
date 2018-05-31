@@ -30,10 +30,6 @@ Creator.Objects.vip_store =
 			type:'text'
 			label:'所属商户'
 			hidden:true
-		images:
-			label: '照片'
-			type: 'image'
-			multiple : true
 		avatar:
 			label:'头像'
 			type:'image'
