@@ -12,7 +12,7 @@ if [ -d "$BUNDLE_PATH" ]; then
 	npm install --registry https://registry.npm.taobao.org -d
 
 	cd $BUNDLE_PATH
-	pm2 restart creator.0
+	pm2 restart vip.0
 else
 	echo "!!!=> Failed to create bundle path: $BUNDLE_PATH"
 fi
