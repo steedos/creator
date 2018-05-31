@@ -8,7 +8,7 @@ Creator.Apps.vip =
 	objects: [
 		"space_users"
 		"vip_card",
-		"post",,
+		"post",
 		"vip_order"
 		"vip_billing",
 		"vip_points",
