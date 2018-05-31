@@ -163,7 +163,9 @@ Meteor.startup ->
 						else
 							user_spaces = Creator.getCollection("space_users").find({user: @userId}, {fields: {space: 1}}).fetch()
 							if key is 'spaces'
-								createQuery.query._id = {$in: _.pluck(user_spaces, 'space')}
+								# space 对所有用户记录为只读
+								delete createQuery.query._id
+#								createQuery.query._id = {$in: _.pluck(user_spaces, 'space')}
 							else
 								createQuery.query.space = {$in: _.pluck(user_spaces, 'space')}
 
