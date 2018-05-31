@@ -94,4 +94,6 @@ Creator.Objects.vip_order =
                         })
                     else if doc.type is 'pay'
                         console.log 'pay'
-                        Creator.getCollection('vip_card').update({ _id: billRecord.card }, { $inc: { points: parseInt(doc.amount) } })
+                        point = parseInt(doc.amount)
+                        if point > 0
+                            Creator.getCollection('vip_card').update({ _id: doc.card }, { $inc: { points: point } })
