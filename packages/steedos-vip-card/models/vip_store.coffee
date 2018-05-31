@@ -69,3 +69,18 @@ Creator.Objects.vip_store =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

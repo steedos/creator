@@ -114,3 +114,18 @@ Creator.Objects.vip_card =
 						count = Creator.getCollection("vip_card").find({space:doc.space,card_number:modifier.$set.card_number}).count()
 						if count
 							throw new Meteor.Error 500, "卡号不能重复"		
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

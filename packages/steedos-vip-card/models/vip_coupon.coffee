@@ -82,3 +82,18 @@ Creator.Objects.vip_coupon =
 			label: "所有优惠券"
 			columns: ["name", "quota", "apply_stores","remain_count","total_count","received_count","used_count"]
 			filter_scope: "space"
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

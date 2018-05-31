@@ -26,3 +26,18 @@ Creator.Objects.vip_points =
 			label: "我的积分记录"
 			columns: ["card", "points", "billing","store"]
 			filter_scope: "space"
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

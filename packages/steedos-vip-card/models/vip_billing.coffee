@@ -32,3 +32,18 @@ Creator.Objects.vip_billing =
 			label: "消费记录"
 			columns: ["card", "store", "amount","description"]
 			filter_scope: "space"
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true

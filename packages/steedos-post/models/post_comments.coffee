@@ -21,4 +21,19 @@ Creator.Objects.post_comments =
 	list_views:
 		all:
 			label: "所有评论"
-			columns: ["created_by","content", "created"]	
+			columns: ["created_by","content", "created"]
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true	

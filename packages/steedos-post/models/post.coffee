@@ -119,3 +119,18 @@ Creator.Objects.post =
 			label:'红包'
 			filter_scope:'space'
 			filters: [["type", "=", "red_packet"]]
+	permission_set:
+		user:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true
