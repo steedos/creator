@@ -51,6 +51,23 @@ Creator.Objects.space_users =
 			type: "text"
 		company:
 			type: "text"
+		phone:
+			type:'[object]'
+			label:'手机号信息'
+			omit:true
+		'phone.number':
+			type:'text'
+			omit:true
+		'phone.mobile':
+			type:'text'
+			omit:true
+		'phone.verified':
+			type:'boolean'
+			omit:true
+			defaultValue:false
+		'phone.modified':
+			type:'datetime'
+			omit:true
 		profile:
 			label: "用户身份"
 			type: "select"
