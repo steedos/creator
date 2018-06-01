@@ -2,6 +2,7 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 	try
 		store_name = req.body.store_name
 		space_name = req.body.space_name || store_name
+		contact_name = req.body.contact_name
 		space_industry = req.body.industry
 		mobile = req.body.phoneNumber
 		location = req.body.location
@@ -12,8 +13,11 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 			throw new Meteor.Error(500, "No permission")
 
 		if !store_name
-			throw new Meteor.Error(500, "店铺名称为必填")
-
+			throw new Meteor.Error(500, "商户名称为必填")
+		
+		if !contact_name
+			throw new Meteor.Error(500, "联系人姓名为必填")
+		
 		if !space_industry
 			throw new Meteor.Error(500, "行业为必填")
 
@@ -26,14 +30,15 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 		#创建工作区、root org、space user
 		spaceId = WXMini.newSpace(userId, space_name)
 		orgId = WXMini.newOrganization(userId, spaceId, space_name)
-		space_user = WXMini.newSpaceUser(userId, spaceId, orgId, mobile, 'admin', mobile)
+		space_user = WXMini.newSpaceUser(userId, spaceId, orgId, contact_name, 'admin', mobile)
 
 		console.log("userId", userId)
 
 		#同步用户手机号
 		WXMini.updateUser(userId, {
 			$set: {
-				mobile: mobile
+				mobile: mobile,
+				name:contact_name
 			}
 		})
 
