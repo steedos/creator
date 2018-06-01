@@ -109,9 +109,9 @@ Creator.Objects.vip_category =
 			columns: ["name", "content", "purchase_count","state"]
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true

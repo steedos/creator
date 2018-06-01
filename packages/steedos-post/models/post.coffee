@@ -10,7 +10,7 @@ Creator.Objects.post =
 			required:true
 		summary:
 			label:'简介'
-			type:'text'
+			type:'textarea'
 		description:
 			label:'详细'
 			is_wide:true
@@ -121,9 +121,9 @@ Creator.Objects.post =
 			filters: [["type", "=", "red_packet"]]
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true

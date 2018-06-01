@@ -8,7 +8,7 @@ Creator.Objects.vip_store =
 			type:'text'
 		description:
 			label:'简介'
-			type:'text'
+			type:'textarea'
 		location:
 			label:'位置'
 			type:'location'
@@ -67,9 +67,9 @@ Creator.Objects.vip_store =
 			todo: (userId, doc)->
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
