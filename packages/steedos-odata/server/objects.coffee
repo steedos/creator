@@ -35,13 +35,16 @@ Meteor.startup ->
 				_.forEach data.fields, (field, key)->
 					_field = _.clone(field)
 
+					if !_field.name
+						_field.name = key
+
 					#将不可编辑的字段设置为readonly = true
 					if (_.indexOf(object_permissions.uneditable_fields, _field.name) > -1)
 						_field.readonly = true
 
 					#不返回不可见字段
 					if (_.indexOf(object_permissions.unreadable_fields, _field.name) < 0)
-						fields[_field.name] = _field
+						fields[key] = _field
 
 				data.fields = fields
 
