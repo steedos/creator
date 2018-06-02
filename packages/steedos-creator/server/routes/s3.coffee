@@ -146,28 +146,27 @@ JsonRoutes.add "post", "/s3/:collection",  (req, res, next) ->
 			if req.files and req.files[0]
 
 				newFile = new FS.File()
+				newFile.name(req.files[0].filename)
 
 				if req.body
 					newFile.metadata = req.body
 
-				newFile.attachData req.files[0].data, {type: req.files[0].mimeType}, (err) ->
+				newFile.owner = userId
+				newFile.metadata.owner = userId
 
-					fileObj = collection.insert newFile
+				newFile.attachData req.files[0].data, {type: req.files[0].mimeType}
 
-					fileObj.on 'stored', (storeName) ->
-						resultData = collection.files.findOne(fileObj._id)
-						JsonRoutes.sendResult res,
-							code: 200
-							data: resultData
-						return
+				collection.insert newFile
 
-					fileObj.on 'error', (storeName) ->
-						JsonRoutes.sendResult res,
-							code: 500
-							data: {errors: '服务器内部错误'}
-						return
+				resultData = collection.files.findOne(newFile._id)
+				JsonRoutes.sendResult res,
+					code: 200
+					data: resultData
+				return
 			else
 				throw new Meteor.Error(500, "No File")
+
+		return
 	catch e
 		console.error e.stack
 		JsonRoutes.sendResult res, {
