@@ -47,3 +47,10 @@ Creator.Objects.vip_billing =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		member:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false

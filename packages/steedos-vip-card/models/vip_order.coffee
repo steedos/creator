@@ -68,6 +68,20 @@ Creator.Objects.vip_order =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		member:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
+		guest:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
 
 	list_views:
 		all:

@@ -129,3 +129,17 @@ Creator.Objects.vip_card =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		member:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
+		guest:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false

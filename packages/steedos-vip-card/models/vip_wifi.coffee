@@ -40,3 +40,17 @@ Creator.Objects.vip_wifi =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		guest:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		member:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
