@@ -12,7 +12,7 @@ Creator.Objects.post =
 			label:'简介'
 			type:'textarea'
 		description:
-			label:'详细'
+			label:'正文'
 			is_wide:true
 			type:'textarea'
 		comment_count:
