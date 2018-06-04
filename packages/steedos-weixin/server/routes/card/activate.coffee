@@ -16,10 +16,10 @@ JsonRoutes.add 'put', '/api/mini/vip/card_activate', (req, res, next) ->
 				"profile.birthdate": data.birthdate,
 				mobile: data.phoneNumber,
 				name: data.name,
-				'phone.number':"+86"+data.phoneNumber,
-				'phone.mobile':data.phoneNumber,
-				'phone.verified':true,
-				'phone.modified':new Date()
+#				'phone.number':"+86"+data.phoneNumber,
+#				'phone.mobile':data.phoneNumber,
+#				'phone.verified':true,
+#				'phone.modified':new Date()
 			}
 		})
 
