@@ -1,11 +1,11 @@
 Creator.Objects.vip_wifi =
 	name: "vip_wifi"
-	label: "Wifi"
+	label: "Wi-Fi"
 	icon: "topic"
 	fields:
 		SSID:
 			type:'text'
-			label:'Wifi名称'
+			label:'Wi-Fi名称'
 			is_name:true
 			required:true
 		BSSID:
@@ -14,7 +14,7 @@ Creator.Objects.vip_wifi =
 			required:true
 		password:
 			type:'text'
-			label:'Wifi密码'
+			label:'Wi-Fi密码'
 		store:
 			label:'门店'
 			type:'lookup'
