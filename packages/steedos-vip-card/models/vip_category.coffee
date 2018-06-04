@@ -1,7 +1,7 @@
 Creator.Objects.vip_category =
 	name: "vip_category"
 	label: "卡项"
-	icon: "apps"
+	icon: "work_type"
 	fields:
 		name:
 			label:'名称'

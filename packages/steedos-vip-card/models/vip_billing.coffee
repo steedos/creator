@@ -1,7 +1,7 @@
 Creator.Objects.vip_billing =
 	name: "vip_billing"
 	label: "消费记录"
-	icon: "apps"
+	icon: "record"
 	fields:
 		amount:
 			label:'消费金额'

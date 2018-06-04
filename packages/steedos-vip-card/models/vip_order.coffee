@@ -1,7 +1,7 @@
 Creator.Objects.vip_order =
 	name: "vip_order"
 	label: "订单"
-	icon: "apps"
+	icon: "orders"
 	fields:
 		name:
 			label: "名称"

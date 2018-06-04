@@ -1,7 +1,7 @@
 Creator.Objects.post =
 	name: "post"
 	label: "动态"
-	icon: "apps"
+	icon: "contract"
 	enable_files:true
 	fields:
 		name:

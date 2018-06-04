@@ -1,7 +1,7 @@
 Creator.Objects.vip_points =
 	name: "vip_points"
 	label: "积分"
-	icon: "apps"
+	icon: "reward"
 	fields:
 		card:
 			label:'会员卡'

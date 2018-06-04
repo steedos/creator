@@ -1,7 +1,7 @@
 Creator.Objects.post_comments =
 	name: "post_comments"
 	label: "评论"
-	icon: "apps"
+	icon: "post"
 	enable_files:true
 	fields:
 		content:

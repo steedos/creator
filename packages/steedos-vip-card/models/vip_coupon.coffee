@@ -1,7 +1,7 @@
 Creator.Objects.vip_coupon =
 	name: "vip_coupon"
 	label: "优惠券"
-	icon: "apps"
+	icon: "product_required"
 	fields:
 		name:
 			label:'标题'

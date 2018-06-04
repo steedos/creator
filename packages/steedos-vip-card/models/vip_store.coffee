@@ -1,7 +1,7 @@
 Creator.Objects.vip_store =
 	name: "vip_store"
 	label: "门店"
-	icon: "apps"
+	icon: "address"
 	fields:
 		name:
 			label:'店名'
