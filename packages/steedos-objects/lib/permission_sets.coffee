@@ -47,6 +47,9 @@ if Meteor.isServer
 			return _.without(_.uniq(apps),undefined,null)
 
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
+		console.log 'spaceId: ', spaceId
+		console.log 'userId: ', userId
+		console.log 'object_name: ', object_name
 		permissions = {}
 		object = Creator.getObject(object_name)
 		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1}})
@@ -134,18 +137,21 @@ if Meteor.isServer
 			if Creator.isSpaceAdmin(spaceId, userId)
 				permissions = opsetAdmin
 			else
-				spaceUser = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { profile: 1 } })
-				if spaceUser
-					prof = spaceUser.profile
-					if prof
-						if prof is 'user'
+				if spaceId is 'common'
+					permissions = opsetUser
+				else
+					spaceUser = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { profile: 1 } })
+					if spaceUser
+						prof = spaceUser.profile
+						if prof
+							if prof is 'user'
+								permissions = opsetUser
+							else if prof is 'member'
+								permissions = opsetMember
+							else if prof is 'guest'
+								permissions = opsetGuest
+						else # 没有profile则认为是user权限
 							permissions = opsetUser
-						else if prof is 'member'
-							permissions = opsetMember
-						else if prof is 'guest'
-							permissions = opsetGuest
-					else # 没有profile则认为是user权限
-						permissions = opsetUser
 
 		if psets.length > 0
 			set_ids = _.pluck psets, "_id"
