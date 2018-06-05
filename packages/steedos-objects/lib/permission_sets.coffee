@@ -47,9 +47,6 @@ if Meteor.isServer
 			return _.without(_.uniq(apps),undefined,null)
 
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
-		console.log 'spaceId: ', spaceId
-		console.log 'userId: ', userId
-		console.log 'object_name: ', object_name
 		permissions = {}
 		object = Creator.getObject(object_name)
 		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1}})
