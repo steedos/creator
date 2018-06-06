@@ -1,10 +1,10 @@
 Creator.Objects.vip_store =
 	name: "vip_store"
-	label: "门店"
+	label: "商户"
 	icon: "address"
 	fields:
 		name:
-			label:'店名'
+			label:'名称'
 			type:'text'
 		description:
 			label:'简介'
@@ -13,10 +13,10 @@ Creator.Objects.vip_store =
 			label:'位置'
 			type:'location'
 			system: 'gcj02'
-		contact:
-			type:'lookup'
-			reference_to:'users'
-			label:'联系人'
+		# contact:
+		# 	type:'lookup'
+		# 	reference_to:'users'
+		# 	label:'联系人'
 		phone:
 			type:'text'
 			label:'联系电话'
@@ -26,10 +26,10 @@ Creator.Objects.vip_store =
 		# address:
 		# 	type:'text'
 		# 	label:'地址'
-		merchant:
-			type:'text'
-			label:'所属商户'
-			hidden:true
+		# merchant:
+		# 	type:'text'
+		# 	label:'所属商户'
+		# 	hidden:true
 		avatar:
 			label:'头像'
 			type:'image'
