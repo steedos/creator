@@ -23,9 +23,9 @@ Creator.Objects.vip_store =
 		business_hours:
 			type:'text'
 			label:'营业时间'
-		address:
-			type:'text'
-			label:'地址'
+		# address:
+		# 	type:'text'
+		# 	label:'地址'
 		merchant:
 			type:'text'
 			label:'所属商户'
@@ -51,10 +51,10 @@ Creator.Objects.vip_store =
 				# {label:'红包',value:'red_packet'}
 			]
 			multiple:true
-		mch_id:
-			type: 'text'
-			label: '商户号'
-			# required: true
+		# mch_id:
+		# 	type: 'text'
+		# 	label: '商户号'
+		# 	# required: true
 	list_views:
 		all:
 			label: "所有门店"
