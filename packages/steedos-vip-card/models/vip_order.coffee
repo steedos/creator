@@ -69,12 +69,12 @@ Creator.Objects.vip_order =
 			modifyAllRecords: true
 			viewAllRecords: true
 		member:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: false
 			allowDelete: false
@@ -92,7 +92,7 @@ Creator.Objects.vip_order =
 			label:"未完成订单"
 			columns:["name","owner", "amount","amount_paid","description"]
 			filter_scope: "space"
-			filters: [["status", "=", "pending"]]                
+			filters: [["status", "=", "pending"]]
 	triggers:
 		"after.update.server.vip_order":
 			on: "server"
