@@ -3,28 +3,24 @@ Creator.Objects.vip_wifi =
 	label: "Wi-Fi"
 	icon: "topic"
 	fields:
-		SSID:
-			type:'text'
-			label:'Wi-Fi名称'
-			is_name:true
-			required:true
-		BSSID:
-			type:'text'
-			label:'物理地址'
-			# required:true
-			omit: true
-		password:
-			type:'text'
-			label:'Wi-Fi密码'
 		store:
 			label:'门店'
 			type:'lookup'
 			reference_to:'vip_store'
 			required:true
+		name:
+			type:'text'
+			label:'Wi-Fi名称'
+			is_name:true
+			required:true
+		password:
+			type:'text'
+			label:'Wi-Fi密码'
+		
 	list_views:
 		all:
 			label: "所有Wifi"
-			columns: ["SSID", "password", "store"]
+			columns: ["name", "password", "store"]
 			filter_scope: "space"
 	permission_set:
 		user:
