@@ -36,21 +36,21 @@ Creator.Objects.vip_store =
 		cover:
 			label:'封面照片'
 			type:'image'
-		post_types:
-			label:'信息分类'
-			type:'select'
-			options:[
-				{label:'公告通知',value:'announcements'},
-				{label:'关于我们',value:'about'},
-				{label:'新闻动态',value:'news'},
-				{label:'会员指南',value:'help'},
-				{label:'招兵买马',value:'jobs'},
-				{label:'线上课程',value:'course'},
-				# {label:'优惠券',value:'coupon'},
-				# {label:'社区',value:'community'},
-				# {label:'红包',value:'red_packet'}
-			]
-			multiple:true
+		# post_types:
+		# 	label:'信息分类'
+		# 	type:'select'
+		# 	options:[
+		# 		{label:'公告通知',value:'announcements'},
+		# 		{label:'关于我们',value:'about'},
+		# 		{label:'新闻动态',value:'news'},
+		# 		{label:'会员指南',value:'help'},
+		# 		{label:'招兵买马',value:'jobs'},
+		# 		{label:'线上课程',value:'course'},
+		# 		# {label:'优惠券',value:'coupon'},
+		# 		# {label:'社区',value:'community'},
+		# 		# {label:'红包',value:'red_packet'}
+		# 	]
+		# 	multiple:true
 		# mch_id:
 		# 	type: 'text'
 		# 	label: '商户号'
