@@ -1,6 +1,6 @@
 Creator.Objects.vip_store =
 	name: "vip_store"
-	label: "商户"
+	label: "门店"
 	icon: "address"
 	fields:
 		name:
@@ -35,6 +35,9 @@ Creator.Objects.vip_store =
 			type:'image'
 		cover:
 			label:'封面照片'
+			type:'image'
+		qrcode:
+			label:'二维码'
 			type:'image'
 		# post_types:
 		# 	label:'信息分类'
