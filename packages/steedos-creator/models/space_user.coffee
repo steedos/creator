@@ -72,8 +72,10 @@ Creator.Objects.space_users =
 			label: "用户身份"
 			type: "select"
 			defaultValue: "user"
-			options: ()->
-				return [{label: "员工", value: "user"}, {label: "会员", value: "member"}, {label: "游客", value: "guest"}]
+			options: [
+				{label: "员工", value: "user"}, 
+				{label: "会员", value: "member"}, {label: "游客", value: "guest"}
+			]
 	list_views:	
 		user:
 			label: "员工"
