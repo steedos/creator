@@ -11,7 +11,8 @@ Creator.Objects.vip_wifi =
 		BSSID:
 			type:'text'
 			label:'物理地址'
-			required:true
+			# required:true
+			omit: true
 		password:
 			type:'text'
 			label:'Wi-Fi密码'
@@ -23,7 +24,7 @@ Creator.Objects.vip_wifi =
 	list_views:
 		all:
 			label: "所有Wifi"
-			columns: ["SSID", "BSSID", "password", "store"]
+			columns: ["SSID", "password", "store"]
 			filter_scope: "space"
 	permission_set:
 		user:
