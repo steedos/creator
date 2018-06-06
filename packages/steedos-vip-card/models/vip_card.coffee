@@ -14,16 +14,16 @@ Creator.Objects.vip_card =
 		points:
 			label:'积分'
 			type:'number'
-		grade:
-			label:'等级'
-			type:'select'
-			options:[
-				{label: "普通", value: "普通"},
-				{label: "白银", value: "白银"},
-				{label: "黄金", value: "黄金"},
-				{label: "铂金", value: "铂金"},
-				{label: "钻石", value: "钻石"}
-			]
+		# grade:
+		# 	label:'等级'
+		# 	type:'select'
+		# 	options:[
+		# 		{label: "普通", value: "普通"},
+		# 		{label: "白银", value: "白银"},
+		# 		{label: "黄金", value: "黄金"},
+		# 		{label: "铂金", value: "铂金"},
+		# 		{label: "钻石", value: "钻石"}
+		# 	]
 		discount:
 			label:'折扣'
 			type:'number'
