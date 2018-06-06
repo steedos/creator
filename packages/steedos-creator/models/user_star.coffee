@@ -3,11 +3,11 @@ Creator.Objects.user_star =
 	label: "收藏"
 	icon: "apps"
 	fields:
-        related_to:
+		related_to:
 			label: "收藏对象"
 			type: "text"
-    permission_set:
-        user:
+	permission_set:
+		user:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: false
