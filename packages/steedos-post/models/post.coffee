@@ -41,10 +41,10 @@ Creator.Objects.post =
 		end_time:
 			label:'结束时间'
 			type:'datetime'
-		store:
-			label:'门店'
-			type:'master_detail'
-			reference_to:'vip_store'
+		# store:
+		# 	label:'门店'
+		# 	type:'master_detail'
+		# 	reference_to:'vip_store'
 		images:
 			label: '图片'
 			type: 'image'
@@ -77,6 +77,15 @@ Creator.Objects.post =
 				{label:'照片',value:'photo'},
 				{label:'视频',value:'video'},
 				{label:'音乐',value:'music'}
+			]
+		visible_type:
+			label:'可见范围'
+			type:'select'
+			options:[
+				{label:'公开',value:'public'},
+				{label:'秘密',value:'private'},
+				{label:'会员可见',value:'member'},
+				{label:'员工可见',value:'user'}
 			]
 	list_views:
 		all:
