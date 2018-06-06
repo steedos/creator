@@ -47,9 +47,6 @@ if Meteor.isServer
 			return _.without(_.uniq(apps),undefined,null)
 
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
-		console.log 'spaceId: ', spaceId
-		console.log 'userId: ', userId
-		console.log 'object_name: ', object_name
 		permissions = {}
 		object = Creator.getObject(object_name)
 		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1}})
@@ -58,10 +55,10 @@ if Meteor.isServer
 		psetsGuest = this.psetsGuest || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1}})
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1}}).fetch()
 
-		opsetAdmin = _.clone(object.permission_set.admin)
-		opsetUser = _.clone(object.permission_set.user)
-		opsetMember = _.clone(object.permission_set.member)
-		opsetGuest = _.clone(object.permission_set.guest)
+		opsetAdmin = _.clone(object.permission_set.admin) || {}
+		opsetUser = _.clone(object.permission_set.user) || {}
+		opsetMember = _.clone(object.permission_set.member) || {}
+		opsetGuest = _.clone(object.permission_set.guest) || {}
 
 		# sharedListViews = Creator.getCollection('object_listviews').find({space: spaceId, object_name: object_name, shared: true}, {fields:{_id:1}}).fetch()
 		# sharedListViews = _.pluck(sharedListViews,"_id")
@@ -152,6 +149,8 @@ if Meteor.isServer
 								permissions = opsetGuest
 						else # 没有profile则认为是user权限
 							permissions = opsetUser
+					else
+						permissions = opsetGuest
 
 		if psets.length > 0
 			set_ids = _.pluck psets, "_id"
