@@ -24,7 +24,7 @@ Creator.Objects.vip_category =
 			label:'简介'
 			type:'textarea'
 		valid_period:
-			label:"有效期"
+			label:"有效期(天)"
 			type:'number'
 		# state:
 		# 	label:'状态'
@@ -41,6 +41,9 @@ Creator.Objects.vip_category =
 		# 	omit:true
 		description:
 			label:'会员权益'
+			type:'textarea'
+		instruction:
+			label:'使用须知'
 			type:'textarea'
 		# level:
 		# 	label:'等级'
