@@ -30,6 +30,8 @@ Meteor.startup ->
 			if object_permissions.allowRead
 				data.allowRead = true
 				data.allowEdit = object_permissions.allowEdit
+				data.allowDelete = object_permissions.allowDelete
+				data.allowCreate = object_permissions.allowCreate
 
 				fields = {}
 				_.forEach data.fields, (field, key)->
