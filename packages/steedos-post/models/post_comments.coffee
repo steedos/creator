@@ -4,20 +4,14 @@ Creator.Objects.post_comments =
 	icon: "post"
 	enable_files:true
 	fields:
-		content:
+		name:
 			label:'评论内容'
 			type:'textarea'
 			required:true
-			is_name:true
 		post_id:
 			label:'评论对象'
 			type:'master_detail'
 			reference_to:'post'
-		reply_user:
-			label:'回复人'
-			type:'lookup'
-			reference_to:'users'
-			omit:true
 	list_views:
 		all:
 			label: "所有评论"
