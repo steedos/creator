@@ -39,6 +39,17 @@ Creator.Objects.vip_store =
 		qrcode:
 			label:'二维码'
 			type:'image'
+		
+		enabled_objects:
+			label:'启用功能'
+			type:'select'
+			options:[
+				{label:'最新动态',value:'post'},
+				{label:'活动报名',value:'vip_activity'},
+				{label:'会员卡',value:'vip_card'},
+				{label:'Wifi',value:'vip_wifi'}
+			]
+			multiple:true
 		# post_types:
 		# 	label:'信息分类'
 		# 	type:'select'
