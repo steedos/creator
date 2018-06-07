@@ -6,13 +6,16 @@ Creator.Objects.vip_store =
 		name:
 			label:'名称'
 			type:'text'
+			is_wide:true
 		description:
 			label:'简介'
-			type:'textarea'
+			type:'text'
+			is_wide:true
+		
 		location:
 			label:'位置'
 			type:'location'
-			system: 'gcj02'
+			group:'-'
 		# contact:
 		# 	type:'lookup'
 		# 	reference_to:'users'
@@ -33,13 +36,15 @@ Creator.Objects.vip_store =
 		avatar:
 			label:'头像'
 			type:'image'
+			group:'-'
 		cover:
 			label:'封面照片'
 			type:'image'
 		qrcode:
 			label:'二维码'
 			type:'image'
-
+			readonly:true
+			omit:true
 		enabled_objects:
 			label:'启用功能'
 			type:'select'
@@ -51,6 +56,7 @@ Creator.Objects.vip_store =
 				{label:'联系我们',value:'vip_store'}
 			]
 			multiple:true
+			group:'-'
 		# post_types:
 		# 	label:'信息分类'
 		# 	type:'select'
