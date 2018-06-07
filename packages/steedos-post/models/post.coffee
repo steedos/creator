@@ -6,7 +6,7 @@ Creator.Objects.post =
 	fields:
 		name:
 			label:'标题'
-			type:'textarea'
+			type:'text'
 			required:true
 			is_wide:true
 		summary:
