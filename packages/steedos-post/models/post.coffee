@@ -6,11 +6,13 @@ Creator.Objects.post =
 	fields:
 		name:
 			label:'标题'
-			type:'text'
+			type:'textarea'
 			required:true
+			is_wide:true
 		summary:
 			label:'简介'
 			type:'textarea'
+			omit:true
 		description:
 			label:'正文'
 			is_wide:true
@@ -35,12 +37,15 @@ Creator.Objects.post =
 			label:'是否允许评论'
 			type:'boolean'
 			defaultValue:true
+			omit:true
 		start_time:
 			label:'开始时间'
 			type:'datetime'
+			omit:true
 		end_time:
 			label:'结束时间'
 			type:'datetime'
+			omit:true
 		# store:
 		# 	label:'门店'
 		# 	type:'master_detail'
@@ -49,12 +54,14 @@ Creator.Objects.post =
 			label: '图片'
 			type: 'image'
 			multiple : true
+			group:"-"
 		video:
 			label: '视频'
 			type: 'video'
 		audio:
 			label: '音频'
 			type: 'audio'
+			omit:true
 		type:
 			label:'信息分类'
 			type:'select'
@@ -69,6 +76,7 @@ Creator.Objects.post =
 				# {label:'社区',value:'community'},
 				# {label:'红包',value:'red_packet'}
 			]
+			omit:true
 		mini_type:
 			label:'内容样式'
 			type:'select'
@@ -78,6 +86,7 @@ Creator.Objects.post =
 				{label:'视频',value:'video'},
 				{label:'音乐',value:'music'}
 			]
+			omit:true
 		visible_type:
 			label:'可见范围'
 			type:'select'
@@ -87,6 +96,7 @@ Creator.Objects.post =
 				{label:'会员可见',value:'member'},
 				{label:'员工可见',value:'user'}
 			]
+			omit:true
 	list_views:
 		all:
 			label: "所有信息"
