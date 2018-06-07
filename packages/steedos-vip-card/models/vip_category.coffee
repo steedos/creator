@@ -7,25 +7,34 @@ Creator.Objects.vip_category =
 			label:'名称'
 			type:'text'
 			required:true
-		cover:
-			label:'背景图'
-			type:'image'
-		avatar:
-			label:'头像'
-			type:'image'
-		count:
-			label:'发行数量'
-			type:'number'
+			is_wide:true
+		summary:
+			label:'简介'
+			type:'text'
+			is_wide:true
+		
 		price:
 			label:'售价'
 			type:'currency'
 			required:true
-		summary:
-			label:'简介'
-			type:'textarea'
+			group:'-'
 		valid_period:
 			label:"有效期(天)"
+			defaultValue:365
 			type:'number'
+		
+		avatar:
+			label:'头像'
+			type:'image'
+			group:'-'
+		cover:
+			label:'背景图'
+			type:'image'
+
+		count:
+			label:'发行数量'
+			type:'number'
+			omit:true
 		# state:
 		# 	label:'状态'
 		# 	type:'select'
@@ -39,12 +48,16 @@ Creator.Objects.vip_category =
 		# 	label:'开卡总数'
 		# 	type:'number'
 		# 	omit:true
+		
 		description:
 			label:'会员权益'
 			type:'textarea'
+			is_wide:true
+			group:'-'
 		instruction:
 			label:'使用须知'
 			type:'textarea'
+			is_wide:true
 		# level:
 		# 	label:'等级'
 		# 	type:'select'
