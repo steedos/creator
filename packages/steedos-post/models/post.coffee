@@ -11,6 +11,7 @@ Creator.Objects.post =
 		summary:
 			label:'简介'
 			type:'textarea'
+			omit:true
 		description:
 			label:'正文'
 			is_wide:true
@@ -81,6 +82,7 @@ Creator.Objects.post =
 		visible_type:
 			label:'可见范围'
 			type:'select'
+			omit:true
 			options:[
 				{label:'公开',value:'public'},
 				{label:'秘密',value:'private'},
