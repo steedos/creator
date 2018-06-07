@@ -5,7 +5,7 @@ Creator.Objects.space_users =
 	enable_search: true
 	fields:
 		name: 
-			label: "名称"
+			label: "姓名"
 			type: "text"
 			defaultValue: ""
 			description: ""
@@ -13,61 +13,53 @@ Creator.Objects.space_users =
 			required: true
 			searchable:true
 			index:true
-		email:
-			type: "text"
-		user:
-			type: "master_detail"
-			reference_to: "users"
-			# required: true
-			omit: true
 		position:
 			type: "text"
-		organization: 
-			type: "master_detail"
-			reference_to: "organizations"
-			omit: true
+			label:'职务'
+		
+		mobile:
+			type: "text"
+			label:'手机'
+			group:'-'
+		email:
+			type: "text"
+			label:'邮件'		
+		work_phone:
+			type: "text"
+			label:'工作电话'		
+		
+		company:
+			type: "text"
+			label:'单位'
+			group:'-'
 		organizations:
 			type: "lookup"
+			label:'所属部门'
 			reference_to: "organizations"
 			multiple: true
 			defaultValue: []
 		manager:
 			type: "lookup"
+			label:'上级主管'
 			reference_to: "users"
+		
 		sort_no:
 			type: "number"
+			label:'排序号'
+			group:'-'
+		organization: 
+			type: "master_detail"
+			reference_to: "organizations"
+			omit: true
 		user_accepted:
 			type: "boolean"
+			label:'接受状态'
 			defaultValue: true
+			omit:true
 		invite_state:
 			label: "邀请状态"
 			type: "text"
 			omit: true
-		mobile:
-			type: "text"
-		work_phone:
-			type: "text"
-		position:
-			type: "text"
-		company:
-			type: "text"
-		phone:
-			type:'[object]'
-			label:'手机号信息'
-			omit:true
-		'phone.number':
-			type:'text'
-			omit:true
-		'phone.mobile':
-			type:'text'
-			omit:true
-		'phone.verified':
-			type:'boolean'
-			omit:true
-			defaultValue:false
-		'phone.modified':
-			type:'datetime'
-			omit:true
 		profile:
 			label: "用户身份"
 			type: "select"
@@ -76,6 +68,11 @@ Creator.Objects.space_users =
 				{label: "员工", value: "user"}, 
 				{label: "会员", value: "member"}, {label: "游客", value: "guest"}
 			]
+		user:
+			type: "master_detail"
+			reference_to: "users"
+			# required: true
+			omit: true
 	list_views:	
 		user:
 			label: "员工"
@@ -101,8 +98,8 @@ Creator.Objects.space_users =
 			modifyAllRecords: false
 			viewAllRecords: true 
 		admin:
-			allowCreate: true
-			allowDelete: true
+			allowCreate: false
+			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
