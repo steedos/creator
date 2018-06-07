@@ -76,7 +76,7 @@ Creator.Objects.vip_order =
 			modifyAllRecords: false
 			viewAllRecords: true
 		guest:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: true
