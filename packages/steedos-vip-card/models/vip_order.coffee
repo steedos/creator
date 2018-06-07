@@ -107,6 +107,12 @@ Creator.Objects.vip_order =
 							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount } })
 						else
 							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount }, $set: { is_actived: true } })
+							#用户没有已经加入商户工作区时，先加入
+							space_user = Creator.getCollection("space_users").findOne({user: doc.owner, space: doc.space}, {fields: {_id: 1}})
+							if !space_user
+								u = Meteor.users.findOne(doc.owner, { fields: { name: 1 } })
+								WXMini.addUserToSpace(doc.owner, doc.space, u.name, "member")
+
 						newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
 						Creator.getCollection('vip_billing').insert({
 							amount: amount
