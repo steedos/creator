@@ -113,7 +113,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 					root_org = Creator.getCollection("organizations").findOne({space: space_id, is_company: true}, {fields: {_id: 1}})
 					if !root_org
 						throw new Meteor.Error(500, "无效的工作区Id:#{space_id}")
-					WXMini.addUserToSpace(ret_data.user_id, space_id, (new Date()).getTime() + "_" + _.random(0, 100), "guest")
+					#WXMini.addUserToSpace(ret_data.user_id, space_id, (new Date()).getTime() + "_" + _.random(0, 100), "guest")
 					ret_data.profile = "guest"
 
 		#设置sessionKey

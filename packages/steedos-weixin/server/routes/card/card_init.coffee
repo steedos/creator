@@ -13,11 +13,11 @@ JsonRoutes.add 'post', '/api/mini/vip/card_init', (req, res, next) ->
 		data = req.body
 
 		#用户没有已经加入商户工作区时，先加入
-		space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
-		if !space_user
-			WXMini.addUserToSpace(userId, spaceId, data.name, "member")
-		else
-			Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member"}})
+		# space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
+		# if !space_user
+		# 	WXMini.addUserToSpace(userId, spaceId, data.name, "member")
+		# else
+		# 	Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member"}})
 
 		#获取商户下的所有门店
 		space_store = Creator.getCollection("vip_store").find({space: spaceId}, {fields: {_id: 1}}).fetch()
@@ -27,7 +27,7 @@ JsonRoutes.add 'post', '/api/mini/vip/card_init', (req, res, next) ->
 		now = new Date()
 		random_number = parseInt(Math.random()*1000000)
 		card_number = "88" + random_number
-		while card_number.indexOf('4')>0 or count>0
+		while card_number.indexOf('4')>0 or count>0 or card_number.length!=8
 			random_number = parseInt(Math.random()*1000000)
 			card_number = "88" + random_number
 			count = Creator.getCollection("vip_card").find({space:spaceId,card_number:card_number}).count()

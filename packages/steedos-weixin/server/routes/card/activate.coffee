@@ -5,10 +5,17 @@ JsonRoutes.add 'put', '/api/mini/vip/card_activate', (req, res, next) ->
 		# #办卡门店
 		# storeId = req.query.store_id
 		userId = Steedos.getUserIdFromAuthToken(req, res);
+		data = req.body
+		#用户没有已经加入商户工作区时，先加入
+		space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
+		if !space_user
+			WXMini.addUserToSpace(userId, spaceId, data.name, "member")
+		else
+			Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member",mobile: data.phoneNumber}})
+
 		if !userId
 			throw new Meteor.Error(500, "No permission")
 		card_id = req.query.card_id
-		data = req.body
 		# 将用户填写的信息同步到user表
 		WXMini.updateUser(userId, {
 			$set: {
@@ -23,12 +30,19 @@ JsonRoutes.add 'put', '/api/mini/vip/card_activate', (req, res, next) ->
 			}
 		})
 
-		Creator.getCollection("space_users").direct.update({
-			user: userId,
-			space: spaceId
-		}, {$set: {mobile: data.phoneNumber}})
+		# Creator.getCollection("space_users").direct.update({
+		# 	user: userId,
+		# 	space: spaceId
+		# }, {$set: {mobile: data.phoneNumber}})
 		if data.price==0
 			Creator.getCollection("vip_card").direct.update({_id:card_id},{$set:{is_actived:true,card_name:data.category_id}})
+				# space_user = Creator.getCollection("space_users").findOne({user: userId, space: spaceId}, {fields: {_id: 1}})
+				# if !space_user
+				# 	WXMini.addUserToSpace(userId, spaceId, data.name, "member")
+				# else
+				# 	Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: "member"}})
+
+
 		else
 			throw new Meteor.Error 500, "支付完成之后才可激活"
 		# doc = {
