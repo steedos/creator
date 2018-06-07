@@ -3,17 +3,31 @@ Creator.Objects.vip_card =
 	label: "会员卡"
 	icon: "scan_card"
 	fields:
+		name:
+			label:'姓名'
+			type:'text'
+		mobile:
+			label:'手机'
+			type:'text'
+		
 		card_number:
 			label:"卡号"
 			type:'text'
-			is_name:true
+			group:'-'
 		card_name:
 			label:'名称'
 			type:'lookup'
 			reference_to:'vip_category'
+			is_wide:true
+		# user:
+		# 	label:'持卡人'
+		# 	type:'master_detail'
+		# 	reference_to:'users'
+		
 		points:
 			label:'积分'
 			type:'number'
+			group:'-'
 		# grade:
 		# 	label:'等级'
 		# 	type:'select'
@@ -31,40 +45,45 @@ Creator.Objects.vip_card =
 			label:'余额'
 			type:'number'
 			scale: 2
+		
 		store:
 			label:'办卡门店'
 			type:'lookup'
 			reference_to:'vip_store'
+			group:'-'
 		apply_stores:
 			label:'适用门店'
 			type:'master_detail'
 			reference_to:'vip_store'
 			multiple:true
+		
 		start_time:
 			label:'办卡时间'
 			type:'datetime'
+			group:'-'
 		end_time:
 			label:"截止时间"
 			type:'datetime'
-		user:
-			label:'持卡人'
-			type:'master_detail'
-			reference_to:'users'
+		
 		members:
 			label:'共享成员'
 			type:'lookup'
 			reference_to:'users'
 			multiple:true
+			omit:true
 		introducer:
 			label:'推荐人'
 			type:'lookup'
 			reference_to:'users'
+			omit:true
 		is_actived:
 			label:'是否激活'
 			type:'boolean'
+			omit:true
 		actived_time:
 			label:'激活时间'
 			type:'datetime'
+			omit:true
 		# shared_users:
 		#     label: "共享用户"
 		#     type:'lookup'
@@ -81,10 +100,12 @@ Creator.Objects.vip_card =
 		description:
 			label:'备注'
 			type:'textarea'
+			is_wide:true
 		is_favorited:
 			label:'放入微信卡包'
 			type:'boolean'
 			defaultValue:false
+			omit:true
 
 	list_views:
 		all:
