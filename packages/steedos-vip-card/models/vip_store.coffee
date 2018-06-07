@@ -90,7 +90,7 @@ Creator.Objects.vip_store =
 			viewAllRecords: true
 		admin:
 			allowCreate: true
-			allowDelete: true
+			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true

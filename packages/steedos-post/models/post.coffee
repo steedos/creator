@@ -90,6 +90,7 @@ Creator.Objects.post =
 		visible_type:
 			label:'可见范围'
 			type:'select'
+			omit:true
 			options:[
 				{label:'公开',value:'public'},
 				{label:'秘密',value:'private'},
