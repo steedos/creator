@@ -31,6 +31,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/routes/card/space_register.coffee', 'server');
 	api.addFiles('server/routes/store/qr_code.coffee', 'server');
 	api.addFiles('server/routes/update_user.coffee', 'server');
+	api.addFiles('server/routes/phone_login.coffee', 'server');
 });
 
 Package.onTest(function(api) {
