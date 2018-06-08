@@ -21,7 +21,7 @@ Creator.Objects.vip_store =
 		# 	reference_to:'users'
 		# 	label:'联系人'
 		phone:
-			type:'text'
+			type:'phone'
 			label:'联系电话'
 		business_hours:
 			type:'text'

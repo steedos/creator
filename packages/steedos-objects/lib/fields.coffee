@@ -20,12 +20,12 @@ Creator.getObjectSchema = (obj) ->
 
 		autoform_type = field.autoform?.type
 
-		if field.type == "text"
+		if field.type == "text" or field.type == "phone"
 			fs.type = String
 			if field.multiple
 				fs.type = [String]
 				fs.autoform.type = "tags"
-		else if field.type == "[text]"
+		else if field.type == "[text]" or field.type == "[phone]"
 			fs.type = [String]
 			fs.autoform.type = "tags"
 		else if field.type == "textarea"
