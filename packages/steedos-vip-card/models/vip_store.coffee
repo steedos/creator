@@ -9,7 +9,7 @@ Creator.Objects.vip_store =
 			is_wide:true
 		description:
 			label:'简介'
-			type:'text'
+			type:'textarea'
 			is_wide:true
 		
 		location:

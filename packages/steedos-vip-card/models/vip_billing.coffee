@@ -21,6 +21,7 @@ Creator.Objects.vip_billing =
 		description:
 			label:'备注'
 			type:'textarea'
+			is_wide:true
 		balance:
 			label: '余额'
 			type: 'number'

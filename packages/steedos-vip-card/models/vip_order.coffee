@@ -30,6 +30,7 @@ Creator.Objects.vip_order =
 		description:
 			label: '描述'
 			type: 'textarea'
+			is_wide:true
 
 		status: # draft, pending, completed, canceled
 			label: '状态'

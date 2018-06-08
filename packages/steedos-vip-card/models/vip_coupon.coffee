@@ -77,6 +77,7 @@ Creator.Objects.vip_coupon =
 		description:
 			label:'说明'
 			type:'textarea'
+			is_wide:true
 	list_views:
 		all:
 			label: "所有优惠券"

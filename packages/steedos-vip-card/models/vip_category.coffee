@@ -10,7 +10,7 @@ Creator.Objects.vip_category =
 			is_wide:true
 		summary:
 			label:'简介'
-			type:'text'
+			type:'textarea'
 			is_wide:true
 		
 		price:

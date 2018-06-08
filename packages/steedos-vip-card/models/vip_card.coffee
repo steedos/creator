@@ -6,9 +6,11 @@ Creator.Objects.vip_card =
 		name:
 			label:'姓名'
 			type:'text'
+			is_wide:true
 		mobile:
 			label:'手机'
 			type:'text'
+			is_wide:true
 		
 		card_number:
 			label:"卡号"
