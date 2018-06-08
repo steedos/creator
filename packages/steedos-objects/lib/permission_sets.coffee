@@ -49,6 +49,12 @@ if Meteor.isServer
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
 		permissions = {}
 		object = Creator.getObject(object_name)
+
+		if spaceId is 'guest'
+			permissions = _.clone(object.permission_set.guest) || {}
+			Creator.processPermissions permissions
+			return permissions
+
 		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1}})
 		psetsUser = this.psetsUser || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1}})
 		psetsMember = this.psetsMember || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1}})
