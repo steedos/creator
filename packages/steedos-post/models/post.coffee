@@ -55,9 +55,9 @@ Creator.Objects.post =
 			type: 'image'
 			multiple : true
 			group:"-"
-		video:
-			label: '视频'
-			type: 'video'
+		# video:
+		# 	label: '视频'
+		# 	type: 'video'
 		audio:
 			label: '音频'
 			type: 'audio'

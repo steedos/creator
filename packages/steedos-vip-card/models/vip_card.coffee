@@ -1,7 +1,7 @@
 Creator.Objects.vip_card =
 	name: "vip_card"
 	label: "会员卡"
-	icon: "scan_card"
+	icon: "opportunity"
 	fields:
 		name:
 			label:'姓名'
