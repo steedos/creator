@@ -66,7 +66,7 @@ Creator.Objects.space_users =
 			defaultValue: "user"
 			options: [
 				{label: "员工", value: "user"}, 
-				{label: "会员", value: "member"}, {label: "游客", value: "guest"}
+				{label: "会员", value: "member"}
 			]
 		user:
 			type: "master_detail"
@@ -84,11 +84,11 @@ Creator.Objects.space_users =
 			columns: ["name", "mobile", "email", "sort_no"]
 			filter_scope: "space"
 			filters: [["profile", "=", "member"]]
-		guest:
-			label: "游客"
-			columns: ["name",  "mobile", "email", "sort_no"]
-			filter_scope: "space"
-			filters: [["profile", "=", "guest"]]
+		# guest:
+		# 	label: "游客"
+		# 	columns: ["name",  "mobile", "email", "sort_no"]
+		# 	filter_scope: "space"
+		# 	filters: [["profile", "=", "guest"]]
 	permission_set:
 		user:
 			allowCreate: false
