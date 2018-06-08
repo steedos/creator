@@ -139,6 +139,19 @@ Creator.Objects.post =
 			label:'红包'
 			filter_scope:'space'
 			filters: [["type", "=", "red_packet"]]
+	triggers:
+		"before.insert.server.post":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				if doc.description and doc.description.length>=100
+					doc.summary = doc.description.substring(0,100)
+		"before.update.server.post":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if doc.description and doc.description.length>=100
+					 modifier.$set.summary = doc.description.substring(0,100)
 	permission_set:
 		user:
 			allowCreate: false
