@@ -53,6 +53,7 @@ Creator.Objects.vip_store =
 				{label:'最新动态',value:'post'},
 				{label:'活动报名',value:'vip_activity'},
 				{label:'Wifi',value:'vip_wifi'},
+				{label:'在线客服', value:'support'}
 				{label:'联系我们',value:'vip_store'}
 			]
 			multiple:true
