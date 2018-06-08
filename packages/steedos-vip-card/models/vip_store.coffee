@@ -58,6 +58,11 @@ Creator.Objects.vip_store =
 			]
 			multiple:true
 			group:'-'
+		featured:
+			label:'发布到首页'
+			type:'boolean'
+			defaultValue:true
+			group:'-'
 		# post_types:
 		# 	label:'信息分类'
 		# 	type:'select'

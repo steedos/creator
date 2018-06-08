@@ -98,6 +98,11 @@ Creator.Objects.post =
 				{label:'员工可见',value:'user'}
 			]
 			omit:true
+		featured:
+			label:'发布到首页'
+			type:'boolean'
+			defaultValue:true
+			group:'-'
 	list_views:
 		all:
 			label: "所有信息"
