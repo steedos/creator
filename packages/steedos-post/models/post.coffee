@@ -149,18 +149,16 @@ Creator.Objects.post =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				if doc.description and doc.description.length>=100
+				if doc.description
 					doc.summary = doc.description.substring(0,100)
-				else
-					doc.summary = doc.description
 		"before.update.server.post":
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if doc.description and doc.description.length>=100
-					 modifier.$set.summary = doc.description.substring(0,100)
-				else
-					doc.summary = doc.description
+				if modifier.$set.description
+					modifier.$set.summary = modifier.$set.description.substring(0,100)
+				if modifier.$unset and modifier.$unset.hasOwnProperty('description')
+					modifier.$unset.summary = 1
 	permission_set:
 		user:
 			allowCreate: false
