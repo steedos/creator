@@ -55,13 +55,13 @@ Creator.Objects.post =
 			type: 'image'
 			multiple : true
 			group:"-"
-		# video:
-		# 	label: '视频'
-		# 	type: 'video'
-		audio:
-			label: '音频'
-			type: 'audio'
-			omit:true
+		video:
+			label: '视频'
+			type: 'video'
+		# audio:
+		# 	label: '音频'
+		# 	type: 'audio'
+		# 	omit:true
 		type:
 			label:'信息分类'
 			type:'select'
