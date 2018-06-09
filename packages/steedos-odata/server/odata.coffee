@@ -142,20 +142,22 @@ Meteor.startup ->
 						statusCode: 404
 						body:setErrorMessage(404,collection,key)
 					}
-					
-				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
+				spaceId = @urlParams.spaceId
+				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				if permissions.viewAllRecords or (permissions.allowRead and @userId)
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 					if key is 'cfs.files.filerecord'
-						createQuery.query['metadata.space'] = @urlParams.spaceId
+						createQuery.query['metadata.space'] = spaceId
 					else if key is 'spaces'
-						createQuery.query._id = @urlParams.spaceId
+						createQuery.query._id = spaceId
 					else
-						createQuery.query.space = @urlParams.spaceId
+						createQuery.query.space = spaceId
 
-					if Creator.isCommonSpace(@urlParams.spaceId)
-						if Creator.isSpaceAdmin(@urlParams.spaceId, @userId)
+					if spaceId is 'guest'
+						delete createQuery.query.space
+					else if Creator.isCommonSpace(spaceId)
+						if Creator.isSpaceAdmin(spaceId, @userId)
 							if key is 'spaces'
 								delete createQuery.query._id
 							else
@@ -171,9 +173,9 @@ Meteor.startup ->
 
 					if not createQuery.sort or !_.size(createQuery.sort)
 						createQuery.sort = { modified: -1 }
-					is_enterprise = Steedos.isLegalVersion(@urlParams.spaceId,"workflow.enterprise")
-					is_professional = Steedos.isLegalVersion(@urlParams.spaceId,"workflow.professional")
-					is_standard = Steedos.isLegalVersion(@urlParams.spaceId,"workflow.standard")
+					is_enterprise = Steedos.isLegalVersion(spaceId,"workflow.enterprise")
+					is_professional = Steedos.isLegalVersion(spaceId,"workflow.professional")
+					is_standard = Steedos.isLegalVersion(spaceId,"workflow.standard")
 					if createQuery.limit
 						limit = createQuery.limit
 						if is_enterprise and limit>100000
@@ -198,7 +200,7 @@ Meteor.startup ->
 								projection[key] = 1
 						createQuery.projection = projection
 					if not createQuery.projection or !_.size(createQuery.projection)
-						readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
+						readable_fields = Creator.getFields(key, spaceId, @userId)
 						fields = Creator.getObject(key).fields
 						_.each readable_fields,(field)->
 							if field.indexOf('$')<0
@@ -209,7 +211,7 @@ Meteor.startup ->
 							# 满足共享规则中的记录也要搜索出来
 							delete createQuery.query.owner
 							shares = []
-							orgs = Steedos.getUserOrganizations(@urlParams.spaceId, @userId, true)
+							orgs = Steedos.getUserOrganizations(spaceId, @userId, true)
 							shares.push {"owner": @userId}
 							shares.push { "sharing.u": @userId }
 							shares.push { "sharing.o": { $in: orgs } }
@@ -225,10 +227,10 @@ Meteor.startup ->
 						#scannedCount = entities.length
 						body = {}
 						headers = {}
-						body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key)
-					#	body['@odata.nextLink'] = SteedosOData.getODataNextLinkPath(@urlParams.spaceId,key)+"?%24skip="+ 10
+						body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key)
+					#	body['@odata.nextLink'] = SteedosOData.getODataNextLinkPath(spaceId,key)+"?%24skip="+ 10
 						body['@odata.count'] = scannedCount
-						entities_OdataProperties = setOdataProperty(entities,@urlParams.spaceId, key)
+						entities_OdataProperties = setOdataProperty(entities,spaceId, key)
 						body['value'] = entities_OdataProperties
 						headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
 						headers['OData-Version'] = SteedosOData.VERSION
@@ -249,11 +251,11 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
-				body['error'] = error				
+				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
-				}	
+				}
 		post: ()->
 			try
 				key = @urlParams.object_name
@@ -301,11 +303,11 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
-				body['error'] = error				
+				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
-				}	
+				}
 
 	})
 	SteedosOdataAPI.addRoute(':object_name/recent', {authRequired: true, spaceRequired: false}, {
@@ -402,11 +404,11 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
-				body['error'] = error				
+				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
-				}	
+				}
 })
 
 	SteedosOdataAPI.addRoute(':object_name/:_id', {authRequired: true, spaceRequired: false}, {
@@ -455,11 +457,11 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
-				body['error'] = error				
+				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
-				}	
+				}
 		get:()->
 
 			key = @urlParams.object_name
@@ -587,11 +589,11 @@ Meteor.startup ->
 					error = {}
 					error['message'] = e.message
 					error['code'] = 500
-					body['error'] = error				
+					body['error'] = error
 					return {
 						statusCode: 500
 						body:body
-					}	
+					}
 
 		put:()->
 			try
@@ -654,11 +656,11 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
-				body['error'] = error				
+				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
-				}	
+				}
 		delete:()->
 			try
 				key = @urlParams.object_name
@@ -668,7 +670,7 @@ Meteor.startup ->
 						statusCode: 401
 						body: setErrorMessage(401)
 						}
-					
+
 				collection = Creator.Collections[key]
 				if not collection
 					return{
@@ -705,13 +707,13 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
-				body['error'] = error				
+				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
-				}	
+				}
 	})
-	
+
 	#TODO remove
 	_.each [], (value, key, list)-> #Creator.Collections
 		if not Creator.objectsByName[key]?.enable_api
