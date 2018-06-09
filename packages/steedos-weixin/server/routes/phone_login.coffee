@@ -20,6 +20,10 @@ JsonRoutes.add 'post', '/api/steedos/weixin/phone_login', (req, res, next) ->
 
 		phone_number = data.phone_number
 
+		nickName = data.nickName
+
+		gender = data.gender
+
 		#先使用phone_number查找用户
 
 		phone_user = Creator.getCollection("users").findOne({mobile: phone_number})
@@ -52,11 +56,22 @@ JsonRoutes.add 'post', '/api/steedos/weixin/phone_login', (req, res, next) ->
 
 			#如果手机号未曾使用，绑定到当前用户
 			if !phone_user
+				set = {
+					mobile: phone_number
+					name: nickName
+				}
+
+				if gender == 1
+					ret_data.sex = '男'
+					set["profile.sex"] = '男'
+				else if gender == 2
+					ret_data.sex = '女'
+					set["profile.sex"] = '女'
+
 				WXMini.updateUser(userId, {
-					$set: {
-						mobile: phone_number
-					}
+					$set: set
 				})
+				ret_data.name = nickName
 				ret_data.mobile = phone_number
 
 		JsonRoutes.sendResult res, {
