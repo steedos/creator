@@ -7,11 +7,11 @@ Package.describe({
 
 Npm.depends({
 	'request': '2.81.0',
-	'base-64':'0.1.0'
+	'base-64': '0.1.0'
 });
 
 
-Package.onUse(function(api) {
+Package.onUse(function (api) {
 	api.versionsFrom("1.2.1");
 	api.use('simple:json-routes@2.1.0');
 	api.use('coffeescript@1.11.1_4');
@@ -32,8 +32,10 @@ Package.onUse(function(api) {
 	api.addFiles('server/routes/store/qr_code.coffee', 'server');
 	api.addFiles('server/routes/update_user.coffee', 'server');
 	api.addFiles('server/routes/phone_login.coffee', 'server');
+
+	api.addFiles('server/schedule/refresh_access_token.coffee', 'server');
 });
 
-Package.onTest(function(api) {
+Package.onTest(function (api) {
 
 });
