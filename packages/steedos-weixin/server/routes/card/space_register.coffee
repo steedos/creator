@@ -37,7 +37,7 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 		#同步用户手机号
 		WXMini.updateUser(userId, {
 			$set: {
-				mobile: mobile,
+#				mobile: mobile,
 				name:contact_name
 			}
 		})

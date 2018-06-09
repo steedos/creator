@@ -21,7 +21,7 @@ JsonRoutes.add 'put', '/api/mini/vip/card_activate', (req, res, next) ->
 			$set: {
 				"profile.sex": data.sex,
 				"profile.birthdate": data.birthdate,
-				mobile: data.phoneNumber,
+#				mobile: data.phoneNumber,
 				name: data.name,
 #				'phone.number':"+86"+data.phoneNumber,
 #				'phone.mobile':data.phoneNumber,
