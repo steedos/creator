@@ -1,3 +1,5 @@
+request = Npm.require("request")
+
 @WXMini = {}
 
 WXMini.newUser = (appId, openid, unionid, name, locale, phoneNumber)->
@@ -96,3 +98,47 @@ WXMini.updateUser = (userId, options)->
 	Creator.getCollection("users").direct.update({_id: userId}, options)
 
 
+# 微信相关接口 #
+# 获取access_token
+WXMini.getNewAccessTokenSync = (appId, secret) ->
+	accessToken = ""
+	resData = Meteor.wrapAsync((appId, secret, cb) ->
+		request.get {
+			url:"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{appId}&secret=#{secret}"
+		}, (err, httpResponse, body) ->
+			cb err, httpResponse, body
+			if err
+				console.error('get access_token failed:', err)
+				return
+			if httpResponse.statusCode == 200
+				return body
+	)(appId, secret)
+
+	if resData
+		body = JSON.parse(resData.body)
+		if body
+			if body.access_token
+				accessToken = body.access_token
+			else if body.errcode
+				console.error body.errmsg
+
+	return accessToken
+
+# 发送模板消息
+WXMini.sendTemplateMessage = (appId, data) ->
+	accessToken = Creator.getCollection("vip_apps").findOne(appId)?.access_token
+	if not accessToken
+		console.error 'Access_token not found'
+		return
+
+	options = {
+		data: data
+	}
+	url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=#{accessToken}"
+	HTTP.call 'POST', url, options, (error, result) ->
+		if error
+			console.error error.stack
+			return
+		console.log result
+
+	return
