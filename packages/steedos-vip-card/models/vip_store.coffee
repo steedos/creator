@@ -92,6 +92,12 @@ Creator.Objects.vip_store =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+		"after.update.server.store":
+			on: "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if doc._id == doc.space && modifier?.$set?.name
+					Creator.getCollection("spaces").direct.update({_id: doc.space}, {$set: {name: modifier.$set.name}})
 	permission_set:
 		user:
 			allowCreate: false
