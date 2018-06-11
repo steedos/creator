@@ -58,6 +58,7 @@ Creator.Objects.post =
 		video:
 			label: '视频'
 			type: 'video'
+			omit:true
 		# audio:
 		# 	label: '音频'
 		# 	type: 'audio'
