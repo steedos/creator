@@ -7,9 +7,9 @@ Package.describe({
 
 Npm.depends({
 	'request': '2.81.0',
-	'base-64': '0.1.0'
+	'base-64': '0.1.0',
+	"node-schedule": "1.1.1"
 });
-
 
 Package.onUse(function (api) {
 	api.versionsFrom("1.2.1");

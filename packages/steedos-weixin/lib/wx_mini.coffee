@@ -1,3 +1,5 @@
+request = Npm.require("request")
+
 @WXMini = {}
 
 WXMini.newUser = (appId, openid, unionid, name, locale, phoneNumber)->

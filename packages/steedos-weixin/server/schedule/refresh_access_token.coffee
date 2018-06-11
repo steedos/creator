@@ -25,6 +25,7 @@ Meteor.startup ->
 					catch err
 						console.error err
 
-		), ->
+		), (e) ->
 			console.log 'Failed to bind environment'
+			console.log e.stack
 		)
