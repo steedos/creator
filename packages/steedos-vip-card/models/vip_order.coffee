@@ -104,10 +104,11 @@ Creator.Objects.vip_order =
 						console.log 'recharge'
 						amount = doc.amount
 						cardId = doc.card
+						point = parseInt(doc.amount)
 						if doc.is_actived
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount } })
+							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point } })
 						else
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount }, $set: { is_actived: true } })
+							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point }, $set: { is_actived: true } })
 							#用户没有已经加入商户工作区时，先加入
 							space_user = Creator.getCollection("space_users").findOne({user: doc.owner, space: doc.space}, {fields: {_id: 1}})
 							if !space_user
