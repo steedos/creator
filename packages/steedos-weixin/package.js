@@ -33,6 +33,7 @@ Package.onUse(function (api) {
 	api.addFiles('server/routes/update_user.coffee', 'server');
 	api.addFiles('server/routes/phone_login.coffee', 'server');
 
+	api.addFiles('server/routes/refresh_access_token.coffee', 'server');
 	api.addFiles('server/schedule/refresh_access_token.coffee', 'server');
 });
 
