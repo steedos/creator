@@ -6,6 +6,7 @@ Creator.Objects.vip_event_attendees =
 		name:
 			label:'姓名'
 			type:'text'
+			omit:true
 		status:
 			label:'接受状态'
 			type:'select'
