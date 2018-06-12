@@ -139,6 +139,8 @@ WXMini.sendTemplateMessage = (appId, data) ->
 		if error
 			console.error error.stack
 			return
-		console.log result
+		if (result && result.data && result.data.errcode)
+			console.error result.data
+			return
 
 	return

@@ -134,3 +134,5 @@ http@1.2.9
 
 steedos:weixin
 steedos:pay
+
+steedos:weixin-template-message-queue
