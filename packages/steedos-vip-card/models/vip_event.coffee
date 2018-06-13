@@ -98,9 +98,9 @@ Creator.Objects.vip_event =
 			modifyAllRecords: true
 			viewAllRecords: true
 		guest:
-			allowCreate: true
-			allowDelete: true
+			allowCreate: false
+			allowDelete: false
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true
