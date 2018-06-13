@@ -39,7 +39,7 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 			}
 
 			requestSettings = {
-				url: "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=",
+				url: "https://api.weixin.qq.com/wxa/getwxacode?access_token=",
 				method: 'POST',
 				encoding: null,
 				qs: { access_token: wxToken.access_token },
