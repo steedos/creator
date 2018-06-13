@@ -1,7 +1,7 @@
 Package.describe({
 
 	name: 'steedos:creator',
-	version: '0.0.5',
+	version: '0.0.6',
 	summary: 'Steedos Creator',
 	git: ''
 });
@@ -96,7 +96,7 @@ Package.onUse(function(api) {
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
 
-	api.use('steedos:objects');
+	api.use('steedos:objects@0.0.1');
 
 	api.addFiles('core.coffee');
 
