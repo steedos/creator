@@ -69,3 +69,10 @@ Creator.Objects.vip_event_attendees =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		guest:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true
