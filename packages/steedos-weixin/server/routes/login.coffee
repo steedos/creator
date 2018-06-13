@@ -15,20 +15,29 @@ getWeiXinSessionAsync = Meteor.wrapAsync(getWeiXinSession);
 
 ###
    微信小程序登录接口
-   参数为：object，object包含wx.getUserInfo()获取的所有数据 + code属性(wx.login().code)
-   如果url上有spaceId 参数，在spaceId有效且当前用户没有加入此工作区时，将用户添加到工作区
+   参数：
+	code：wx code, 必须
+    phoneNumber：用户手机号
+    spaceId：商户Id，如果有此字段，并且值为有效，则将用户加入此工作区
+    iv：密钥
+    encryptedData：加密数据
+    language：语言
+    nickName: 用户昵称
 ###
 JsonRoutes.add 'post', '/api/steedos/weixin/login', (req, res, next) ->
 	try
 		reqBody = req.body
+		iv = reqBody.iv
+		encryptedData = reqBody.encryptedData
+		language = reqBody.language
+		nickName = reqBody.nickName || ((new Date()).getTime() + "_" + _.random(0, 100))
 
-		userInfo = reqBody.userInfo
-		console.log("req.headers", JSON.stringify(req.headers))
 		appId = req.headers["appid"]
-		console.log("appId", appId)
+
 		secret = Meteor.settings.weixin.appSecret[appId]
 		if !secret
 			throw new Meteor.Error(500, "无效的appId #{appId}")
+
 		code = reqBody.code
 		spaceId = req.query.spaceId || reqBody.spaceId
 		phoneNumber = reqBody.phoneNumber
@@ -48,14 +57,9 @@ JsonRoutes.add 'post', '/api/steedos/weixin/login', (req, res, next) ->
 
 		unionid = wxSession.unionid
 
-		if !unionid
-			iv = reqBody.iv
-			encryptedData = reqBody.encryptedData
-
+		if !unionid && iv && encryptedData
 			pc = new Creator.WXBizDataCrypt(appId, sessionKey)
-
 			data = pc.decryptData(encryptedData, iv)
-
 			unionid = data.unionId
 
 		console.log(appId, openid, unionid)
@@ -73,21 +77,26 @@ JsonRoutes.add 'post', '/api/steedos/weixin/login', (req, res, next) ->
 			userId = user_openid?._id
 			console.log("openid find...")
 
-		if userInfo.language == "zh_CN" || userInfo.language == "zh_TW"
-			locale = "zh-cn"
-		else
+#		if language == "zh_CN" || language == "zh_TW"
+#			locale = "zh-cn"
+#		else
+#			locale = "en-us"
+
+		if language == "en"
 			locale = "en-us"
+		else
+			locale = "zh-cn"
 
 		# 未找到user，则新建
 		if !user_unionid && !user_openid
-			userId = WXMini.newUser(appId, openid, unionid, userInfo.nickName, locale, phoneNumber)
+			userId = WXMini.newUser(appId, openid, unionid, nickName, locale, phoneNumber)
 			# 加入工作区
 			if spaceId
-				WXMini.addUserToSpace(userId, spaceId, userInfo.nickName)
+				WXMini.addUserToSpace(userId, spaceId, nickName)
 			else
-				spaceId = WXMini.newSpace(userId, userInfo.nickName)
-				orgId = WXMini.newOrganization(userId, spaceId, userInfo.nickName)
-				space_user = WXMini.newSpaceUser(userId, spaceId, orgId, userInfo.nickName)
+				spaceId = WXMini.newSpace(userId, nickName)
+				orgId = WXMini.newOrganization(userId, spaceId, nickName)
+				space_user = WXMini.newSpaceUser(userId, spaceId, orgId, nickName)
 
 		# 华炎小程序已经满足unionid的返回条件，但unionid还没有与用户绑定，将unionid绑定到user对象
 		if unionid && !user_unionid && user_openid
@@ -110,7 +119,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/login', (req, res, next) ->
 			}, {fields: {space: 1}})
 			# 加入工作区
 			if !user_space
-				WXMini.addUserToSpace(userId, spaceId, userInfo.nickName)
+				WXMini.addUserToSpace(userId, spaceId, nickName)
 		else
 			user_space = Creator.getCollection("space_users").findOne({user: userId}, {fields: {space: 1}})
 			if user_space

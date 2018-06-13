@@ -96,7 +96,7 @@ JsonRoutes.add "post", "/s3/",  (req, res, next) ->
 							size: size
 							modified: (new Date())
 							modified_by: owner
-						$push: 
+						$push:
 							versions:
 								$each: [ fileObj._id ]
 								$position: 0
@@ -129,3 +129,47 @@ JsonRoutes.add "post", "/s3/",  (req, res, next) ->
 			res.statusCode = 500;
 			res.end();
 
+JsonRoutes.add "post", "/s3/:collection",  (req, res, next) ->
+	try
+		userId = Steedos.getUserIdFromAuthToken(req, res)
+		if !userId
+			throw new Meteor.Error(500, "No permission")
+
+		collectionName = req.params.collection
+
+		JsonRoutes.parseFiles req, res, ()->
+			collection = cfs[collectionName]
+
+			if not collection
+				throw new Meteor.Error(500, "No Collection")
+
+			if req.files and req.files[0]
+
+				newFile = new FS.File()
+				newFile.name(req.files[0].filename)
+
+				if req.body
+					newFile.metadata = req.body
+
+				newFile.owner = userId
+				newFile.metadata.owner = userId
+
+				newFile.attachData req.files[0].data, {type: req.files[0].mimeType}
+
+				collection.insert newFile
+
+				resultData = collection.files.findOne(newFile._id)
+				JsonRoutes.sendResult res,
+					code: 200
+					data: resultData
+				return
+			else
+				throw new Meteor.Error(500, "No File")
+
+		return
+	catch e
+		console.error e.stack
+		JsonRoutes.sendResult res, {
+			code: e.error || 500
+			data: {errors: e.reason || e.message}
+		}
