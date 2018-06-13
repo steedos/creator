@@ -87,8 +87,8 @@ steedos:cfs-ui
 
 steedos:e164-phones-countries
 steedos:i18n-iso-countries
-steedos:qcloud-smsqueue
-steedos:oauth2-server
+# steedos:qcloud-smsqueue
+# steedos:oauth2-server
 
 smoral:sweetalert@1.1.1
 
@@ -97,16 +97,16 @@ peppelg:bootstrap-3-modal@1.0.4
 keepnox:perfect-scrollbar
 
 steedos:ionicons@0.1.7
-steedos:vip-card
-steedos:vip-post
+# steedos:vip-card
+# steedos:vip-post
 steedos:objects
 steedos:sso
-#steedos:app-crm
-#steedos:app-informations
-#steedos:app-cms
+# steedos:app-crm
+# steedos:app-informations
+# steedos:app-cms
 steedos:app-workflow
 steedos:app-admin
-#steedos:app-example
+# steedos:app-example
 steedos:creator
 natestrauser:select2
 meteorhacks:unblock@1.1.0
