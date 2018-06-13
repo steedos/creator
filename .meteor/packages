@@ -124,15 +124,15 @@ steedos:logger@0.0.2
 
 steedos:object-database
 
-#steedos:app-archive
+# steedos:app-archive
 
-steedos:instance-record-queue
+# steedos:instance-record-queue
 
-steedos:instances-statistics
+# steedos:instances-statistics
 
 http@1.2.9
 
-steedos:weixin
-steedos:pay
+# steedos:weixin
+# steedos:pay
 
-steedos:weixin-template-message-queue
+# steedos:weixin-template-message-queue
