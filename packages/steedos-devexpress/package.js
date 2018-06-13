@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:devexpress',
-	version: '0.0.2',
+	version: '0.0.1',
 	summary: 'Devexpress for Steedos Creator',
 	git: '',
 	documentation: null

@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:odata',
-	version: '0.0.2',
+	version: '0.0.1',
 	summary: 'Steedos odata libraries',
 	git: ''
 });
