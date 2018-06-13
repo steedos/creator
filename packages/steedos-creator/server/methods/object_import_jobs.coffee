@@ -1,6 +1,6 @@
 fs = Npm.require 'fs'
 path = Npm.require('path')
-xls = Npm.require('node-xlsx')
+xlsx = Npm.require('node-xlsx')
 logger = new Logger 'QUEUE_IMPORT'
 converterString = (field_name, dataCell,jsonObj)->
 	text_error = ""
@@ -114,7 +114,7 @@ importObject = (importObj,space) ->
 			chunks.push chunk 
 
 		stream.on 'end', Meteor.bindEnvironment(() ->
-			workbook = xls.parse(Buffer.concat(chunks))
+			workbook = xlsx.parse(Buffer.concat(chunks), {cellDates: true})
 			total_count = 0
 			success_count = 0
 			failure_count = 0
