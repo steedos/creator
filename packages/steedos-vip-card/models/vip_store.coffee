@@ -63,6 +63,11 @@ Creator.Objects.vip_store =
 			type:'boolean'
 			defaultValue:true
 			group:'-'
+		star_count:
+			label:'关注人数'
+			type:'number'
+			readonly:true
+			omit:true
 		# post_types:
 		# 	label:'信息分类'
 		# 	type:'select'
