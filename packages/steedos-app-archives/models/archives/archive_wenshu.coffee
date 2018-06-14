@@ -61,7 +61,8 @@ Creator.Objects.archive_wenshu =
 			defaultValue: "文件"
 			options:[
 				{label:"案卷",value:"案卷"},
-				{label:"文件",value:"文件"}]
+				{label:"文件",value:"文件"}],
+			allowedValues:["案卷","文件"],
 			# omit:true
 			group:"内容描述"
 
@@ -283,7 +284,8 @@ Creator.Objects.archive_wenshu =
 				{label: "10年", value: "10年"},
 				{label: "20年", value: "20年"},
 				{label: "30年", value: "30年"}
-			]
+			],
+			allowedValues:["10年","20年","30年"],			
 			group:"内容描述"
 
 		document_aggregation:
@@ -293,7 +295,8 @@ Creator.Objects.archive_wenshu =
 			options: [
 				{label: "单件", value: "单件"},
 				{label: "组合文件", value: "组合文件"}
-			]
+			],
+			allowedValues:["单件","组合文件"],			
 			group:"形式特征"
 
 		total_number_of_items:
@@ -340,7 +343,8 @@ Creator.Objects.archive_wenshu =
 			options: [
 				{label: "数字化", value: "数字化"},
 				{label: "原生", value: "原生"}
-			]
+			],
+			allowedValues:["数字化","原生"],		
 			group:"形式特征"
 			# omit:true
 
@@ -479,7 +483,8 @@ Creator.Objects.archive_wenshu =
 				{label: "浏览", value: "浏览"},
 				{label: "解密", value: "解密"}
 
-			]
+			],
+			allowedValues:["公布","复制","浏览","解密"],			
 			# omit:true
 			group:"权限管理"
 		control_identifier:
@@ -488,7 +493,8 @@ Creator.Objects.archive_wenshu =
 			options: [
 				{label: "开放", value: "开放"},
 				{label: "控制", value: "控制"}
-			]
+			],
+			allowedValues:["开放","控制"],			
 			# omit:true
 			group:"权限管理"
 		agent_type:
@@ -499,7 +505,8 @@ Creator.Objects.archive_wenshu =
 				{label: "单位", value: "单位"},
 				{label: "部门", value: "部门"},
 				{label: "个人", value: "个人"}
-			]
+			],
+			allowedValues:["单位","部门","个人"],		
 			group:"机构人员"
 			# omit:true
 		agent_name:
@@ -540,7 +547,8 @@ Creator.Objects.archive_wenshu =
 				{label: "移出", value: "移出"},
 				{label: "销毁", value: "销毁"},
 				{label: "出借", value: "出借"}
-			]
+			],
+			allowedValues:["在档","暂存","移出","销毁","出借"],		
 			group:"内容描述"
 			# omit:true
 
