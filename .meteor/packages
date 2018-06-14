@@ -127,3 +127,5 @@ steedos:instance-record-queue
 http@1.2.9
 
 steedos:app-archive@0.0.5
+
+steedos:records-sync
