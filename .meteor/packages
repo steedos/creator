@@ -98,7 +98,7 @@ steedos:objects
 steedos:sso
 
 #steedos:app-crm
-steedos:app-informations
+# steedos:app-informations
 steedos:app-admin
 #steedos:app-cms
 steedos:app-workflow
@@ -120,10 +120,10 @@ steedos:logger@0.0.2
 
 steedos:object-database
 
-steedos:app-archive@0.0.5
-
 steedos:instance-record-queue
 
-steedos:instances-statistics
+# steedos:instances-statistics
 
 http@1.2.9
+
+steedos:app-archive@0.0.5

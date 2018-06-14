@@ -130,7 +130,6 @@ steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.1
 steedos:app-archive@0.0.5
-steedos:app-informations@0.0.2
 steedos:app-workflow@0.0.1
 steedos:application-package@0.0.1
 steedos:autoform@0.0.10
@@ -171,7 +170,6 @@ steedos:fullcalendar@3.4.0_1
 steedos:i18n@0.0.11
 steedos:i18n-iso-countries@3.3.0
 steedos:instance-record-queue@0.0.1
-steedos:instances-statistics@0.0.1
 steedos:ionicons@0.1.7
 steedos:jstree@3.3.2
 steedos:lightning-design-system@0.0.1
