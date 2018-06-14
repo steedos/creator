@@ -76,3 +76,20 @@ Creator.Objects.vip_event_attendees =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+	triggers:
+		"after.update.server.event":
+			on: "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				status = doc.status
+				preStatus = this.previous.status
+				if preStatus != status
+					collection = Creator.getCollection("vip_event")
+					eventId = doc.event
+					selector = {_id: eventId}
+					# 如果修改了status，则应该在对应的事件中把老的status数量减一，新的status数量加一
+					inc = {}
+					if preStatus
+						inc["#{preStatus}_count"] = -1
+					inc["#{status}_count"] = 1
+					collection.update(selector, {$inc: inc})
