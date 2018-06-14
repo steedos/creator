@@ -1,4 +1,5 @@
 request = Npm.require("request")
+crypto = Npm.require('crypto')
 
 @WXMini = {}
 
@@ -144,3 +145,51 @@ WXMini.sendTemplateMessage = (appId, data) ->
 			return
 
 	return
+
+WXMini.getTempToken = (userId, secret)->
+	if userId
+		now = parseInt(new Date().getTime()/1000).toString()
+		key32 = ""
+		len = userId.length
+
+		iv = secret
+
+		if len < 32
+			c = ""
+			i = 0
+			m = 32 - len
+			while i < m
+				c = " " + c
+				i++
+			key32 = userId + c
+		else if len >= 32
+			key32 = userId.slice(0,32)
+
+		cipher = crypto.createCipheriv('aes-256-cbc', new Buffer(key32, 'utf8'), new Buffer(iv, 'utf8'))
+		console.log('now', now)
+		cipheredMsg = Buffer.concat([cipher.update(new Buffer(now, 'utf8')), cipher.final()])
+		steedos_token = cipheredMsg.toString('base64')
+
+	return steedos_token
+
+WXMini.decipherToken = (token, userId, secret)->
+	key32 = ""
+	len = userId.length
+	iv = secret
+	if len < 32
+		c = ""
+		i = 0
+		m = 32 - len
+		while i < m
+			c = " " + c
+			i++
+		key32 = userId + c
+	else if len >= 32
+		key32 = userId.slice(0,32)
+	decipher = crypto.createDecipheriv('aes-256-cbc', new Buffer(key32, 'utf8'), new Buffer(iv, 'utf8'))
+
+	decoded  = decipher.update(token, 'base64', 'utf8');
+
+	decoded += decipher.final('utf8');
+
+	return decoded
