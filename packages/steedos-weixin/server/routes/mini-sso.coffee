@@ -98,23 +98,26 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 					auth_token: authToken
 				}
 
-		if space_id
-			if Steedos.isSpaceAdmin(space_id, ret_data.user_id)
-				ret_data.profile = "admin"
-			else
-				space_user = Creator.getCollection("space_users").findOne({
-					user: ret_data.user_id,
-					space: space_id
-				}, {fields: {profile: 1}})
+		space_users = Creator.getCollection("space_users").find({
+			user: ret_data.user_id
+		}, {fields: {space: 1, profile: 1}}).fetch()
 
-				if space_user
-					ret_data.profile = space_user.profile
-				else
-					root_org = Creator.getCollection("organizations").findOne({space: space_id, is_company: true}, {fields: {_id: 1}})
-					if !root_org
-						throw new Meteor.Error(500, "无效的工作区Id:#{space_id}")
-					#WXMini.addUserToSpace(ret_data.user_id, space_id, (new Date()).getTime() + "_" + _.random(0, 100), "guest")
-					ret_data.profile = "guest"
+		if space_users.length
+			spaces = Creator.getCollection("spaces").find({
+				_id:{$in:_.pluck(space_users,"space")}
+			}, {fields: {name: 1,admins: 1}}).fetch()
+			space_users = space_users.map((su)->
+				s = _.findWhere(spaces, {_id: su.space})
+				s = _.extend(su, s)
+				isSpaceAdmin = s.admins?.indexOf(ret_data.user_id) > -1
+				if isSpaceAdmin
+					s.profile = 'admin'
+				delete s.admins
+				delete s.space
+				return s
+			)
+
+		ret_data.my_spaces = space_users
 
 		#设置sessionKey
 		Creator.getCollection("users").direct.update({
