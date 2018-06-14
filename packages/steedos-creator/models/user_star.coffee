@@ -21,26 +21,36 @@ Creator.Objects.user_star =
 			columns: ["user", "star_space", "star_post"]
 			filter_scope: "space"
 	triggers:
-		"after.insert.server.store":
+		"after.insert.server.user_star":
 			on: "server"
 			when: "after.insert"
 			todo: (userId, doc)->
-				store_id = doc.space
-				store_obj = Creator.getCollection("vip_store").findOne({_id: store_id})
-				if store_obj._id
-					star_count = store_obj.star_count || 0
+				if doc.star_space
+					object_name = "vip_store"
+				else
+					object_name = "post"
+				_id = doc.star_space || doc.star_post
+				obj = Creator.getCollection(object_name).findOne({_id: _id})
+				if obj._id
+					star_count = obj.star_count || 0
 					star_count++
-					Creator.getCollection("vip_store").direct.update({_id: store_obj._id}, {$set: {star_count: star_count}})
-		"after.remove.server.store":
+					Creator.getCollection(object_name).direct.update({_id: _id}, {$set: {star_count: star_count}})
+
+		"after.remove.server.user_star":
 			on: "server"
 			when: "after.remove"
 			todo: (userId, doc)->
-				store_id = doc.space
-				store_obj = Creator.getCollection("vip_store").findOne({_id: store_id})
-				if store_obj._id
-					star_count = store_obj.star_count || 0
+				if doc.star_space
+					object_name = "vip_store"
+				else
+					object_name = "post"
+				_id = doc.star_space || doc.star_post
+				obj = Creator.getCollection(object_name).findOne({_id: _id})
+				if obj._id
+					star_count = obj.star_count || 0
 					star_count--
-					Creator.getCollection("vip_store").direct.update({_id: store_obj._id}, {$set: {star_count: star_count}})
+					Creator.getCollection(object_name).direct.update({_id: _id}, {$set: {star_count: star_count}})
+
 	permission_set:
 		user:
 			allowCreate: true
