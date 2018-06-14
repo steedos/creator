@@ -76,3 +76,65 @@ Creator.Objects.vip_event_attendees =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+	triggers:
+
+		"before.insert.server.event":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				if _.isEmpty(doc.event)
+					throw new Meteor.Error 500, "所属活动不能为空"
+					
+		"after.insert.server.event":
+			on: "server"
+			when: "after.insert"
+			todo: (userId, doc)->
+				status = doc.status
+				if status
+					collection = Creator.getCollection("vip_event")
+					eventId = doc.event
+					selector = {_id: eventId}
+					# 增加记录时，如果status值存在，则应该在对应的事件中把status数量加一
+					inc = {}
+					inc["#{status}_count"] = 1
+					collection.update(selector, {$inc: inc})
+		
+		"before.update.server.event":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc)->
+				if _.isEmpty(doc.event)
+					throw new Meteor.Error 500, "所属活动不能为空"
+
+		"after.update.server.event":
+			on: "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				status = doc.status
+				preStatus = this.previous.status
+				if preStatus != status
+					collection = Creator.getCollection("vip_event")
+					eventId = doc.event
+					selector = {_id: eventId}
+					# 如果修改了status，则应该在对应的事件中把老的status数量减一，新的status数量加一
+					inc = {}
+					if preStatus
+						inc["#{preStatus}_count"] = -1
+					inc["#{status}_count"] = 1
+					collection.update(selector, {$inc: inc})
+
+		"after.remove.server.event":
+			on: "server"
+			when: "after.remove"
+			todo: (userId, doc)->
+				if _.isEmpty(doc.event)
+					return
+				status = doc.status
+				if status
+					collection = Creator.getCollection("vip_event")
+					eventId = doc.event
+					selector = {_id: eventId}
+					# 删除记录时，如果status值存在，则应该在对应的事件中把status数量减一
+					inc = {}
+					inc["#{status}_count"] = -1
+					collection.update(selector, {$inc: inc})

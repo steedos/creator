@@ -17,17 +17,11 @@ getAccessTokenAsync = Meteor.wrapAsync(getAccessToken);
 
 WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 	try
-		appId = req.headers["appid"]
+		appId = req.query.appid
 		userId = Steedos.getUserIdFromAuthToken(req, res)
 		secret = Meteor.settings.weixin.appSecret[appId]
-		storeId = req.body.store_id
-		page = req.body.page
-		width = req.body.width
-		console.log "page====",page
-		console.log "spaceId===",req.body.store_id
-		appId = "wx89eb02efdb4ddaaf"
-		secret = "03937733e0ab47685080fbb81c0a5459"
-		#console.log req 
+		storeId = req.query.store_id
+		page = req.query.page
 		if !secret
 			throw new Meteor.Error(500, "无效的appId #{appId}")
 		resData = getAccessTokenAsync appId, secret
@@ -37,9 +31,8 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 				page: page,
 				scene:storeId,
 				width: 430,
-				line_color:{"r":"171","g":"171","b":"171"}
+				line_color:{"r":"35","g":"35","b":"35"}
 			}
-
 			requestSettings = {
 				url: "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=",
 				method: 'POST',
@@ -54,23 +47,8 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 					console.error error
 					res.end()
 					return
-				
-				collection = cfs.images
-				imageFile = new FS.File()
-				imageFile.attachData body, { type: "image/jpeg" }
-
-				imageFile.name(storeId + ".jpg")
-				metadata = {
-					owner :userId
-				}
-				imageFile.owner = userId
-				imageFile.metadata = metadata
-				console.log imageFile
-				#imageFile.metadata = metadata
-				collection.insert imageFile,(error,result)->
-					Creator.getCollection("vip_store").direct.update(_id:storeId,{$set:qrcode:imageFile._id})
-				#res.setHeader('Content-type', 'image/jpeg')
-				res.end(imageFile._id)
+				res.setHeader('Content-type', 'image/jpeg')
+				res.end(body)
 			)
 	catch e
 		console.error e.stack
