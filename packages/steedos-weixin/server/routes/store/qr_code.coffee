@@ -31,7 +31,7 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 				page: page,
 				scene:storeId,
 				width: 430,
-				line_color:{"r":"171","g":"171","b":"171"}
+				line_color:{"r":"35","g":"35","b":"35"}
 			}
 			requestSettings = {
 				url: "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=",
