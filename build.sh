@@ -1,5 +1,5 @@
 #!/bin/bash
-BUNDLE_PATH="/srv/creator_records"
+BUNDLE_PATH="/srv/creator_records_bundle"
 
 # Create BUNDLE_PATH directory if it does not exist
 [ ! -d $BUNDLE_PATH ] && mkdir -p $BUNDLE_PATH || :
