@@ -21,9 +21,9 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 		userId = Steedos.getUserIdFromAuthToken(req, res)
 		secret = Meteor.settings.weixin.appSecret[appId]
 		storeId = req.body.store_id
-		path = req.body.path
+		page = req.body.page
 		width = req.body.width
-		console.log "path====",path
+		console.log "page====",page
 		console.log "spaceId===",req.body.store_id
 		appId = "wx89eb02efdb4ddaaf"
 		secret = "03937733e0ab47685080fbb81c0a5459"
@@ -34,12 +34,14 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 		wxToken = JSON.parse(resData.body)
 		if wxToken?.access_token
 			formData = {
-				path: path
-				width: 430
+				page: page,
+				scene:storeId,
+				width: 430,
+				line_color:{"r":"171","g":"171","b":"171"}
 			}
 
 			requestSettings = {
-				url: "https://api.weixin.qq.com/wxa/getwxacode?access_token=",
+				url: "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=",
 				method: 'POST',
 				encoding: null,
 				qs: { access_token: wxToken.access_token },

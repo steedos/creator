@@ -44,7 +44,6 @@ Creator.Objects.vip_store =
 			label:'二维码'
 			type:'image'
 			readonly:true
-			omit:true
 		enabled_objects:
 			label:'启用功能'
 			type:'select'
