@@ -132,6 +132,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 		ret_data.mobile = user.mobile
 		ret_data.sex = user.profile?.sex
 		ret_data.birthdate = user.profile?.birthdate
+		ret_data.avatar = user.profile?.avatar
 
 		JsonRoutes.sendResult res, {
 			code: 200,
