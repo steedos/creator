@@ -95,6 +95,12 @@ Creator.Objects.vip_store =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+		"before.update.server.store":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if modifier?.$set?.avatar
+					modifier.$set.qrcode = ''
 		"after.update.server.store":
 			on: "server"
 			when: "after.update"
