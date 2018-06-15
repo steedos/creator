@@ -180,6 +180,7 @@ steedos:object-database@0.0.1
 steedos:objects@0.0.1
 steedos:odata@0.0.1
 steedos:records-sync@0.0.1
+steedos:records-xml@0.0.1
 steedos:smsqueue@0.0.1
 steedos:sso@0.0.4
 steedos:theme@0.0.30
