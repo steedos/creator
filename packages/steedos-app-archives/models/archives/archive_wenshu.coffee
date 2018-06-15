@@ -528,14 +528,14 @@ Creator.Objects.archive_wenshu =
 		archive_date:
 			type:"date"
 			label:"归档日期"
-			group:"内容描述"
+			group:"形式特征"
 			# omit:true
 
 		archive_dept:
 			type:"text"
 			label:"归档部门"
 			defaultValue: ""
-			group:"内容描述"
+			group:"形式特征"
 
 		produce_flag:
 			type:"select",
@@ -549,7 +549,7 @@ Creator.Objects.archive_wenshu =
 				{label: "出借", value: "出借"}
 			],
 			allowedValues:["在档","暂存","移出","销毁","出借"],		
-			group:"内容描述"
+			group:"形式特征"
 			# omit:true
 
 		main_dept:
@@ -576,6 +576,7 @@ Creator.Objects.archive_wenshu =
 			label:"参见"
 			group:"内容描述"
 			# omit:true
+		
 		#是否接收，默认是未接收
 		is_received:
 			type:"boolean"
