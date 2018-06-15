@@ -10,10 +10,11 @@ Npm.depends({
 	busboy: "0.2.13",
 	mkdirp: "0.3.5",
 	"xml2js": "0.4.19",
-	"node-xlsx":"0.12.0"
+	"node-xlsx": "0.12.0",
+	"aliyun-sdk": "1.11.7"
 });
 
-Package.onUse(function(api) {
+Package.onUse(function (api) {
 	api.versionsFrom('1.0');
 
 	api.use('reactive-var@1.0.10');
@@ -162,7 +163,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/routes/s3.coffee', 'server');
 	api.addFiles('server/routes/api_workflow_drafts.coffee', 'server');
 
-	api.addFiles('server/routes/bootstrap.coffee','server');
+	api.addFiles('server/routes/bootstrap.coffee', 'server');
 	api.addFiles('client/views/_helpers.coffee', 'client');
 
 	api.addFiles('client/layout/layout.html', 'client');
