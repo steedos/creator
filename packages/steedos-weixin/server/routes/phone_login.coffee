@@ -22,6 +22,8 @@ JsonRoutes.add 'post', '/api/steedos/weixin/phone_login', (req, res, next) ->
 
 		nickName = data.nickName
 
+		avatarUrl = data.avatarUrl
+
 		gender = data.gender
 
 		#先使用phone_number查找用户
@@ -51,6 +53,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/phone_login', (req, res, next) ->
 						ret_data.mobile = phone_user.mobile
 						ret_data.sex = phone_user.profile?.sex
 						ret_data.birthdate = phone_user.profile?.birthdate
+						ret_data.avatar = phone_user.profile?.avatar
 				else
 					ret_data.mobile = phone_number
 
@@ -59,6 +62,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/phone_login', (req, res, next) ->
 				set = {
 					mobile: phone_number
 					name: nickName
+					"profile.avatar": avatarUrl
 				}
 
 				if gender == 1
@@ -73,6 +77,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/phone_login', (req, res, next) ->
 				})
 				ret_data.name = nickName
 				ret_data.mobile = phone_number
+				ret_data.avatar = avatarUrl
 
 		JsonRoutes.sendResult res, {
 			code: 200,
