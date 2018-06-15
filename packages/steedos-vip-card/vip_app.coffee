@@ -9,6 +9,7 @@ Creator.Apps.vip =
 		"space_users"
 		"vip_card",
 		"post",
+		"vip_event",
 		"user_star",
 		"vip_order",
 		"vip_billing",
@@ -16,4 +17,5 @@ Creator.Apps.vip =
 		"vip_coupon",
 		"vip_wifi",
 		"vip_category",
-		"vip_store"]
+		"vip_store"
+		]
