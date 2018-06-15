@@ -55,7 +55,6 @@ Creator.Objects.vip_event =
 		featured:
 			label:'发布到首页'
 			type:'boolean'
-			defaultValue:true
 			group:'-'
 		cover:
 			label:'封面照片'

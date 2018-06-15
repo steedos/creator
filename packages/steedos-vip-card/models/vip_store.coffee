@@ -43,7 +43,7 @@ Creator.Objects.vip_store =
 		qrcode:
 			label:'二维码'
 			type:'image'
-			readonly:true
+			#readonly:true
 		enabled_objects:
 			label:'启用功能'
 			type:'select'
@@ -60,7 +60,6 @@ Creator.Objects.vip_store =
 		featured:
 			label:'发布到首页'
 			type:'boolean'
-			defaultValue:true
 			group:'-'
 		star_count:
 			label:'关注人数'

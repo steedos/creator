@@ -102,7 +102,6 @@ Creator.Objects.post =
 		featured:
 			label:'发布到首页'
 			type:'boolean'
-			defaultValue:true
 			group:'-'
 	list_views:
 		all:
