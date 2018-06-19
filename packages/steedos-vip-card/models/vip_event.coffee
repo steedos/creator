@@ -10,6 +10,13 @@ Creator.Objects.vip_event =
 		start:
 			label:'开始时间'
 			type:'datetime'
+			defaultValue: ()->
+				# 默认取值为下一个整点
+				now = new Date()
+				reValue = new Date(now.getTime() + 1 * 60 * 60 * 1000)
+				reValue.setMinutes(0)
+				reValue.setSeconds(0)
+				return reValue
 		# end:
 		# 	label:'结束时间'
 		# 	type:'datetime'
@@ -24,6 +31,7 @@ Creator.Objects.vip_event =
 			label:'提醒时间'
 			type:'select'
 			multiple:true
+			defaultValue: ['-PT1H']
 			options:[
 				{label:'不提醒',value:'null'},
 				{label:'活动开始时',value:'Now'},
@@ -40,6 +48,7 @@ Creator.Objects.vip_event =
 		description:
 			label:'描述'
 			type:'textarea'
+			is_wide:true
 		accepted_count:
 			label:"报名人数"
 			type:'number'
@@ -90,16 +99,30 @@ Creator.Objects.vip_event =
 			modifyAllRecords: true
 			viewAllRecords: true
 		member:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true
 		guest:
 			allowCreate: false
 			allowDelete: false
-			allowEdit: true
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+
+	triggers:
+
+		"before.insert.server.event":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				fields = Creator.getObject("vip_event")?.fields
+				unless fields
+					return
+				if _.isEmpty(doc.start)
+					doc.start = fields.start?.defaultValue()
+				if _.isEmpty(doc.alarms)
+					doc.alarms = fields.alarms?.defaultValue
