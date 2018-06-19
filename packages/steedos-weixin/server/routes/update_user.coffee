@@ -22,6 +22,9 @@ JsonRoutes.add 'put', '/mini/vip/user', (req, res, next) ->
 		if data.birthdate
 			updateDoc["profile.birthdate"] = data.birthdate
 		
+		if data.avatar
+			updateDoc["profile.avatar"] = data.avatar
+		
 		# 将用户填写的信息同步到user表
 		WXMini.updateUser(userId, {
 			$set: updateDoc
