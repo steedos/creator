@@ -12,6 +12,17 @@ Creator.Objects.post_comments =
 			label:'评论对象'
 			type:'master_detail'
 			reference_to:'post'
+	triggers:
+		"after.insert.server.post_comments":
+			on: "server"
+			when: "after.insert"
+			todo: (userId, doc)->
+				if doc.name and doc.post_id
+					obj = Creator.getCollection("post").findOne({_id: doc.post_id})
+					if obj._id
+						comment_count = obj.comment_count || 0
+						comment_count++
+						Creator.getCollection("post").direct.update({_id: doc.post_id}, {$set: {comment_count: comment_count}})
 	list_views:
 		all:
 			label: "所有评论"
