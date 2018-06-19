@@ -10,13 +10,13 @@ Creator.Objects.vip_event =
 		start:
 			label:'开始时间'
 			type:'datetime'
-		end:
-			label:'结束时间'
-			type:'datetime'
-		allDay:
-			label:"全天活动"
-			type:'boolean'
-			defaultValue:false
+		# end:
+		# 	label:'结束时间'
+		# 	type:'datetime'
+		# allDay:
+		# 	label:"全天活动"
+		# 	type:'boolean'
+		# 	defaultValue:false
 		location:
 			label:'地点'
 			type:'location'		
