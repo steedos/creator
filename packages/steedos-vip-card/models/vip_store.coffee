@@ -99,15 +99,23 @@ Creator.Objects.vip_store =
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
+		"after.insert.server.store":
+			todo: (userId, doc)->
+				space_doc = {avatar:doc.avatar,cover:doc.cover,name:doc.name}
+				if doc._id == doc.space
+					Creator.getCollection("spaces").direct.update({_id: doc.space}, {$set:space_doc})
 
 		"after.update.server.store":
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if doc._id == doc.space && modifier?.$set?.name
-					Creator.getCollection("spaces").direct.update({_id: doc.space}, {$set: {name: modifier.$set.name}})
+				space_doc = {avatar:doc.avatar,cover:doc.cover}
+				if doc._id == doc.space
+					if modifier?.$set?.name
+						space_doc['name'] = modifier.$set.name
+					Creator.getCollection("spaces").direct.update({_id: doc.space}, {$set: space_doc})
 				if modifier?.$set?.avatar
-					Creator.getCollection("vip_store").direct.update({_id: doc.space},{$unset:{qrcode:1}})
+					Creator.getCollection("vip_store").direct.update({_id: doc.space},{$unset:{qrcode:1}})					
 	permission_set:
 		user:
 			allowCreate: false
