@@ -6,7 +6,7 @@ var _validateDocument = function (doc) {
 		appid: String,
 		info: Object,
 		sent: Match.Optional(Boolean),
-		sending: Match.Optional(Match.Integer),
+		sending: Match.Optional(Number),
 		createdAt: Date,
 		createdBy: Match.OneOf(String, null)
 	});
