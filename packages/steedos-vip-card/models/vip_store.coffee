@@ -99,14 +99,15 @@ Creator.Objects.vip_store =
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if modifier?.$set?.avatar
-					modifier.$set.qrcode = ''
+
 		"after.update.server.store":
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
 				if doc._id == doc.space && modifier?.$set?.name
 					Creator.getCollection("spaces").direct.update({_id: doc.space}, {$set: {name: modifier.$set.name}})
+				if modifier?.$set?.avatar
+					Creator.getCollection("vip_store").direct.update({_id: doc.space},{$unset:{qrcode:1}})
 	permission_set:
 		user:
 			allowCreate: false
