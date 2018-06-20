@@ -7,10 +7,64 @@ Export2XML.encapsulation = (_id) ->
 	retention_obj = Creator.Collections["archive_retention"].findOne({'_id':record_obj?.retention_peroid})
 	# 类别
 	category_obj = Creator.Collections["archive_classification"].findOne({'_id':record_obj?.category_code})
-	# 读取正文附件
-
+	# 读取所有的文件
+	cms_files = Creator.Collections["cms_files"].find({'parent.ids':_id},{sort: {created: -1}})
 	# 审计
 	audit_list = Creator.Collections["archive_audit"].find({'action_administrative_records_id':record_obj?._id}).fetch()
+
+	readFileInfo = (cms_file) ->
+		file_objs = Creator.Collections['cfs.files.filerecord'].find({_id:{$in:cms_file.versions}},{sort: {created: -1}})
+		WDSJ = []
+		file_objs.forEach (file_obj)->
+			DZSX = {
+				"格式信息": file_obj?.original?.type,
+				"计算机文件名": file_obj?.original?.name,
+				"计算机文件大小": file_obj?.original?.size,
+				"文档创建程序": ""
+			}
+			SZHSX = {
+				"数字化对象形态":"",
+				"扫描分辨率":"",
+				"扫描色彩模式":"",
+				"图像压缩方案":"",
+			}
+
+			bmms = "本封装包中“编码数据”元素存储的是计算机文件二进制流的Base64编码，有关Base64编码规则参见IETF RFC 2045多用途邮件扩展（MIME）第一部分：互联网信息体格式。当提取和显现封装在编码数据元素中的计算机文件时，应对Base64编码进行反编码，并依据封装包中“反编码关键字”元素中记录的值还原计算机文件的扩展名"
+
+			fbmms = "base64-" + file_obj?.original?.name
+
+			bmsj = ""
+
+			converterBase64 = (callback)->
+				stream = file_obj.createReadStream('files')
+				# buffer the read chunks
+				chunks = []
+				stream.on 'data', (chunk) ->
+					chunks.push chunk
+				stream.on 'end', Meteor.bindEnvironment(() ->
+					file_data = Buffer.concat(chunks)
+					bmsj = file_data.toString('base64')
+					console.log "111111"
+					callback()
+				)
+
+			async_converterBase64 = Meteor.wrapAsync(converterBase64)
+
+			async_converterBase64()
+
+			console.log "222222"
+
+			
+			BM = {
+				"编码ID": file_obj?._id,
+				"电子属性": DZSX,
+				"数字化属性": SZHSX,
+				"编码描述": bmms,
+				"反编码关键字": fbmms,
+				"编码数据": bmsj
+			}
+			WDSJ.push BM
+		return WDSJ
 
 	if record_obj
 		# === 电子文件封装包 - 被签名对象 - 封装内容
@@ -85,13 +139,21 @@ Export2XML.encapsulation = (_id) ->
 			"控制标识": record_obj?.control_identifier || ""
 		}
 
-		# ===========未完成============
 		# 文件数据
 		WJSJ = []
 		# 读取文档
-		WD = {}
-		WJSJ.push WD
-		# ============未完成===========
+		cms_files.forEach (cms_file, index)->
+			WDSJ = readFileInfo(cms_file)
+			wdzcsm = "附属文档"
+			if cms_file?.main
+				wdzcsm = "主文档"
+			WD = {
+				"文档标识符": cms_file?._id,
+				"文档序号": index,
+				"文档主从声明": wdzcsm,
+				"文档数据": WDSJ
+			}
+			WJSJ.push WD
 
 		# 文件实体
 		WJST = {
@@ -191,19 +253,23 @@ Export2XML.encapsulation = (_id) ->
 			"封装内容":FZNR
 		}
 
-		# === 电子签名块
-		DZQMK = []
-
-		# === 锁定签名
-		SDQM = []
+		# === 电子签名
+		DZQM = {
+			"签名标识符":"",
+			"签名规则":"",
+			"签名时间":"",
+			"签名人":"",
+			"签名结果":"",
+			"证书块":"",
+			"签名算法标识":""
+		}
 
 		# 电子文件封装包
 		DZWJFZB = {
 			"封装包格式描述": "本EEP根据中华人民共和国档案行业标准DA/T HGWS《基于XML的电子文件封装规范》生成",
 			"版本": "2018",
 			"被签名对象": BQMDX,
-			"电子签名块": DZQMK,
-			"锁定签名": SDQM
+			"电子签名": DZQM
 		}
 
 		return DZWJFZB

@@ -7,7 +7,7 @@ logger = new Logger 'QHD_Export_TO_XML'
 
 Export2XML = {}
 
-# Export2XML.export2xml("fHgmzuMGrWB6QMWDM")
+# Export2XML.export2xml("CMxwTtxqmSxBskGu3")
 Export2XML.export2xml = (_id) ->
 
 	result_obj = Export2XML.encapsulation(_id)
@@ -19,10 +19,6 @@ Export2XML.export2xml = (_id) ->
 			{
 				$set:{ has_xml:true }
 			})
-
-		console.log "======================"
-
-		console.log result_obj
 
 		# 转xml
 		builder = new xml2js.Builder()
