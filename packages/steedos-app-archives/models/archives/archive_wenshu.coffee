@@ -669,6 +669,11 @@ Creator.Objects.archive_wenshu =
 			label:"移交单"
 			reference_to:"archive_transfer"
 			group:"移交"
+		has_xml:
+			type:"boolean"
+			label:"是否封装xml"
+			defaultValue:false
+			omit:true
 	list_views:
 		recent:
 			label: "最近查看"
@@ -699,6 +704,7 @@ Creator.Objects.archive_wenshu =
 			filter_scope: "space"
 			filters: [["is_received", "=", true],["destroy_date","<=",new Date()],["is_destroyed", "=", false]]
 			columns:["year","title","document_date","destroy_date","archive_destroy_id"]
+		
 	permission_set:
 		user:
 			allowCreate: false
