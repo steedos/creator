@@ -62,6 +62,7 @@ Creator.Objects.post =
 		video_url:
 			label: '视频地址'
 			type: 'text'
+			omit:true
 		# audio:
 		# 	label: '音频'
 		# 	type: 'audio'
@@ -154,6 +155,13 @@ Creator.Objects.post =
 			todo: (userId, doc)->
 				if doc.description
 					doc.summary = doc.description.substring(0,100)
+
+				if doc.video
+					if Meteor.settings.public.cfs?.store is 'OSS'
+						video = cfs.videos.findOne(doc.video)
+						if video
+							doc.video_url = 'https://' + Meteor.settings.cfs.aliyun.bucket + '.' + Meteor.settings.cfs.aliyun.region + '.aliyuncs.com/videos/videos-' + video._id + '-' + encodeURIComponent(video.original.name)
+
 		"before.update.server.post":
 			on: "server"
 			when: "before.update"
@@ -162,6 +170,13 @@ Creator.Objects.post =
 					modifier.$set.summary = modifier.$set.description.substring(0,100)
 				if modifier.$unset and modifier.$unset.hasOwnProperty('description')
 					modifier.$unset.summary = 1
+
+				if modifier.$set.video
+					if Meteor.settings.public.cfs?.store is 'OSS'
+						video = cfs.videos.findOne(modifier.$set.video)
+						if video
+							modifier.$set.video_url = 'https://' + Meteor.settings.cfs.aliyun.bucket + '.' + Meteor.settings.cfs.aliyun.region + '.aliyuncs.com/videos/videos-' + video._id + '-' + encodeURIComponent(video.original.name)
+
 	permission_set:
 		user:
 			allowCreate: false

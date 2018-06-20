@@ -58,7 +58,7 @@ cfs[store_name] = new FS.Collection store_name,
     stores: [files_store],
     filter: {
       allow: {
-        contentTypes: ['video/*'] # allow only images in this FS.Collection
+        contentTypes: ['video/*'] # allow only videos in this FS.Collection
       }
     }
 
