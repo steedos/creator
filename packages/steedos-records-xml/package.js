@@ -9,6 +9,8 @@ Npm.depends({
 	'request'  : '2.81.0',
 	'node-schedule' : '1.2.1',
 	cookies: "0.6.1",
+	mkdirp: "0.3.5",
+	"xml2js": "0.4.19",
 });
 
 Package.onUse(function (api) {
@@ -31,6 +33,8 @@ Package.onUse(function (api) {
 	// api.addFiles('server/lib/records_xml.coffee', 'server');
 
 	api.addFiles('server/lib/export_to_xml.coffee', 'server');
+	api.addFiles('server/lib/encapsulation.coffee', 'server');
+
 
 	api.export('Export2XML');
 
