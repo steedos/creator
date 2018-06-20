@@ -42,6 +42,10 @@ Creator.Objects.vip_event_attendees =
 				{label:'2天前',value:'-P2D'}
 			]
 			group:'-'
+		wx_form_id:
+			label:'表单'
+			type:'text'
+			omit:true
 	list_views:
 		all:
 			label: "所有参与者"
