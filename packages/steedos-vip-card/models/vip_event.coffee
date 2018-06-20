@@ -8,7 +8,7 @@ Creator.Objects.vip_event =
 			type:'text'
 			is_wide:true
 		start:
-			label:'开始时间'
+			label:'时间'
 			type:'datetime'
 			defaultValue: ()->
 				# 默认取值为下一个整点
@@ -46,7 +46,7 @@ Creator.Objects.vip_event =
 			]
 			group:'-'
 		description:
-			label:'描述'
+			label:'备注'
 			type:'textarea'
 			is_wide:true
 		accepted_count:
