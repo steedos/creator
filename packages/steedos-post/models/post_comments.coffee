@@ -43,16 +43,16 @@ Creator.Objects.post_comments =
 			modifyAllRecords: true
 			viewAllRecords: true
 		guest:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		member:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true	
