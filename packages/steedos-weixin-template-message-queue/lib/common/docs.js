@@ -13,7 +13,7 @@ var _validateDocument = function (doc) {
 
 };
 
-WeixinTemplateMessageQueue.send = function (appid, options) {
+WeixinTemplateMessageQueue.send = function (appid, options, sending) {
 	var currentUser = Meteor.isClient && Meteor.userId && Meteor.userId() || Meteor.isServer && (options.createdBy || '<SERVER>') || null
 	var doc = _.extend({
 		createdAt: new Date(),
@@ -27,7 +27,12 @@ WeixinTemplateMessageQueue.send = function (appid, options) {
 	}
 
 	doc.sent = false;
-	doc.sending = 0;
+
+	if (!sending) {
+		doc.sending = 0;
+	} else {
+		doc.sending = sending;
+	}
 
 	_validateDocument(doc);
 
