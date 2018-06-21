@@ -162,7 +162,7 @@ Creator.Objects.vip_card =
 		guest:
 			allowCreate: false
 			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false
