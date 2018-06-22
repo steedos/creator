@@ -30,6 +30,10 @@
         "schedule": "10 10 0 * * *" //每天的晚上的 0点10分10秒调用执行
     },
     "weixin": {
+        "invite": {
+            "iv": "", // 密钥，16位字符串
+            "validity_period": 86400 //有效期，默认值24小时
+        },
         "appSecret": {
             "应用ID": "应用secret"
         }
