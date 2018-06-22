@@ -26,11 +26,10 @@ Creator.Objects.vip_event =
 		# 	defaultValue:false
 		location:
 			label:'地点'
-			type:'location'		
+			type:'location'
 		alarms:
 			label:'提醒时间'
 			type:'select'
-			multiple:true
 			defaultValue: ['-PT1H']
 			options:[
 				{label:'不提醒',value:'null'},
