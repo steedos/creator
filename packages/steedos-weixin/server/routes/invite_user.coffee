@@ -55,7 +55,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/invite_user', (req, res, next) ->
 			throw new Meteor.Error(500, "参数不匹配")
 
 		#校验当前用户是否输入space：不属于，则创建space users
-		space_user = Creator.getCollection("space_users").findOne({user: userId, space: space_id}, {fields: {_id: 1, profile: 1}})
+		space_user = Creator.getCollection("space_users").findOne({user: userId, space: space_id}, {fields: {_id: 1, profile: 1, owner: 1}})
 
 		if !space_user
 			user = Creator.getCollection("users").findOne({_id: userId})
@@ -68,9 +68,10 @@ JsonRoutes.add 'post', '/api/steedos/weixin/invite_user', (req, res, next) ->
 		JsonRoutes.sendResult res, {
 			code: 200,
 			data: {
-				space_id: space_id,
+				_id: space_id,
 				space_name: space.name,
 				profile: 'user'
+				owner: space.owner
 			}
 		}
 		return
