@@ -105,7 +105,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 		if space_users.length
 			spaces = Creator.getCollection("spaces").find({
 				_id:{$in:_.pluck(space_users,"space")}
-			}, {fields: {name: 1,admins: 1}}).fetch()
+			}, {fields: {name: 1,admins: 1, owner: 1}}).fetch()
 			space_users = space_users.map((su)->
 				s = _.findWhere(spaces, {_id: su.space})
 				s = _.extend(su, s)
