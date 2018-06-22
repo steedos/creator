@@ -17,5 +17,9 @@ Creator.Apps.vip =
 		"vip_coupon",
 		"vip_wifi",
 		"vip_category",
-		"vip_store"
+		"vip_store",
+		"vip_product",
+		"vip_product_category",
+		"vip_address",
+		"vip_invoice_info"
 		]
