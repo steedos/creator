@@ -80,7 +80,7 @@ Creator.Objects.vip_coupon =
 			is_wide:true
 	list_views:
 		all:
-			label: "所有优惠券"
+			label: "所有"
 			columns: ["name", "quota", "apply_stores","remain_count","total_count","received_count","used_count"]
 			filter_scope: "space"
 	permission_set:

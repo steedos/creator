@@ -30,7 +30,7 @@ Creator.Objects.vip_billing =
 			hidden: true
 	list_views:
 		all:
-			label: "消费记录"
+			label: "所有"
 			columns: ["card", "store", "amount","description"]
 			filter_scope: "space"
 	permission_set:

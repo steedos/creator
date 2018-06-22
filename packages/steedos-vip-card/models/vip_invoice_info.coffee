@@ -25,7 +25,7 @@ Creator.Objects.vip_invoice_info =
 			type:'text'
 	list_views:
 		all:
-			label: "我的发票信息"
+			label: "我的"
 			columns: ["name", "tax_no", "address", "phone", "bank", "bank_number"]
 			filter_scope: "space"
 	permission_set:

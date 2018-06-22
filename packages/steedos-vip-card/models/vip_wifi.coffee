@@ -19,7 +19,7 @@ Creator.Objects.vip_wifi =
 		
 	list_views:
 		all:
-			label: "所有Wifi"
+			label: "所有"
 			columns: ["name", "password", "store"]
 			filter_scope: "space"
 	permission_set:

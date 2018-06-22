@@ -13,7 +13,7 @@ Creator.Objects.vip_product_category =
 			type:'number'
 	list_views:
 		all:
-			label: "所有商品分类"
+			label: "所有"
 			columns: ["name", "sort_no"]
 			filter_scope: "space"
 	permission_set:

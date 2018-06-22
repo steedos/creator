@@ -87,7 +87,7 @@ Creator.Objects.vip_event_attendees =
 			omit:true
 	list_views:
 		all:
-			label: "所有参与者"
+			label: "所有"
 			columns: ["name","status"]
 			filter_scope: "space"
 	permission_set:

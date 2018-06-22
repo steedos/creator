@@ -55,7 +55,7 @@ Creator.Objects.vip_product =
 			scale: 2
 	list_views:
 		all:
-			label: "所有商品"
+			label: "所有"
 			columns: ["name", "default_price", "compared_price", "avatar", "categories"]
 			filter_scope: "space"
 	permission_set:
