@@ -87,7 +87,7 @@ Creator.Objects.vip_store =
 		# 	# required: true
 	list_views:
 		all:
-			label: "所有门店"
+			label: "所有"
 			columns: ["name", "location", "phone","address","business_hours","merchant"]
 			filter_scope: "space"
 	triggers:

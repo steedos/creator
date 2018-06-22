@@ -148,7 +148,7 @@ Creator.Objects.vip_order =
 
 	list_views:
 		all:
-			label: "所有订单"
+			label: "所有"
 			columns: ["name","owner", "amount_paid", "description"]
 			filter_scope: "space"
 		draft:

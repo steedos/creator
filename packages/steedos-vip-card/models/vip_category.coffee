@@ -120,7 +120,7 @@ Creator.Objects.vip_category =
 		# 	omit:true            
 	list_views:
 		all:
-			label: "全部"
+			label: "所有"
 			filter_scope: "space"
 			columns: ["name", "content", "purchase_count","state"]
 	permission_set:

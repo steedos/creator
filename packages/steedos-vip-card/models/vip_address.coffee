@@ -27,7 +27,7 @@ Creator.Objects.vip_address =
 			label:'默认地址'
 	list_views:
 		all:
-			label: "我的地址"
+			label: "所有"
 			columns: ["name", "address", "door", "phone", "is_default"]
 			filter_scope: "space"
 	permission_set:
@@ -43,8 +43,8 @@ Creator.Objects.vip_address =
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
-			viewAllRecords: false
+			modifyAllRecords: true
+			viewAllRecords: true
 		member:
 			allowCreate: true
 			allowDelete: true

@@ -80,7 +80,7 @@ Creator.Objects.vip_event =
 			omit:'true'
 	list_views:
 		all:
-			label: "所有活动"
+			label: "所有"
 			columns: ["name", "start", "end","location","accepted_count","pending_count"]
 			filter_scope: "space"
 	permission_set:
