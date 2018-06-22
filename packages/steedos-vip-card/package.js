@@ -22,4 +22,8 @@ Package.onUse(function (api) {
 	api.addFiles('models/vip_coupon.coffee');
 	api.addFiles('models/vip_wifi.coffee');
 	api.addFiles('models/vip_apps.coffee');
+	api.addFiles('models/vip_address.coffee');
+	api.addFiles('models/vip_invoice_info.coffee');
+	api.addFiles('models/vip_product.coffee');
+	api.addFiles('models/vip_product_category.coffee');
 })

@@ -49,8 +49,8 @@ Creator.Objects.vip_order =
 		status: # draft购物车, pending待付款, paid待发货，delivered待收货，completed已完成， canceled已取消
 			label: '状态'
 			type: 'text'
-			required: true
-
+			defaultValue:"draft"
+			omit:true
 		store:
 			label:'门店'
 			type:'lookup'
@@ -65,11 +65,13 @@ Creator.Objects.vip_order =
 		type: # recharge, pay, ...
 			label: '类型'
 			type: 'text'
-			required: true
-		
+			omit:true
 		products: 
 			label: "商品"
-			type: "[Object]"
+			type: "grid"
+		"products.$._id":
+			label: "编号"
+			type:'text'
 		"products.$.name":
 			label: "名称"
 			type:'text'
@@ -85,6 +87,7 @@ Creator.Objects.vip_order =
 		address:
 			label:'收货地址'
 			type: "object"
+			is_wide:true
 			blackbox:true
 		invoice_info:
 			label:'开票信息'
@@ -112,6 +115,7 @@ Creator.Objects.vip_order =
 		comment:
 			label:'留言'
 			type: "textarea"
+			is_wide:true
 	permission_set:
 		user:
 			allowCreate: false
@@ -145,13 +149,38 @@ Creator.Objects.vip_order =
 	list_views:
 		all:
 			label: "所有订单"
-			columns: ["name","owner", "amount_paid","description"]
+			columns: ["name","owner", "amount_paid", "description"]
 			filter_scope: "space"
+		draft:
+			label:"购物车"
+			columns:["name","owner", "amount", "products"]
+			filter_scope: "space"
+			filters: [["status", "=", "draft"]]
 		pending:
-			label:"未完成订单"
-			columns:["name","owner", "amount","amount_paid","description"]
+			label:"待付款"
+			columns:["name", "owner", "amount", "products"]
 			filter_scope: "space"
 			filters: [["status", "=", "pending"]]
+		paid:
+			label:"待发货"
+			columns:["name","owner", "amount", "products", "description"]
+			filter_scope: "space"
+			filters: [["status", "=", "paid"]]
+		delivered:
+			label:"待收货"
+			columns:["name", "owner", "amount", "amount_paid", "address"]
+			filter_scope: "space"
+			filters: [["status", "=", "delivered"]]
+		completed:
+			label:"已完成"
+			columns:["name","owner", "amount", "products"]
+			filter_scope: "space"
+			filters: [["status", "=", "completed"]]
+		canceled:
+			label:"已取消"
+			columns:["name","owner", "amount", "products"]
+			filter_scope: "space"
+			filters: [["status", "=", "canceled"]]
 	triggers:
 		"after.update.server.vip_order":
 			on: "server"
