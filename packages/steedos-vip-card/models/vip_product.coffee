@@ -26,8 +26,14 @@ Creator.Objects.vip_product =
 			label:'轮播图'
 			type:'image'
 			multiple:true
+			required:true
+		images:
+			label:'详情描述图'
+			type:'image'
+			multiple:true
+			required:true
 		avatar:
-			label:'展示图'
+			label:'封面'
 			type:'image'
 			required:true
 		video:
