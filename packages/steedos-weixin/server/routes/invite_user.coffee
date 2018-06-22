@@ -1,5 +1,5 @@
 
-JsonRoutes.add 'post', '/api/steedos/weixin/invite_admin', (req, res, next) ->
+JsonRoutes.add 'post', '/api/steedos/weixin/invite_user', (req, res, next) ->
 
 	try
 		userId = Steedos.getUserIdFromAuthToken(req, res);
@@ -30,9 +30,11 @@ JsonRoutes.add 'post', '/api/steedos/weixin/invite_admin', (req, res, next) ->
 		#校验链接有效期
 		timestamps = WXMini.decipherToken(token, introducer, Meteor.settings.weixin.invite.iv)
 
-		now = parseInt(new Date().getTime()/1000)
+		now = parseInt(new Date().getTime()/1000);
 
-		if timestamps <= (now - 60 * 10)
+		validity_period = Meteor.settings.weixin.invite.iv || 60 * 60 * 24
+
+		if timestamps <= (now - validity_period)
 			throw new Meteor.Error(500, "邀请已失效")
 
 		#权限校验：校验邀请者是否为工作区拥有者
@@ -53,16 +55,14 @@ JsonRoutes.add 'post', '/api/steedos/weixin/invite_admin', (req, res, next) ->
 			throw new Meteor.Error(500, "参数不匹配")
 
 		#校验当前用户是否输入space：不属于，则创建space users
-		space_user = Creator.getCollection("space_users").findOne({user: userId, space: space_id}, {fields: {_id: 1}})
+		space_user = Creator.getCollection("space_users").findOne({user: userId, space: space_id}, {fields: {_id: 1, profile: 1}})
 
 		if !space_user
 			user = Creator.getCollection("users").findOne({_id: userId})
-			WXMini.addUserToSpace(userId, space_id, user.name, "admin")
+			WXMini.addUserToSpace(userId, space_id, user.name, "user")
 		else
-			Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: 'admin'}})
-
-		#将用户添加到space的管理员
-		Creator.getCollection("spaces").direct.update({_id: space_id}, {$push: {'admins': userId}})
+			if space_user.profile != 'admin' && space_user.profile != 'user'
+				Creator.getCollection("space_users").direct.update({_id: space_user._id}, {$set: {profile: 'user'}})
 
 		#接口返回：当前用户在工作区的属性
 		JsonRoutes.sendResult res, {
@@ -70,7 +70,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/invite_admin', (req, res, next) ->
 			data: {
 				space_id: space_id,
 				space_name: space.name,
-				profile: 'admin'
+				profile: 'user'
 			}
 		}
 		return

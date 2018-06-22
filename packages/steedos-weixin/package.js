@@ -34,7 +34,8 @@ Package.onUse(function (api) {
 	api.addFiles('server/routes/phone_login.coffee', 'server');
 
 	api.addFiles('server/routes/temp_token.coffee', 'server');
-	api.addFiles('server/routes/invite_admin.coffee', 'server');
+	// api.addFiles('server/routes/invite_admin.coffee', 'server');
+	api.addFiles('server/routes/invite_user.coffee', 'server');
 
 	api.addFiles('server/routes/refresh_access_token.coffee', 'server');
 	api.addFiles('server/schedule/refresh_access_token.coffee', 'server');
