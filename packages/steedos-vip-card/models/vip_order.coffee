@@ -20,7 +20,21 @@ Creator.Objects.vip_order =
 			scale: 2
 			defaultValue: 0
 			required: true
-
+		product_amount:
+			label: '商品金额'
+			type: 'number'
+			scale: 2
+			defaultValue: 0
+		deliver_amount:
+			label: '运费'
+			type: 'number'
+			scale: 2
+			defaultValue: 0
+		discount_amount:
+			label: '优惠金额'
+			type: 'number'
+			scale: 2
+			defaultValue: 0
 		amount_paid:
 			label: '已付金额'
 			type: 'number'
@@ -32,7 +46,7 @@ Creator.Objects.vip_order =
 			type: 'textarea'
 			is_wide:true
 
-		status: # draft, pending, completed, canceled
+		status: # draft购物车, pending待付款, paid待发货，delivered待收货，completed已完成， canceled已取消
 			label: '状态'
 			type: 'text'
 			required: true
@@ -47,13 +61,57 @@ Creator.Objects.vip_order =
 			label:'会员卡'
 			type:'master_detail'
 			reference_to:'vip_card'
-			required: true
 
 		type: # recharge, pay, ...
 			label: '类型'
 			type: 'text'
 			required: true
-
+		
+		products: 
+			label: "商品"
+			type: "[Object]"
+		"products.$.name":
+			label: "名称"
+			type:'text'
+		"products.$.price":
+			label: "单价"
+			type: "number"
+		"products.$.count": 
+			label: "数量"
+			type: "number"
+		"products.$.sum": 
+			label: "总价"
+			type: "number"
+		address:
+			label:'收货地址'
+			type: "object"
+			blackbox:true
+		invoice_info:
+			label:'开票信息'
+			type: "object"
+			blackbox:true
+		invoice_type:
+			label:'开票类型'
+			type: "text"
+			#null,普票，增票
+		invoice_detail:
+			label:'开票内容'
+			type: "text"
+		deliver_company:
+			label:'快递公司'
+			type: "text"
+		deliver_no:
+			label:'快递单号'
+			type: "text"
+		deliver_date:
+			label:'发货时间'
+			type:'datetime'
+		expect_deliver_date:
+			label:'期望配送日期'
+			type:'date'
+		comment:
+			label:'留言'
+			type: "textarea"
 	permission_set:
 		user:
 			allowCreate: false
