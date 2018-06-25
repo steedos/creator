@@ -158,14 +158,14 @@ Creator.Objects.vip_event_attendees =
 					else
 						# 如果修改了status，则应该在对应的事件中把老的status数量减一，新的status数量加一
 						event_data = Creator.getCollection("vip_event").findOne(doc.event, { fields: { name: 1, start: 1, location: 1 } })
-						#start = moment(event_data.start).utcOffset(utcOffset, false).format("YYYY-MM-DD HH:mm")
+						start =event_data.start
 						remindtime = remindTime(alarm,start)
 						data = {
 							"keyword1": {
 								"value": event_data.name
 							},
 							"keyword2": {
-								"value":event_data.start
+								"value":start
 							},
 							"keyword3": {
 								"value": event_data.location.address
