@@ -41,7 +41,8 @@ Creator.Objects.vip_product =
 			type:'video'
 		categories:
 			label:'分类'
-			type:'text'  
+			type:'lookup'
+			reference_to:'vip_product_category'
 			multiple:true
 			required:true
 		tags:
