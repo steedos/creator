@@ -152,40 +152,41 @@ Creator.Objects.vip_event_attendees =
 				alarm = doc.alarms || modifier.$set.alarms
 				appId = now_wx_form_id.split(':')[0]
 				formId = now_wx_form_id.split(':')[1]
-				if WeixinTemplateMessageQueue.collection.find({ 'info.form_id': formId, sent: false }).count() > 0
-					delete modifier.$set.wx_form_id
-				else
-					# 如果修改了status，则应该在对应的事件中把老的status数量减一，新的status数量加一
-					event_data = Creator.getCollection("vip_event").findOne(doc.event, { fields: { name: 1, start: 1, location: 1 } })
-					start = event_data.start
-					remindtime = remindTime(alarm,start)
-					data = {
-						"keyword1": {
-							"value": event_data.name
-						},
-						"keyword2": {
-							"value": event_data.start
-						},
-						"keyword3": {
-							"value": event_data.location.address
-						}
-					}
-					user = Creator.getCollection("users").findOne({_id:userId},{fields:{'services':1}})
-					if user
-						openids = user.services?.weixin?.openid
-						if openids
-							open_token = _.find(openids, (t)->
-								if t.appid == appId
-									return t._id
-							)
-							message = {
-								touser: open_token._id,
-								template_id: 'F3KbQYC0sN6LWNUokitLE2b4f_dZYTO2dyTS7SC543o',
-								page: 'pages/event/view',
-								form_id: formId,
-								data: data
+				if alarm and formId
+					if WeixinTemplateMessageQueue.collection.find({ 'info.form_id': formId, sent: false }).count() > 0
+						delete modifier.$set.wx_form_id
+					else
+						# 如果修改了status，则应该在对应的事件中把老的status数量减一，新的status数量加一
+						event_data = Creator.getCollection("vip_event").findOne(doc.event, { fields: { name: 1, start: 1, location: 1 } })
+						#start = moment(event_data.start).utcOffset(utcOffset, false).format("YYYY-MM-DD HH:mm")
+						remindtime = remindTime(alarm,start)
+						data = {
+							"keyword1": {
+								"value": event_data.name
+							},
+							"keyword2": {
+								"value":event_data.start
+							},
+							"keyword3": {
+								"value": event_data.location.address
 							}
-							WeixinTemplateMessageQueue.send(appId, message, remindtime)
+						}
+						user = Creator.getCollection("users").findOne({_id:userId},{fields:{'services':1}})
+						if user
+							openids = user.services?.weixin?.openid
+							if openids
+								open_token = _.find(openids, (t)->
+									if t.appid == appId
+										return t._id
+								)
+								message = {
+									touser: open_token._id,
+									template_id: 'F3KbQYC0sN6LWNUokitLE2b4f_dZYTO2dyTS7SC543o',
+									page: 'pages/event/view?space_id='+ doc.space + '&event_id='+ doc.event,
+									form_id: formId,
+									data: data
+								}
+								WeixinTemplateMessageQueue.send(appId, message, remindtime)
 
 		"after.update.server.event":
 			on: "server"
