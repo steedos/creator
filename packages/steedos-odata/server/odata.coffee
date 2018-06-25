@@ -271,10 +271,12 @@ Meteor.startup ->
 						statusCode: 404
 						body:setErrorMessage(404,collection,key)
 					}
-
-				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
+				spaceId = @urlParams.spaceId
+				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				if permissions.allowCreate
-					@bodyParams.space = @urlParams.spaceId
+					@bodyParams.space = spaceId
+					if spaceId is 'guest'
+						delete @bodyParams.space
 					entityId = collection.insert @bodyParams
 					entity = collection.findOne entityId
 					entities = []
@@ -282,8 +284,8 @@ Meteor.startup ->
 						body = {}
 						headers = {}
 						entities.push entity
-						body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key) + '/$entity'
-						entity_OdataProperties = setOdataProperty(entities,@urlParams.spaceId, key)
+						body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
+						entity_OdataProperties = setOdataProperty(entities,spaceId, key)
 						body['value'] = entity_OdataProperties
 						headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
 						headers['OData-Version'] = SteedosOData.VERSION
