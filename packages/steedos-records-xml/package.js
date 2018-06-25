@@ -11,6 +11,7 @@ Npm.depends({
 	cookies: "0.6.1",
 	mkdirp: "0.3.5",
 	"xml2js": "0.4.19",
+	'node-rsa': '1.0.0'
 });
 
 Package.onUse(function (api) {

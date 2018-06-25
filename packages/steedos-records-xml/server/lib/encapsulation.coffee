@@ -1,3 +1,4 @@
+# 封装被签名对象
 Export2XML.encapsulation = (_id) ->
 	# 档案记录
 	record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':_id})
@@ -248,30 +249,12 @@ Export2XML.encapsulation = (_id) ->
 			"封装内容":FZNR
 		}
 
-		# === 电子签名
-		# 签名标识符
-		qmbsf = Creator.Collections["archive_wenshu"]._makeNewID()
-		# 签名时间
-		qmsj = new Date
-
-
-
-		DZQM = {
-			"签名标识符": qmbsf,
-			"签名规则": qmsj.toISOString(),
-			"签名时间": qmsj.toISOString(),
-			"签名人":"",
-			"签名结果":"",
-			"证书块":"",
-			"签名算法标识":""
-		}
-
 		# 电子文件封装包
-		DZWJFZB = {
-			"封装包格式描述": "本EEP根据中华人民共和国档案行业标准DA/T HGWS《基于XML的电子文件封装规范》生成",
-			"版本": "2018",
-			"被签名对象": BQMDX,
-			"电子签名": DZQM
-		}
+		# DZWJFZB = {
+		# 	"封装包格式描述": "本EEP根据中华人民共和国档案行业标准DA/T HGWS《基于XML的电子文件封装规范》生成",
+		# 	"版本": "2018",
+		# 	"被签名对象": BQMDX,
+		# 	"电子签名": DZQM
+		# }
 
-		return DZWJFZB
+		return BQMDX
