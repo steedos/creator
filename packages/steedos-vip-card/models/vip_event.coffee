@@ -27,6 +27,7 @@ Creator.Objects.vip_event =
 		location:
 			label:'地点'
 			type:'location'
+			required:true
 		alarms:
 			label:'提醒时间'
 			type:'select'
