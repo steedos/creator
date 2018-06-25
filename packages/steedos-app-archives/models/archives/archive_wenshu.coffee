@@ -672,7 +672,6 @@ Creator.Objects.archive_wenshu =
 		has_xml:
 			type:"boolean"
 			label:"是否封装xml"
-			defaultValue:false
 			omit:true
 	list_views:
 		recent:
