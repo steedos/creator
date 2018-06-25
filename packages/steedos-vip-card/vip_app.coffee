@@ -20,6 +20,7 @@ Creator.Apps.vip =
 		"vip_store",
 		"vip_product",
 		"vip_product_category",
+		"post_category",
 		"vip_address",
 		"vip_invoice_info"
 		]
