@@ -12,6 +12,21 @@ Export2XML.encapsulation = (_id) ->
 	# 审计
 	audit_list = Creator.Collections["archive_audit"].find({'action_administrative_records_id':record_obj?._id}).fetch()
 
+	converterBase64 = (file_obj, callback)->
+		bmsj = ""
+		stream = file_obj.createReadStream('files')
+		# buffer the read chunks
+		chunks = []
+		stream.on 'data', (chunk) ->
+			chunks.push chunk
+		stream.on 'end', () ->
+			file_data = Buffer.concat(chunks)
+			bmsj = file_data.toString('base64')
+			callback("", bmsj)
+			return
+
+	async_converterBase64 = Meteor.wrapAsync(converterBase64)
+
 	readFileInfo = (cms_file) ->
 		file_objs = Creator.Collections['cfs.files.filerecord'].find({_id:{$in:cms_file.versions}},{sort: {created: -1}})
 		WDSJ = []
@@ -31,29 +46,9 @@ Export2XML.encapsulation = (_id) ->
 
 			bmms = "本封装包中“编码数据”元素存储的是计算机文件二进制流的Base64编码，有关Base64编码规则参见IETF RFC 2045多用途邮件扩展（MIME）第一部分：互联网信息体格式。当提取和显现封装在编码数据元素中的计算机文件时，应对Base64编码进行反编码，并依据封装包中“反编码关键字”元素中记录的值还原计算机文件的扩展名"
 
-			fbmms = "base64-" + file_obj?.original?.name
+			fbmms = "base64-" + file_obj?.getExtension()
 
-			bmsj = ""
-
-			converterBase64 = (callback)->
-				stream = file_obj.createReadStream('files')
-				# buffer the read chunks
-				chunks = []
-				stream.on 'data', (chunk) ->
-					chunks.push chunk
-				stream.on 'end', Meteor.bindEnvironment(() ->
-					file_data = Buffer.concat(chunks)
-					bmsj = file_data.toString('base64')
-					console.log "111111"
-					callback()
-				)
-
-			async_converterBase64 = Meteor.wrapAsync(converterBase64)
-
-			async_converterBase64()
-
-			console.log "222222"
-
+			bmsj = async_converterBase64(file_obj)
 			
 			BM = {
 				"编码ID": file_obj?._id,
@@ -254,10 +249,17 @@ Export2XML.encapsulation = (_id) ->
 		}
 
 		# === 电子签名
+		# 签名标识符
+		qmbsf = Creator.Collections["archive_wenshu"]._makeNewID()
+		# 签名时间
+		qmsj = new Date
+
+
+
 		DZQM = {
-			"签名标识符":"",
-			"签名规则":"",
-			"签名时间":"",
+			"签名标识符": qmbsf,
+			"签名规则": qmsj.toISOString(),
+			"签名时间": qmsj.toISOString(),
 			"签名人":"",
 			"签名结果":"",
 			"证书块":"",
