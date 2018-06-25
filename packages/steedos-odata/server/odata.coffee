@@ -613,11 +613,14 @@ Meteor.startup ->
 						statusCode: 404
 						body: setErrorMessage(404,collection,key)
 					}
-				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
-				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
+				spaceId = @urlParams.spaceId
+				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
+				record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
 				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId )
 				if isAllowed
-					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
+					selector = {_id: @urlParams._id, space: spaceId}
+					if spaceId is 'guest'
+						delete selector.space
 					fields_editable = true
 					_.keys(@bodyParams.$set).forEach (key)->
 						if _.indexOf(permissions.uneditable_fields, key) > -1
@@ -632,8 +635,8 @@ Meteor.startup ->
 							headers = {}
 							body = {}
 							# entities.push entity
-							# body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key) + '/$entity'
-							# entity_OdataProperties = setOdataProperty(entities,@urlParams.spaceId, key)
+							# body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
+							# entity_OdataProperties = setOdataProperty(entities,spaceId, key)
 							# _.extend body,entity_OdataProperties[0]
 							headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
 							headers['OData-Version'] = SteedosOData.VERSION
@@ -679,17 +682,20 @@ Meteor.startup ->
 						statusCode: 404
 						body: setErrorMessage(404,collection,key)
 					}
-				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
-				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
+				spaceId = @urlParams.spaceId
+				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
+				record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
 				isAllowed = permissions.modifyAllRecords or (permissions.allowDelete and record_owner==@userId )
 				if isAllowed
-					selector = {_id: @urlParams._id, space: @urlParams.spaceId}
+					selector = {_id: @urlParams._id, space: spaceId}
+					if spaceId is 'guest'
+						delete selector.space
 					if collection.remove selector
 						headers = {}
 						body = {}
 						# entities.push entity
-						# body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key) + '/$entity'
-						# entity_OdataProperties = setOdataProperty(entities,@urlParams.spaceId, key)
+						# body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
+						# entity_OdataProperties = setOdataProperty(entities,spaceId, key)
 						# _.extend body,entity_OdataProperties[0]
 						headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
 						headers['OData-Version'] = SteedosOData.VERSION
