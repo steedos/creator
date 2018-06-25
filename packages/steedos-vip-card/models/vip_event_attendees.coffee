@@ -149,13 +149,12 @@ Creator.Objects.vip_event_attendees =
 				if _.isEmpty(doc.event)
 					throw new Meteor.Error 500, "所属活动不能为空"
 
-				now_wx_form_id = doc.wx_form_id
-				nowFormId = now_wx_form_id.split(':')[1]
-				if WeixinTemplateMessageQueue.collection.find({ 'info.form_id': nowFormId, sent: false }).count() > 0
+				now_wx_form_id = doc.wx_form_id || modifier.$set.wx_form_id
+				appId = now_wx_form_id.split(':')[0]
+				formId = now_wx_form_id.split(':')[1]
+				if WeixinTemplateMessageQueue.collection.find({ 'info.form_id': formId, sent: false }).count() > 0
 					delete modifier.$set.wx_form_id
 				else
-					appId = doc.wx_form_id.split(':')[0]
-					formId = doc.wx_form_id.split(':')[1]
 					# 如果修改了status，则应该在对应的事件中把老的status数量减一，新的status数量加一
 					event_data = Creator.getCollection("vip_event").findOne(doc.event, { fields: { name: 1, start: 1, location: 1 } })
 					start = event_data.start
