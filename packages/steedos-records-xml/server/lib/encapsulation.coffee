@@ -233,9 +233,9 @@ Export2XML.encapsulation = (_id) ->
 		fzblx = "原始型"
 		# 封装包类型描述
 		fzblxms = "本封装包包含电子文件数据及其元数据，原始封装，未经修改"
-		if record_obj?.has_xml
-			fzblx = "修改型"
-			fzblxms = "本封装包包含电子文件数据及其元数据，系修改封装，在保留原封装包的基础上，添加了修改层"
+		# if record_obj?.has_xml
+		# 	fzblx = "修改型"
+		# 	fzblxms = "本封装包包含电子文件数据及其元数据，系修改封装，在保留原封装包的基础上，添加了修改层"
 		# 封装包创建时间
 		fzbcjsj = new Date
 		# 封装包创建单位
