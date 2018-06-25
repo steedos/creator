@@ -25,7 +25,7 @@ Creator.Objects.post_comments =
 						Creator.getCollection("post").direct.update({_id: doc.post_id}, {$set: {comment_count: comment_count}})
 	list_views:
 		all:
-			label: "所有评论"
+			label: "所有"
 			columns: ["created_by","content", "created"]
 	permission_set:
 		user:

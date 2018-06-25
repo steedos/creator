@@ -1,6 +1,6 @@
 Creator.Objects.post_category =
 	name: "post_category"
-	label: "动态栏目"
+	label: "栏目"
 	icon: "post"
 	enable_files:true
 	fields:
