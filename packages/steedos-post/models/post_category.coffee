@@ -14,7 +14,6 @@ Creator.Objects.post_category =
 		description:
 			label:'描述'
 			type:'textarea'
-			required:true
 			is_wide:true
 		cover:
 			label: "封面图"
@@ -31,7 +30,7 @@ Creator.Objects.post_category =
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -45,12 +44,12 @@ Creator.Objects.post_category =
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: false
 			allowDelete: false
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 
