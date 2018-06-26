@@ -68,7 +68,7 @@ Creator.Objects.post =
 		# 	type: 'audio'
 		# 	omit:true
 		categories:
-			label:'分类'
+			label:'栏目'
 			type:'lookup'
 			reference_to:'post_category'
 			multiple:true
