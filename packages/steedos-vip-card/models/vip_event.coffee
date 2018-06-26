@@ -31,7 +31,7 @@ Creator.Objects.vip_event =
 		alarms:
 			label:'提醒时间'
 			type:'select'
-			defaultValue: ['-PT1H']
+			defaultValue: '-PT1H'
 			options:[
 				{label:'不提醒',value:'null'},
 				{label:'活动开始时',value:'Now'},
