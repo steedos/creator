@@ -1,5 +1,5 @@
 # 封装被签名对象
-Export2XML.encapsulation = (_id) ->
+Records2XML.encapsulation = (_id) ->
 	# 档案记录
 	record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':_id})
 	# 全宗

@@ -34,10 +34,12 @@ Package.onUse(function (api) {
 	// api.addFiles('server/lib/records_xml.coffee', 'server');
 
 	api.addFiles('server/lib/export_to_xml.coffee', 'server');
-	api.addFiles('server/lib/encapsulation.coffee', 'server');
+	// api.addFiles('server/lib/encapsulation.coffee', 'server');
+	api.addFiles('server/lib/records_xml_sync.coffee', 'server');
 
+	api.export('XMLSync');
 
-	api.export('Export2XML');
+	api.export('Records2XML');
 
 });
 
