@@ -13,6 +13,8 @@ Export2XML.encapsulation = (_id) ->
 	# 审计
 	audit_list = Creator.Collections["archive_audit"].find({'action_administrative_records_id':record_obj?._id}).fetch()
 
+	# 读取文件
+	# 存储为编码数据，base64字符串
 	converterBase64 = (file_obj, callback)->
 		bmsj = ""
 		stream = file_obj.createReadStream('files')

@@ -38,14 +38,14 @@ Export2XML.export2xml = (_id) ->
 
 			# 电子签名
 			qmbsf = "修改0-签名1"
-			qmgz = "utf8"
+			qmgz = "base64"
 			qmsj = new Date
 			qmr = Meteor.settings?.records_xml?.archive?.signaturer || ""
 			qmsfbs = "sha1WithRSAEncryption"
 			zsk = []
-			certificate_file = Meteor.settings?.records_xml?.archive?.certificate_file
-			if certificate_file
-				zs = fs.readFileSync certificate_file,{encoding:'base64'}
+			public_key_file = Meteor.settings?.records_xml?.archive?.public_key_file
+			if public_key_file
+				zs = fs.readFileSync public_key_file,{encoding:'utf8'}
 				zsyz = ""
 				zs_obj = {
 					"证书": zs,
@@ -61,7 +61,6 @@ Export2XML.export2xml = (_id) ->
 				"证书块": zsk,
 				"签名算法标识": qmsfbs
 			}
-
 			
 			DZWJFZB = {
 				"封装包格式描述": "本EEP根据中华人民共和国档案行业标准DA/T HGWS《基于XML的电子文件封装规范》生成",
