@@ -114,45 +114,10 @@ Creator.Objects.post =
 			group:'-'
 	list_views:
 		all:
-			label: "所有信息"
+			label: "所有"
 			columns: ["name","summary", "comment_count", "star_count","forward_count"]
 			filter_scope: "space"
-		announcements:
-			label:"公告"
-			filter_scope:'space'
-			filters: [["type", "=", "announcements"]]
-		about:
-			label:"关于"
-			filter_scope:'space'
-			filters: [["type", "=", "about"]]
-		news:
-			label:"新闻"
-			filter_scope:'space'
-			filters: [["type", "=", "news"]]
-		help:
-			label:"帮助"
-			filter_scope:'space'
-			filters: [["type", "=", "help"]]
-		jobs:
-			label:"招聘"
-			filter_scope:'space'
-			filters: [["type", "=", "jobs"]]
-		course:
-			label:"线上课程"
-			filter_scope:'space'
-			filters: [["type", "=", "course"]]
-		coupon:
-			label:"优惠卷"
-			filter_scope:'space'
-			filters: [["type", "=", "coupon"]]
-		community:
-			label:"社区"
-			filter_scope:'space'
-			filters: [["type", "=", "community"]]
-		red_packet:
-			label:'红包'
-			filter_scope:'space'
-			filters: [["type", "=", "red_packet"]]
+		
 	triggers:
 		"before.insert.server.post":
 			on: "server"
