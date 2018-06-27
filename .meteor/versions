@@ -140,7 +140,7 @@ steedos:autoform-lookup@0.3.10
 steedos:base@0.0.81
 steedos:bootstrap3-datetimepicker@4.17.47
 steedos:cfs-access-point@0.1.50
-steedos:cfs-aliyun@0.1.0
+steedos:cfs-aliyun@0.1.0_1
 steedos:cfs-base-package@0.0.30
 steedos:cfs-collection@0.5.6_4
 steedos:cfs-collection-filters@0.2.5_4
