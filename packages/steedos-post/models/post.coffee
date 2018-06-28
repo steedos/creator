@@ -117,7 +117,7 @@ Creator.Objects.post =
 			label: "所有"
 			columns: ["name","summary", "comment_count", "star_count","forward_count"]
 			filter_scope: "space"
-		
+
 	triggers:
 		"before.insert.server.post":
 			on: "server"
@@ -130,7 +130,7 @@ Creator.Objects.post =
 					if Meteor.settings.public.cfs?.store is 'OSS'
 						video = cfs.videos.findOne(doc.video)
 						if video
-							doc.video_url = 'https://' + Meteor.settings.cfs.aliyun.bucket + '.' + Meteor.settings.cfs.aliyun.region + '.aliyuncs.com/videos/videos-' + video._id + '-' + encodeURIComponent(video.original.name)
+							doc.video_url = 'https://' + Meteor.settings.cfs.aliyun.bucket + '.' + Meteor.settings.cfs.aliyun.region.split('-internal')[0] + '.aliyuncs.com/videos/videos-' + video._id + '-' + encodeURIComponent(video.original.name)
 
 		"before.update.server.post":
 			on: "server"
@@ -145,7 +145,7 @@ Creator.Objects.post =
 					if Meteor.settings.public.cfs?.store is 'OSS'
 						video = cfs.videos.findOne(modifier.$set.video)
 						if video
-							modifier.$set.video_url = 'https://' + Meteor.settings.cfs.aliyun.bucket + '.' + Meteor.settings.cfs.aliyun.region + '.aliyuncs.com/videos/videos-' + video._id + '-' + encodeURIComponent(video.original.name)
+							modifier.$set.video_url = 'https://' + Meteor.settings.cfs.aliyun.bucket + '.' + Meteor.settings.cfs.aliyun.region.split('-internal')[0] + '.aliyuncs.com/videos/videos-' + video._id + '-' + encodeURIComponent(video.original.name)
 
 	permission_set:
 		user:
