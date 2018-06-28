@@ -482,7 +482,6 @@ Creator.Objects.archive_wenshu =
 				{label: "复制", value: "复制"},
 				{label: "浏览", value: "浏览"},
 				{label: "解密", value: "解密"}
-
 			],
 			allowedValues:["公布","复制","浏览","解密"],			
 			# omit:true
@@ -672,7 +671,8 @@ Creator.Objects.archive_wenshu =
 		has_xml:
 			type:"boolean"
 			label:"是否封装xml"
-			omit:true
+			# 彻底不显示
+			hidden: true
 	list_views:
 		recent:
 			label: "最近查看"
