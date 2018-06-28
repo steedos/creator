@@ -49,10 +49,11 @@ Creator.Objects.vip_store =
 			type:'select'
 			options:[
 				{label:'会员卡',value:'vip_card'},
-				{label:'最新动态',value:'post'},
-				{label:'活动报名',value:'vip_activity'},
+				{label:'动态',value:'post'},
+				{label:'商城',value:'vip_product'},
+				{label:'活动',value:'vip_event'},
 				{label:'Wifi',value:'vip_wifi'},
-				{label:'在线客服', value:'support'}
+				{label:'客服', value:'support'},
 				{label:'联系我们',value:'vip_store'}
 			]
 			multiple:true
