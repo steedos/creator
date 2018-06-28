@@ -58,6 +58,11 @@ Creator.Objects.vip_store =
 			]
 			multiple:true
 			group:'-'
+		admins:
+			label:'管理员'
+			type:'lookup'
+			reference_to:'users'
+			multiple:true
 		featured:
 			label:'发布到首页'
 			type:'boolean'
@@ -106,7 +111,7 @@ Creator.Objects.vip_store =
 					Creator.getCollection("vip_store").direct.update({_id: doc.space},{$unset:{qrcode:1}})
 		"after.insert.server.store":
 			todo: (userId, doc)->
-				space_doc = {avatar:doc.avatar,cover:doc.cover,name:doc.name}
+				space_doc = {avatar:doc.avatar, cover:doc.cover, name:doc.name, admins:doc.admins}
 				if doc._id == doc.space
 					Creator.getCollection("spaces").direct.update({_id: doc.space}, {$set:space_doc})
 				
@@ -114,7 +119,7 @@ Creator.Objects.vip_store =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				space_doc = {avatar:doc.avatar,cover:doc.cover}
+				space_doc = {avatar:doc.avatar, cover:doc.cover, admins:doc.admins}
 				if doc._id == doc.space
 					if modifier?.$set?.name
 						space_doc['name'] = modifier.$set.name
