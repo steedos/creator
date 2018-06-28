@@ -8,6 +8,10 @@ Creator.Objects.post_category =
 			label:'名称'
 			type:'text'
 			required:true
+		parent:
+			label:'上级栏目'
+			type:'lookup'
+			reference_to:'post_category'
 		sort_no:
 			label:'排序号'
 			type:'number'
