@@ -1,6 +1,6 @@
 fs = Npm.require 'fs'
 path = Npm.require('path')
-xls = Npm.require('node-xlsx')
+xlsx = Npm.require('node-xlsx')
 logger = new Logger 'QUEUE_IMPORT'
 converterString = (field_name, dataCell,jsonObj)->
 	text_error = ""
@@ -114,7 +114,7 @@ importObject = (importObj,space) ->
 			chunks.push chunk 
 
 		stream.on 'end', Meteor.bindEnvironment(() ->
-			workbook = xls.parse(Buffer.concat(chunks))
+			workbook = xlsx.parse(Buffer.concat(chunks), {cellDates: true})
 			total_count = 0
 			success_count = 0
 			failure_count = 0
@@ -166,4 +166,10 @@ Meteor.methods
 		data = []
 		_.each results ,(result)->
 			data.push result[name_field]
-		return data	
+		return data
+
+	# Creator.testImportJobs("fSNrgYcftFkiBXEvi","Af8eM6mAHo7wMDqD3")
+	# 测试
+	testImportJobs:(record_id,space) ->
+		importObj = Creator.Collections["queue_import"].findOne({_id:record_id})
+		importObject importObj,space
