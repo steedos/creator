@@ -2,18 +2,18 @@ request = Npm.require("request")
 base64 = Npm.require('base-64');
 fs = Npm.require 'fs'
 
-getAccessToken = (appId,secret,cb)->
-	request.get {
-		url:"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{appId}&secret=#{secret}"
-	},(err,httpResponse,body)->
-		cb err, httpResponse, body
-		if err
-			console.error('get access_token failed:', err)
-			return
-		if httpResponse.statusCode ==200
-			return body['access_token']
+# getAccessToken = (appId,secret,cb)->
+# 	request.get {
+# 		url:"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{appId}&secret=#{secret}"
+# 	},(err,httpResponse,body)->
+# 		cb err, httpResponse, body
+# 		if err
+# 			console.error('get access_token failed:', err)
+# 			return
+# 		if httpResponse.statusCode ==200
+# 			return body['access_token']
 
-getAccessTokenAsync = Meteor.wrapAsync(getAccessToken);
+# getAccessTokenAsync = Meteor.wrapAsync(getAccessToken);
 
 WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 	try
@@ -24,9 +24,10 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 		page = req.query.page
 		if !secret
 			throw new Meteor.Error(500, "无效的appId #{appId}")
-		resData = getAccessTokenAsync appId, secret
-		wxToken = JSON.parse(resData.body)
-		if wxToken?.access_token
+		wxToken = WXMini.getNewAccessTokenSync appId, secret
+		# console.log (resData)
+		# wxToken = JSON.parse(resData.body)
+		if wxToken
 			formData = {
 				page: page,
 				scene:storeId,
@@ -37,7 +38,7 @@ WebApp.connectHandlers.use '/api/steedos/weixin/code', (req, res, next) ->
 				url: "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=",
 				method: 'POST',
 				encoding: null,
-				qs: { access_token: wxToken.access_token },
+				qs: { access_token: wxToken },
 				form: false,
 				body: JSON.stringify(formData)
 			}
