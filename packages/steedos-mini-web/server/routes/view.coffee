@@ -64,7 +64,8 @@ getBaseConfig = (space_id, template_type) ->
 		"@blog": getBlog(space_id),
 		"@labs": {},
 		template_type: template_type,
-		pagination: {}
+		pagination: {},
+		homeUrl: '/site/' + space_id
 	}
 
 
@@ -129,7 +130,6 @@ JsonRoutes.add "get", "/site/:space_id/categorie/:_id", (req, res, next)->
 
 # post detailed
 JsonRoutes.add "get", "/site/:space_id/:_id", (req, res, next)->
-	console.log('req', req.params);
 	space_id = req.params.space_id
 
 	template_type = 'post'

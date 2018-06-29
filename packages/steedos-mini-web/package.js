@@ -18,6 +18,10 @@ Package.onUse(function(api) {
 	api.use('tap:i18n@1.7.0');
 	api.use('steedos:objects');
 
+	api.addAssets('themes/casper/partials/icons/point.hbs', 'server');
+	api.addAssets('themes/casper/partials/icons/weichat.hbs', 'server');
+	api.addAssets('themes/casper/partials/icons/avatar.hbs', 'server');
+
 	api.addAssets('themes/casper/default.hbs', 'server');
 	api.addAssets('themes/casper/index.hbs', 'server');
 	api.addAssets('themes/casper/post.hbs', 'server');

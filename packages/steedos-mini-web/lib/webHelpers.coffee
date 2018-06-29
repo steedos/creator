@@ -31,8 +31,6 @@ Template.registerHelper 'authorMultiple', (context, options)->
 
 
 Template.registerHelper 'plural', (number, options)->
-	console.log('plural...', number, options)
-
 	if !number || number == 0
 		console.log('if --->', new Handlebars.SafeString(options.hash.empty.replace('%', number)))
 		return new Handlebars.SafeString(options.hash.empty.replace('%', number));

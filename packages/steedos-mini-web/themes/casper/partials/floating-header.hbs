@@ -11,13 +11,9 @@
     <div class="floating-header-title">{{title}}</div>
     <div class="floating-header-share">
         <div class="floating-header-share-label">分享到 {{> icons_point}}</div>
-        <a class="floating-header-share-wx" href="https://twitter.com/share?text={{encode title}}&amp;url={{url absolute="true"}}"
+        <a class="floating-header-share-wx" href=""
             onclick="window.open(this.href, 'share-weichat', 'width=550,height=235');return false;">
             {{> icons_weichat}}
-        </a>
-        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u={{url absolute="true"}}"
-            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
-            {{> icons_facebook}}
         </a>
     </div>
     <progress class="progress" value="0">

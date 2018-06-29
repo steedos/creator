@@ -21,17 +21,17 @@
                 <div class="bio">
                     {{#if bio}}
                         <p>{{bio}}</p>
-                        <p><a href="{{url}}">More posts</a> by {{name}}.</p>
+                        <p><a href="{{homeUrl}}">More posts</a> by {{name}}.</p>
                     {{else}}
-                        <p>Read <a href="{{url}}">more posts</a> by this author.</p>
+                        <p>Read <a href="{{homeUrl}}">more posts</a> by this author.</p>
                     {{/if}}
                 </div>
             </div>
 
             {{#if profile_image}}
-                <a href="{{url}}" class="moving-avatar"><img class="author-profile-image" src="{{profile_image}}" alt="{{name}}" /></a>
+                <a href="{{homeUrl}}" class="moving-avatar"><img class="author-profile-image" src="{{profile_image}}" alt="{{name}}" /></a>
             {{else}}
-                <a href="{{url}}" class="moving-avatar author-profile-image">{{> icons_avatar}}</a>
+                <a href="{{homeUrl}}" class="moving-avatar author-profile-image">{{> icons_avatar}}</a>
             {{/if}}
 
         </li>
