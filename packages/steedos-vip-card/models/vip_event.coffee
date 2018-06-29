@@ -119,10 +119,13 @@ Creator.Objects.vip_event =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
+				console.log("before.insert.server.event=======doc=====", doc);
 				fields = Creator.getObject("vip_event")?.fields
 				unless fields
 					return
-				if _.isEmpty(doc.start)
+				if !doc.start
+					console.log("before.insert.server.event=======start===isEmpty==", doc.start);
 					doc.start = fields.start?.defaultValue()
-				if _.isEmpty(doc.alarms)
+				if !doc.alarms
+					console.log("before.insert.server.event=======alarms===isEmpty==", doc.alarms);
 					doc.alarms = fields.alarms?.defaultValue
