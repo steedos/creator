@@ -3,11 +3,6 @@ Creator.Objects.vip_wifi =
 	label: "Wi-Fi"
 	icon: "topic"
 	fields:
-		store:
-			label:'门店'
-			type:'lookup'
-			reference_to:'vip_store'
-			required:true
 		name:
 			type:'text'
 			label:'Wi-Fi名称'
