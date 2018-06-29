@@ -145,8 +145,10 @@ JsonRoutes.add "get", "/site/:space_id/:_id", (req, res, next)->
 	md = new MarkdownIt();
 
 	options.primary_tag = getPostPrimaryTag(space_id, post)
-
-	options.content = Spacebars.SafeString(md.render(post.description))
+	if post.description
+		options.content = Spacebars.SafeString(md.render(post.description))
+	else
+		options.content = ''
 
 	body = getBody('post', options)
 
