@@ -13,9 +13,7 @@ Creator.Objects.vip_menu =
 		related_to:
 			label: "关联到"
 			type: "lookup"
-			reference_to: ()->
-				o = ['post','post_category','vip_product','vip_product_category','vip_event','vip_store']
-				return o 
+			reference_to: ['post','post_category','vip_product','vip_product_category','vip_event','vip_store']
 			# options:[
 			# 	{label:'动态',value:'post'},
 			# 	{label:'栏目',value:'post_category'},
