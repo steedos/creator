@@ -18,6 +18,7 @@ Package.onUse(function (api) {
 	api.addFiles('models/vip_category.coffee');
 	api.addFiles('models/vip_event.coffee');
 	api.addFiles('models/vip_event_attendees.coffee');
+	api.addFiles('models/vip_menu.coffee');
 	api.addFiles('vip_app.coffee');
 	api.addFiles('site_app.coffee');
 	api.addFiles('models/vip_coupon.coffee');
