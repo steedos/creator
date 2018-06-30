@@ -15,8 +15,9 @@ Creator.Objects.post =
 			omit:true
 		description:
 			label:'正文'
-			is_wide:true
+			is_wide:false
 			type:'textarea'
+			rows: 8
 		comment_count:
 			label:'评论数'
 			type:'number'
