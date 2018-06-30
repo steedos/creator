@@ -139,12 +139,12 @@ Creator.Objects.vip_card =
 							throw new Meteor.Error 500, "卡号不能重复"		
 	permission_set:
 		user:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -153,16 +153,16 @@ Creator.Objects.vip_card =
 			modifyAllRecords: true
 			viewAllRecords: true
 		member:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
-			allowRead: true
-			modifyAllRecords: false
-			viewAllRecords: false
-		guest:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
+		guest:
+			allowCreate: true
+			allowDelete: false
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
