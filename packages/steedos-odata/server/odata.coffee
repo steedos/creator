@@ -685,7 +685,7 @@ Meteor.startup ->
 				spaceId = @urlParams.spaceId
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
-				isAllowed = permissions.modifyAllRecords or (permissions.allowDelete and record_owner==@userId )
+				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete)  or (permissions.allowDelete and record_owner==@userId )
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest'

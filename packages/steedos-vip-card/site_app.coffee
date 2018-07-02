@@ -12,5 +12,6 @@ Creator.Apps.site =
 		"vip_event",
 		"space_users",
 		"vip_store",
-		"vip_wifi"
+		"vip_wifi",
+		"vip_menu"
 		]
