@@ -20,75 +20,23 @@ Creator.Objects.archive_wenshu =
 	enable_files: true
 	enable_api: true
 	fields:
-		old_id:
-			type:"text"
-			label:"编号"
-			omit:true
-			group:"来源"
-		archives_name:
-			type:"text"
-			label:"档案馆名称"
-			# omit:true
-			group:"来源"
-		archives_identifier:
-			type:"text"
-			label:"档案馆代码"
-			# omit:true
-			group:"来源"
-		fonds_name:
-			type:"master_detail"
-			label:"全宗名称"
-			reference_to:"archive_fonds"
-			# omit:true
-			group:"来源"
-		archival_category_code:
-			type: "text"
-			label:"档案门类代码"
-			defaultValue: "WS"
-			group:"内容描述"
-			# omit:true
-
-		fonds_constituting_unit_name:
-			type: "text"
-			label:"立档单位名称"
-			defaultValue: ""
-			# omit:true
-			group:"来源"
-
-		aggregation_level:
-			type: "select"
-			label:"聚合层次"
-			defaultValue: "文件"
-			options:[
-				{label:"案卷",value:"案卷"},
-				{label:"文件",value:"文件"}],
-			allowedValues:["案卷","文件"],
-			# omit:true
-			group:"内容描述"
-
-		electronic_record_code:
-			type: "text"
-			label:"电子文件号"
-			defaultValue: ""
-			group:"电子文件号"
-			# omit:true
-
+		# ########档号###########
 		archival_code:
 			type:"text"
 			label:"档号"
+			is_wide:true
 			group:"档号"
-			# omit:true
+
 		fonds_identifier:
 			type:"master_detail"
 			label:"全宗号"
 			reference_to:"archive_fonds"
 			group:"档号"
-			omit:true
+
 		year:
 			type: "text"
 			label:"年度"
 			defaultValue: "2018"
-			#required:true
 			sortable:true
 			group:"档号"
 
@@ -96,22 +44,20 @@ Creator.Objects.archive_wenshu =
 			type:"master_detail"
 			label:"保管期限"
 			reference_to:"archive_retention"
-			#required:true
 			sortable:true
 			group:"档号"
 
 		category_code:
 			type:"master_detail"
 			label:"类别号"
-			defaultValue: ""
 			reference_to: "archive_classification"
-			#required:true
 			group:"档号"
 
 		organizational_structure:
 			type:"text"
 			label:"机构"
 			group:"档号"
+			omit:true
 		
 		organizational_structure_code:
 			type:"master_detail"
@@ -123,20 +69,17 @@ Creator.Objects.archive_wenshu =
 			type:"text"
 			label:"保管卷号"
 			group:"档号"
-			# omit:true
 
 		classification_number:
 			type:"text"
 			label:"分类卷号"
 			group:"档号"
-			# omit:true
 
 		item_number:
 			type: "number"
 			label:"件号"
 			group:"档号"
 			sortable:true
-			# omit:true
 
 		document_sequence_number:
 			type: "number"
@@ -148,12 +91,13 @@ Creator.Objects.archive_wenshu =
 			label:"页号"
 			group:"档号"
 
+		# ########内容描述###########
 		title:
 			type:"textarea"
 			label:"题名"
 			is_wide:true
 			is_name:true
-			#required:true
+			required:true
 			sortable:true
 			searchable:true
 			group:"内容描述"
@@ -167,45 +111,33 @@ Creator.Objects.archive_wenshu =
 			type:"text"
 			label:"说明题名文字"
 			group:"内容描述"
+
 		annex_title:
 			type:"textarea"
 			label:"附件题名"
-			is_wide:true
 			group:"内容描述"
-		descriptor:
-			type:"text"
-			label:"主题词"
-			# omit:true
-			group:"内容描述"
-		keyword:
-			type:"text"
-			label:"关键词"
-			# omit:true
-			group:"内容描述"
+		
 		personal_name:
 			type:"text"
 			label:"人名"
 			group:"内容描述"
-		abstract:
-			type:"text"
-			label:"摘要"
-			# omit:true
-			group:"内容描述"
+
 		document_number:
 			type:"text"
 			label:"文件编号"
 			group:"内容描述"
 			sortable:true
+			
 		author:
 			type:"text"
 			label:"责任者"
-			#required:true
 			group:"内容描述"
+		
 		document_date:
 			type:"date"
 			label:"文件日期"
 			format:"YYYYMMDD"
-			#required:true
+			required:true
 			group:"内容描述"
 			sortable:true
 
@@ -214,28 +146,38 @@ Creator.Objects.archive_wenshu =
 			label:"起始日期"
 			format:"YYYYMMDD"
 			group:"内容描述"
-			# omit:true
 
 		closing_date:
 			type:"date"
 			label:"截止日期"
 			format:"YYYYMMDD"
 			group:"内容描述"
-			# omit:true
+
 		destroy_date:
 			type:"date"
 			label:"销毁日期"
 			format:"YYYYMMDD"
 			group:"内容描述"
 			omit:true
-		precedence:
-			type:"text"
-			label:"紧急程度"
-			# omit:true
+		
+		archival_category_code:
+			type: "text"
+			label:"档案门类代码"
+			defaultValue: "WS"
 			group:"内容描述"
+			omit:true
+
+		electronic_record_code:
+			type: "text"
+			label:"电子文件号"
+			defaultValue: ""
+			group:"内容描述"
+			omit:true
+
 		prinpipal_receiver:
 			type:"text",
 			label:"主送",
+			is_wide:true
 			group:"内容描述"
 
 		other_receivers:
@@ -248,6 +190,40 @@ Creator.Objects.archive_wenshu =
 			label:"抄报",
 			group:"内容描述"
 
+		applicant_name:
+			type:"text"
+			label:"拟稿人"
+			group:"内容描述"
+
+		applicant_organization_name:
+			type:"text"
+			label:"拟稿单位"
+			group:"内容描述"
+		
+		main_dept:
+			type:"text",
+			label:"主办部室",
+			is_wide:true
+			defaultValue: ""
+			group:"内容描述"
+
+		storage_location:
+			type:"text"
+			label:"存放位置"
+			group:"内容描述"
+		
+		annotation:
+			type:"textarea",
+			label:"备注"
+			is_wide:true
+			group:"内容描述"
+
+		reference:
+			type: "text"
+			label:"参见"
+			is_wide:true
+			group:"内容描述"
+
 		security_classification:
 			type:"select"
 			label:"密级"
@@ -258,24 +234,12 @@ Creator.Objects.archive_wenshu =
 				{label: "秘密", value: "秘密"},
 				{label: "机密", value: "机密"},
 				{label: "绝密", value: "绝密"},
-				{label: "非密", value: "非密"}
+				{label: "非密", value: "非密"},
+				{label: "普通", value: "普通"}
 			]
 			allowedValues:["公开","限制","秘密","机密","绝密","非密","普通"]
-			#required:true
 			sortable:true
 			group:"内容描述"
-
-		applicant_name:
-			type:"text"
-			label:"拟稿人"
-			group:"内容描述"
-			# omit:true
-
-		applicant_organization_name:
-			type:"text"
-			label:"拟稿单位"
-			group:"内容描述"
-			# omit:true
 
 		secrecy_period:
 			type:"select"
@@ -287,6 +251,40 @@ Creator.Objects.archive_wenshu =
 			],
 			allowedValues:["10年","20年","30年"],			
 			group:"内容描述"
+		
+		descriptor:
+			type:"text"
+			label:"主题词"
+			is_wide:true
+			group:"内容描述"
+
+		keyword:
+			type:"text"
+			label:"关键词"
+			omit:true
+			group:"内容描述"
+
+		abstract:
+			type:"text"
+			label:"摘要"
+			is_wide:true
+			group:"内容描述"
+		
+		# ########形式特征###########
+		archive_dept:
+			type:"text"
+			label:"归档部门"
+			group:"形式特征"
+		
+		archive_date:
+			type:"date"
+			label:"归档日期"
+			group:"形式特征"
+
+		document_type:
+			type:"text"
+			label:"文件类型"
+			group:"形式特征"
 
 		document_aggregation:
 			type:"select",
@@ -298,244 +296,7 @@ Creator.Objects.archive_wenshu =
 			],
 			allowedValues:["单件","组合文件"],			
 			group:"形式特征"
-
-		total_number_of_items:
-			type: "text"
-			label:"卷内文件数"
-			group:"形式特征"
-			# omit:true
-
-		total_number_of_pages:
-			type:"number"
-			label:"页数"
-			group:"形式特征"
-
-		document_type:
-			type:"text"
-			label:"文件类型"
-			group:"形式特征"
-			# omit:true
-
-		document_status:
-			type:"select",
-			label:"文件状态",
-			defaultValue: "不归档"
-			options: [
-				{label: "不归档", value: "不归档"},
-				{label: "电子归档", value: "电子归档"},
-				{label: "暂存", value: "暂存"},
-				{label: "待归档", value: "待归档"},
-				{label: "实物归档", value: "实物归档"}
-			]
-			allowedValues:["不归档","电子归档","待归档","暂存","实物归档"]
-			group:"形式特征"
-
-		language:
-			type:"text"
-			label:"语种"
-			defaultValue: "汉语"
-			group:"形式特征"
-
-		orignal_document_creation_way:
-			type:"text"
-			label:"电子档案生成方式"
-			defaultValue: "原生"
-			options: [
-				{label: "数字化", value: "数字化"},
-				{label: "原生", value: "原生"}
-			],
-			allowedValues:["数字化","原生"],		
-			group:"形式特征"
-			# omit:true
-
-		format_name:
-			type:"text"
-			label:"格式名称"
-			# omit:true
-			group:"电子属性"
-		format_version:
-			type:"text"
-			label:"格式版本"
-			# omit:true
-			group:"电子属性"
-		computer_file_name:
-			type:"text"
-			label:"计算机文件名"
-			# omit:true
-			group:"电子属性"
-		document_size:
-			type:"text"
-			label:"计算机文件大小"
-			# omit:true
-			group:"电子属性"
-		physical_record_characteristics:
-			type:"text"
-			label:"数字化对象形态"
-			# omit:true
-			group:"数字化属性"
-		scanning_resolution:
-			type:"text"
-			label:"扫描分辨率"
-			# omit:true
-			group:"数字化属性"
-		scanning_color_model:
-			type:"text"
-			label:"扫描色彩模式"
-			# omit:true
-			group:"数字化属性"
-		image_compression_scheme:
-			type:"text"
-			label:"图像压缩方案"
-			# omit:true
-			group:"数字化属性"
-		device_type:
-			type:"text"
-			label:"设备类型"
-			# omit:true
-			group:"数字化设备信息"
-		device_manufacturer:
-			type:"text"
-			label:"设备制造商"
-			# omit:true
-			group:"数字化设备信息"
-		device_model_number:
-			type:"text"
-			label:"设备型号"
-			# omit:true
-			group:"数字化设备信息"
-		device_model_serial_number:
-			type:"text"
-			label:"设备序列号"
-			# omit:true
-			group:"数字化设备信息"
-		software_type:
-			type:"text"
-			label:"软件类型"
-			# omit:true
-			group:"数字化设备信息"
-		software_name:
-			type:"text"
-			label:"软件名称"
-			# omit:true
-			group:"数字化设备信息"
-		signature_rules:
-			type:"text"
-			label:"签名规则"
-			# omit:true
-			group:"电子签名"
-		signature_time:
-			type:"datetime"
-			label:"签名时间"
-			# omit:true
-			group:"电子签名"
-		signer:
-			type:"text"
-			label:"签名人"
-			# omit:true
-			group:"电子签名"
-		signature:
-			type:"text"
-			label:"签名结果"
-			# omit:true
-			group:"电子签名"
-		certificate:
-			type:"text"
-			label:"证书"
-			# omit:true
-			group:"电子签名"
-		certificate_reference:
-			type:"text"
-			label:"证书引证"
-			# omit:true
-			group:"电子签名"
-		signature_algorithm_identifier:
-			type:"text"
-			label:"签名算法标识"
-			# omit:true
-			group:"电子签名"
-		current_location:
-			type:"text"
-			label:"当前位置"
-			# omit:true
-			group:"存储位置"
-		offline_medium_identifier:
-			type:"text"
-			label:"脱机载体编号"
-			group:"存储位置"
-		offline_medium_storage_location:
-			type:"text"
-			label:"脱机载体存址"
-			group:"存储位置"
-		intelligent_property_statement:
-			type: "text"
-			label:"知识产权说明"
-			group:"权限管理"
-		authorized_agent:
-			type: "text"
-			label:"授权对象"
-			group:"权限管理"
-		permission_assignment:
-			type: "select"
-			label:"授权行为"
-			options: [
-				{label: "公布", value: "公布"},
-				{label: "复制", value: "复制"},
-				{label: "浏览", value: "浏览"},
-				{label: "解密", value: "解密"}
-			],
-			allowedValues:["公布","复制","浏览","解密"],			
-			# omit:true
-			group:"权限管理"
-		control_identifier:
-			type: "select"
-			label:"控制标识"
-			options: [
-				{label: "开放", value: "开放"},
-				{label: "控制", value: "控制"}
-			],
-			allowedValues:["开放","控制"],			
-			# omit:true
-			group:"权限管理"
-		agent_type:
-			type: "select"
-			label:"机构人员类型"
-			defaultValue:"部门"
-			options: [
-				{label: "单位", value: "单位"},
-				{label: "部门", value: "部门"},
-				{label: "个人", value: "个人"}
-			],
-			allowedValues:["单位","部门","个人"],		
-			group:"机构人员"
-			# omit:true
-		agent_name:
-			type: "text"
-			label:"机构人员名称"
-			group:"机构人员"
-			# omit:true
-		organization_code:
-			type: "text"
-			label:"组织机构代码"
-			group:"机构人员"
-			# omit:true
-		agent_belongs_to:
-			type: "text"
-			label:"机构人员隶属"
-			group:"机构人员"
-			# omit:true
-
-		archive_date:
-			type:"date"
-			label:"归档日期"
-			group:"形式特征"
-			# omit:true
-
-		archive_dept:
-			type:"text"
-			label:"归档部门"
-			defaultValue: ""
-			group:"形式特征"
-
+			
 		produce_flag:
 			type:"select",
 			label:"处理标志",
@@ -549,104 +310,230 @@ Creator.Objects.archive_wenshu =
 			],
 			allowedValues:["在档","暂存","移出","销毁","出借"],		
 			group:"形式特征"
-			# omit:true
-
-		main_dept:
-			type:"text",
-			label:"主办部室",
-			is_wide:true
-			defaultValue: ""
-			group:"内容描述"
-
-		annotation:
-			type:"textarea",
-			label:"备注",
-			is_wide:true
-			group:"内容描述"
-
-		storage_location:
-			type:"text"
-			label:"存放位置"
-			group:"内容描述"
-			# omit:true
-
-		reference:
-			type: "text"
-			label:"参见"
-			group:"内容描述"
-			# omit:true
 		
+		language:
+			type:"text"
+			label:"语种"
+			defaultValue: "汉语"
+			group:"形式特征"
+
+		total_number_of_items:
+			type: "number"
+			label:"卷内文件数"
+			group:"形式特征"
+
+		total_number_of_pages:
+			type:"number"
+			label:"页数"
+			group:"形式特征"
+
+		document_status:
+			type:"select",
+			label:"文件状态",
+			defaultValue: "暂存"
+			options: [
+				{label: "不归档", value: "不归档"},
+				{label: "电子归档", value: "电子归档"},
+				{label: "暂存", value: "暂存"},
+				{label: "待归档", value: "待归档"},
+				{label: "实物归档", value: "实物归档"}
+			]
+			allowedValues:["不归档","电子归档","待归档","暂存","实物归档"]
+			group:"形式特征"
+
+		orignal_document_creation_way:
+			type:"text"
+			label:"电子档案生成方式"
+			defaultValue: "原生"
+			options: [
+				{label: "数字化", value: "数字化"},
+				{label: "原生", value: "原生"}
+			],
+			allowedValues:["数字化","原生"],		
+			group:"形式特征"
+
+		aggregation_level:
+			type: "select"
+			label:"聚合层次"
+			defaultValue: "文件"
+			options:[
+				{label:"案卷",value:"案卷"},
+				{label:"文件",value:"文件"}],
+			allowedValues:["案卷","文件"]
+			group:"形式特征"
+		# ########存储位置###########
+		current_location:
+			type:"text"
+			label:"当前位置"
+			is_wide:true
+			group:"存储位置"
+
+		offline_medium_identifier:
+			type:"text"
+			label:"脱机载体编号"
+			group:"存储位置"
+
+		offline_medium_storage_location:
+			type:"text"
+			label:"脱机载体存址"
+			group:"存储位置"
+
+		# ########权限管理###########
+		intelligent_property_statement:
+			type: "text"
+			label:"知识产权说明"
+			group:"权限管理"
+		
+		control_identifier:
+			type: "select"
+			label:"控制标识"
+			options: [
+				{label: "开放", value: "开放"},
+				{label: "控制", value: "控制"}
+			],
+			allowedValues:["开放","控制"],
+			group:"权限管理"
+
+		authorized_agent:
+			type: "text"
+			label:"授权对象"
+			group:"权限管理"
+
+		permission_assignment:
+			type: "select"
+			label:"授权行为"
+			options: [
+				{label: "公布", value: "公布"},
+				{label: "复制", value: "复制"},
+				{label: "浏览", value: "浏览"},
+				{label: "解密", value: "解密"}
+			],
+			allowedValues:["公布","复制","浏览","解密"],
+			group:"权限管理"
+
+		# ########机构人员###########
+		agent_type:
+			type: "select"
+			label:"机构人员类型"
+			defaultValue:"部门"
+			options: [
+				{label: "单位", value: "单位"},
+				{label: "部门", value: "部门"},
+				{label: "个人", value: "个人"}
+			],
+			allowedValues:["单位","部门","个人"],		
+			group:"机构人员"
+
+		agent_name:
+			type: "text"
+			label:"机构人员名称"
+			group:"机构人员"
+
+		organization_code:
+			type: "text"
+			label:"组织机构代码"
+			group:"机构人员"
+
+		agent_belongs_to:
+			type: "text"
+			label:"机构人员隶属"
+			group:"机构人员"
+
+		# ########来源###########
+		archives_name:
+			type:"text"
+			label:"档案馆名称"
+			group:"来源"
+
+		archives_identifier:
+			type:"text"
+			label:"档案馆代码"
+			group:"来源"
+
+		fonds_name:
+			type:"master_detail"
+			label:"全宗名称"
+			reference_to:"archive_fonds"
+			group:"来源"
+
+		fonds_constituting_unit_name:
+			type: "text"
+			label:"立档单位名称"
+			defaultValue: ""
+			group:"来源"
+
+		related_archives:
+			label:'关联文件'
+			type:'lookup'
+			is_wide:true
+			reference_to:'archive_wenshu'
+			multiple:true
+			group:"来源"
+
+		# 老系统的ID
+		old_id:
+			type:"text"
+			label:"编号"
+			hidden: true
+		#如果是从OA归档过来的档案，则值为表单Id,否则不存在该字段
+		# OA系统的表单ID
+		external_id:
+			type:"text"
+			label:'表单ID'
+			hidden: true
+
 		#是否接收，默认是未接收
 		is_received:
 			type:"boolean"
 			label:"是否接收"
 			defaultValue:false
-			omit:true
-
+			hidden: true
 		received:
 			type:"datetime"
 			label:"接收时间"
-			omit:true
-
+			hidden: true
 		received_by:
 			type: "lookup"
 			label:"接收人"
 			reference_to: "users"
-			omit: true
+			hidden: true
+		
 		#是否移交，默认是不存在，在“全部”视图下点击移交，进入“待移交”视图，此时is_transfer=false
 		#审核通过之后，is_transfer = true
 		is_transfered:
 			type:"boolean"
-			omit:true
 			label:"是否移交"
+			hidden: true
 		transfered:
 			type:"datetime"
 			label:"移交时间"
-			omit:true
+			hidden: true
 		transfered_by:
 			type: "lookup"
 			label:"移交人"
 			reference_to: "users"
-			omit: true
-
+			hidden: true
+		archive_transfer_id:
+			type:"master_detail"
+			label:"移交单"
+			reference_to:"archive_transfer"
+			group:"移交"
+		
 		#是否销毁，默认是不存在，在“全部”视图下点击销毁，进入“待销毁”视图，此时is_destroy=false
 		#审核通过之后，is_transfer = true
 		is_destroyed:
 			type:"boolean"
 			label:'是否销毁'
-			omit:true
-			group:"销毁"
+			hidden: true
 		destroyed:
 			type:"datetime"
 			label:'实际销毁时间'
-			omit:true
-			group:"销毁"
+			hidden: true
 		destroyed_by:
 			type: "lookup"
 			label:"销毁人"
 			reference_to: "users"
-			omit: true
-			group:"销毁"
-		is_borrowed:
-			type:"boolean"
-			defaultValue:false
-			label:'是否借阅'
-			omit:true
-		borrowed:
-			type:"datetime"
-			label:"借阅时间"
-			omit:true
-		borrowed_by:
-			type: "lookup"
-			label:"借阅人"
-			reference_to: "users"
-			omit: true
-		#如果是从OA归档过来的档案，则值为表单Id,否则不存在改字段
-		external_id:
-			type:"text"
-			label:'表单Id'
-			omit:true
-			group:"内容描述"
+			hidden: true
 		archive_destroy_id:
 			type:"master_detail"
 			label:"销毁单"
@@ -654,25 +541,33 @@ Creator.Objects.archive_wenshu =
 			depend_on:["destroy_state"]
 			reference_to:"archive_destroy"
 			group:"销毁"
+		
+		# 是否借阅
+		is_borrowed:
+			type:"boolean"
+			defaultValue:false
+			label:'是否借阅'
+			hidden: true
+		borrowed:
+			type:"datetime"
+			label:"借阅时间"
+			hidden: true
+		borrowed_by:
+			type: "lookup"
+			label:"借阅人"
+			reference_to: "users"
+			hidden: true
+		
 		related_modified:
 			type:"datetime"
 			label:"附属更新时间"
-			omit:true
-		related_archives:
-			label:'关联文件'
-			type:'lookup'
-			reference_to:'archive_wenshu'
-			multiple:true
-		archive_transfer_id:
-			type:"master_detail"
-			label:"移交单"
-			reference_to:"archive_transfer"
-			group:"移交"
+			hidden: true
+		
 		has_xml:
 			type:"boolean"
 			label:"是否封装xml"
-			# 彻底不显示
 			hidden: true
+
 	list_views:
 		recent:
 			label: "最近查看"
@@ -701,7 +596,7 @@ Creator.Objects.archive_wenshu =
 		destroy:
 			label:"待销毁"
 			filter_scope: "space"
-			filters: [["is_received", "=", true],["destroy_date","<=",new Date()],["is_destroyed", "=", false]]
+			filters: [["is_received", "=", true],["is_destroyed", "=", false]]
 			columns:["year","title","document_date","destroy_date","archive_destroy_id"]
 		
 	permission_set:
@@ -734,6 +629,10 @@ Creator.Objects.archive_wenshu =
 				rules = Creator.Collections["archive_rules"].find({fieldname:'title'},{fields:{keywords:1}}).fetch()
 				rules_keywords = _.pluck rules, "keywords"
 				i = 0
+				console.log rules_keywords
+				rules_keywords.forEach (rules_keyword)->
+					console.log rules_keyword
+					
 				while i < rules_keywords.length
 					is_matched = true
 					j = 0
@@ -750,13 +649,17 @@ Creator.Objects.archive_wenshu =
 					i++
 				if rule_id
 					category_retention = Creator.Collections["archive_rules"].findOne({_id:rule_id},{fields:{classification:1,retention:1}})
-					doc.category_code = category_retention.classification
-					doc.retention_peroid = category_retention.retention
-					duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
-					year = doc.document_date.getFullYear()+duration
-					month = doc.document_date.getMonth()
-					day = doc.document_date.getDate()
-					doc.destroy_date = new Date(year,month,day)
+				else
+					category_retention = Creator.Collections["archive_rules"].findOne({name:'长期'},{fields:{classification:1,retention:1}})
+				# 类别号
+				doc.category_code = category_retention?.classification
+				# 保管期限
+				doc.retention_peroid = category_retention?.retention
+				duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
+				year = doc.document_date.getFullYear()+duration
+				month = doc.document_date.getMonth()
+				day = doc.document_date.getDate()
+				doc.destroy_date = new Date(year,month,day)
 				return true
 
 		"before.update.server.default":
@@ -791,7 +694,14 @@ Creator.Objects.archive_wenshu =
 					swal("请先选择要接收的档案")
 					return
 				init_num = prompt("输入初始件号值")
-				Meteor.call("archive_item_number",object_name,Creator.TabularSelectedIds?[object_name],init_num)
+				Meteor.call("archive_item_number",object_name,Creator.TabularSelectedIds?[object_name],init_num,
+					(error, result)->
+						if result
+							text = "编号已更新到" + result + "号"
+							swal(text)
+						)
+
+		
 		receive:
 			label: "接收"
 			visible: true
