@@ -137,7 +137,7 @@ Creator.Objects.vip_store =
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
+			modifyAllRecords: true
 			viewAllRecords: true
 		guest:
 			allowCreate: false
