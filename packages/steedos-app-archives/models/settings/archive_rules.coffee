@@ -16,7 +16,6 @@ Creator.Objects.archive_rules =
 			type:"[text]"
 			label:"关键词"
 			is_wide:true
-			required:true
 		classification:
 			type:"master_detail"
 			label:"设置为分类"
@@ -45,5 +44,15 @@ Creator.Objects.archive_rules =
 		all:
 			label:"全部分类规则"
 			filter_scope: "space"
-			columns:["fieldname","classification","keywords","retention"]
+			columns:["fieldname","keywords","retention","classification"]
+		title_rules:
+			label:"保管期限规则"
+			filter_scope: "space"
+			filters: [["fieldname", "=", "title"]]
+			columns:["fieldname","keywords","retention"]
+		dept_rules:
+			label:"分类规则"
+			filter_scope: "space"
+			filters: [["fieldname", "=", "dept"]]
+			columns:["fieldname","keywords","classification"]
 
