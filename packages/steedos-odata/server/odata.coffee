@@ -682,9 +682,8 @@ Meteor.startup ->
 						statusCode: 404
 						body: setErrorMessage(404,collection,key)
 					}
-				spaceId = @urlParams.spaceId
-				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
-				record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
+				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
+				record_owner = collection.findOne({_id: @urlParams._id, space: @urlParams.spaceId})?.owner
 				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete)  or (permissions.allowDelete and record_owner==@userId )
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
