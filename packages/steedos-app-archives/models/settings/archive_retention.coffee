@@ -6,7 +6,7 @@ Creator.Objects.archive_retention =
 	fields:
 		name:
 			type:"text"
-			label:"保管期限"
+			label:"名称"
 			is_name:true
 			is_wide:true
 			required:true
