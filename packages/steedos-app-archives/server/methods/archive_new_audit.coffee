@@ -13,3 +13,4 @@ Meteor.methods
 		SelectedIds.forEach (SelectedId)->
 			Creator.Collections[object_name].update(SelectedId,{$set:item_number:init_num})
 			init_num++
+		return init_num
