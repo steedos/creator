@@ -30,6 +30,20 @@ Creator.Objects.vip_address =
 			label: "所有"
 			columns: ["name", "address", "door", "phone", "is_default"]
 			filter_scope: "space"
+	triggers:
+		"after.insert.server.vip_address":
+			on: "server"
+			when: "after.insert"
+			todo: (userId, doc)->
+				if doc?.is_default
+					Creator.getCollection('vip_address').direct.update({_id: {$ne: doc._id}, owner: userId}, {$set: {is_default: false}}, {multi: true})
+		"after.update.server.vip_address":
+			on: "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if modifier?.$set?.is_default
+					Creator.getCollection('vip_address').direct.update({_id: {$ne: doc._id}, owner: userId}, {$set: {is_default: false}}, {multi: true})
+					
 	permission_set:
 		user:
 			allowCreate: true
