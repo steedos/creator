@@ -4,25 +4,25 @@ Creator.Objects.vip_share_response =
 	icon: "address"
 	fields:
 		name:
-			label:'名称'
+			label:'响应人'
 			type:'text'
 			#owner.name
-		vip_share:
-			label:'相关分享'
+		share:
+			label:'分享人'
 			type:'lookup'
 			reference_to:'vip_share'
-		related_to:
-			label: "关联到"
-			type: "lookup"
-			reference_to: 'vip_product'
+		# related_to:
+		# 	label: "关联到"
+		# 	type: "lookup"
+		# 	reference_to: 'vip_product'
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "owner","vip_share"]
+			columns: ["name","share","created"]
 			filter_scope: "space"
 	permission_set:
 		user:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: false
@@ -30,20 +30,20 @@ Creator.Objects.vip_share_response =
 			viewAllRecords: true
 		admin:
 			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
-			modifyAllRecords: true
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
 			viewAllRecords: true
 		member:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
 			viewAllRecords: true
 		guest:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: false

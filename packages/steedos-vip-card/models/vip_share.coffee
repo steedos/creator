@@ -4,9 +4,9 @@ Creator.Objects.vip_share =
 	icon: "address"
 	fields:
 		name:
-			label:'名称'
+			label:'分享人'
 			type:'text'
-			#分享的商品对应的礼物名称
+			#owner.name
 		#分享人就是owner
 		related_to:
 			label: "关联到"
@@ -15,16 +15,16 @@ Creator.Objects.vip_share =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "related_to"]
+			columns: ["name", "related_to","created"]
 			filter_scope: "space"
 	permission_set:
 		user:
-			allowCreate: false
-			allowDelete: false
+			allowCreate: true
+			allowDelete: true
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -33,19 +33,19 @@ Creator.Objects.vip_share =
 			modifyAllRecords: true
 			viewAllRecords: true
 		member:
-			allowCreate: false
-			allowDelete: false
+			allowCreate: true
+			allowDelete: true
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		guest:
-			allowCreate: false
-			allowDelete: false
+			allowCreate: true
+			allowDelete: true
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 
 		
 

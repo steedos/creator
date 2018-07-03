@@ -8,31 +8,31 @@ Creator.Objects.vip_share_gift =
 			type:'text'
 			#礼物的名称
 		vip_share:
-			label:'发起人'
+			label:'分享人'
 			type:'lookup'
 			reference_to:'vip_share'
 		related_to:
 			label: "关联到"
 			type: "lookup"
 			reference_to: 'vip_product'
-		count:
-			label:'份数'
-			type:'number'
-			defaultValue:0
+		# count:
+		# 	label:'份数'
+		# 	type:'number'
+		# 	defaultValue:0
 		#此表记录的owner和vip_share的owner一致
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "owner","count"]
+			columns: ["name", "owner","created"]
 			filter_scope: "space"
 	permission_set:
 		user:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -41,17 +41,17 @@ Creator.Objects.vip_share_gift =
 			modifyAllRecords: true
 			viewAllRecords: true
 		member:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		guest:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
-			allowRead: false
+			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 
