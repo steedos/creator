@@ -160,6 +160,12 @@ Creator.Objects.archive_wenshu =
 			group:"内容描述"
 			omit:true
 		
+		destroy_date_timestamp:
+			type:"number"
+			label:"销毁日期时间戳"
+			group:"内容描述"
+			hidden:true
+		
 		archival_category_code:
 			type: "text"
 			label:"档案门类代码"
@@ -596,7 +602,7 @@ Creator.Objects.archive_wenshu =
 		destroy:
 			label:"待销毁"
 			filter_scope: "space"
-			filters: [["is_received", "=", true],["is_destroyed", "=", false]]
+			filters: [["is_received", "=", true],["destroy_date_timestamp", "<=", new Date().getTime()],["is_destroyed", "=", false]]
 			columns:["year","title","document_date","destroy_date","archive_destroy_id"]
 		
 	permission_set:
@@ -629,10 +635,6 @@ Creator.Objects.archive_wenshu =
 				rules = Creator.Collections["archive_rules"].find({fieldname:'title'},{fields:{keywords:1}}).fetch()
 				rules_keywords = _.pluck rules, "keywords"
 				i = 0
-				console.log rules_keywords
-				rules_keywords.forEach (rules_keyword)->
-					console.log rules_keyword
-					
 				while i < rules_keywords.length
 					is_matched = true
 					j = 0
@@ -662,11 +664,11 @@ Creator.Objects.archive_wenshu =
 				doc.destroy_date = new Date(year,month,day)
 				return true
 
-		"before.update.server.default":
-			on: "server"
-			when: "before.update"
-			todo: (userId, doc, fieldNames, modifier, options)->
-				doc.retention_peroid = "DRmxfw7ByKd92gXsK"
+		# "before.update.server.default":
+		# 	on: "server"
+		# 	when: "before.update"
+		# 	todo: (userId, doc, fieldNames, modifier, options)->
+		# 		doc.retention_peroid = ""
 
 		"after.update.server.default":
 			on: "server"
@@ -674,14 +676,20 @@ Creator.Objects.archive_wenshu =
 			todo: (userId, doc, fieldNames, modifier, options)->
 				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_name or modifier['$set']?.year
                     set_archivecode(doc._id)
-                if modifier['$set']?.retention_peroid
+                if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
                 	duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})?.years
 					if duration
 						year = doc.document_date.getFullYear()+duration
 						month = doc.document_date.getMonth()
 						day = doc.document_date.getDate()
-						destroy_date = new Date(year,month,day)
-						Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},{$set:{destroy_date:destroy_date}})
+						destroy_date = new Date(year,month,day)destroy_date_timestamp = destroy_date.getTime()
+						Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
+							{
+								$set:{
+									destroy_date:destroy_date,
+									destroy_date_timestamp:destroy_date_timestamp
+									}
+							})
 				# logger.info "AAA"
 
 	actions:
