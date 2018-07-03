@@ -89,14 +89,14 @@ Creator.Objects.vip_event =
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
 			viewAllRecords: true
 		member:
 			allowCreate: true
