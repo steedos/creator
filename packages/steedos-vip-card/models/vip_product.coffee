@@ -19,8 +19,8 @@ Creator.Objects.vip_product =
 			type:'number'
 			scale: 2
 		description:
-			label:'备注'
-			type:'text'
+			label:'正文'
+			type:'textarea'
 			is_wide:true
 		covers:
 			label:'轮播图'
