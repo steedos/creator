@@ -25,11 +25,15 @@ Package.onUse(function(api) {
 	api.addFiles('models/archives/archive_tongji.coffee');
 	api.addFiles('models/archives/archive_shenji.coffee');
 	
+	
+	api.addFiles('manage.coffee');
+	api.addFiles('models/manages/archive_borrow.coffee');
+	api.addFiles('models/manages/archive_destroy.coffee');	
+
+	
 	api.addFiles('setting.coffee');
 	api.addFiles('models/settings/archive_organization.coffee');
-	api.addFiles('models/settings/archive_borrow.coffee');
 	api.addFiles('models/settings/archive_classification.coffee');
-	api.addFiles('models/settings/archive_destroy.coffee');
 	api.addFiles('models/settings/archive_transfer.coffee');
 	api.addFiles('models/settings/archive_entity_relation.coffee');
 	api.addFiles('models/settings/archive_fonds.coffee');
@@ -42,5 +46,6 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/archive_transfer.coffee', 'server');
 	api.addFiles('server/methods/archive_new_audit.coffee', 'server');
 	api.addFiles('server/methods/archive_export.coffee', 'server');
+
 
 })
