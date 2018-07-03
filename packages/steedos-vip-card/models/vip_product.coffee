@@ -19,7 +19,7 @@ Creator.Objects.vip_product =
 			type:'number'
 			scale: 2
 		description:
-			label:'正文'
+			label:'商品描述'
 			type:'textarea'
 			is_wide:true
 		covers:
