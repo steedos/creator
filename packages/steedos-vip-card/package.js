@@ -28,4 +28,7 @@ Package.onUse(function (api) {
 	api.addFiles('models/vip_invoice_info.coffee');
 	api.addFiles('models/vip_product.coffee');
 	api.addFiles('models/vip_product_category.coffee');
+	api.addFiles('models/vip_share.coffee');
+	api.addFiles('models/vip_share_gift.coffee');
+	api.addFiles('models/vip_share_response.coffee');
 })

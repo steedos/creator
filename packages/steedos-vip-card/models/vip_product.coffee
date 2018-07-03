@@ -60,6 +60,9 @@ Creator.Objects.vip_product =
 			label:'重量'
 			type:'number'   
 			scale: 2
+		gift:
+			label:'赠礼'
+			type:'text'
 	list_views:
 		all:
 			label: "所有"
