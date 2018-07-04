@@ -20,11 +20,16 @@ Creator.Objects.archive_retention =
 			type:"number"
 			label:"对应年限"
 			required:true
+		is_default:
+			type: "boolean"
+			label: "是否默认"
+			required: true
+			defaultValue: false
 	list_views:
 		all:
 			label:"所有"
 			filter_scope: "space"
-			columns:["name","code","years"]
+			columns:["name","code","years","is_default"]
 	permission_set:
 		user:
 			allowCreate: false
