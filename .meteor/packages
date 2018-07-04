@@ -36,7 +36,6 @@ aldeed:collection2
 aldeed:simple-schema
 aldeed:autoform
 steedos:autoform-bs-datetimepicker
-risul:moment-timezone
 steedos:bootstrap3-datetimepicker
 steedos:creator-autoform-modals
 steedos:autoform-bs-minicolors
@@ -55,6 +54,8 @@ meteorhacks:subs-manager
 dburles:collection-helpers
 
 momentjs:moment
+mrt:moment
+mrt:moment-timezone
 
 steedos:loaders-css
 
@@ -84,7 +85,10 @@ steedos:cfs-s3
 steedos:cfs-standard-packages
 steedos:cfs-ui
 
-steedos:oauth2-server
+steedos:e164-phones-countries
+steedos:i18n-iso-countries
+# steedos:qcloud-smsqueue
+# steedos:oauth2-server
 
 smoral:sweetalert@1.1.1
 
@@ -93,16 +97,19 @@ peppelg:bootstrap-3-modal@1.0.4
 keepnox:perfect-scrollbar
 
 steedos:ionicons@0.1.7
-
+# steedos:vip-card
+# steedos:vip-post
 steedos:objects
 steedos:sso
 
-#steedos:app-crm
-# steedos:app-informations
 steedos:app-admin
+
+# steedos:app-crm
+# steedos:app-informations
+
 #steedos:app-cms
 steedos:app-workflow
-#steedos:app-example
+# steedos:app-example
 steedos:creator
 natestrauser:select2
 meteorhacks:unblock@1.1.0
@@ -126,8 +133,8 @@ steedos:instance-record-queue
 
 http@1.2.9
 
-steedos:app-archive@0.0.5
+steedos:app-archive
 
-steedos:records-sync
+steedos:qhd-archive-sync
 
-steedos:records-xml
+steedos:qhd-archive-xml

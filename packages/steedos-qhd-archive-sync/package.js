@@ -1,7 +1,7 @@
 Package.describe({
-	name: 'steedos:records-xml',
+	name: 'steedos:qhd-archive-sync',
 	version: '0.0.1',
-	summary: 'Steedos xml',
+	summary: 'Steedos libraries',
 	git: ''
 });
 
@@ -9,9 +9,7 @@ Npm.depends({
 	'request'  : '2.81.0',
 	'node-schedule' : '1.2.1',
 	cookies: "0.6.1",
-	mkdirp: "0.3.5",
-	"xml2js": "0.4.19",
-	'node-rsa': '1.0.0'
+	"eval": "0.1.2",
 });
 
 Package.onUse(function (api) {
@@ -31,15 +29,21 @@ Package.onUse(function (api) {
 	api.use('steedos:app-workflow');
 	api.use('steedos:app-archive');
 
-	// api.addFiles('server/lib/records_xml.coffee', 'server');
+	api.addFiles('server/lib/instance_manager.coffee', 'server');
 
-	api.addFiles('server/lib/export_to_xml.coffee', 'server');
-	// api.addFiles('server/lib/encapsulation.coffee', 'server');
-	api.addFiles('server/lib/records_xml_sync.coffee', 'server');
+	api.addFiles('server/lib/instances_to_archive.coffee', 'server');
 
-	api.export('XMLSync');
+	api.addFiles('server/lib/records_qhd.coffee', 'server');
 
-	api.export('Records2XML');
+	api.export('steedosRequest');
+
+	api.export('InstancesToArchive');
+
+	api.export('InstancesToContracts');
+
+	api.export("InstanceManager");
+
+	api.export('RecordsQHD');
 
 });
 

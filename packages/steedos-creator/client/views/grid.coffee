@@ -16,6 +16,8 @@ _standardQuery = (curObjectName)->
 					query_arr.push([key, ">=", val])
 				else if ["text", "textarea", "html"].includes(object_fields[key].type)
 					query_arr.push([key, "contains", val])
+				else if ["boolean"].includes(object_fields[key].type)
+					query_arr.push([key, "=", JSON.parse(val)])
 				else
 					query_arr.push([key, "=", val])
 			else
@@ -29,6 +31,10 @@ _itemClick = (e, curObjectName, list_view_id)->
 	record = e.data
 	if !record
 		return
+
+	if _.isObject(record._id)
+		record._id = record._id._value
+
 	record_permissions = Creator.getRecordPermissions curObjectName, record, Meteor.userId()
 	actions = _actionItems(curObjectName, record._id, record_permissions)
 
@@ -403,7 +409,7 @@ Template.creator_grid.onRendered ->
 							else if error.httpStatus == 403
 								error.message = t "creator_odata_user_privileges"
 							else if error.httpStatus == 500
-								if error.message == "Unexpected character at 106"
+								if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 									error.message = t "creator_odata_unexpected_character"
 							toastr.error(error.message)
 					select: selectColumns
