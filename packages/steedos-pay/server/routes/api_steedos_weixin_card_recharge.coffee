@@ -16,7 +16,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         check order_id, String
         check sub_appid, String
 
-        order = Creator.getCollection('vip_order').findOne(order_id, { fields: { space: 1, store: 1, amount: 1, amount_paid: 1 } })
+        order = Creator.getCollection('vip_order').findOne(order_id, { fields: { space: 1, store: 1, amount: 1, amount_paid: 1, name: 1 } })
 
         if not order
             throw new Meteor.Error('error', "未找到订单")
@@ -35,7 +35,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
 
         returnData = {}
 
-        order_body = '会员充值'
+        order_body = order.name || '消费'
 
         attach = {}
         attach.record_id = Creator.getCollection('billing_record')._makeNewID()
