@@ -30,7 +30,7 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 		#创建工作区、root org、space user
 		spaceId = WXMini.newSpace(userId, space_name)
 		orgId = WXMini.newOrganization(userId, spaceId, space_name)
-		space_user = WXMini.newSpaceUser(userId, spaceId, orgId, contact_name, 'admin', mobile)
+		space_user = WXMini.newSpaceUser(userId, spaceId, orgId, contact_name, 'user', mobile)
 
 		console.log("userId", userId)
 
