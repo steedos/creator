@@ -109,6 +109,8 @@ Creator.Objects.vip_store =
 					if modifier?.$set?.qrcode == doc.qrcode
 						delete modifier.$set.qrcode
 					Creator.getCollection("vip_store").direct.update({_id: doc.space},{$unset:{qrcode:1}})
+				if modifier?.$set?.admins && modifier?.$set?.admins.indexOf(doc.owner) < 0
+					modifier.$set.admins.push doc.owner
 		"after.insert.server.store":
 			todo: (userId, doc)->
 				space_doc = {avatar:doc.avatar, cover:doc.cover, name:doc.name, admins:doc.admins}
