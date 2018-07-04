@@ -682,7 +682,8 @@ Creator.Objects.archive_wenshu =
 						year = doc.document_date.getFullYear()+duration
 						month = doc.document_date.getMonth()
 						day = doc.document_date.getDate()
-						destroy_date = new Date(year,month,day)destroy_date_timestamp = destroy_date.getTime()
+						destroy_date = new Date(year,month,day)
+						destroy_date_timestamp = destroy_date?.getTime()
 						Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
 							{
 								$set:{
