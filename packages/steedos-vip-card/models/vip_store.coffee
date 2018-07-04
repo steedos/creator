@@ -45,7 +45,7 @@ Creator.Objects.vip_store =
 			type:'image'
 			#readonly:true
 		enabled_objects:
-			label:'启用功能'
+			label:'默认菜单'
 			type:'select'
 			options:[
 				{label:'会员卡',value:'vip_card'},

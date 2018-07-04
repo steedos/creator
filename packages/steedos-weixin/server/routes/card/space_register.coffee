@@ -56,6 +56,7 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 			modified_by: userId
 			created: now
 			modified: now
+			enabled_objects:['post', 'vip_product', 'vip_store']
 		}
 
 		storeId = Creator.getCollection("vip_store").insert(doc)
