@@ -339,7 +339,7 @@ Template.creator_grid.onRendered ->
 					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
 			# console.log "selectColumns", selectColumns
-			console.log "filter", filter
+			# console.log "filter", filter
 			# console.log "expand_fields", expand_fields
 			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
 				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
@@ -354,7 +354,7 @@ Template.creator_grid.onRendered ->
 					pageSize: pageSize
 				pager: 
 					showPageSizeSelector: true,
-					allowedPageSizes: [10,25, 50, 100],
+					allowedPageSizes: [10,25, 50, 100, 500],
 					showInfo: false,
 					showNavigationButtons: true
 				export:
