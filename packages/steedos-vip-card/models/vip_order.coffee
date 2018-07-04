@@ -59,6 +59,7 @@ Creator.Objects.vip_order =
 			type: 'number'
 			scale: 2
 			defaultValue: 0
+		
 		description:
 			label: '描述'
 			type: 'textarea'
@@ -80,10 +81,10 @@ Creator.Objects.vip_order =
 			type:'master_detail'
 			reference_to:'vip_card'
 
-		type: # recharge, pay, ...
-			label: '类型'
-			type: 'text'
-			omit:true
+		# type: # recharge, pay, ...
+		# 	label: '类型'
+		# 	type: 'text'
+		# 	omit:true
 		products: 
 			label: "商品"
 			type: "grid"
