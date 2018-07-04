@@ -1,7 +1,7 @@
 Creator.Objects.vip_share =
 	name: "vip_share"
 	label: "分享"
-	icon: "address"
+	icon: "omni_supervisor"
 	fields:
 		name:
 			label:'分享人'
@@ -12,6 +12,10 @@ Creator.Objects.vip_share =
 			label: "关联到"
 			type: "lookup"
 			reference_to: 'vip_product'
+		way:
+			label:'分享方式'
+			type:'text'
+			#可能取值[分享给好友weixin，分享至朋友圈friend_circle]
 	list_views:
 		all:
 			label: "所有"

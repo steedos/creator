@@ -17,5 +17,8 @@ Creator.Apps.vip =
 		"vip_store",
 		"space_users",
 		"vip_address",
-		"vip_invoice_info"
+		"vip_invoice_info",
+		"vip_share",
+		"vip_share_response",
+		"vip_share_gift"
 		]

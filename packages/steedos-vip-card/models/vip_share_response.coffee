@@ -1,7 +1,7 @@
 Creator.Objects.vip_share_response =
 	name: "vip_share_response"
 	label: "响应分享"
-	icon: "address"
+	icon: "partners"
 	fields:
 		name:
 			label:'响应人'

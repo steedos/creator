@@ -1,7 +1,7 @@
 Creator.Objects.vip_share_gift =
 	name: "vip_share_gift"
 	label: "分享赠礼"
-	icon: "address"
+	icon: "reward"
 	fields:
 		name:
 			label:'名称'
