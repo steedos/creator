@@ -14,12 +14,6 @@ Creator.Objects.vip_order =
 			required: true
 			reference_to:'users'
 
-		amount:
-			label: '应付金额'
-			type: 'number'
-			scale: 2
-			defaultValue: 0
-			required: true
 		product_amount:
 			label: '商品金额'
 			type: 'number'
@@ -35,12 +29,36 @@ Creator.Objects.vip_order =
 			type: 'number'
 			scale: 2
 			defaultValue: 0
+		# card_amount:
+		# 	label: '会员卡支付金额'
+		# 	type: 'number'
+		# 	scale: 2
+		# 	defaultValue: 0
+		amount:
+			label: '应付金额'
+			type: 'number'
+			scale: 2
+			defaultValue: 0
+			required: true
 		amount_paid:
 			label: '已付金额'
 			type: 'number'
 			scale: 2
 			defaultValue: 0
+		paid_by: # alipay, weixin, bank, cash, card
+            label: '支付方式'
+            type: 'text'
 
+		card_balance:
+			label: '卡内余额'
+			type: 'number'
+			scale: 2
+			defaultValue: 0
+		store_balance:
+			label: '门店余额'
+			type: 'number'
+			scale: 2
+			defaultValue: 0
 		description:
 			label: '描述'
 			type: 'textarea'
