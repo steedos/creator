@@ -7,6 +7,7 @@ Creator.baseObject =
 			sortable: true
 			index: true
 			defaultValue: "{userId}"
+			hidden: true
 		space:
 			type: "lookup"
 			label:"所属工作区"
@@ -19,7 +20,7 @@ Creator.baseObject =
 			label:"创建日期"
 			readonly: true
 			sortable: true
-			omit: true
+			hidden: true
 		created_by:
 			label:"创建人"
 			type: "lookup"
@@ -27,7 +28,7 @@ Creator.baseObject =
 			reference_to: "users"
 			disabled: true
 			index: true
-			omit: true
+			hidden: true
 		modified:
 			label:"修改时间"
 			type: "datetime"
@@ -35,14 +36,14 @@ Creator.baseObject =
 			sortable: true
 			searchable: true
 			index: true
-			omit: true
+			hidden: true
 		modified_by:
 			label:"修改人"
 			type: "lookup"
 			readonly: true
 			reference_to: "users"
 			disabled: true
-			omit: true
+			hidden: true
 		is_deleted:
 			type: "boolean"
 			label:"已删除"
@@ -121,7 +122,8 @@ Creator.baseObject =
 				doc.created = new Date();
 				doc.modified = new Date();
 				if userId
-					# doc.owner = userId
+					unless doc.owner
+						doc.owner = userId
 					doc.created_by = userId;
 					doc.modified_by = userId;
 
