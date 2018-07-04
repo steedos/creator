@@ -1,12 +1,13 @@
 Creator.Objects.vip_menu =
 	name: "vip_menu"
-	label: "菜单"
+	label: "自定义菜单"
 	icon: "lead_list"
 	enable_files:true
 	fields:
 		name:
-			label:'名称'
+			label:'标题'
 			type:'text'
+			required:true
 		avatar:
 			label:'图标图片'
 			type:'image'
