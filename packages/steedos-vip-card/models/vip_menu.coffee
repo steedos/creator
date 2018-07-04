@@ -22,6 +22,7 @@ Creator.Objects.vip_menu =
 			# 	{label:'商品分类',value:'vip_product_category'},
 			# 	{label:'活动',value:c},
 			# ]
+			required:true
 		sort_no:
 			label:'排序号'
 			type:'number'

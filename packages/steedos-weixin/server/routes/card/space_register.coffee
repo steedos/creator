@@ -43,6 +43,8 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 		})
 
 		now = new Date()
+		admins = []
+		admins.push userId
 		#创建店铺
 		doc = {
 			_id: spaceId #初始化的 store_id 和  space_id 相同
@@ -57,6 +59,7 @@ JsonRoutes.add 'post', '/api/mini/vip/space_register', (req, res, next) ->
 			created: now
 			modified: now
 			enabled_objects:['post', 'vip_product', 'vip_store']
+			admins:admins
 		}
 
 		storeId = Creator.getCollection("vip_store").insert(doc)
