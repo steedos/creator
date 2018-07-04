@@ -11,7 +11,7 @@ Creator.Objects.vip_share =
 		related_to:
 			label: "关联到"
 			type: "lookup"
-			reference_to: 'vip_product'
+			reference_to: ['vip_product']
 		way:
 			label:'分享方式'
 			type:'text'
