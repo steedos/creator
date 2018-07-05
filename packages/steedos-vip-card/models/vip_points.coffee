@@ -17,14 +17,14 @@ Creator.Objects.vip_points =
 			label:'门店'
 			type:'lookup'
 			reference_to:'vip_store'
-		billing:
-			label:'消费记录'
+		order:
+			label:'订单'
 			type:'lookup'
-			reference_to:'vip_billing'
+			reference_to:'vip_order'
 	list_views:
 		all:
 			label: "我的"
-			columns: ["card", "points", "billing","store"]
+			columns: ["card", "points", "order","store"]
 			filter_scope: "space"
 	permission_set:
 		user:

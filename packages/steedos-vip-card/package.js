@@ -11,7 +11,6 @@ Package.onUse(function (api) {
 	api.use('coffeescript@1.11.1_4');
 	api.use('steedos:creator@0.0.4');
 	api.addFiles('models/vip_card.coffee');
-	api.addFiles('models/vip_billing.coffee');
 	api.addFiles('models/vip_points.coffee');
 	api.addFiles('models/vip_store.coffee');
 	api.addFiles('models/vip_order.coffee');

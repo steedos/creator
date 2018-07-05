@@ -88,10 +88,14 @@ Creator.Objects.vip_store =
 		# 		# {label:'红包',value:'red_packet'}
 		# 	]
 		# 	multiple:true
-		# mch_id:
-		# 	type: 'text'
-		# 	label: '商户号'
-		# 	# required: true
+		mch_id:
+			type: 'text'
+			label: '商户号'
+			# required: true
+		balance:
+			label: '余额'
+			type: 'number'
+			scale: 2
 	list_views:
 		all:
 			label: "所有"
