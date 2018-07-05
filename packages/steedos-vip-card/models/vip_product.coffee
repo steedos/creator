@@ -38,6 +38,7 @@ Creator.Objects.vip_product =
 		avatar:
 			label:'封面'
 			type:'image'
+			omit:true
 		# video:
 		# 	label:'视频'
 		# 	type:'video'
@@ -102,5 +103,16 @@ Creator.Objects.vip_product =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
-
-		
+	triggers:
+		"before.insert.server.product":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				if(doc.covers)
+					doc.avatar = doc.covers[0]
+		"before.update.server.product":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if(modifier?.$set?.covers)
+					modifier.$set['avatar'] = modifier?.$set?.covers[0]
