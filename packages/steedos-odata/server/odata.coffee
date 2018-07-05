@@ -152,11 +152,10 @@ Meteor.startup ->
 					else if key is 'spaces'
 						createQuery.query._id = spaceId
 					else
-						createQuery.query.space = spaceId
+						if spaceId isnt 'guest'
+							createQuery.query.space = spaceId
 
-					if spaceId is 'guest'
-						delete createQuery.query.space
-					else if Creator.isCommonSpace(spaceId)
+					if Creator.isCommonSpace(spaceId)
 						if Creator.isSpaceAdmin(spaceId, @userId)
 							if key is 'spaces'
 								delete createQuery.query._id
