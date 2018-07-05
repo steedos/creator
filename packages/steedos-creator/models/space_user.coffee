@@ -98,7 +98,7 @@ Creator.Objects.space_users =
 			modifyAllRecords: false
 			viewAllRecords: true 
 		admin:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
