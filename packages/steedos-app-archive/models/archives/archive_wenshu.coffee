@@ -1,4 +1,50 @@
-# logger = new Logger 'ARCHIVE_WENSHU'
+set_retention = (doc)->
+	doc.destroy_date = new Date()
+	rules = Creator.Collections["archive_rules"].find({ fieldname: 'title'},{ fields:{ keywords: 1,retention:1 } } ).fetch()
+	rules_keywords = _.pluck rules, "keywords"
+
+	# 所有规则关键词
+	i = 0
+	while i < rules_keywords.length
+		is_matched = true
+		j = 0
+		arrs = rules_keywords[i]
+		while j < arrs.length
+			if doc.title.indexOf(arrs[j])<0
+				is_matched = false
+				break;
+			j++
+		if is_matched
+			retention_id = rules[i].retention
+			break;
+		i++
+
+	# 保管期限表
+	if retention_id
+		retention = Creator.Collections["archive_retention"].findOne({_id:retention_id})
+	else
+		retention = Creator.Collections["archive_retention"].findOne({is_default:true})		
+	# 设置保管期限和销毁日期
+	if retention
+		doc.retention = retention
+		duration = retention?.years
+		year = doc.document_date?.getFullYear() + duration
+		month = doc.document_date?.getMonth()
+		day = doc.document_date?.getDate()
+		doc?.destroy_date = new Date(year,month,day)
+		doc?.destroy_date_timestamp = destroy_date?.getTime()
+	return doc
+
+# 设置类别号
+set_category_code = (doc)->
+	rules_keywords = _.pluck rules, "keywords"
+	# 根据归档部门确定类别号
+	if doc?.archive_dept
+		keyword = doc?.archive_dept
+		rule = Creator.Collections["archive_rules"].findOne({ fieldname: 'dept', keywords: keyword})
+	if rule
+		doc.category_code = rule?.classification
+	return doc
 
 set_archivecode = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{archival_code:1,fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
@@ -6,7 +52,6 @@ set_archivecode = (record_id)->
 		fonds_name_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
 		retention_peroid_code = Creator.Collections["archive_retention"].findOne(record.retention_peroid,{fields:{code:1}})?.code
 		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
-		#organizational_structure_code = "BGS"
 		year = record.year
 		item_number = (Array(6).join('0') + record.item_number).slice(-4)
 		archive_code = fonds_name_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
@@ -582,14 +627,12 @@ Creator.Objects.archive_wenshu =
 			label: "全部"
 			filter_scope: "space"
 			filters: [["is_received", "=", true]]
-			#columns: ["year","retention_peroid","item_number","title","archival_code","document_date","author","category_code",
-					#	"archive_date","archive_dept","security_classification"]
 			columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
-		borrow:
-            label:"查看"
-            filter_scope: "space"
-            filters: [["is_received", "=", true]]
-            columns:['document_sequence_number',"author","title","document_date","total_number_of_pages","annotation"]
+# 		borrow:
+#             label:"查看"
+#             filter_scope: "space"
+#             filters: [["is_received", "=", true]]
+#             columns:['document_sequence_number',"author","title","document_date","total_number_of_pages","annotation"]
 		receive:
 			label:"待接收"
 			filter_scope: "space"
@@ -632,36 +675,10 @@ Creator.Objects.archive_wenshu =
 				doc.is_received = false
 				doc.is_destroyed = false
 				doc.is_borrowed = false
-				rules = Creator.Collections["archive_rules"].find({fieldname:'title'},{fields:{keywords:1}}).fetch()
-				rules_keywords = _.pluck rules, "keywords"
-				i = 0
-				while i < rules_keywords.length
-					is_matched = true
-					j = 0
-					arrs = rules_keywords[i]
-					while j < arrs.length
-						if doc.title.indexOf(arrs[j])<0
-							is_matched = false
-							break;
-						j++
-					if is_matched
-						match_rule = rules_keywords[i]
-						rule_id = rules[i]._id
-						break;
-					i++
-				if rule_id
-					category_retention = Creator.Collections["archive_rules"].findOne({_id:rule_id},{fields:{classification:1,retention:1}})
-				else
-					category_retention = Creator.Collections["archive_rules"].findOne({name:'长期'},{fields:{classification:1,retention:1}})
-				# 类别号
-				doc.category_code = category_retention?.classification
-				# 保管期限
-				doc.retention_peroid = category_retention?.retention
-				duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid}).years
-				year = doc.document_date.getFullYear()+duration
-				month = doc.document_date.getMonth()
-				day = doc.document_date.getDate()
-				doc.destroy_date = new Date(year,month,day)
+				# 设置保管期限
+				doc = set_retention(doc)
+				# 设置分类号
+				doc = set_category_code(doc)
 				return true
 
 		# "before.update.server.default":
@@ -691,7 +708,6 @@ Creator.Objects.archive_wenshu =
 									destroy_date_timestamp:destroy_date_timestamp
 									}
 							})
-				# logger.info "AAA"
 
 	actions:
 		number_adjuct:
