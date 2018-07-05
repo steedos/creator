@@ -150,7 +150,8 @@ Meteor.startup ->
 					if key is 'cfs.files.filerecord'
 						createQuery.query['metadata.space'] = spaceId
 					else if key is 'spaces'
-						createQuery.query._id = spaceId
+						if spaceId isnt 'guest'
+							createQuery.query._id = spaceId
 					else
 						if spaceId isnt 'guest'
 							createQuery.query.space = spaceId
