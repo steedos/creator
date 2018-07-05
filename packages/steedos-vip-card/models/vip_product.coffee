@@ -9,60 +9,65 @@ Creator.Objects.vip_product =
 			type:'text'
 			is_wide:true
 			required:true
-		default_price:
-			label:'价格'
-			type:'number'
-			required:true
-			scale: 2
-		compared_price:
-			label:'原价'
-			type:'number'
-			scale: 2
 		description:
 			label:'商品描述'
 			type:'textarea'
 			is_wide:true
+		
+		default_price:
+			label:'现价'
+			type:'number'
+			required:true
+			scale: 2
+			group:'-'
+		compared_price:
+			label:'原价'
+			type:'number'
+			scale: 2
+		
 		covers:
 			label:'轮播图'
 			type:'image'
 			multiple:true
 			required:true
+			group:'-'
 		images:
 			label:'详情描述图'
 			type:'image'
 			multiple:true
-			required:true
 		avatar:
 			label:'封面'
 			type:'image'
-			required:true
-		video:
-			label:'视频'
-			type:'video'
+		# video:
+		# 	label:'视频'
+		# 	type:'video'
 		categories:
 			label:'分类'
 			type:'lookup'
 			reference_to:'vip_product_category'
 			multiple:true
-			required:true
+			group:'-'
 		tags:
 			label:'标签'
 			type:'text'
-			required:true
 		vendor:
 			label:'供应商'
 			type:'text' 
-		status:
-			label:'状态'
-			type:'text'
-			#草稿，上架，下架
 		weight:
 			label:'重量'
 			type:'number'   
 			scale: 2
 		gift:
-			label:'赠礼'
-			type:'text'
+			label:'分享赠礼'
+			type:'textarea'
+			inlineHelpText:'邀请好友成功购买，可获得增礼。'
+			group:'-'
+		status:
+			label:'上架'
+			type:'boolean'
+			defaultValue:true
+			group:'-'
+			#草稿，上架，下架
 	list_views:
 		all:
 			label: "所有"
