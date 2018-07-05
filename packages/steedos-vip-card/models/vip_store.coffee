@@ -62,6 +62,7 @@ Creator.Objects.vip_store =
 			label:'管理员'
 			type:'lookup'
 			reference_to:'users'
+			filters: [["profile", "=", "user"]]
 			multiple:true
 		featured:
 			label:'发布到首页'
