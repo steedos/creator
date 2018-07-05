@@ -1,8 +1,9 @@
 set_retention = (doc)->
-	doc.destroy_date = new Date()
 	rules = Creator.Collections["archive_rules"].find({ fieldname: 'title'},{ fields:{ keywords: 1,retention:1 } } ).fetch()
-	rules_keywords = _.pluck rules, "keywords"
-
+	if rules
+		rules_keywords = _.pluck rules, "keywords"
+	else
+		rules_keywords = []
 	# 所有规则关键词
 	i = 0
 	while i < rules_keywords.length
@@ -25,37 +26,69 @@ set_retention = (doc)->
 	else
 		retention = Creator.Collections["archive_retention"].findOne({is_default:true})		
 	# 设置保管期限和销毁日期
-	if retention
-		doc.retention = retention
+	if retention?.years
 		duration = retention?.years
 		year = doc.document_date?.getFullYear() + duration
 		month = doc.document_date?.getMonth()
 		day = doc.document_date?.getDate()
-		doc?.destroy_date = new Date(year,month,day)
-		doc?.destroy_date_timestamp = destroy_date?.getTime()
-	return doc
+		destroy_date = new Date(year,month,day)
+		destroy_date_timestamp = destroy_date?.getTime()
+		Creator.Collections["archive_wenshu"].direct.update(doc._id,
+		{
+			$set:{
+				retention: retention,
+				destroy_date: destroy_date,
+				destroy_date_timestamp: destroy_date_timestamp
+				}
+		})
+
 
 # 设置类别号
 set_category_code = (doc)->
-	rules_keywords = _.pluck rules, "keywords"
 	# 根据归档部门确定类别号
 	if doc?.archive_dept
 		keyword = doc?.archive_dept
 		rule = Creator.Collections["archive_rules"].findOne({ fieldname: 'dept', keywords: keyword})
-	if rule
-		doc.category_code = rule?.classification
-	return doc
+	if rule?.classification
+		Creator.Collections["archive_wenshu"].direct.update(doc._id,
+		{
+			$set:{
+				category_code:rule.classification
+			}
+		})
 
+# 设置档号
 set_archivecode = (record_id)->
-	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{archival_code:1,fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
-	if record?.item_number and record?.fonds_name and  record?.retention_peroid and record?.organizational_structure and record?.year
-		fonds_name_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_identifier:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
+	if record?.item_number and record?.fonds_identifier and record?.retention_peroid and record?.organizational_structure and record?.year
+		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_identifier,{fields:{code:1}})?.code
 		retention_peroid_code = Creator.Collections["archive_retention"].findOne(record.retention_peroid,{fields:{code:1}})?.code
 		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
 		year = record.year
 		item_number = (Array(6).join('0') + record.item_number).slice(-4)
-		archive_code = fonds_name_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
-		Creator.Collections["archive_wenshu"].direct.update(record_id,{$set:{archival_code:archive_code}})
+		archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
+		Creator.Collections["archive_wenshu"].direct.update(record_id,
+		{
+			$set:{
+				archival_code:archive_code
+			}
+		})
+
+set_destory = (doc)->
+	duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})?.years
+	if duration
+		year = doc.document_date.getFullYear()+duration
+		month = doc.document_date.getMonth()
+		day = doc.document_date.getDate()
+		destroy_date = new Date(year,month,day)
+		destroy_date_timestamp = destroy_date?.getTime()
+		Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
+			{
+				$set:{
+					destroy_date:destroy_date,
+					destroy_date_timestamp:destroy_date_timestamp
+					}
+			})
 		
 Creator.Objects.archive_wenshu =
 	name: "archive_wenshu"
@@ -71,10 +104,11 @@ Creator.Objects.archive_wenshu =
 			label:"档号"
 			is_wide:true
 			group:"档号"
+			omit:true
 
 		fonds_identifier:
 			type:"master_detail"
-			label:"全宗号"
+			label:"所属全宗"
 			reference_to:"archive_fonds"
 			group:"档号"
 
@@ -99,16 +133,22 @@ Creator.Objects.archive_wenshu =
 			group:"档号"
 
 		organizational_structure:
-			type:"text"
-			label:"机构"
-			group:"档号"
-			omit:true
-		
-		organizational_structure_code:
 			type:"master_detail"
-			label:"机构代码"
+			label:"机构"
 			reference_to: "archive_organization"
 			group:"档号"
+		
+		item_number:
+			type: "number"
+			label:"件号"
+			group:"档号"
+			sortable:true
+		
+		# organizational_structure_code:
+		# 	type:"master_detail"
+		# 	label:"机构代码"
+		# 	reference_to: "archive_organization"
+		# 	group:"档号"
 
 		file_number:
 			type:"text"
@@ -119,12 +159,6 @@ Creator.Objects.archive_wenshu =
 			type:"text"
 			label:"分类卷号"
 			group:"档号"
-
-		item_number:
-			type: "number"
-			label:"件号"
-			group:"档号"
-			sortable:true
 
 		document_sequence_number:
 			type: "number"
@@ -502,10 +536,10 @@ Creator.Objects.archive_wenshu =
 			group:"来源"
 
 		fonds_name:
-			type:"master_detail"
+			type:"text"
 			label:"全宗名称"
-			reference_to:"archive_fonds"
 			group:"来源"
+			hidden:true
 
 		fonds_constituting_unit_name:
 			type: "text"
@@ -668,17 +702,17 @@ Creator.Objects.archive_wenshu =
 			list_views:["default","recent","all","borrow"]
 			actions:["borrow"]
 	triggers:
-		"before.insert.server.default":
+		"after.insert.server.default":
 			on: "server"
-			when: "before.insert"
+			when: "after.insert"
 			todo: (userId, doc)->
 				doc.is_received = false
 				doc.is_destroyed = false
 				doc.is_borrowed = false
 				# 设置保管期限
-				doc = set_retention(doc)
+				set_retention(doc)
 				# 设置分类号
-				doc = set_category_code(doc)
+				# set_category_code(doc)
 				return true
 
 		# "before.update.server.default":
@@ -691,23 +725,10 @@ Creator.Objects.archive_wenshu =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_name or modifier['$set']?.year
+				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_identifier or modifier['$set']?.year
                     set_archivecode(doc._id)
                 if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
-                	duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})?.years
-					if duration
-						year = doc.document_date.getFullYear()+duration
-						month = doc.document_date.getMonth()
-						day = doc.document_date.getDate()
-						destroy_date = new Date(year,month,day)
-						destroy_date_timestamp = destroy_date?.getTime()
-						Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
-							{
-								$set:{
-									destroy_date:destroy_date,
-									destroy_date_timestamp:destroy_date_timestamp
-									}
-							})
+                	set_destory(doc)
 
 	actions:
 		number_adjuct:
