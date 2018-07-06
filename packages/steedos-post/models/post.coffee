@@ -110,7 +110,7 @@ Creator.Objects.post =
 			]
 			omit:true
 		featured:
-			label:'发布到首页'
+			label:'推荐'
 			type:'boolean'
 			group:'-'
 	list_views:
