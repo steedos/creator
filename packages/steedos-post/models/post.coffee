@@ -9,10 +9,10 @@ Creator.Objects.post =
 			type:'text'
 			required:true
 			is_wide:true
-		# summary:
-		# 	label:'简介'
-		# 	type:'textarea'
-		# 	omit:true
+		summary:
+			label:'简介'
+			type:'textarea'
+			omit:true
 		description:
 			label:'正文'
 			is_wide:false
