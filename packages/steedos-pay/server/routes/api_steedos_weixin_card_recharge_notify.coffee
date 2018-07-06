@@ -39,7 +39,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 							Creator.getCollection('vip_order').update({ _id: order_id }, { $inc: { amount_paid: amount_paid } })
 							order = Creator.getCollection('vip_order').findOne(order_id, { fields: { amount: 1, amount_paid: 1 } })
 							if order.amount is order.amount_paid
-								Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'completed' } })
+								Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'paid' } })
 
 						else
 							console.error "recharge notify failed"
