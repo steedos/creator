@@ -9,10 +9,10 @@ Creator.Objects.post =
 			type:'text'
 			required:true
 			is_wide:true
-		summary:
-			label:'简介'
-			type:'textarea'
-			omit:true
+		# summary:
+		# 	label:'简介'
+		# 	type:'textarea'
+		# 	omit:true
 		description:
 			label:'正文'
 			is_wide:false
@@ -116,7 +116,7 @@ Creator.Objects.post =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name","summary", "comment_count", "star_count","forward_count"]
+			columns: ["name", "comment_count", "star_count","forward_count"]
 			filter_scope: "space"
 
 	triggers:
@@ -124,8 +124,8 @@ Creator.Objects.post =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				if doc.description
-					doc.summary = doc.description.substring(0,100)
+				# if doc.description
+				# 	doc.summary = doc.description.substring(0,100)
 
 				if doc.video
 					if Meteor.settings.public.cfs?.store is 'OSS'
@@ -137,10 +137,10 @@ Creator.Objects.post =
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if modifier.$set.description
-					modifier.$set.summary = modifier.$set.description.substring(0,100)
-				if modifier.$unset and modifier.$unset.hasOwnProperty('description')
-					modifier.$unset.summary = 1
+				# if modifier.$set.description
+				# 	modifier.$set.summary = modifier.$set.description.substring(0,100)
+				# if modifier.$unset and modifier.$unset.hasOwnProperty('description')
+				# 	modifier.$unset.summary = 1
 
 				if modifier.$set.video
 					if Meteor.settings.public.cfs?.store is 'OSS'
