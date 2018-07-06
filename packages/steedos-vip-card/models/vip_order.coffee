@@ -11,7 +11,6 @@ Creator.Objects.vip_order =
 		out_trade_no:
 			label: "订单编号"
 			type: "text"
-			required: true
 			omit:true
 		owner:
 			label: '顾客'
@@ -102,6 +101,7 @@ Creator.Objects.vip_order =
 		"products.$.default_price":
 			label: "单价"
 			type: "number"
+			scale: 2
 		"products.$.count":
 			label: "数量"
 			type: "number"
@@ -111,6 +111,7 @@ Creator.Objects.vip_order =
 		"products.$.sum":
 			label: "总价"
 			type: "number"
+			scale: 2
 		address:
 			label:'收货地址'
 			type: "object"
@@ -209,6 +210,12 @@ Creator.Objects.vip_order =
 			filter_scope: "space"
 			filters: [["status", "=", "canceled"]]
 	triggers:
+		"before.insert.server.vip_order":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				doc.out_trade_no = moment().format('YYYYMMDDHHmmssSSS') + '001'
+
 		"after.update.server.vip_order":
 			on: "server"
 			when: "after.update"
