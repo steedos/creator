@@ -35,7 +35,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge/notify', (req, res, ne
 						if billRecord and billRecord.total_fee is Number(result.total_fee) and sign is result.sign
 							Creator.getCollection('billing_record').update({ _id: record_id }, { $set: { paid: true } })
 							amount_paid = billRecord.total_fee/100
-							order_id = billRecord.out_trade_no
+							order_id = billRecord.order_id
 							Creator.getCollection('vip_order').update({ _id: order_id }, { $inc: { amount_paid: amount_paid } })
 							order = Creator.getCollection('vip_order').findOne(order_id, { fields: { amount: 1, amount_paid: 1 } })
 							if order.amount is order.amount_paid

@@ -88,7 +88,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                         total_fee: totalFee
                         owner: user_id
                         space: order.space
-                        out_trade_no: out_trade_no
+                        order_id: order_id
                     }
 
                     Creator.getCollection('billing_record').insert(obj)
