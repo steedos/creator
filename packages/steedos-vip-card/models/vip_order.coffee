@@ -94,12 +94,15 @@ Creator.Objects.vip_order =
 		"products.$.name":
 			label: "名称"
 			type:'text'
-		"products.$.price":
+		"products.$.default_price":
 			label: "单价"
 			type: "number"
 		"products.$.count":
 			label: "数量"
 			type: "number"
+		"products.$.avatar":
+			label: "头像"
+			type:'image'
 		"products.$.sum":
 			label: "总价"
 			type: "number"
