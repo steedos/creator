@@ -64,6 +64,20 @@ Creator.Objects.vip_store =
 			reference_to:'users'
 			filters: [["profile", "=", "user"]]
 			multiple:true
+		mch_id:
+			type: 'text'
+			label: '微信商户号'
+			# omit:true
+			readonly:true
+			group:'-'
+
+			# required: true
+		balance:
+			label: '余额'
+			type: 'number'
+			scale: 2
+			readonly:true
+			# omit:true
 		featured:
 			label:'发布到首页'
 			type:'boolean'
@@ -88,16 +102,6 @@ Creator.Objects.vip_store =
 		# 		# {label:'红包',value:'red_packet'}
 		# 	]
 		# 	multiple:true
-		mch_id:
-			type: 'text'
-			label: '微信商户号'
-			omit:true
-			# required: true
-		balance:
-			label: '余额'
-			type: 'number'
-			scale: 2
-			omit:true
 	list_views:
 		all:
 			label: "所有"
