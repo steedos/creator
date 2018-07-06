@@ -24,29 +24,29 @@ Creator.Objects.vip_share =
 	permission_set:
 		user:
 			allowCreate: true
-			allowDelete: true
-			allowEdit: false
-			allowRead: true
-			modifyAllRecords: false
-			viewAllRecords: false
-		admin:
-			allowCreate: true
-			allowDelete: true
+			allowDelete: false
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: false
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
 			viewAllRecords: true
 		member:
 			allowCreate: true
-			allowDelete: true
-			allowEdit: false
+			allowDelete: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false
 		guest:
 			allowCreate: true
-			allowDelete: true
-			allowEdit: false
+			allowDelete: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false
