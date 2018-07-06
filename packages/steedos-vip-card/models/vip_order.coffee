@@ -72,8 +72,15 @@ Creator.Objects.vip_order =
 
 		status: # draft购物车, pending待付款, paid待发货，delivered待收货，completed已完成， canceled已取消
 			label: '状态'
-			type: 'text'
-			defaultValue:"draft"
+			type: 'select'
+			defaultValue: 'draft'
+			options:[
+				{label:'购物车',value:'draft'},
+				{label:'待付款',value:'pending'},
+				{label:'待发货',value:'paid'},
+				{label:'待收货',value:'delivered'},
+				{label:'已完成',value:'completed'},
+				{label:'已取消',value:'canceled'}
 			omit:true
 		store:
 			label:'门店'
