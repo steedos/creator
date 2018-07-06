@@ -90,12 +90,14 @@ Creator.Objects.vip_store =
 		# 	multiple:true
 		mch_id:
 			type: 'text'
-			label: '商户号'
+			label: '微信商户号'
+			omit:true
 			# required: true
 		balance:
 			label: '余额'
 			type: 'number'
 			scale: 2
+			omit:true
 	list_views:
 		all:
 			label: "所有"
