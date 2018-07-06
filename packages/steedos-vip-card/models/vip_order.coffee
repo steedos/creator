@@ -79,7 +79,7 @@ Creator.Objects.vip_order =
 				{label:'待发货',value:'paid'},
 				{label:'待收货',value:'delivered'},
 				{label:'已完成',value:'completed'},
-				{label:'已取消',value:'canceled'}
+				{label:'已取消',value:'canceled'}]
 			omit:true
 		store:
 			label:'门店'
