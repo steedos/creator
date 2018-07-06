@@ -46,8 +46,8 @@ Creator.Objects.vip_order =
 			scale: 2
 			defaultValue: 0
 		paid_by: # alipay, weixin, bank, cash, card
-            label: '支付方式'
-            type: 'text'
+			label: '支付方式'
+			type: 'text'
 
 		card_balance:
 			label: '卡内余额'
@@ -59,7 +59,7 @@ Creator.Objects.vip_order =
 			type: 'number'
 			scale: 2
 			defaultValue: 0
-		
+
 		description:
 			label: '描述'
 			type: 'textarea'
@@ -85,7 +85,7 @@ Creator.Objects.vip_order =
 		# 	label: '类型'
 		# 	type: 'text'
 		# 	omit:true
-		products: 
+		products:
 			label: "商品"
 			type: "grid"
 		"products.$._id":
@@ -97,10 +97,10 @@ Creator.Objects.vip_order =
 		"products.$.price":
 			label: "单价"
 			type: "number"
-		"products.$.count": 
+		"products.$.count":
 			label: "数量"
 			type: "number"
-		"products.$.sum": 
+		"products.$.sum":
 			label: "总价"
 			type: "number"
 		address:
