@@ -11,6 +11,7 @@ Creator.Objects.vip_menu =
 		avatar:
 			label:'图标图片'
 			type:'image'
+			required:true
 		related_to:
 			label: "关联到"
 			type: "lookup"
