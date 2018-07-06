@@ -51,11 +51,14 @@ Creator.Objects.post =
 		# 	label:'门店'
 		# 	type:'master_detail'
 		# 	reference_to:'vip_store'
+		cover:
+			label: '封面'
+			type: 'image'
+			group:"-"
 		images:
 			label: '图片'
 			type: 'image'
-			multiple : true
-			group:"-"
+			multiple : true			
 		video:
 			label: '视频'
 			type: 'video'
