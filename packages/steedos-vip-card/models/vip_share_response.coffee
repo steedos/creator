@@ -24,28 +24,28 @@ Creator.Objects.vip_share_response =
 		user:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: false
-			allowRead: false
+			allowEdit: true
+			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: false
-			allowRead: false
+			allowEdit: true
+			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		member:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: false
-			allowRead: false
+			allowEdit: true
+			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		guest:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: false
-			allowRead: false
+			allowEdit: true
+			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true

@@ -22,7 +22,7 @@ Creator.Objects.billing_record =
             omit: true
             hidden: true
 
-        out_trade_no:
+        order_id:
             label: "订单"
             type: "master_detail"
             reference_to:'vip_order'
@@ -31,6 +31,6 @@ Creator.Objects.billing_record =
             label: '支付方式'
             type: 'text'
 
-        
+
 
 
