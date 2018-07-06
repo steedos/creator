@@ -8,6 +8,11 @@ Creator.Objects.vip_order =
 			type: "text"
 			required: true
 
+		out_trade_no:
+			label: "订单编号"
+			type: "text"
+			required: true
+			omit:true
 		owner:
 			label: '顾客'
 			type: 'lookup'
