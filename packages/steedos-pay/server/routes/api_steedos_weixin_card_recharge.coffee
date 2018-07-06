@@ -16,7 +16,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
         check order_id, String
         check sub_appid, String
 
-        order = Creator.getCollection('vip_order').findOne(order_id, { fields: { space: 1, store: 1, amount: 1, amount_paid: 1, name: 1 } })
+        order = Creator.getCollection('vip_order').findOne(order_id, { fields: { space: 1, store: 1, amount: 1, amount_paid: 1, name: 1, out_trade_no: 1 } })
 
         if not order
             throw new Meteor.Error('error', "未找到订单")
@@ -47,10 +47,10 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                 sub_openid = o._id
 
         totalFee = parseInt(amount*100)
-
+        out_trade_no = order.out_trade_no
         orderData = {
             body: order_body,
-            out_trade_no: order_id,
+            out_trade_no: out_trade_no,
             total_fee: totalFee,
             spbill_create_ip: '127.0.0.1',
             notify_url: Meteor.absoluteUrl() + 'api/steedos/weixin/card/recharge/notify',
@@ -88,12 +88,12 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                         total_fee: totalFee
                         owner: user_id
                         space: order.space
-                        out_trade_no: order_id
+                        out_trade_no: out_trade_no
                     }
 
                     Creator.getCollection('billing_record').insert(obj)
 
-                    Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'pending' } })
+                    Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'pending', name: out_trade_no } })
 
                     returnData.timeStamp = Math.floor(Date.now() / 1000) + ""
                     returnData.nonceStr = util.generateNonceString()
