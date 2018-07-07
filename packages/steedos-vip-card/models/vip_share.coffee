@@ -8,10 +8,10 @@ Creator.Objects.vip_share =
 			type:'text'
 			#owner.name
 		#分享人就是owner
-		related_to:
-			label: "关联到"
+		product:
+			label: "商品"
 			type: "lookup"
-			reference_to: ['vip_product']
+			reference_to: 'vip_product'
 		way:
 			label:'分享方式'
 			type:'text'
@@ -19,7 +19,7 @@ Creator.Objects.vip_share =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "related_to","created"]
+			columns: ["name", "product","created"]
 			filter_scope: "space"
 	permission_set:
 		user:
