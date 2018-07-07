@@ -8,10 +8,12 @@ Creator.Objects.vip_menu =
 			label:'标题'
 			type:'text'
 			required:true
+			group:'-'
 		avatar:
 			label:'图标图片'
 			type:'image'
 			required:true
+
 		related_to:
 			label: "关联到"
 			type: "lookup"
@@ -24,9 +26,12 @@ Creator.Objects.vip_menu =
 			# 	{label:'活动',value:c},
 			# ]
 			required:true
+			group:'-'
+
 		sort_no:
 			label:'排序号'
 			type:'number'
+			group:'-'
 		enabled:
 			label:'是否启用'
 			type:'boolean'

@@ -8,20 +8,25 @@ Creator.Objects.post_category =
 			label:'名称'
 			type:'text'
 			required:true
-		parent:
-			label:'上级栏目'
-			type:'lookup'
-			reference_to:'post_category'
-		sort_no:
-			label:'排序号'
-			type:'number'
+			group:'-'
 		description:
 			label:'描述'
 			type:'textarea'
 			is_wide:true
+
 		cover:
 			label: "封面图"
 			type:'image'
+			group:'-'
+
+		parent:
+			label:'上级栏目'
+			type:'lookup'
+			reference_to:'post_category'
+			group:'-'
+		sort_no:
+			label:'排序号'
+			type:'number'
 	list_views:
 		all:
 			label: "所有"
