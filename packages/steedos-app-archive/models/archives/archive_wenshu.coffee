@@ -75,20 +75,21 @@ set_archivecode = (record_id)->
 		})
 
 set_destory = (doc)->
-	duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})?.years
-	if duration
-		year = doc.document_date.getFullYear()+duration
-		month = doc.document_date.getMonth()
-		day = doc.document_date.getDate()
-		destroy_date = new Date(year,month,day)
-		destroy_date_timestamp = destroy_date?.getTime()
-		Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
-			{
-				$set:{
-					destroy_date:destroy_date,
-					destroy_date_timestamp:destroy_date_timestamp
-					}
-			})
+	if doc?.retention_peroid and doc?.document_date
+		duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})?.years
+		if duration
+			year = doc.document_date.getFullYear()+duration
+			month = doc.document_date.getMonth()
+			day = doc.document_date.getDate()
+			destroy_date = new Date(year,month,day)
+			destroy_date_timestamp = destroy_date?.getTime()
+			Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
+				{
+					$set:{
+						destroy_date:destroy_date,
+						destroy_date_timestamp:destroy_date_timestamp
+						}
+				})
 		
 Creator.Objects.archive_wenshu =
 	name: "archive_wenshu"
@@ -713,6 +714,8 @@ Creator.Objects.archive_wenshu =
 				set_retention(doc)
 				# 设置分类号
 				# set_category_code(doc)
+				# 设置销毁期限
+				set_destory(doc)
 				return true
 
 		# "before.update.server.default":
