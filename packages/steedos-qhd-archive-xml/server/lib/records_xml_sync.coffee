@@ -25,7 +25,7 @@ XMLSync.run = ()->
 	catch  e
 		logger.error "XML_Sync.records2Xml()", e
 
-# XMLSync.records2Xml()
+# XMLSync.startExport()
 XMLSync.startExport = (record_ids)->
 
 	spaces = XMLSync?.settings_records_xml?.spaces
@@ -34,9 +34,9 @@ XMLSync.startExport = (record_ids)->
 		logger.error "缺少settings配置: records-qhd.spaces"
 		return
 
-	Records2XML = new Records2XML(spaces, record_ids)
+	exportToXML = new ExportToXML(spaces, record_ids)
 
-	Records2XML.syncRecords()
+	exportToXML.DoExport()
 
 XMLSync.startScheduleJob = (name, recurrenceRule, fun) ->
 

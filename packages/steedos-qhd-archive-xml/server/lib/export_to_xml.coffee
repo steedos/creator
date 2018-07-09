@@ -6,6 +6,14 @@ NodeRSA = Npm.require 'node-rsa'
 
 logger = new Logger 'QHD_Export_TO_XML'
 
+# =============================================
+# spaces: Array 工作区ID
+# contract_flows： Array 合同类流程
+ExportToXML = (spaces, record_ids) ->
+	@spaces = spaces
+	@record_ids = record_ids
+	return
+
 # 存储为编码数据，base64字符串
 converterBase64 = (file_obj, callback)->
 	bmsj = ""
@@ -66,7 +74,7 @@ encapsulation = (record_obj) ->
 	# 类别
 	category_obj = Creator.Collections["archive_classification"].findOne({'_id':record_obj?.category_code})
 	# 读取所有的文件
-	cms_files = Creator.Collections["cms_files"].find({'parent.ids':_id},{sort: {created: -1}})
+	cms_files = Creator.Collections["cms_files"].find({'parent.ids':record_obj?._id},{sort: {created: -1}})
 	# 审计
 	audit_list = Creator.Collections["archive_audit"].find({'action_administrative_records_id':record_obj?._id}).fetch()
 
@@ -256,17 +264,8 @@ encapsulation = (record_obj) ->
 
 	return BQMDX
 
-# =============================================
-
-# spaces: Array 工作区ID
-# contract_flows： Array 合同类流程
-Records2XML = (spaces, record_ids) ->
-	@spaces = spaces
-	@record_ids = record_ids
-	return
-
 # 导出为xml文件
-Records2XML.export2xml = (record_obj, callback) ->
+ExportToXML.export2xml = (record_obj, callback) ->
 	# 封装被签名对象
 	bqmdx_json = encapsulation(record_obj)
 
@@ -356,16 +355,15 @@ Records2XML.export2xml = (record_obj, callback) ->
 						logger.error "#{record_obj._id}写入xml文件失败",err
 				)
 
-Records2XML.success = (record_obj)->
-	console.log("success, name is #{record_obj.title}, id is #{record_obj._id}")
+
+ExportToXML.success = (record_obj)->
 	Creator.Collections["archive_wenshu"].update({_id: record_obj._id}, {$set: {has_xml: true}})
 
-Records2XML.failed = (record_obj, error)->
-	console.log("failed, name is #{record_obj.title}, id is #{record_obj._id}. error: ")
-	console.log error
+ExportToXML.failed = (record_obj, error)->
+	logger.error "failed, name is #{record_obj.title}, id is #{record_obj._id}. error: " + error
 
 #获取所有未导出为xml的文书records
-Records2XML::getRecords = ()->
+ExportToXML::getNonExportedRecords = ()->
 	query = {
 		space: {$in: @spaces},
 		# has_xml是否导出为xml
@@ -378,14 +376,14 @@ Records2XML::getRecords = ()->
 		query._id = {$in: @record_ids}
 	return Creator.Collections["archive_wenshu"].find(query, {fields: {_id: 1}}).fetch()
 
-Records2XML::syncRecords = () ->
+ExportToXML::DoExport = () ->
 	console.time("syncRecords")
-	records = @getRecords()
+	records = @getNonExportedRecords()
 	that = @
 	console.log "records.length is #{records.length}"
 	records.forEach (record)->
 		# 档案记录
 		record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':record?._id})
 		if record_obj
-			Records2XML.export2xml(record_obj)
+			ExportToXML.export2xml(record_obj)
 	console.timeEnd("syncRecords")

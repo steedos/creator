@@ -43,7 +43,7 @@ Package.onUse(function (api) {
 
 	api.export('XMLSync');
 
-	api.export('Records2XML');
+	api.export('ExportToXML');
 
 });
 
