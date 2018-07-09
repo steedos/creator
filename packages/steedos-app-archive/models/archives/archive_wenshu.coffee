@@ -767,9 +767,10 @@ Creator.Objects.archive_wenshu =
 								text = "共接收"+result[0]+"条,"+"成功"+result[1]+"条"
 								swal(text)
 							)
+							
 		export2xml:
 			label:"导出XML"
-			visible:true
+			visible:false
 			on: "list"
 			todo:(object_name, record_id)->
 				# 转为XML文件
@@ -779,6 +780,7 @@ Creator.Objects.archive_wenshu =
 								text = "记录导出路径："
 								swal(text + result)
 							)
+
 		borrow:
 			label:"借阅"
 			visible:true
@@ -790,3 +792,14 @@ Creator.Objects.archive_wenshu =
 					return
 				doc = Archive.createBorrowObject(object_name, record_id)
 				Creator.createObject("archive_borrow",doc)
+		
+		borrow:
+			label:"查看XML"
+			visible:true
+			on: "record"
+			todo:(object_name, record_id, fields)->
+				has_xml = Creator.Collections[object_name].findOne({_id:record_id})?.has_xml
+				if has_xml
+					window.location = "/view/encapsulation/xml?filename=#{record_id}.xml"
+				else
+					swal("该档案暂无XML封装文件")
