@@ -80,7 +80,7 @@ Package.onUse(function (api) {
 	api.use('steedos:accounts@0.0.31');
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:i18n@0.0.11');
-	api.use('steedos:autoform@0.0.12');
+	api.use('steedos:autoform@0.0.13');
 	api.use('steedos:creator-autoform-modals@0.0.1');
 	api.use('raix:push@3.0.2');
 
