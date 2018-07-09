@@ -793,7 +793,7 @@ Creator.Objects.archive_wenshu =
 				doc = Archive.createBorrowObject(object_name, record_id)
 				Creator.createObject("archive_borrow",doc)
 		
-		borrow:
+		viewxml:
 			label:"查看XML"
 			visible:true
 			on: "record"
