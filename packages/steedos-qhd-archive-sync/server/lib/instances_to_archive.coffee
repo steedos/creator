@@ -141,7 +141,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 			collection = Creator.Collections["cms_files"]
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
-			console.log "cf?.metadata?.main当前正文", cf?.metadata?.main
+			
 			collection.insert({
 					_id: cmsFileId,
 					versions: [],
@@ -295,12 +295,10 @@ InstancesToArchive = (spaces, contract_flows, ins_ids) ->
 	return
 
 InstancesToArchive.success = (instance)->
-	console.log("success, name is #{instance.name}, id is #{instance._id}")
 	Creator.Collections["instances"].update({_id: instance._id}, {$set: {is_recorded: true}})
 
 InstancesToArchive.failed = (instance, error)->
-	console.log("failed, name is #{instance.name}, id is #{instance._id}. error: ")
-	console.log error
+	logger.error "failed, name is #{instance.name}, id is #{instance._id}. error: ", error
 
 #	获取非合同类的申请单：正常结束的(不包括取消申请、被驳回的申请单)
 InstancesToArchive::getNonContractInstances = ()->
@@ -308,18 +306,20 @@ InstancesToArchive::getNonContractInstances = ()->
 		space: {$in: @spaces},
 		flow: {$nin: @contract_flows},
 		# is_archived字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
+		# 正常情况下，未归档的表单无 is_recorded 字段
 		$or: [
 			{is_recorded: false},
 			{is_recorded: {$exists: false}}
 		],
 		is_deleted: false,
 		state: "completed",
-		"values.record_need": "true",
-		$or: [
-			{final_decision: "approved"},
-			{final_decision: {$exists: false}},
-			{final_decision: ""}
-		]
+		"values.record_need": "true"
+		# 重定位到结束的表单该值为 terminated，故取消此判断
+		# $or: [
+		# 	{final_decision: "approved"},
+		# 	{final_decision: {$exists: false}},
+		# 	{final_decision: ""}
+		# ]
 	}
 	if @ins_ids
 		query._id = {$in: @ins_ids}
@@ -364,7 +364,6 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 Test.run = (ins_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
-		console.log instance.name
 		InstancesToArchive.syncNonContractInstance instance
 
 InstancesToArchive::syncNonContractInstances = () ->
@@ -372,10 +371,8 @@ InstancesToArchive::syncNonContractInstances = () ->
 	instances = @getNonContractInstances()
 
 	that = @
-	console.log "instances.length is #{instances.length}"
 	instances.forEach (mini_ins)->
 		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
 		if instance
-			console.log instance.name
 			InstancesToArchive.syncNonContractInstance instance
 	console.timeEnd("syncNonContractInstances")
