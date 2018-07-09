@@ -9,6 +9,7 @@ Npm.depends({
 	'request'  : '2.81.0',
 	'node-schedule' : '1.2.1',
 	cookies: "0.6.1",
+	mkdirp: "0.3.5",
 	"eval": "0.1.2",
 });
 
