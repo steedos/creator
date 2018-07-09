@@ -70,7 +70,7 @@ Package.onUse(function (api) {
 	api.use('steedos:cfs-standard-packages@0.5.10');
 	api.use('steedos:cfs-s3@0.1.4');
 	api.use('steedos:cfs-aliyun@0.1.0');
-	api.use('steedos:autoform-file@0.4.2_1');
+	api.use('steedos:autoform-file@0.4.2_2');
 
 
 	api.use('accounts-base@1.3.4');
