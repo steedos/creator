@@ -290,7 +290,6 @@ Records2XML.export2xml = (record_obj, callback) ->
 			# 参数2：加密后返回的格式
 			# 参数3：签名数据编码
 			signature = key.sign(buffer_bqmdx, 'base64', 'utf8');
-			console.log "signature",signature
 
 			# 电子签名
 			qmbsf = "修改0-签名1"
@@ -335,7 +334,6 @@ Records2XML.export2xml = (record_obj, callback) ->
 			# 参数3：被签名对象的编码格式
 			# 参数4：签名的编码格式
 			result = key.verify(buffer_bqmdx, signature, 'utf8', 'base64')
-			console.log "result",result
 
 			# 根据当天时间的年月日作为存储路径
 			now = new Date
@@ -344,8 +342,8 @@ Records2XML.export2xml = (record_obj, callback) ->
 			day = now.getDate()
 
 			# 文件路径
-			filePath = path.join(__meteor_bootstrap__.serverDir,'../../../export/' + year + '/' + month + '/' + day )
-			fileName = "标准封装XML.xml"
+			filePath = path.join(__meteor_bootstrap__.serverDir,'../../../export/encapsulation')
+			fileName = record_obj?._id + ".xml"
 			fileAddress = path.join filePath, fileName
 
 			if !fs.existsSync filePath
@@ -355,7 +353,7 @@ Records2XML.export2xml = (record_obj, callback) ->
 			fs.writeFile fileAddress, stream, Meteor.bindEnvironment(
 				(err) ->
 					if err
-						logger.error "#{jsonObj._id}写入xml文件失败",err
+						logger.error "#{record_obj._id}写入xml文件失败",err
 				)
 
 Records2XML.success = (record_obj)->

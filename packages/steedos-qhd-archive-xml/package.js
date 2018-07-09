@@ -6,6 +6,7 @@ Package.describe({
 });
 
 Npm.depends({
+	'express' :'4.13.4',
 	'request'  : '2.81.0',
 	'node-schedule' : '1.2.1',
 	cookies: "0.6.1",
@@ -23,6 +24,8 @@ Package.onUse(function (api) {
 	api.use('check');
 	api.use('underscore');
 
+	api.use(['webapp'], 'server');
+
 	api.use('steedos:logger');
 
 	api.use('steedos:creator');
@@ -32,6 +35,7 @@ Package.onUse(function (api) {
 	api.use('steedos:app-archive');
 
 	// api.addFiles('server/lib/records_xml.coffee', 'server');
+	api.addFiles('server/router.coffee', 'server');
 
 	api.addFiles('server/lib/export_to_xml.coffee', 'server');
 	// api.addFiles('server/lib/encapsulation.coffee', 'server');
