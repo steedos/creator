@@ -146,4 +146,4 @@ Creator.Export2xml = (objName, recordList) ->
 		filePath = _writeXmlFile jsonObj,objName
 
 	console.timeEnd "Creator.Export2xml"
-	return filePath
+	return true
