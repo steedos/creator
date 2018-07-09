@@ -1,3 +1,9 @@
+# start_month_time = ()->
+# 	console.log("1111111111111111")
+# 	date = new Date()
+# 	year = new date.getYear()
+# 	month = date.getMonth()
+# 	start_date = new Date(date.getYear(),month,1)
 Creator.Objects.meeting =
 	name: "meeting"
 	label: "会议"
@@ -83,32 +89,41 @@ Creator.Objects.meeting =
 			label:'其他功能'
 			type:'text'
 			multiple:true
+	calendar:
+		textExpr:'name'
+		startDateExpr:'start'
+		endDateExpr:'end'
+		groups:['room']
 	list_views:
 		all:
-			label: "所有"
-			columns: ["name", "start", "unit", "room","count","owner" ,"phone",                 "features"]
+			label: "列表"
+			columns: ["name", "start", "unit", "room","count","owner" ,"phone", "features"]
 			filter_scope: "space"
-		today:
-			label: "今日"
-			columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
+		calendar:
+			label: "日历"
+			columns: ["name", "start","end"]
 			filter_scope: "space"
-			filters: [["start_stamp", ">=", (new Date(new Date().toLocaleDateString()).getTime()-28800000)], ["start_stamp", "<=", 
-				new Date(new Date().toLocaleDateString()).getTime()+57600000]]
-		week:
-			label: "本周"
-			columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
-			filter_scope: "space"
-			filters: [["start_stamp", ">=", new Date(new Date().toLocaleDateString()).getTime() - (new Date().getDay()-1)* 24 * 60*60*1000 - 28800000
-			], 
-			["start_stamp", "<", new Date(new Date().toLocaleDateString()).getTime() + 
-				(7-new Date().getDay())* 24 * 60*60*1000 + 57600000
-			]]
-		today:
-			label: "本月"
-			columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
-			filter_scope: "space"
-			filters: [["start_stamp", ">=", new Date(new Date(new Date().toLocaleDateString()).setDate(1))], ["start_stamp", "<", 
-				new Date(new Date(new Date().toLocaleDateString()).setMonth(new Date().getMonth()+1))]]
+		# today:
+		# 	label: "今日"
+		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
+		# 	filter_scope: "space"
+		# 	filters: [["start_stamp", ">=", (new Date(new Date().toLocaleDateString()).getTime()-28800000)], ["start_stamp", "<=", 
+		# 		new Date(new Date().toLocaleDateString()).getTime()+57600000]]
+		# week:
+		# 	label: "本周"
+		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
+		# 	filter_scope: "space"
+		# 	filters: [["start_stamp", ">=", new Date(new Date().toLocaleDateString()).getTime() - (new Date().getDay()-1)* 24 * 60*60*1000 - 28800000
+		# 	], 
+		# 	["start_stamp", "<", new Date(new Date().toLocaleDateString()).getTime() + 
+		# 		(7-new Date().getDay())* 24 * 60*60*1000 + 57600000
+		# 	]]
+		# today:
+		# 	label: "本月"
+		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
+		# 	filter_scope: "space"
+		# 	filters: [["start_stamp", ">=", new Date(new Date(new Date().toLocaleDateString()).setDate(1))], ["start_stamp", "<", 
+		# 		new Date(new Date(new Date().toLocaleDateString()).setMonth(new Date().getMonth()+1))]]
 		# room:
 		# 	label: "按会议室查看"
 		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                 "features"]
