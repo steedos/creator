@@ -47,7 +47,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
                 sub_openid = o._id
 
         totalFee = parseInt(amount*100)
-        out_trade_no = order.out_trade_no
+        out_trade_no = moment().format('YYYYMMDDHHmmssSSS') + '001'
         orderData = {
             body: order_body,
             out_trade_no: out_trade_no,
@@ -93,7 +93,7 @@ JsonRoutes.add 'post', '/api/steedos/weixin/card/recharge', (req, res, next) ->
 
                     Creator.getCollection('billing_record').insert(obj)
 
-                    Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'pending', name: out_trade_no } })
+                    Creator.getCollection('vip_order').update({ _id: order_id }, { $set: { status: 'pending', name: out_trade_no, out_trade_no: out_trade_no } })
 
                     returnData.timeStamp = Math.floor(Date.now() / 1000) + ""
                     returnData.nonceStr = util.generateNonceString()
