@@ -80,40 +80,40 @@
                                 "days": {
                                     "format": {
                                         "abbreviated": {
-                                            "sun": "Sun",
-                                            "mon": "Mon",
-                                            "tue": "Tue",
-                                            "wed": "Wed",
-                                            "thu": "Thu",
-                                            "fri": "Fri",
-                                            "sat": "Sat"
+                                            "sun": "日",
+                                            "mon": "一",
+                                            "tue": "二",
+                                            "wed": "三",
+                                            "thu": "四",
+                                            "fri": "五",
+                                            "sat": "六"
                                         },
                                         "narrow": {
-                                            "sun": "S",
-                                            "mon": "M",
-                                            "tue": "T",
-                                            "wed": "W",
-                                            "thu": "T",
-                                            "fri": "F",
-                                            "sat": "S"
+                                            "sun": "日",
+                                            "mon": "一",
+                                            "tue": "二",
+                                            "wed": "三",
+                                            "thu": "四",
+                                            "fri": "五",
+                                            "sat": "六"
                                         },
                                         "short": {
-                                            "sun": "Su",
-                                            "mon": "Mo",
-                                            "tue": "Tu",
-                                            "wed": "We",
-                                            "thu": "Th",
-                                            "fri": "Fr",
-                                            "sat": "Sa"
+                                            "sun": "日",
+                                            "mon": "一",
+                                            "tue": "二",
+                                            "wed": "三",
+                                            "thu": "四",
+                                            "fri": "五",
+                                            "sat": "六"
                                         },
                                         "wide": {
-                                            "sun": "Sunday",
-                                            "mon": "Monday",
-                                            "tue": "Tuesday",
-                                            "wed": "Wednesday",
-                                            "thu": "Thursday",
-                                            "fri": "Friday",
-                                            "sat": "Saturday"
+                                            "sun": "星期日",
+                                            "mon": "星期一",
+                                            "tue": "星期二",
+                                            "wed": "星期三",
+                                            "thu": "星期四",
+                                            "fri": "星期五",
+                                            "sat": "星期六"
                                         }
                                     }
                                 },
