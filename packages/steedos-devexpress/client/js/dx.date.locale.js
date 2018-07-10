@@ -143,11 +143,11 @@
                                     "format": {
                                         "abbreviated": {
                                             "midnight": "midnight",
-                                            "am": "AM",
-                                            "am-alt-variant": "am",
+                                            "am": "上午",
+                                            "am-alt-variant": "上午",
                                             "noon": "noon",
-                                            "pm": "PM",
-                                            "pm-alt-variant": "pm",
+                                            "pm": "下午",
+                                            "pm-alt-variant": "下午",
                                             "morning1": "in the morning",
                                             "afternoon1": "in the afternoon",
                                             "evening1": "in the evening",
@@ -155,11 +155,11 @@
                                         },
                                         "narrow": {
                                             "midnight": "midnight",
-                                            "am": "AM",
-                                            "am-alt-variant": "am",
+                                            "am": "上午",
+                                            "am-alt-variant": "上午",
                                             "noon": "noon",
-                                            "pm": "PM",
-                                            "pm-alt-variant": "pm",
+                                            "pm": "下午",
+                                            "pm-alt-variant": "下午",
                                             "morning1": "in the morning",
                                             "afternoon1": "in the afternoon",
                                             "evening1": "in the evening",
@@ -167,11 +167,11 @@
                                         },
                                         "wide": {
                                             "midnight": "midnight",
-                                            "am": "AM",
-                                            "am-alt-variant": "am",
+                                            "am": "上午",
+                                            "am-alt-variant": "上午",
                                             "noon": "noon",
-                                            "pm": "PM",
-                                            "pm-alt-variant": "pm",
+                                            "pm": "下午",
+                                            "pm-alt-variant": "下午",
                                             "morning1": "morning",
                                             "afternoon1": "afternoon",
                                             "evening1": "evening",
@@ -383,6 +383,14 @@
                 months.push(monthsObj[k]);
             }
             return months;
+        }
+        localization.date.getDayNames = function (format) {
+            var daysObj = localeData.dates.calendars.gregorian.days.format[(format || "wide")];
+            var days = [];
+            for (var k in daysObj) {
+                days.push(daysObj[k]);
+            }
+            return days;
         }
     }
 });
