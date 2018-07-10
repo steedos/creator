@@ -36,12 +36,8 @@ _deleteData = (data) ->
 	
 
 getTooltipTemplate = (data) ->
-	str = """
-		<div class='meeting-tooltip'>
-			<div class="dx-scheduler-appointment-tooltip-title">#{data.name}</div>
-			<div class='dx-scheduler-appointment-tooltip-date'>
-				#{moment(data.start).tz("Asia/Shanghai").format("MMM D, h:mm A")} - #{moment(data.end).tz("Asia/Shanghai").format("MMM D, h:mm A")}
-			</div>
+	if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+		action = """
 			<div class="action">
 				<div class="dx-scheduler-appointment-tooltip-buttons">
 					<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
@@ -52,6 +48,16 @@ getTooltipTemplate = (data) ->
 					</div>
 				</div>
 			</div>
+		"""
+	else
+		action = ""
+	str = """
+		<div class='meeting-tooltip'>
+			<div class="dx-scheduler-appointment-tooltip-title">#{data.name}</div>
+			<div class='dx-scheduler-appointment-tooltip-date'>
+				#{moment(data.start).tz("Asia/Shanghai").format("MMM D, h:mm A")} - #{moment(data.end).tz("Asia/Shanghai").format("MMM D, h:mm A")}
+			</div>
+			#{action}
 		</div>
 	"""
 	return $(str)
