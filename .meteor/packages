@@ -97,7 +97,7 @@ peppelg:bootstrap-3-modal@1.0.4
 keepnox:perfect-scrollbar
 
 steedos:ionicons@0.1.7
-steedos:vip-card
+#steedos:vip-card
 steedos:vip-post
 steedos:objects
 steedos:sso
@@ -113,9 +113,9 @@ meteorhacks:unblock@1.1.0
 
 steedos:lightning-design-system
 
-##steedos:cms
+#steedos:cms
 
-# steedos:qhd-records
+#steedos:qhd-records
 
 steedos:odata
 yogiben:autoform-tags
@@ -132,8 +132,8 @@ steedos:instances-statistics
 steedos:meeting
 http@1.2.9
 
-steedos:weixin
-steedos:pay
+#steedos:weixin
+#steedos:pay
 
-steedos:weixin-template-message-queue
+#steedos:weixin-template-message-queue
 steedos:mini-web

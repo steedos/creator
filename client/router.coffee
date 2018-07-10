@@ -1,6 +1,6 @@
 FlowRouter.route '/',
 	action: (params, queryParams)->
-		FlowRouter.go '/app'
+		FlowRouter.go '/app/meeting'
 
 
 # Meteor.startup ->
