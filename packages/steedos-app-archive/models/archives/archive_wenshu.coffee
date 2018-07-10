@@ -1,3 +1,4 @@
+# 设置保管期限
 set_retention = (doc)->
 	rules = Creator.Collections["archive_rules"].find({ fieldname: 'title'},{ fields:{ keywords: 1,retention:1 } } ).fetch()
 	if rules
@@ -41,7 +42,6 @@ set_retention = (doc)->
 				destroy_date_timestamp: destroy_date_timestamp
 				}
 		})
-
 
 # 设置类别号
 set_category_code = (doc)->
@@ -90,7 +90,26 @@ set_destory = (doc)->
 						destroy_date_timestamp:destroy_date_timestamp
 						}
 				})
-		
+
+# 日志记录
+set_audit = (record_id, space, userId)->
+
+	doc = {
+		business_status: "历史行为",
+		business_activity: "修改文书档案",
+		action_time: new Date(),
+		action_user: userId,
+		action_mandate: "",
+		action_description: "成功",
+		action_administrative_records_id: record_id,
+		created_by: userId,
+		created: new Date(),
+		owner: userId,
+		space: space
+	}
+	Creator.Collections["archive_audit"].insert(doc)
+
+
 Creator.Objects.archive_wenshu =
 	name: "archive_wenshu"
 	icon: "record"
@@ -728,10 +747,16 @@ Creator.Objects.archive_wenshu =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
+				# console.log "userID",userId
+				# console.log "doc",doc
+				# console.log "fieldNames",fieldNames
+				# console.log "modifier",modifier
+				# console.log "options",options
 				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_identifier or modifier['$set']?.year
                     set_archivecode(doc._id)
                 if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
                 	set_destory(doc)
+				set_audit(doc?._id, doc?.space, userId)
 
 	actions:
 		number_adjuct:
