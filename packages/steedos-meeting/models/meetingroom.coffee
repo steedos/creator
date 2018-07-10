@@ -4,7 +4,7 @@ Creator.Objects.meetingroom =
 	icon: "contract"
 	fields:
 		name:
-			label:'名称'
+			label:'会议室'
 			type:'text'
 			is_wide:true
 			sortable:true
@@ -38,24 +38,30 @@ Creator.Objects.meetingroom =
 			label:'其他功能'
 			type:'text'
 			multiple:true
+		color:
+			label:'颜色'
+			type:'select'
+			inlineHelpText: "日历上会议显示的颜色"
+			options:[{label:'红色',value:"#ff2d55"},
+					{label:'橙色',value:"#ff9500"}
+					{label:'黄色',value:"#ffcc00"},
+					{label:'绿色',value:"#65db39"},
+					{label:'蓝色',value:"#34aadc"},
+					{label:'紫色',value:"#cc73e1"},
+					{label:'棕色',value:"#a2845e"}]
 	list_views:
 		all:
 			label: "所有"
 			columns: ["name", "capacity","region","features"]
 			filter_scope: "space"
-		region_one:
-			label: "一号楼"
-			columns: ["name", "capacity","region","features"]
-			filter_scope: "space"
-			filters: [["region", "=", "一号楼"]]
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -64,19 +70,19 @@ Creator.Objects.meetingroom =
 			modifyAllRecords: true
 			viewAllRecords: true
 		member:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		guest:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 
 	triggers:
 

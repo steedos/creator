@@ -21,29 +21,43 @@ _insertData = () ->
 	Session.set("action_save_and_insert", false)
 	Meteor.defer ->
 		$(".creator-add").click();
+
+_deleteData = (data) ->
+	action = {
+		name: "standard_delete", 
+		todo: "standard_delete"
+	}
+	action_record_title = data.name
+	record_id = data._id
+	object_name = Session.get("object_name")
+	dxSchedulerInstance.hideAppointmentTooltip()
+	Creator.executeAction object_name, action, record_id, action_record_title, 'calendar', ()->
+		dxSchedulerInstance.repaint()
 	
 
 getTooltipTemplate = (data) ->
+	if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+		action = """
+			<div class="action">
+				<div class="dx-scheduler-appointment-tooltip-buttons">
+					<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
+						<i class="dx-icon dx-icon-trash"></i>
+					</div>
+					<div class="dx-button dx-button-normal dx-widget dx-button-has-text dx-state-hover edit" role="button" aria-label="打开日程" tabindex="0">
+						<span class="dx-button-text">打开日程</span>
+					</div>
+				</div>
+			</div>
+		"""
+	else
+		action = ""
 	str = """
 		<div class='meeting-tooltip'>
 			<div class="dx-scheduler-appointment-tooltip-title">#{data.name}</div>
 			<div class='dx-scheduler-appointment-tooltip-date'>
 				#{moment(data.start).tz("Asia/Shanghai").format("MMM D, h:mm A")} - #{moment(data.end).tz("Asia/Shanghai").format("MMM D, h:mm A")}
 			</div>
-			<div class="action">
-				<div class="dx-scheduler-appointment-tooltip-buttons">
-					<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
-						<div class="dx-button-content">
-							<i class="dx-icon dx-icon-trash"></i>
-						</div>
-					</div>
-					<div class="dx-button dx-button-normal dx-widget dx-button-has-text dx-state-hover edit" role="button" aria-label="打开日程" tabindex="0">
-						<div class="dx-button-content">
-							<span class="dx-button-text">打开日程</span>
-						</div>
-					</div>
-				</div>
-			</div>
+			#{action}
 		</div>
 	"""
 	return $(str)
@@ -90,7 +104,10 @@ Template.creator_calendar.onRendered ->
 									error.message = t "creator_odata_unexpected_character"
 							toastr.error(error.message)
 				}
-				views: ["day", "week", "timelineDay"]
+				views: [{
+					type: "day",
+					groups: ["room"]
+				}, "week", "month"]
 				currentView: "day"
 				# currentDate: new Date()
 				firstDayOfWeek: 0
@@ -102,7 +119,7 @@ Template.creator_calendar.onRendered ->
 				timeZone: "Asia/Shanghai"
 				showAllDayPanel: false,
 				height: "100%"
-				groups: ["room"]
+				# groups: ["room"]
 				crossScrollingEnabled: true
 				cellDuration: 30
 				editing: { 
@@ -166,7 +183,12 @@ Template.creator_calendar.onRendered ->
 						if _.indexOf(key, '@') < 0
 							doc[key] = e.newData[key]
 					doc['modified'] = new Date()
-					Creator.odata.update("meeting",e.newData['_id'],doc)
+					Creator.odata.update("meeting", e.newData['_id'], doc, () -> 
+						dxSchedulerInstance.repaint()
+					)
+
+				onAppointmentUpdated: (e)->
+					dxSchedulerInstance.repaint()
 
 				appointmentTooltipTemplate: (data, container) ->
 					console.log('[appointmentTooltipTemplate]', data, container)
@@ -177,6 +199,10 @@ Template.creator_calendar.onRendered ->
 						onClick: () ->
 							_editData(data)
 					});
+					markup.find(".delete").dxButton({
+						onClick: () ->
+							_deleteData(data)
+					})
 					return markup;
 			}).dxScheduler("instance")
 
@@ -187,7 +213,7 @@ Template.creator_calendar.helpers
 		actions: ()->
 		actions = Creator.getActions()
 		actions = _.filter actions, (action)->
-			if action.on == "list"
+			if action.on == "list" && action.todo != "standard_query"
 				if typeof action.visible == "function"
 					return action.visible()
 				else
