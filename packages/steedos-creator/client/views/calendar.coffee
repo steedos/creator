@@ -115,8 +115,8 @@ Template.creator_calendar.onRendered ->
 				cellDuration: 30
 				editing: { 
 					allowAdding: false,
-					allowDragging: false,
-					allowResizing: false,
+					allowDragging: true,
+					allowResizing: true,
 					# allowUpdating: false
 				},
 				resources: [{
@@ -128,7 +128,7 @@ Template.creator_calendar.onRendered ->
 						store: 
 							type: "odata"
 							version: 4
-							url: "/api/odata/v4/#{Steedos.spaceId()}/meetingroom"
+							url: "/api/odata/v4/#{Steedos.spaceId()}/meetingroom?$orderby=name"
 							withCredentials: false
 							beforeSend: (request) ->
 								request.headers['X-User-Id'] = Meteor.userId()
@@ -145,6 +145,7 @@ Template.creator_calendar.onRendered ->
 									if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 										error.message = t "creator_odata_unexpected_character"
 								toastr.error(error.message)
+						#orderby:'name'
 					}
 				}],
 				onAppointmentDblClick: (e) ->
