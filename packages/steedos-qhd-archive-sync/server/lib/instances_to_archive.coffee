@@ -135,10 +135,11 @@ _minxiAttachmentInfo = (instance, record_id) ->
 		'metadata.current': true
 	}).fetch()
 
+	collection = Creator.Collections["cms_files"]
+
 	currentFiles.forEach (cf)->
 		try
 			versions = []
-			collection = Creator.Collections["cms_files"]
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
 			
@@ -199,21 +200,90 @@ _minxiAttachmentInfo = (instance, record_id) ->
 			collection.update(cmsFileId, {$set: {versions: versions}})
 		catch e
 			logger.error "正文附件下载失败：#{cf._id}. error: " + e
+
+
+# 整理表单html
+_minxiInstanceHtml = (instance, record_id) ->
+	admin = RecordsQHD?.settings_records_qhd?.to_archive?.admin
+	apps_url = RecordsQHD?.settings_records_qhd?.to_archive?.apps_url
+	
+	space_id = instance?.space
+	ins_id = instance?._id
+
+	user_id = admin?.userid
+	username = admin?.username
+	password = admin?.password
+
+	instance_html_url = apps_url + '/workflow/space/' + space_id + '/view/readonly/' + ins_id + '?username=' + username + '&password=' + password + '&hide_traces=1'
+
+	result_html = HTTP.call('GET',instance_html_url)?.content
+
+	if result_html
+		try
+			object_name = RecordsQHD?.settings_records_qhd?.to_archive?.object_name
+
+			collection = Creator.Collections["cms_files"]
+
+			cmsFileId = collection._makeNewID()
+
+			date_now = new Date()
+
+			data_buffer = new Buffer(result_html.toString())
+
+			file_name = instance?.name + '.html'
+
+			file_size = data_buffer?.length
 		
-	# 表单原文导出为xml
-	# form = Creator.Collections["forms"].findOne({_id: instance.form})
+			collection.insert({
+					_id: cmsFileId,
+					versions: [],
+					size: file_size,
+					owner: user_id,
+					instance_html: true,
+					parent: {
+						o: object_name,
+						ids: [record_id]
+					},
+					modified: date_now,
+					modified_by: user_id,
+					created: date_now,
+					created_by: user_id,
+					name: file_name,
+					space: space_id,
+					extention: 'html'
+				},
+				(error,result)->
+					if error
+						throw new Meteor.Error(error)
+				)
 
-	# attachInfoName = "#{form?.name}_#{instance._id}.html";
-
-	# space = Creator.Collections["spaces"].findOne({_id: instance.space});
-
-	# user = Creator.Collections["users"].findOne({_id: space.owner})
-
-	# options = {showTrace: true, showAttachments: true, absolute: true}
-
-	# html = InstanceReadOnlyTemplate.getInstanceHtml(user, space, instance, options)
-
-	# dataBuf = new Buffer(html);
+			newFile = new FS.File()
+			newFile.attachData(
+				data_buffer,
+				{type: 'text/html'},
+				(err)->
+					if err
+						throw new Meteor.Error(err.error, err.reason)
+					newFile.name file_name
+					newFile.size file_size
+					metadata = {
+						owner: user_id,
+						owner_name: "系统生成",
+						space: space_id,
+						record_id: record_id,
+						object_name: object_name,
+						parent: cmsFileId,
+						instance_html: true
+					}
+					newFile.metadata = metadata
+					fileObj = cfs.files.insert(newFile)
+					if fileObj
+						versions = []
+						versions.push fileObj?._id
+						collection.update(cmsFileId, {$set: {versions: versions}})
+				)
+		catch e
+			logger.error "表单生成HTML失败：#{ins_id}. error: " + e
 
 
 # 整理档案审计数据
@@ -305,7 +375,7 @@ InstancesToArchive::getNonContractInstances = ()->
 	query = {
 		space: {$in: @spaces},
 		flow: {$nin: @contract_flows},
-		# is_archived字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
+		# is_archived 字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
 		# 正常情况下，未归档的表单无 is_recorded 字段
 		$or: [
 			{is_recorded: false},
@@ -347,6 +417,9 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 
 		# 整理文件
 		_minxiAttachmentInfo(instance, record_id)
+
+		# 整理表单html
+		_minxiInstanceHtml(instance, record_id)
 
 		# 整理关联档案
 		_minxiRelatedArchives(instance, record_id)

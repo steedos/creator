@@ -25,6 +25,7 @@ RecordsQHD.run = ()->
 		logger.error "RecordsQHD.instanceToArchive", e
 
 # RecordsQHD.instanceToArchive()
+# RecordsQHD.instanceToArchive(["jXib7XrPu6FqWSKXH"])
 RecordsQHD.instanceToArchive = (ins_ids)->
 
 	spaces = RecordsQHD?.settings_records_qhd?.spaces
