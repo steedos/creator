@@ -21,6 +21,18 @@ _insertData = () ->
 	Session.set("action_save_and_insert", false)
 	Meteor.defer ->
 		$(".creator-add").click();
+
+_deleteData = (data) ->
+	action = {
+		name: "standard_delete", 
+		todo: "standard_delete"
+	}
+	action_record_title = data.name
+	record_id = data._id
+	object_name = Session.get("object_name")
+	dxSchedulerInstance.hideAppointmentTooltip()
+	Creator.executeAction object_name, action, record_id, action_record_title, 'calendar', ()->
+		dxSchedulerInstance.repaint()
 	
 
 getTooltipTemplate = (data) ->
@@ -33,14 +45,10 @@ getTooltipTemplate = (data) ->
 			<div class="action">
 				<div class="dx-scheduler-appointment-tooltip-buttons">
 					<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
-						<div class="dx-button-content">
-							<i class="dx-icon dx-icon-trash"></i>
-						</div>
+						<i class="dx-icon dx-icon-trash"></i>
 					</div>
 					<div class="dx-button dx-button-normal dx-widget dx-button-has-text dx-state-hover edit" role="button" aria-label="打开日程" tabindex="0">
-						<div class="dx-button-content">
-							<span class="dx-button-text">打开日程</span>
-						</div>
+						<span class="dx-button-text">打开日程</span>
 					</div>
 				</div>
 			</div>
@@ -176,6 +184,10 @@ Template.creator_calendar.onRendered ->
 						onClick: () ->
 							_editData(data)
 					});
+					markup.find(".delete").dxButton({
+						onClick: () ->
+							_deleteData(data)
+					})
 					return markup;
 			}).dxScheduler("instance")
 
