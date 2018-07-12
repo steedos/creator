@@ -1,9 +1,5 @@
 <template name="steedosAfMarkdown">
 	<div class="steedos-markdown">
-		<textarea style="display: none" {{this.atts}}>{{value}}</textarea>
-		<div class="markdown-body">{{{markdownStr value}}}</div>
-		<span id="edit-markdown">
-			{{> steedos_icon class="slds-button__icon slds-button__icon_hint" source="utility-sprite" name="edit"}}
-		</span>
+		<textarea {{this.atts}}>{{value}}</textarea>
 	</div>
 </template>

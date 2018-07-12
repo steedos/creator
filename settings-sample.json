@@ -2,9 +2,6 @@
     "public": {
         "cfs": {
             "store": "" // 值为空或者未配置此属性表示文件存本地，OSS表示存阿里云， S3表示存AWS
-        },
-        "markdown": {
-            "stackEditURL": "" //markdown StackEdit 编辑服务地址，如果没有，则默认使用https://stackedit.io/app#
         }
     },
     "cron": {
