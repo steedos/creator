@@ -27,12 +27,12 @@ Creator.Objects.archive_rules =
 		
 	permission_set:
 		user:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
-			allowRead: false
-			modifyAllRecords: false
-			viewAllRecords: false 
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true 
 		admin:
 			allowCreate: true
 			allowDelete: true

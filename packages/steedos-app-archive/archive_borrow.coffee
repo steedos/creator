@@ -1,7 +1,6 @@
 Creator.Apps.archive_borrow = 
 	url: "/app/archive_borrow"
 	name: "档案借阅"
-	icon: "document" 
-	icon_slds: "custom" 
+	icon_slds: "today"
 	objects: [
 		"archive_borrow"]

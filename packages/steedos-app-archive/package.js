@@ -45,6 +45,9 @@ Package.onUse(function(api) {
 	api.addFiles('archive_transfer.coffee');
 	api.addFiles('models/archive_transfer/archive_transfer.coffee');
 
+	// 档案统计
+	api.addFiles('archive_statistics.coffee');
+
 	// 档案维护
 	api.addFiles('archive_setting.coffee');
 	api.addFiles('models/archive_setting/archive_fonds.coffee');
