@@ -60,12 +60,16 @@ _dataSource = () ->
 				toastr.error(error.message)
 	}
 	return dataSource
-	
 
+getAppointmentColor = (room) ->
+	result = Creator.odata.get('meetingroom',room,'color')
+	return result.color
+	
 getTooltipTemplate = (data) ->
+	color = getAppointmentColor(data.room)
 	if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
 		action = """
-			<div class="action">
+			<div class="action" style='background-color:" + color + ";'>
 				<div class="dx-scheduler-appointment-tooltip-buttons">
 					<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
 						<i class="dx-icon dx-icon-trash"></i>
@@ -79,7 +83,7 @@ getTooltipTemplate = (data) ->
 	else
 		action = ""
 	str = """
-		<div class='meeting-tooltip'>
+		<div class='meeting-tooltip' style='background-color:" + color + ";'>
 			<div class="dx-scheduler-appointment-tooltip-title">#{data.name}</div>
 			<div class='dx-scheduler-appointment-tooltip-date'>
 				#{moment(data.start).tz("Asia/Shanghai").format("MMM D, h:mm A")} - #{moment(data.end).tz("Asia/Shanghai").format("MMM D, h:mm A")}
@@ -110,11 +114,17 @@ Template.creator_calendar.onRendered ->
 				dataSource: _dataSource()
 				views: [{
 					type: "day",
+					maxAppointmentsPerCell:"unlimited"
 					groups: ["room"]
-				}, "week", "month"]
+				}, {
+					type:"week",
+					maxAppointmentsPerCell:"unlimited"
+				}, "month"]
 				currentView: "day"
-				# currentDate: new Date()
-				firstDayOfWeek: 0
+				currentDate: new Date()
+				crossScrollingEnabled: true,
+				showAllDayPanel: false,
+				firstDayOfWeek: 1
 				startDayHour: 8
 				endDayHour: 18
 				textExpr: "name"
@@ -162,10 +172,33 @@ Template.creator_calendar.onRendered ->
 					}
 				}],
 				onAppointmentClick: (e) ->
-					console.log('[onAppointmentClick]', e)
+					if e.event.currentTarget.className.includes("dx-list-item")
+						e.cancel = true
 
 				onAppointmentDblClick: (e) ->
 					e.cancel = true	
+
+				dropDownAppointmentTemplate: (data, index, container) ->
+					container.addClass('appointment-border')
+					if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+						$("body").off("click", ".appointment-border")
+						$("body").on("click", ".appointment-border", ()->
+							_editData(data)
+						)
+					markup = getTooltipTemplate(data);
+					markup.find(".edit").dxButton({
+						text: "Edit details",
+						type: "default",
+						onClick: () ->
+							_editData(data)
+					});
+					
+					markup.find(".delete").dxButton({
+						onClick: () ->
+							_deleteData(data)
+					})
+					return markup;
+					console.log('[dropDownAppointmentTemplate]', data)
 
 				onCellClick: (e) ->
 					console.log('[onCellClick]', e)

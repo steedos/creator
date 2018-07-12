@@ -16,8 +16,9 @@
     } else {
         factory(DevExpress.localization)
     }
-}(this, function(localization) {
+}(this, function (localization) {
     localization.loadDateLocale = function(locale){
+        var formattersCache = {};
         var caGregorian = {
             "main": {
                 "zh": {
@@ -200,10 +201,10 @@
                                     }
                                 },
                                 "dateFormats": {
-                                    "full": "EEEE, MMMM d, y",
-                                    "long": "MMMM d, y",
-                                    "medium": "MMM d, y",
-                                    "short": "M/d/yy"
+                                    "full": "y年 MMMM d日 EEEE",
+                                    "long": "y年 MMMM d日",
+                                    "medium": "y年 MMM d日",
+                                    "short": "yy年 M d日"
                                 },
                                 "timeFormats": {
                                     "full": "h:mm:ss a zzzz",
@@ -217,7 +218,7 @@
                                     "medium": "{1}, {0}",
                                     "short": "{1}, {0}",
                                     "availableFormats": {
-                                        "d": "d",
+                                        "d": "d日",
                                         "E": "ccc",
                                         "Ed": "d E",
                                         "Ehm": "E h:mm a",
@@ -239,23 +240,23 @@
                                         "hmv": "h:mm a v",
                                         "Hmv": "HH:mm v",
                                         "M": "L",
-                                        "Md": "M/d",
-                                        "MEd": "E, M/d",
+                                        "Md": "M d日",
+                                        "MEd": "M d日 E",
                                         "MMM": "LLL",
-                                        "MMMd": "MMM d",
-                                        "MMMEd": "E, MMM d",
-                                        "MMMMd": "MMMM d",
+                                        "MMMd": "MMM d日",
+                                        "MMMEd": "MMM d日 E",
+                                        "MMMMd": "MMMM d日",
                                         "ms": "mm:ss",
-                                        "y": "y",
-                                        "yM": "M/y",
-                                        "yMd": "M/d/y",
-                                        "yMEd": "E, M/d/y",
-                                        "yMMM": "MMM y",
-                                        "yMMMd": "MMM d, y",
-                                        "yMMMEd": "E, MMM d, y",
-                                        "yMMMM": "MMMM y",
-                                        "yQQQ": "QQQ y",
-                                        "yQQQQ": "QQQQ y"
+                                        "y": "y年",
+                                        "yM": "y年 M",
+                                        "yMd": "y年 M d日",
+                                        "yMEd": "y年 M d日 E",
+                                        "yMMM": "y年 MMM",
+                                        "yMMMd": "y年 MMM d日",
+                                        "yMMMEd": "y年 MMM d日 E",
+                                        "yMMMM": "y年 MMMM",
+                                        "yQQQ": "y年 QQQ",
+                                        "yQQQQ": "y年 QQQQ"
                                     },
                                     "appendItems": {
                                         "Day": "{0} ({2}: {1})",
@@ -271,9 +272,9 @@
                                         "Year": "{0} {1}"
                                     },
                                     "intervalFormats": {
-                                        "intervalFormatFallback": "{0} – {1}",
+                                        "intervalFormatFallback": "{0} - {1}",
                                         "d": {
-                                            "d": "d – d"
+                                            "d": "MMM – d"
                                         },
                                         "h": {
                                             "a": "h a – h a",
@@ -347,8 +348,8 @@
                                             "y": "E, M/d/y – E, M/d/y"
                                         },
                                         "yMMM": {
-                                            "M": "MMM – MMM y",
-                                            "y": "MMM y – MMM y"
+                                            "M": "y MMM – MMM",
+                                            "y": "y MMM – y MMM"
                                         },
                                         "yMMMd": {
                                             "d": "MMM d – d, y",
@@ -361,8 +362,8 @@
                                             "y": "E, MMM d, y – E, MMM d, y"
                                         },
                                         "yMMMM": {
-                                            "M": "MMMM – MMMM y",
-                                            "y": "MMMM y – MMMM y"
+                                            "M": "y MMMM – MMMM",
+                                            "y": "y MMMM – y MMMM"
                                         }
                                     }
                                 }
@@ -376,26 +377,165 @@
         if (!localeData) {
             return;
         }
-        localization.date.getMonthNames = function (format) {
-            var monthsObj = localeData.dates.calendars.gregorian.months.format[(format || "wide")];
-            var months = [];
-            for (var k in monthsObj) {
-                months.push(monthsObj[k]);
+        var FORMATS_TO_GLOBALIZE_MAP = {
+            "shortdate": {
+                path: "dateTimeFormats/availableFormats/yMd"
+            },
+            "shorttime": {
+                path: "timeFormats/short"
+            },
+            "longdate": {
+                path: "dateFormats/full"
+            },
+            "longtime": {
+                path: "timeFormats/medium"
+            },
+            "monthandday": {
+                path: "dateTimeFormats/availableFormats/MMMMd"
+            },
+            "monthandyear": {
+                path: "dateTimeFormats/availableFormats/yMMMM"
+            },
+            "quarterandyear": {
+                path: "dateTimeFormats/availableFormats/yQQQ"
+            },
+            "day": {
+                path: "dateTimeFormats/availableFormats/d"
+            },
+            "year": {
+                path: "dateTimeFormats/availableFormats/y"
+            },
+            "shortdateshorttime": {
+                path: "dateTimeFormats/short",
+                parts: ["shorttime", "shortdate"]
+            },
+            "mediumdatemediumtime": {
+                path: "dateTimeFormats/medium",
+                parts: ["shorttime", "monthandday"]
+            },
+            "longdatelongtime": {
+                path: "dateTimeFormats/medium",
+                parts: ["longtime", "longdate"]
+            },
+            "month": {
+                pattern: "LLLL"
+            },
+            "shortyear": {
+                pattern: "yy"
+            },
+            "dayofweek": {
+                pattern: "EEEE"
+            },
+            "quarter": {
+                pattern: "QQQ"
+            },
+            "millisecond": {
+                pattern: "SSS"
+            },
+            "hour": {
+                pattern: "HH"
+            },
+            "minute": {
+                pattern: "mm"
+            },
+            "second": {
+                pattern: "ss"
             }
-            return months;
-        }
-        localization.date.getDayNames = function (format) {
-            var daysObj = localeData.dates.calendars.gregorian.days.format[(format || "wide")];
-            var days = [];
-            for (var k in daysObj) {
-                days.push(daysObj[k]);
+        };
+        var dateLocalization = {
+            getMonthNames: function (format) {
+                var monthsObj = localeData.dates.calendars.gregorian.months.format[(format || "wide")];
+                var months = [];
+                for (var k in monthsObj) {
+                    months.push(monthsObj[k]);
+                }
+                return months;
+            },
+            getDayNames: function (format) {
+                var daysObj = localeData.dates.calendars.gregorian.days.format[(format || "wide")];
+                var days = [];
+                for (var k in daysObj) {
+                    days.push(daysObj[k]);
+                }
+                return days;
+            },
+            getPeriodNames: function (format) {
+                var dayPeriodsObj = localeData.dates.calendars.gregorian.dayPeriods.format[(format || "wide")];
+                var dayPeriods = [dayPeriodsObj.am, dayPeriodsObj.pm];
+                return dayPeriods;
+            },
+            _getFormatStringByPath: function (path) {
+                // return Globalize.locale().main("dates/calendars/gregorian/" + path);
+                var re = localeData.dates.calendars.gregorian;
+                try{
+                    re = eval("re." + path.replace(/\//g, "."));
+                }
+                catch(ex){
+
+                }
+                return re;
+            },
+            _getPatternByFormat: function (format) {
+                // return 'EEEE';
+                var that = this,
+                    lowerFormat = format.toLowerCase(),
+                    globalizeFormat = FORMATS_TO_GLOBALIZE_MAP[lowerFormat];
+
+                if (lowerFormat === "datetime-local") {
+                    return "yyyy-MM-ddTHH':'mm':'ss";
+                }
+
+                if (!globalizeFormat) {
+                    return;
+                }
+
+                var result = globalizeFormat.path && that._getFormatStringByPath(globalizeFormat.path) || globalizeFormat.pattern;
+
+                if (globalizeFormat.parts) {
+                    // iteratorUtils.each(globalizeFormat.parts, function (index, part) {
+                    //     result = result.replace("{" + index + "}", that._getPatternByFormat(part));
+                    // });
+                    globalizeFormat.parts.forEach(function (part, index) {
+                        result = result.replace("{" + index + "}", that._getPatternByFormat(part));
+                    });
+                }
+                return result;
+            },
+            isString: function(n){
+                return typeof n === "string";
+            },
+            format: function (date, format) {
+                if (!date) {
+                    return;
+                }
+
+                if (!format) {
+                    return date;
+                }
+
+                var formatter;
+
+                if (typeof (format) === "function") {
+                    formatter = format;
+                } else if (format.formatter) {
+                    formatter = format.formatter;
+                } else {
+                    format = format.type || format;
+                    if (this.isString(format)) {
+                        // format = FORMATS_TO_PATTERN_MAP[format.toLowerCase()] || format;
+                        format = this._getPatternByFormat(format) || format;
+                        return localization.number.convertDigits(this.getFormatter(format, this)(date));
+                    }
+                }
+
+                if (!formatter) {
+                    // TODO: log warning or error
+                    return;
+                }
+
+                return formatter(date);
             }
-            return days;
-        }
-        localization.date.getPeriodNames = function (format) {
-            var dayPeriodsObj = localeData.dates.calendars.gregorian.dayPeriods.format[(format || "wide")];
-            var dayPeriods = [dayPeriodsObj.am, dayPeriodsObj.pm];
-            return dayPeriods;
-        }
+        };
+        localization.date.inject(dateLocalization);
     }
 });

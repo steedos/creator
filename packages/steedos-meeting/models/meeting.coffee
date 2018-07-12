@@ -1,17 +1,10 @@
-# start_month_time = ()->
-# 	console.log("1111111111111111")
-# 	date = new Date()
-# 	year = new date.getYear()
-# 	month = date.getMonth()
-# 	start_date = new Date(date.getYear(),month,1)
+
 clashRemind = (_id,room,start,end)->
 	console.log("start====end===",start,end)
-	meetings = Creator.getCollection("meeting").find({_id:{ $ne:_id},room:room,$or: [{start:{$lt:start},end:{$gt:start}},{start:{$lt:end},end:{$gt:end}},{start:{$gt:start},end:{$lt:end}}]}).fetch()
+	meetings = Creator.getCollection("meeting").find({_id:{ $ne:_id},room:room,$or: [{start:{$lte:start},end:{$gt:start}},{start:{$lt:end},end:{$gte:end}},{start:{$gte:start},end:{$lte:end}}]}).fetch()
 	#console.log "meetings=================",meetings
 	return meetings?.length
-	#console.log("mettings===",mettings)
-	# mettings.forEach (metting) ->
-	# 	if meeting.start < start and start<meeting.
+
 Creator.Objects.meeting =
 	name: "meeting"
 	label: "会议"
@@ -25,6 +18,7 @@ Creator.Objects.meeting =
 			required:true
 			reference_sort:{name:1}
 			reference_limit: 20
+			sortable:true
 		start:
 			label:'开始时间'
 			type:'datetime'
@@ -36,6 +30,7 @@ Creator.Objects.meeting =
 				reValue.setMinutes(0)
 				reValue.setSeconds(0)
 				return reValue
+			sortable:true
 		end:
 			label:'结束时间'
 			type:'datetime'
@@ -43,7 +38,7 @@ Creator.Objects.meeting =
 			defaultValue: ()->
 				# 默认取值为下一个整点
 				now = new Date()
-				reValue = new Date(now.getTime() + 1 * 60 * 60 * 1000)
+				reValue = new Date(now.getTime() + 2 * 60 * 60 * 1000)
 				reValue.setMinutes(0)
 				reValue.setSeconds(0)
 				return reValue
@@ -58,7 +53,12 @@ Creator.Objects.meeting =
 		unit:
 			label:'参会单位'
 			type:'text'
+			defaultValue:()->
+				collection = Creator.Collections["organizations"]
+				organziation = collection.findOne({users:Meteor.userId(),space:Session.get("spaceId")},{fields:{name:1}}).name
+				return organziation
 			required:true
+			sortable:true
 		count:
 			label:'参会人数'
 			type:'number'
@@ -83,6 +83,10 @@ Creator.Objects.meeting =
 		phone:
 			label:'联系方式'
 			type:'text'
+			defaultValue:()->
+				collection = Creator.Collections["space_users"]
+				mobile = collection.findOne({user:Meteor.userId(),space:Session.get("spaceId")},{fields:{mobile:1}}).mobile
+				return mobile
 		features:
 			label:'用品需求'
 			type:'select'
@@ -154,8 +158,8 @@ Creator.Objects.meeting =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				if doc.end < doc.start
-					throw new Meteor.Error 500, "开始时间不能大于结束时间"
+				if doc.end <= doc.start
+					throw new Meteor.Error 500, "开始时间需小于结束时间"
 				clashs = clashRemind(doc._id,doc.room,doc.start,doc.end)
 				if clashs
 					throw new Meteor.Error 500, "该时间段的此会议室已被占用"
@@ -171,7 +175,7 @@ Creator.Objects.meeting =
 				if !modifier?.$set?.end
 					end = doc.end
 				#console.log("start,,end======",start,end)
-				if end < start
+				if end <= start
 					throw new Meteor.Error 500, "开始时间不能大于结束时间"	
 				if modifier?.$set?.room
 					room = modifier?.$set?.room
