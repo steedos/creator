@@ -2,7 +2,7 @@
 
 Package.describe({
     name: 'steedos:markdown',
-    summary: 'Steedos Autoform location',
+    summary: 'Steedos Autoform Markdown',
     version: '0.0.1',
     git: ''
 });
