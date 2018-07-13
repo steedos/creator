@@ -1,6 +1,6 @@
 Creator.Objects.archive_audit = 
 	name: "archive_audit"
-	icon: "campaign"
+	icon: "note"
 	label: "日志记录"
 	enable_search: false
 	fields:
