@@ -11,10 +11,10 @@ Creator.Objects.vip_share_response =
 			label:'分享人'
 			type:'lookup'
 			reference_to:'vip_share'
-		# related_to:
-		# 	label: "关联到"
-		# 	type: "lookup"
-		# 	reference_to: 'vip_product'
+		product:
+			label: "商品"
+			type: "lookup"
+			reference_to: 'vip_product'
 	list_views:
 		all:
 			label: "所有"
