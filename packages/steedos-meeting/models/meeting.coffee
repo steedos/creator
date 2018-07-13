@@ -1,16 +1,50 @@
-# start_month_time = ()->
-# 	console.log("1111111111111111")
-# 	date = new Date()
-# 	year = new date.getYear()
-# 	month = date.getMonth()
-# 	start_date = new Date(date.getYear(),month,1)
+
+clashRemind = (_id,room,start,end)->
+	console.log("start====end===",start,end)
+	meetings = Creator.getCollection("meeting").find({_id:{ $ne:_id},room:room,$or: [{start:{$lte:start},end:{$gt:start}},{start:{$lt:end},end:{$gte:end}},{start:{$gte:start},end:{$lte:end}}]}).fetch()
+	#console.log "meetings=================",meetings
+	return meetings?.length
+
 Creator.Objects.meeting =
 	name: "meeting"
 	label: "会议"
-	icon: "contract"
+	icon: "event"
+	enable_search: true
 	fields:
+		room:
+			label:'会议室'
+			type:'lookup'
+			reference_to:'meetingroom'
+			is_wide:true
+			required:true
+			reference_sort:{name:1}
+			reference_limit: 20
+			sortable:true
+		start:
+			label:'开始时间'
+			type:'datetime'
+			required:true
+			defaultValue: ()->
+				# 默认取值为下一个整点
+				now = new Date()
+				reValue = new Date(now.getTime() + 1 * 60 * 60 * 1000)
+				reValue.setMinutes(0)
+				reValue.setSeconds(0)
+				return reValue
+			sortable:true
+		end:
+			label:'结束时间'
+			type:'datetime'
+			required:true
+			defaultValue: ()->
+				# 默认取值为下一个整点
+				now = new Date()
+				reValue = new Date(now.getTime() + 2 * 60 * 60 * 1000)
+				reValue.setMinutes(0)
+				reValue.setSeconds(0)
+				return reValue
 		name:
-			label:'标题'
+			label:'会议标题'
 			type:'text'
 			is_wide:true
 			required:true
@@ -20,63 +54,42 @@ Creator.Objects.meeting =
 		unit:
 			label:'参会单位'
 			type:'text'
+			defaultValue:()->
+				collection = Creator.Collections["organizations"]
+				organziation = collection.findOne({users:Meteor.userId(),space:Session.get("spaceId")},{fields:{name:1}}).name
+				return organziation
+			required:true
+			sortable:true
 		count:
 			label:'参会人数'
 			type:'number'
-		room:
-			label:'会议室'
-			type:'lookup'
-			reference_to:'meetingroom'
-		start:
-			label:'开始时间'
-			type:'datetime'
-			defaultValue: ()->
-				# 默认取值为下一个整点
-				now = new Date()
-				reValue = new Date(now.getTime() + 1 * 60 * 60 * 1000)
-				reValue.setMinutes(0)
-				reValue.setSeconds(0)
-				return reValue
-		start_stamp:
-			label:'开始时间'
-			type:'number'
-			hidden:true
-		end:
-			label:'结束时间'
-			type:'datetime'
-			defaultValue: ()->
-				# 默认取值为下一个整点
-				now = new Date()
-				reValue = new Date(now.getTime() + 1 * 60 * 60 * 1000)
-				reValue.setMinutes(0)
-				reValue.setSeconds(0)
-				return reValue
-		alarms:
-			label:'提醒时间'
-			type:'select'
-			defaultValue: '-PT1H'
-			options:[
-				{label:'不提醒',value:'null'},
-				{label:'活动开始时',value:'Now'},
-				{label:'5分钟前',value:'-PT5M'},
-				{label:'10分钟前',value:'-PT10M'},
-				{label:'15分钟前',value:'-PT15M'},
-				{label:'30分钟前',value:'-PT30M'},
-				{label:'1小时前',value:'-PT1H'},
-				{label:'2小时前',value:'-PT2H'},
-				{label:'1天前',value:'-P1D'},
-				{label:'2天前',value:'-P2D'}
-			]
-			group:'-'
+		
+		# alarms:
+		# 	label:'提醒时间'
+		# 	type:'select'
+		# 	defaultValue: '-PT1H'
+		# 	options:[
+		# 		{label:'不提醒',value:'null'},
+		# 		{label:'活动开始时',value:'Now'},
+		# 		{label:'5分钟前',value:'-PT5M'},
+		# 		{label:'10分钟前',value:'-PT10M'},
+		# 		{label:'15分钟前',value:'-PT15M'},
+		# 		{label:'30分钟前',value:'-PT30M'},
+		# 		{label:'1小时前',value:'-PT1H'},
+		# 		{label:'2小时前',value:'-PT2H'},
+		# 		{label:'1天前',value:'-P1D'},
+		# 		{label:'2天前',value:'-P2D'}
+		# 	]
+		# 	group:'-'
 		phone:
 			label:'联系方式'
 			type:'text'
-		description:
-			label:'备注'
-			type:'textarea'
-			is_wide:true
+			defaultValue:()->
+				collection = Creator.Collections["space_users"]
+				mobile = collection.findOne({user:Meteor.userId(),space:Session.get("spaceId")},{fields:{mobile:1}}).mobile
+				return mobile
 		features:
-			label:'其他用品需求'
+			label:'用品需求'
 			type:'select'
 			options:[
 				{label:'上网',value:'surfing'},
@@ -85,10 +98,17 @@ Creator.Objects.meeting =
 				{label:'会标',value:'monogram'}
 				]
 			multiple:true
-		other_features:
-			label:'其他功能'
-			type:'text'
-			multiple:true
+		description:
+			label:'备注'
+			type:'textarea'
+			is_wide:true
+
+		# other_features:
+		# 	label:'其他功能'
+		# 	type:'text'
+		# 	multiple:true
+		owner:
+			hidden:true
 	calendar:
 		textExpr:'name'
 		startDateExpr:'start'
@@ -103,31 +123,7 @@ Creator.Objects.meeting =
 			label: "日历"
 			columns: ["name", "start","end"]
 			filter_scope: "space"
-		# today:
-		# 	label: "今日"
-		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
-		# 	filter_scope: "space"
-		# 	filters: [["start_stamp", ">=", (new Date(new Date().toLocaleDateString()).getTime()-28800000)], ["start_stamp", "<=", 
-		# 		new Date(new Date().toLocaleDateString()).getTime()+57600000]]
-		# week:
-		# 	label: "本周"
-		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
-		# 	filter_scope: "space"
-		# 	filters: [["start_stamp", ">=", new Date(new Date().toLocaleDateString()).getTime() - (new Date().getDay()-1)* 24 * 60*60*1000 - 28800000
-		# 	], 
-		# 	["start_stamp", "<", new Date(new Date().toLocaleDateString()).getTime() + 
-		# 		(7-new Date().getDay())* 24 * 60*60*1000 + 57600000
-		# 	]]
-		# today:
-		# 	label: "本月"
-		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                    "features","start_stamp"]
-		# 	filter_scope: "space"
-		# 	filters: [["start_stamp", ">=", new Date(new Date(new Date().toLocaleDateString()).setDate(1))], ["start_stamp", "<", 
-		# 		new Date(new Date(new Date().toLocaleDateString()).setMonth(new Date().getMonth()+1))]]
-		# room:
-		# 	label: "按会议室查看"
-		# 	columns: ["name", "start", "unit", "room","count","owner" ,"phone",                 "features"]
-		# 	filter_scope: "space"
+		
 	permission_set:
 		user:
 			allowCreate: true
@@ -163,5 +159,30 @@ Creator.Objects.meeting =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				doc.start_stamp = doc.start.getTime()
-				
+				if doc.end <= doc.start
+					throw new Meteor.Error 500, "开始时间需小于结束时间"
+				clashs = clashRemind(doc._id,doc.room,doc.start,doc.end)
+				if clashs
+					throw new Meteor.Error 500, "该时间段的此会议室已被占用"
+		"before.update.server.event":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if modifier?.$set?.start || modifier?.$set?.end
+					start = modifier?.$set?.start
+					end = modifier?.$set?.end
+				if !modifier?.$set?.start
+					start = doc.start
+				if !modifier?.$set?.end
+					end = doc.end
+				#console.log("start,,end======",start,end)
+				if end <= start
+					throw new Meteor.Error 500, "开始时间不能大于结束时间"	
+				if modifier?.$set?.room
+					room = modifier?.$set?.room
+				else
+					room  = doc.room
+			#	console.log("room===========",room)
+				clashs = clashRemind(doc._id,room,start,end)
+				if clashs
+					throw new Meteor.Error 500, "该时间段的此会议室已被占用"
