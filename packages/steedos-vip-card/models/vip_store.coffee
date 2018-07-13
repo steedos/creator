@@ -82,6 +82,18 @@ Creator.Objects.vip_store =
 			label:'发布到首页'
 			type:'boolean'
 			group:'-'
+		enabled_share:
+			label:'启用转发返现'
+			type:'boolean'
+			group:'-'
+		proportion:
+			label:'返现比例'
+			type:'number'
+			scale: 2
+		valid_period:
+			label:"返现有效期(天)"
+			defaultValue:90
+			type:'number'
 		star_count:
 			label:'关注人数'
 			type:'number'
