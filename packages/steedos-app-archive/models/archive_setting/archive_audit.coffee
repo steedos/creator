@@ -51,7 +51,7 @@ Creator.Objects.archive_audit =
 		all:
 			label: "全部"
 			filter_scope: "space"
-			columns: ["business_status", "business_activity","action_user","action_time","action_description","action_administrative_records_id"]
+			columns: ["business_status", "business_activity","action_user","action_time","action_description"]
 	permission_set:
 		user:
 			allowCreate: false
