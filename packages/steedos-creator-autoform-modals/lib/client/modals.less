@@ -7,6 +7,69 @@
 	.is-single {
 		width: 600px !important;
 	}
+
+	.full-screen {
+		width: 100% !important;
+		max-width: none !important;
+		margin: 0;
+		.slds-modal__container {
+			padding: 0;
+			.slds-modal__header {
+				border-radius: 0;
+				.slds-modal__close {
+					top: 1rem;
+					right: 1rem;
+					color: inherit;
+				}
+			}
+			.slds-modal__content {
+				height: 100%;
+				.steedos-markdown {
+					.CodeMirror-fullscreen, .editor-preview-side {
+						height: calc(~"100% - 106px") !important;
+					}
+					.editor-preview-side {
+						bottom: 56px;
+					}
+				}
+			}
+			.slds-modal__footer {
+				border-radius: 0;
+			}
+		}
+	}
+
+	.full-screen.is-single {
+		form {
+			height: 100%;
+			.view-page-section-row {
+				height: 100%;
+				.view-page-block-item {
+					height: 100%;
+					.slds-form-element_edit {
+						height: 100%;
+						.form-group {
+							height: 100%;
+							display: flex;
+							flex-direction: column;
+							> div {
+								display: flex;
+								flex: 1;
+								.steedos-markdown {
+									display: flex;
+									flex: 1;
+									flex-direction: column;
+									.CodeMirror.cm-s-paper.CodeMirror-wrap {
+										flex: 1;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 .autoform-tags-field {

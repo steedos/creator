@@ -88,6 +88,13 @@ Template.creator_view.helpers
 		fields = Creator.getObject().fields
 		return fields[key]
 
+	full_screen: (key) ->
+		fields = Creator.getObject().fields
+		if fields[key].type is "markdown"
+			return true
+		else
+			return false
+
 	label: (key) ->
 		return AutoForm.getLabelForField(key)
 
@@ -363,6 +370,7 @@ Template.creator_view.events
 
 	'click #creator-quick-form .table-cell-edit': (event, template)->
 		# $(".creator-record-edit").click()
+		full_screen = this.full_screen
 		field = this.field_name
 		if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
@@ -373,6 +381,7 @@ Template.creator_view.events
 		doc = this.doc
 
 		if doc
+			Session.set("cmFullScreen", full_screen)
 			Session.set("action_fields", field)
 			Session.set("action_collection", "Creator.Collections.#{object_name}")
 			Session.set("action_collection_name", collection_name)
