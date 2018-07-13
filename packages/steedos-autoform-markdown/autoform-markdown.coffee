@@ -7,7 +7,12 @@ Template.steedosAfMarkdown.onRendered ->
 	Meteor.setTimeout ()->
 		simplemde = new SimpleMDE({
 			element: element,
-			toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "|", "code", "table", "horizontal-rule", "|", "preview", "fullscreen", "side-by-side"],
+			toolbar: [{
+				name: "bold",
+				action: SimpleMDE.toggleBold,
+				className: "fa fa-bold",
+				title: "粗体",
+			}, "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "|", "code", "table", "horizontal-rule", "|", "preview", "fullscreen", "side-by-side"],
 		});
 		#simplemde.value(this.data.value)
 		element._simplemde = simplemde
