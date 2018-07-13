@@ -42,14 +42,14 @@ Creator.Objects.vip_share =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: true
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 
 		
 
