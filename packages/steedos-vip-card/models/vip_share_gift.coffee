@@ -7,7 +7,7 @@ Creator.Objects.vip_share_gift =
 			label:'名称'
 			type:'text'
 			#礼物的名称
-		vip_share:
+		share:
 			label:'分享人'
 			type:'lookup'
 			reference_to:'vip_share'
