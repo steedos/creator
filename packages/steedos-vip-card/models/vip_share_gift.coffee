@@ -12,7 +12,7 @@ Creator.Objects.vip_share_gift =
 			type:'lookup'
 			reference_to:'vip_share'
 		product:
-			label: "关联到"
+			label: "商品"
 			type: "lookup"
 			reference_to: 'vip_product'
 		# count:
@@ -20,6 +20,15 @@ Creator.Objects.vip_share_gift =
 		# 	type:'number'
 		# 	defaultValue:0
 		#此表记录的owner和vip_share的owner一致
+		order:
+			label: "订单"
+			type: "lookup"
+			reference_to: 'vip_order'
+		amount:
+			label: "订单"
+			type: "number"
+			defaultValue: 0
+			scale: 2
 	list_views:
 		all:
 			label: "所有"

@@ -3,18 +3,29 @@ Creator.Objects.vip_share_response =
 	label: "响应分享"
 	icon: "partners"
 	fields:
-		name:
+		name: # 值格式: 分享人姓名 分享给 被分享人姓名
 			label:'响应人'
 			type:'text'
 			#owner.name
-		share:
-			label:'分享人'
+		from:
+			label:'来自'
 			type:'lookup'
-			reference_to:'vip_share'
+			reference_to:'users'
 		product:
 			label: "商品"
 			type: "lookup"
 			reference_to: 'vip_product'
+		space:
+			label: '商户'
+
+		owner:
+			label: '被分享人'
+
+		share:
+			label:'分享ID'
+			type:'lookup'
+			reference_to:'vip_share'
+
 	list_views:
 		all:
 			label: "所有"
