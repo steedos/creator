@@ -235,3 +235,6 @@ Template.creator_table_cell.helpers
 		if this.hideIcon
 			return false
 		return true
+
+	isMarkdown: (type)->
+		return type is "markdown"
