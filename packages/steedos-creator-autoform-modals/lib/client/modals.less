@@ -3,6 +3,12 @@
 	z-index: 2000 !important;
 }
 
+.creator-auotform-modals {
+	.is-single {
+		width: 600px !important;
+	}
+}
+
 .autoform-tags-field {
 	.bootstrap-tagsinput .tag {
 		line-height: 26px;
@@ -157,15 +163,17 @@
 	}
 }
 
-@media screen and (min-width: 768px){
+@media screen and (min-width: 648px){
 	.creator-auotform-modals,.creator-object-modals {
 		.normal-large {
-			width: 700px;
+			width: 70%;
+			max-width: 840px;
+    		min-width: 480px;
 		}
 	}
 }
 
-@media screen and (max-width: 767px){
+@media screen and (max-width: 647px){
 	.creator-auotform-modals,.creator-object-modals {
 		.slds-modal__container {
 			padding: 0;
