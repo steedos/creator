@@ -113,10 +113,16 @@ Creator.getObjectUrl = (object_name, record_id, app_id) ->
 	if record_id
 		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/view/" + record_id)
 	else
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
+		if object_name is "meeting"
+			return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
+		else
+			return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
 
 Creator.getListViewUrl = (object_name, app_id, list_view_id) ->
-	return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
+	if list_view_id is "calendar"
+		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
+	else
+		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
 
 Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id
@@ -576,14 +582,14 @@ Creator.getHiddenFields = (schema)->
 
 Creator.getFieldsWithNoGroup = (schema)->
 	fields = _.map(schema, (field, fieldName) ->
-  		return (!field.autoform or !field.autoform.group) and (!field.autoform or field.autoform.type != "hidden") and fieldName
+		return (!field.autoform or !field.autoform.group or field.autoform.group == "-") and (!field.autoform or field.autoform.type != "hidden") and fieldName
 	)
 	fields = _.compact(fields)
 	return fields
 
 Creator.getSortedFieldGroupNames = (schema)->
 	names = _.map(schema, (field) ->
- 		return field.autoform and field.autoform.group
+ 		return field.autoform and field.autoform.group and field.autoform.group != "-"
 	)
 	names = _.compact(names)
 	names = _.unique(names)
