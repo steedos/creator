@@ -82,15 +82,15 @@ Creator.Objects.vip_store =
 			label:'发布到首页'
 			type:'boolean'
 			group:'-'
-		enabled_share:
+		cash_back_enabled:
 			label:'启用转发返现'
 			type:'boolean'
 			group:'-'
-		proportion:
+		cash_back_percentage:
 			label:'返现比例'
 			type:'number'
 			scale: 2
-		valid_period:
+		cash_back_period:
 			label:"返现有效期(天)"
 			defaultValue:90
 			type:'number'
