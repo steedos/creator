@@ -87,8 +87,6 @@ Template.creator_table_cell.helpers
 
 		if _field.type == "grid"
 			data.push {isTable: true}
-		else if _field.type == "markdown"
-			data.push {full_screen: true}
 		else if _field.type == "location"
 			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
