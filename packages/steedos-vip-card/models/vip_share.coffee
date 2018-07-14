@@ -12,10 +12,6 @@ Creator.Objects.vip_share =
 			label: "商品"
 			type: "lookup"
 			reference_to: 'vip_product'
-		way:
-			label:'分享方式'
-			type:'text'
-			#可能取值[分享给好友weixin，分享至朋友圈friend_circle]
 		post:
 			label: "动态"
 			type: "lookup"

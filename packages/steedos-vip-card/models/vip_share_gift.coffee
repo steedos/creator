@@ -25,7 +25,7 @@ Creator.Objects.vip_share_gift =
 			type: "lookup"
 			reference_to: 'vip_order'
 		amount:
-			label: "订单"
+			label: "返现"
 			type: "number"
 			defaultValue: 0
 			scale: 2
