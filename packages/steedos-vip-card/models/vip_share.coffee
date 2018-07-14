@@ -16,6 +16,9 @@ Creator.Objects.vip_share =
 			label: "动态"
 			type: "lookup"
 			reference_to: 'post'
+		other:#记录URL值
+			label: "其他"
+			type: "text"
 	list_views:
 		all:
 			label: "所有"
