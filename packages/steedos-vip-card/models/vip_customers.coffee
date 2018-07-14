@@ -42,10 +42,9 @@ Creator.Objects.vip_customers =
 			type:'number'
 			scale: 2
 		
-		cash_back_period:
-			label:"返现有效期(天)"
-			defaultValue:90
-			type:'number'
+		cash_back_expired:
+			label:"返现有效期"
+			type:'datetime'
 
 	list_views:
 		all:
@@ -81,3 +80,20 @@ Creator.Objects.vip_customers =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+
+	triggers:
+		"before.insert.server.vip_customers":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				share_id = doc?.share
+				space_id = doc?.space
+				if share_id
+					store = Creator.getCollection("vip_store").findOne({_id: space_id}, {fields: {cash_back_enabled:1,cash_back_percentage:1,cash_back_period:1}})
+					if(store and store.cash_back_enabled)
+						period = store.cash_back_period
+						unless period
+							period = 90
+						expired = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * period)
+						doc.cash_back_expired = expired
+						doc.cash_back_percentage = store.cash_back_percentage
