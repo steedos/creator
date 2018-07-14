@@ -118,7 +118,7 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 			)
 			
 		customers = Creator.getCollection("vip_customers").find({
-			user: ret_data.user_id
+			owner: ret_data.user_id
 		}).fetch()
 
 		ret_data.my_spaces = space_users
