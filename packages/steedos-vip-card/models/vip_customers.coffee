@@ -36,6 +36,16 @@ Creator.Objects.vip_customers =
 			type: "number"
 			defaultValue: 0
 			scale: 2
+		
+		cash_back_percentage:
+			label:'返现比例'
+			type:'number'
+			scale: 2
+		
+		cash_back_period:
+			label:"返现有效期(天)"
+			defaultValue:90
+			type:'number'
 
 	list_views:
 		all:
