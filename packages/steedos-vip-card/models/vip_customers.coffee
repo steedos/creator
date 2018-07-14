@@ -18,6 +18,14 @@ Creator.Objects.vip_customers =
 		owner:
 			label: '客户'
 
+		mobile:
+			type: "text"
+			label:'手机'
+
+		is_member:
+			label: '是否会员'
+			type: "boolean"
+
 		share:
 			label: '分享ID'
 			type: 'lookup'

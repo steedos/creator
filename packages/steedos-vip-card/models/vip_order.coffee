@@ -228,33 +228,52 @@ Creator.Objects.vip_order =
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
 				if modifier.$set?.status is 'completed' and this.previous.status isnt 'completed'
-					if doc.type is 'recharge'
-						console.log 'recharge'
-						amount = doc.amount
-						cardId = doc.card
-						point = parseInt(doc.amount)
-						if doc.is_actived
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point } })
-						else
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point }, $set: { is_actived: true } })
-							#用户没有已经加入商户工作区时，先加入
-							space_user = Creator.getCollection("space_users").findOne({user: doc.owner, space: doc.space}, {fields: {_id: 1}})
-							if !space_user
-								u = Meteor.users.findOne(doc.owner, { fields: { name: 1 } })
-								WXMini.addUserToSpace(doc.owner, doc.space, u.name, "member")
+					# if doc.type is 'recharge'
+					# 	console.log 'recharge'
+					# 	amount = doc.amount
+					# 	cardId = doc.card
+					# 	point = parseInt(doc.amount)
+					# 	if doc.is_actived
+					# 		Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point } })
+					# 	else
+					# 		Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point }, $set: { is_actived: true } })
+					# 		#用户没有已经加入商户工作区时，先加入
+					# 		space_user = Creator.getCollection("space_users").findOne({user: doc.owner, space: doc.space}, {fields: {_id: 1}})
+					# 		if !space_user
+					# 			u = Meteor.users.findOne(doc.owner, { fields: { name: 1 } })
+					# 			WXMini.addUserToSpace(doc.owner, doc.space, u.name, "member")
 
-						newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
-						Creator.getCollection('vip_billing').insert({
-							amount: amount
-							store: doc.store
-							card: cardId
-							description: doc.name
-							owner: doc.owner
-							space: doc.space
-							balance: newestCard.balance
-						})
-					else if doc.type is 'pay'
-						console.log 'pay'
-						point = parseInt(doc.amount)
-						if point > 0
-							Creator.getCollection('vip_card').update({ _id: doc.card }, { $inc: { points: point } })
+					# 	newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
+					# 	Creator.getCollection('vip_billing').insert({
+					# 		amount: amount
+					# 		store: doc.store
+					# 		card: cardId
+					# 		description: doc.name
+					# 		owner: doc.owner
+					# 		space: doc.space
+					# 		balance: newestCard.balance
+					# 	})
+					# else if doc.type is 'pay'
+					# 	console.log 'pay'
+					# 	point = parseInt(doc.amount)
+					# 	if point > 0
+					# 		Creator.getCollection('vip_card').update({ _id: doc.card }, { $inc: { points: point } })
+
+					customer = Creator.getCollection('vip_customers').findOne({ space: doc.space, owner: doc.owner })
+					if customer and customer.from and customer.share
+						store = Creator.getCollection('vip_customers').findOne({
+							_id: doc.space, cash_back_enabled: true, cash_back_percentage: { $exists: true }, cash_back_period: { $exists: true } })
+						if store
+							cash_back_period_time = customer.created.getTime() + cash_back_period*24*3600*1000
+							now = new Date()
+							if cash_back_period_time > now.getTime()
+								cashBack = doc.amount_paid*cash_back_percentage
+								Creator.getCollection('vip_share_gift').insert({
+									name: '转发返现'
+									share: customer.share
+									order: doc._id
+									amount: cashBack
+									owner: customer.from
+									space: doc.space
+								})
+								Creator.getCollection('vip_customers').update({ space: doc.space, owner: customer.from }, { $inc: { balance: cashBack } })
