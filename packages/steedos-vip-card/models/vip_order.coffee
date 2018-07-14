@@ -260,19 +260,15 @@ Creator.Objects.vip_order =
 					# 		Creator.getCollection('vip_card').update({ _id: doc.card }, { $inc: { points: point } })
 
 					customer = Creator.getCollection('vip_customers').findOne({ space: doc.space, owner: doc.owner })
-					if customer and customer.from and customer.share
-						store = Creator.getCollection('vip_store').findOne({
-							_id: doc.store, cash_back_enabled: true, cash_back_percentage: { $exists: true }, cash_back_period: { $exists: true } })
-						if store
-							cash_back_period_time = customer.created.getTime() + cash_back_period*24*3600*1000
-							if cash_back_period_time > new Date().getTime()
-								cashBack = doc.amount_paid*cash_back_percentage
-								Creator.getCollection('vip_share_gift').insert({
-									name: '转发返现'
-									share: customer.share
-									order: doc._id
-									amount: cashBack
-									owner: customer.from
-									space: doc.space
-								})
-								Creator.getCollection('vip_customers').update({ space: doc.space, owner: customer.from }, { $inc: { balance: cashBack } })
+					if customer and customer.from and customer.share and customer.cash_back_percentage and customer.cash_back_expired
+						if customer.cash_back_expired > new Date()
+							cashBack = doc.amount_paid*customer.cash_back_percentage
+							Creator.getCollection('vip_share_gift').insert({
+								name: '转发返现'
+								share: customer.share
+								order: doc._id
+								amount: cashBack
+								owner: customer.from
+								space: doc.space
+							})
+							Creator.getCollection('vip_customers').update({ space: doc.space, owner: customer.from }, { $inc: { balance: cashBack } })
