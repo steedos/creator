@@ -261,12 +261,11 @@ Creator.Objects.vip_order =
 
 					customer = Creator.getCollection('vip_customers').findOne({ space: doc.space, owner: doc.owner })
 					if customer and customer.from and customer.share
-						store = Creator.getCollection('vip_customers').findOne({
-							_id: doc.space, cash_back_enabled: true, cash_back_percentage: { $exists: true }, cash_back_period: { $exists: true } })
+						store = Creator.getCollection('vip_store').findOne({
+							_id: doc.store, cash_back_enabled: true, cash_back_percentage: { $exists: true }, cash_back_period: { $exists: true } })
 						if store
 							cash_back_period_time = customer.created.getTime() + cash_back_period*24*3600*1000
-							now = new Date()
-							if cash_back_period_time > now.getTime()
+							if cash_back_period_time > new Date().getTime()
 								cashBack = doc.amount_paid*cash_back_percentage
 								Creator.getCollection('vip_share_gift').insert({
 									name: '转发返现'
