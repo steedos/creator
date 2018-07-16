@@ -21,7 +21,9 @@ Creator.odata = {}
 # 					toastr?.error?(error)
 # 	else
 # 		toastr.error("未找到记录")
-Creator.odata.get = (object_name, record_id,field_name)->
+Creator.odata.get = (object_name, record_id,field_name, callback)->
+	result = null
+	isAsync = if typeof callback == "function" then true else false
 	if object_name and record_id
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
 		$.ajax
@@ -30,20 +32,34 @@ Creator.odata.get = (object_name, record_id,field_name)->
 			data:{'$select':field_name}
 			dataType: "json"
 			contentType: "application/json"
+			async: isAsync
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+			success: (data) ->
+				if callback and typeof callback == "function"
+					callback(data)
+				result = data
 			error: (jqXHR, textStatus, errorThrown) ->
 				error = jqXHR.responseJSON.error
-				console.error error
+				# if error.httpStatus == 400 or error.httpStatus == 401
+				# 	message = t("creator_odata_authentication_required")
+				# else if error.httpStatus == 403
+				# 	message =t("creator_odata_user_access_fail")
+				# else if error.httpStatus == 404
+				# 	message =t("creator_odata_record_query_fail")
+				# else if error.httpStatus == 500
 				if error?.reason
 					toastr?.error?(TAPi18n.__(error.reason))
 				else if error?.message
-					toastr?.error?(TAPi18n.__(error.message))
+					#toastr?.error?(TAPi18n.__(error.message))
+					toastr.error(t(error?.message))
 				else
 					toastr?.error?("未找到记录")
 	else
 		toastr.error("未找到记录")
+	return result
+
 Creator.odata.query = (object_name, options)->
 	if object_name
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
@@ -91,6 +107,7 @@ Creator.odata.query = (object_name, options)->
 	# 				toastr?.error?(error)
 	# else
 	# 	toastr.error("未找到记录")				
+
 Creator.odata.delete = (object_name,record_id,callback)->
 	if object_name and record_id
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
@@ -119,7 +136,7 @@ Creator.odata.delete = (object_name,record_id,callback)->
 				else
 					toastr?.error?(error)
 
-Creator.odata.update = (object_name,record_id,doc)->
+Creator.odata.update = (object_name,record_id,doc,callback)->
 	if object_name and record_id
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
 		data = {}
@@ -135,11 +152,11 @@ Creator.odata.update = (object_name,record_id,doc)->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
 
-			# success: (data) ->
-			# 	if callback and typeof callback == "function"
-			# 		callback()
-			# 	else
-			# 		toastr?.success?(t("afModal_remove_suc"))
+			success: (data) ->
+				if callback and typeof callback == "function"
+					callback()
+				# else
+				# 	toastr?.success?(t("afModal_remove_suc"))
 
 			error: (jqXHR, textStatus, errorThrown) ->
 				error = jqXHR.responseJSON.error

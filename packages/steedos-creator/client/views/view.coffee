@@ -1,4 +1,5 @@
 Template.creator_view.onCreated ->
+	this.recordsTotal = new ReactiveVar({})
 
 Template.creator_view.onRendered ->
 	this.autorun ->
@@ -21,7 +22,8 @@ Template.creator_view.onRendered ->
 			fields = Creator.getFields(object_name)
 			ref_fields = {}
 			_.each fields, (f)->
-				ref_fields[f] = 1
+				if f.indexOf(".")  < 0
+					ref_fields[f] = 1
 			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields
 
 Template.creator_view.helpers Creator.helpers
@@ -40,9 +42,14 @@ Template.creator_view.helpers
 		return schema
 
 	schemaFields: ()->
-		schema = Creator.getSchema(Session.get("object_name"))._schema
-		firstLevelKeys = Creator.getSchema(Session.get("object_name"))._firstLevelSchemaKeys
+		simpleSchema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(Session.get("object_name"))))
+		schema = simpleSchema._schema
+		firstLevelKeys = simpleSchema._firstLevelSchemaKeys
 		permission_fields = Creator.getFields()
+
+		_.forEach schema, (field, name)->
+			if field.type == Object && field.autoform
+				field.autoform.type = 'hidden'
 
 		fieldGroups = []
 		fieldsForGroup = []
@@ -128,9 +135,12 @@ Template.creator_view.helpers
 	related_list: ()->
 		return Creator.getRelatedList(Session.get("object_name"), Session.get("record_id"))
 
-	related_list_count: ()->
-		info = Tabular.tableRecords.findOne("creator_" + this.object_name)
-		return info?.recordsTotal
+	related_list_count: (obj)->
+		if obj
+			object_name = obj.object_name
+			recordsTotal = Template.instance().recordsTotal.get()
+			if !_.isEmpty(recordsTotal) and object_name
+				return recordsTotal[object_name]
 
 	related_selector: ()->
 		object_name = this.object_name
@@ -236,6 +246,10 @@ Template.creator_view.helpers
 		console.log data
 		return data
 
+	list_data: (obj) ->
+		console.log obj
+		related_object_name = obj.object_name
+		return {related_object_name: related_object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
 
 Template.creator_view.events
 

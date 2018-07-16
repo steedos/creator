@@ -87,7 +87,8 @@ Template.creator_table_cell.helpers
 
 		if _field.type == "grid"
 			data.push {isTable: true}
-
+		else if _field.type == "location"
+			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
 
 			# 有optionsFunction的情况下，reference_to不考虑数组
@@ -155,6 +156,7 @@ Template.creator_table_cell.helpers
 		else
 			if (val instanceof Date)
 				if this.agreement == "odata"
+					# 老的datatable列表界面，现在没有在用了，都用DevExtreme的grid列表代替了
 					if _field.type == "datetime"
 						utcOffset = moment().utcOffset() / 60
 						val = moment(this.val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
@@ -164,7 +166,7 @@ Template.creator_table_cell.helpers
 					if _field.type == "datetime"
 						val = moment(this.val).format('YYYY-MM-DD H:mm')
 					else if _field.type == "date"
-						val = moment(this.val).format('YYYY-MM-DD')
+						val = moment.utc(this.val).format('YYYY-MM-DD')
 			else if (this.val == null)
 				val = ""
 			else if _field.type == "boolean"
@@ -178,11 +180,11 @@ Template.creator_table_cell.helpers
 					_options = _field.options()
 				if _.isArray(this.val)
 					self_val = this.val
-					_val = ""
+					_val = []
 					_.each _options, (_o)->
 						if _.indexOf(self_val, _o.value) > -1
-							_val += _o.label
-					val = _val
+							_val.push _o.label
+					val = _val.join(",")
 				else
 					val = _.findWhere(_options, {value: this.val})?.label
 				unless val

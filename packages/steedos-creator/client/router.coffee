@@ -1,5 +1,8 @@
 @urlQuery = new Array()
 
+Accounts.onLogout ()->
+	Creator.bootstrapLoaded.set(false)
+
 checkUserSigned = (context, redirect) ->
 	if !Meteor.userId()
 		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
@@ -45,15 +48,17 @@ initLayout = ()->
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned, initLayout ],
 	action: (params, queryParams)->
+		$("body").addClass("loading")
+		BlazeLayout.render Creator.getLayout(),
+			main: "creator_app_home"
 		Tracker.autorun (c)->
-			if Session.get("app_id")
-				FlowRouter.go '/app/' + Session.get("app_id")
-			else
-				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-					c.stop()
-					apps = Creator.getVisibleApps()
-					firstApp = apps[0]
-					FlowRouter.go '/app/' + firstApp?._id
+			if Creator.bootstrapLoaded.get()
+				c.stop()
+				$("body").removeClass("loading")
+				apps = Creator.getVisibleApps()
+				firstAppId = apps[0]?._id
+				if firstAppId
+					FlowRouter.go '/app/' + firstAppId
 
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned, initLayout ],
@@ -63,7 +68,8 @@ FlowRouter.route '/app/menu',
 FlowRouter.route '/app/:app_id',
 	triggersEnter: [ checkUserSigned, checkAppPermission, initLayout ],
 	action: (params, queryParams)->
-		Session.set("app_id", FlowRouter.getParam("app_id"))
+		app_id = FlowRouter.getParam("app_id")
+		Session.set("app_id", app_id)
 		if Steedos.isMobile()
 			Tracker.autorun (c)->
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
@@ -72,8 +78,11 @@ FlowRouter.route '/app/:app_id',
 						Meteor.defer ->
 							Blaze.renderWithData(Template.objectMenu, {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
 		else
-			BlazeLayout.render Creator.getLayout(),
-				main: "creator_app_home"
+			if FlowRouter.getParam("app_id") is "meeting"
+				FlowRouter.go('/app/' + app_id + '/meeting/calendar')
+			else
+				BlazeLayout.render Creator.getLayout(),
+					main: "creator_app_home"
 
 FlowRouter.route '/admin',
 	triggersEnter: [ checkUserSigned, initLayout ],
@@ -216,3 +225,19 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 		
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_list_wrapper"
+
+FlowRouter.route '/app/:app_id/:object_name/calendar/',
+	triggersEnter: [ checkUserSigned, checkObjectPermission, initLayout ],
+	action: (params, queryParams)->
+		if Session.get("object_name") != FlowRouter.getParam("object_name")
+			Session.set("list_view_id", null)
+
+		Session.set("app_id", FlowRouter.getParam("app_id"))
+		Session.set("object_name", FlowRouter.getParam("object_name"))
+		Session.set("list_view_visible", false)
+
+		Tracker.afterFlush ()->
+			Session.set("list_view_visible", true)
+		
+		BlazeLayout.render Creator.getLayout(),
+			main: "creator_calendar"

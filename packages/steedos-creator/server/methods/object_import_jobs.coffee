@@ -166,4 +166,10 @@ Meteor.methods
 		data = []
 		_.each results ,(result)->
 			data.push result[name_field]
-		return data	
+		return data
+
+	# Creator.testImportJobs("fSNrgYcftFkiBXEvi","Af8eM6mAHo7wMDqD3")
+	# 测试
+	testImportJobs:(record_id,space) ->
+		importObj = Creator.Collections["queue_import"].findOne({_id:record_id})
+		importObject importObj,space

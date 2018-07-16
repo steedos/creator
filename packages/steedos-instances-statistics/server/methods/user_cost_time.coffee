@@ -54,6 +54,10 @@ UserCostTime::startStat = () ->
 	console.log "start_date", start_date
 	console.log "end_date", end_date
 
+	space_users = db.space_users.find({space: spaceId},{fields: {user: 1}}).fetch()
+
+	space_user_ids = space_users.map((m)->return m.user)
+
 	query = {
 		# 筛选出当前工作区
 		"space": spaceId,
@@ -61,6 +65,8 @@ UserCostTime::startStat = () ->
 		"is_deleted": false,
 		# 排除 取消申请 的表单
 		"final_decision": {$ne: "terminated"},
+		# 申请人必须是当前工作区
+		"submitter": {$in: space_user_ids},
 		# state判断，进行中和已完成的表单
 		$or:[
 				# 进行中的申请单，全部查出来
@@ -79,10 +85,6 @@ UserCostTime::startStat = () ->
 				}
 			]
 	}
-
-	space_users = db.space_users.find({space: spaceId},{fields: {user: 1}}).fetch()
-
-	space_user_ids = space_users.map((m)->return m.user)
 
 	aggregate = (pipeline, ins_approves, cb) ->
 		# aggregate聚合
@@ -163,13 +165,20 @@ UserCostTime::startStat = () ->
 						month_finished_time: {
 							$sum: "$_approve.cost_time"
 						},
-						# 当月审批总数
+						# 当月已处理总数
 						month_finished_count: {
 							$sum: 1
 						},
-						# 审批开始时间
+						# 待审核表单的ID
+						inbox_instances:{
+							$addToSet: "$_approve.instance"
+						},
+						# 待审批开始时间
 						itemsSold: {
-							$push:  { start_date: "$_approve.start_date"}
+							$push:  {
+								instance: "$_approve.instance",
+								start_date: "$_approve.start_date"
+							}
 						}
 					}
 				}
@@ -181,9 +190,12 @@ UserCostTime::startStat = () ->
 	cursor = async_aggregate(pipeline, ins_approves)
 
 	
-	console.log "====================",ins_approves?.length
+	# console.log "====================",ins_approves?.length
 
 	if ins_approves?.length > 0
+		# console.log "========================"
+
+		# console.log ins_approves
 
 		# 将查询到的approve分两个组，一组是已完成，一组是正在进行的
 		ins_approves_group = _.groupBy ins_approves, "is_finished"
@@ -201,26 +213,38 @@ UserCostTime::startStat = () ->
 				inbox_approve = _.find(inbox_approves, (item ,index)->
 					# 待审批步骤里面的人员和审批完成步骤里面的人员一致
 					if item._id?.handler == finished_approve._id?.handler
-						# 从待审核数组中将该user剪切掉
+						# 从待审核数组中将该user去掉
 						inbox_approves.splice(index,1)
 						return item
 				)
 
-				# 本月待处理数量 = 在待审核数组中，元素的当月数量
-				finished_approve.inbox_count = inbox_approve?.month_finished_count||0
+				# 本月待处理文件的数量
+				# inbox_approve数组中，itemsSold的instance去掉重复的ID后的数量
+				if inbox_approve?.inbox_instances and inbox_approve?.inbox_instances.length>0
+					finished_approve.inbox_count = inbox_approve?.inbox_instances.length
+				else
+					finished_approve.inbox_count = 0
+				
+				# 待审核的表单ID
+				finished_approve.inbox_instances = inbox_approve?.inbox_instances
 
 				delete finished_approve.is_finished	# 本来就是已完成
+
+				# delete finished_approve.inbox_instances # 删除已处理的ID，不用统计
 
 				finished_approve.itemsSold = inbox_approve?.itemsSold
 		
 		# 遍历剩余未处理的列表
 		if inbox_approves?.length > 0
 			inbox_approves?.forEach (inbox_approve)->
+				count = inbox_approve?.inbox_instances?.length || 0
+				itemsSold = 
 				finished_approves.push({
 					_id: inbox_approve._id,
 					month_finished_time: 0,	#当月已处理总耗时
 					month_finished_count: 0,		#当月已完成的处理，本来就是0
-					inbox_count: inbox_approve.month_finished_count, 	#未完成数量
+					inbox_count: count, 	#未完成数量
+					inbox_instances: inbox_approve.inbox_instances,	# 待审核的表单ID
 					itemsSold: inbox_approve.itemsSold	#所有未审批的开始时间
 				})
 
@@ -231,15 +255,24 @@ UserCostTime::startStat = () ->
 	if finished_approves?.length > 0
 
 		# 未处理文件总耗时，已 end_date 为判断
-		sumTime = (itemsSold)->
+		sumTime = (inbox_instances, itemsSold)->
+			# console.log "==========待审核步骤信息============="
+			# console.log itemsSold
+			# console.log "==========待审核表单ID============="
+			# console.log inbox_instances
 			sum = 0
-			if itemsSold?.length > 0
-				itemsSold.forEach (sold)->
-					minus = (end_date - sold?.start_date) / (1000*60*60) || 0
+			if inbox_instances?.length > 0
+				inbox_instances.forEach (inbox_instance)->
+					# 传阅的情况下，一个文件会有多个待处理步骤，取最早的待处理步骤
+					items = itemsSold.filter((m)->return m.instance==inbox_instance)
+					items.sort((a,b)->return (Date.parse(a.time)-Date.parse(b.time)))
+					# console.log "==========排序步骤=========="
+					# console.log items[0]
+					minus = (end_date - items[0]?.start_date) / (1000*60*60) || 0
 					sum += minus
 			return sum
 
-		console.log 'finished_approves',finished_approves.length
+		# console.log 'finished_approves',finished_approves.length
 
 		# 循环已处理的审批步骤
 		finished_approves.forEach (approve)->
@@ -248,8 +281,8 @@ UserCostTime::startStat = () ->
 			
 			# console.log "approve", approve
 
-			# 当月待处理的总耗时
-			inbox_time = sumTime(approve?.itemsSold)
+			# 当月待处理的总耗时(如果一个待处理文件当前有多个步骤，取最早的步骤时间节点)
+			inbox_time = sumTime(approve?.inbox_instances, approve?.itemsSold)
 
 			# 当月待处理的平均耗时
 			if approve?.inbox_count > 0
