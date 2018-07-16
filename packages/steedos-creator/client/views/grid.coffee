@@ -471,7 +471,7 @@ Template.creator_grid.events
 			field.push(this.field_name)
 			field = field.join(",")
 
-		objectName = if is_related then Session.get("related_object_name") else Session.get("object_name")
+		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else Session.get("object_name")
 		collection_name = Creator.getObject(objectName).label
 		# rowData = this.doc
 
