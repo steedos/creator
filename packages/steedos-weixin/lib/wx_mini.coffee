@@ -106,7 +106,7 @@ WXMini.updateUser = (userId, options)->
 			c_options.$set.name = options.$set.name
 
 		if !_.isEmpty(c_options.$set)
-			Creator.getCollection("vip_customers").update({owner: userId}, c_options)
+			Creator.getCollection("vip_customers").update({owner: userId}, c_options, {multi: true})
 
 # 微信相关接口 #
 # 获取access_token
