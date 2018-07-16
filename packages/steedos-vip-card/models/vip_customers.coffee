@@ -37,6 +37,12 @@ Creator.Objects.vip_customers =
 			defaultValue: 0
 			scale: 2
 		
+		cash_back_total:
+			label: "累计返现"
+			type: "number"
+			defaultValue: 0
+			scale: 2
+		
 		cash_back_percentage:
 			label:'返现比例'
 			type:'number'
