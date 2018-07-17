@@ -176,7 +176,7 @@ Creator.Objects.vip_order =
 		guest:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: true
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: false
@@ -272,3 +272,14 @@ Creator.Objects.vip_order =
 								space: doc.space
 							})
 							Creator.getCollection('vip_customers').update({ space: doc.space, owner: customer.from }, { $inc: { balance: cashBack } })
+
+	methods:
+		# 可通过this获取到object_name, record_id, space_id, user_id; params为request的body
+		confirmReceipt: (params) ->
+			Creator.getCollection('vip_order').update({ _id: this.record_id, owner: this.user_id, status: 'delivered' },
+				{$set: { status: 'completed' } })
+			return true
+		cancelOrder: (params) ->
+			Creator.getCollection('vip_order').update({ _id: this.record_id, owner: this.user_id, status: 'pending' },
+				{$set: { status: 'canceled' } })
+			return true
