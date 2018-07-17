@@ -88,6 +88,7 @@ Creator.Objects.vip_store =
 			group:'-'
 		cash_back_percentage:
 			label:'返现比例'
+			inlineHelpText:'请输入0到100之间的整数'
 			type:'number'
 			scale: 2
 		cash_back_period:
