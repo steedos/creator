@@ -1,0 +1,22 @@
+{
+  "records_sync": {
+    "spaces": ["51ae9b1a8e296a29c9000001"],
+    "-recurrenceRule": "* /10 * * * *",
+    "to_archive": {
+      "object_name": "archive_wenshu",
+      "no_need_recorded_flows": [
+        "49cd342e-76a3-41ed-bbd6-e0921be9f004",
+        "2d6055de-53d2-4d65-8e56-0df9862b3226",
+        "25d7f36f-747d-4031-b767-e3023783846f",
+        "6a520bf56a83eac20a604bde",
+        "f0a3f03c7a64c6cc2cb2d40b"
+      ],
+      "admin":{
+        "userid":"5194c66ef4a563537a000003",
+        "username":"zhuangjianguo",
+        "password":"123456"
+      },
+      "apps_url":"http://192.168.0.21"
+    }
+  }
+}
