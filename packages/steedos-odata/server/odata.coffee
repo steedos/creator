@@ -751,7 +751,7 @@ Meteor.startup ->
 							permissions: permissions
 						}
 						methods[methodName].apply(thisObj, [@bodyParams])
-						{ body: {} }
+						{}
 					else
 						return {
 							statusCode: 404
