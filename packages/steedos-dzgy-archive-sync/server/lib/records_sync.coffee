@@ -24,30 +24,32 @@ RecordsSync.run = ()->
 	catch  e
 		logger.error "RecordsSync.instanceToArchive", e
 
-# RecordsQHD.instanceToArchive()
-# RecordsQHD.instanceToArchive(["jXib7XrPu6FqWSKXH"])
+# RecordsSync.instanceToArchive()
+# RecordsSync.instanceToArchive(["jXib7XrPu6FqWSKXH"])
 RecordsSync.instanceToArchive = (ins_ids)->
+
+	console.log "0000000000000"
 
 	spaces = RecordsSync?.settings_records_sync?.spaces
 
-	to_archive_sett = RecordsSync?.settings_records_sync?.to_archive
-
 	# 需要同步的流程
-	flows = to_archive_sett?.need_recorded_flows
+	need_recorded_flows = RecordsSync?.settings_records_sync?.need_recorded_flows
 
 	if !spaces
 		logger.error "缺少settings配置: records-sync.spaces"
 		return
 	
-	if !flows
+	if !need_recorded_flows
 		logger.error "缺少settings配置: records-sync.need_recorded_flows"
 		return
 
-	# instancesToArchive = new InstancesToArchive(spaces, flows, ins_ids)
+	instancesToArchive = new InstancesToArchive(spaces, need_recorded_flows, ins_ids)
 
-	# instancesToArchive.syncNonContractInstances()
+	console.log "11111111111"
 
-RecordsQHD.startScheduleJob = (name, recurrenceRule, fun) ->
+	instancesToArchive.syncInstances()
+
+RecordsSync.startScheduleJob = (name, recurrenceRule, fun) ->
 
 	if !recurrenceRule
 		logger.error "Miss recurrenceRule"

@@ -1,5 +1,5 @@
 Package.describe({
-	name: 'steedos:archive-sync-dzgy',
+	name: 'steedos:dzgy-archive-sync',
 	version: '0.0.1',
 	summary: 'Steedos libraries',
 	git: ''

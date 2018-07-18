@@ -18,6 +18,7 @@ Package.onUse(function(api) {
 
 	// 档案管理
 	api.addFiles('archive_manage.coffee');
+	api.addFiles('models/archive_manage/archive_gongwen.coffee');
 	api.addFiles('models/archive_manage/archive_keji.coffee');
 	api.addFiles('models/archive_manage/archive_kejiditu.coffee');
 	api.addFiles('models/archive_manage/archive_wenshu.coffee');

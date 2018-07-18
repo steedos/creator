@@ -7,12 +7,13 @@ logger = new Logger 'Records_QHD -> InstancesToArchive'
 
 #	校验必填
 _checkParameter = (formData) ->
-	if !formData.fonds_name
+	if !formData?.title
 		return false
 	return true
 
 # 整理档案表数据
 _minxiInstanceData = (formData, instance) ->
+
 	if !instance
 		return
 	dateFormat = "YYYY-MM-DD HH:mm:ss"
@@ -26,42 +27,10 @@ _minxiInstanceData = (formData, instance) ->
 	formData.created = new Date()
 
 	# 字段映射:表单字段对应到formData
-	field_values = InstanceManager.handlerInstanceByFieldMap(instance)
-
-	formData.applicant_name = field_values?.nigaorens
-	formData.document_status = field_values?.guidangzhuangtai
-	formData.archive_dept = field_values?.guidangbumen
-	formData.applicant_organization_name=field_values?.nigaodanwei || field_values?.FILE_CODE_fzr
-	formData.total_number_of_pages = field_values?.PAGE_COUNT
-	formData.security_classification = field_values?.miji
-	formData.document_type = field_values?.wenjianleixing
-	formData.document_date = field_values?.wenjianriqi
-	formData.document_number = field_values?.wenjianzihao
-	formData.author = field_values?.FILE_CODE_fzr
+	# field_values = InstanceManager.handlerInstanceByFieldMap(instance)
+	
 	formData.title = instance.name
 
-	# 机构：FILING_DEPT字段（发文是拟稿单位，收文是所属部门）
-	if field_values?.FILING_DEPT
-		orgObj = Creator.Collections["archive_organization"].findOne({'name':field_values?.FILING_DEPT})
-	if orgObj
-		formData.organizational_structure = orgObj._id
-
-	# 根据FONDSID查找全宗号和全总名称
-	fondObj = Creator.Collections["archive_fonds"].findOne({'name':field_values?.FONDSID})
-	if fondObj
-		formData.fonds_identifier = fondObj?._id
-		formData.fonds_name = fondObj?.name
-
-	# 保管期限代码查找
-	retentionObj = Creator.Collections["archive_retention"].findOne({'name':field_values?.baocunqixian})
-	if retentionObj
-		formData.retention_peroid = retentionObj?._id
-		# 根据保管期限,处理标志
-		if retentionObj?.years >= 10
-			formData.produce_flag = "在档"
-		else
-			formData.produce_flag = "暂存"
-	
 	# 归档日期
 	formData.archive_date = moment(new Date()).format(dateFormat)
 
@@ -125,7 +94,7 @@ _minxiRelatedArchives = (instance, record_id) ->
 # 整理文件数据
 _minxiAttachmentInfo = (instance, record_id) ->
 	# 对象名
-	object_name = RecordsQHD?.settings_records_qhd?.to_archive?.object_name
+	object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
 	parents = []
 	spaceId = instance?.space
 
@@ -204,8 +173,8 @@ _minxiAttachmentInfo = (instance, record_id) ->
 
 # 整理表单html
 _minxiInstanceHtml = (instance, record_id) ->
-	admin = RecordsQHD?.settings_records_qhd?.to_archive?.admin
-	apps_url = RecordsQHD?.settings_records_qhd?.to_archive?.apps_url
+	admin = RecordsSync?.settings_records_sync?.to_archive?.admin
+	apps_url = RecordsSync?.settings_records_sync?.to_archive?.apps_url
 	
 	space_id = instance?.space
 	ins_id = instance?._id
@@ -215,12 +184,12 @@ _minxiInstanceHtml = (instance, record_id) ->
 	password = admin?.password
 
 	instance_html_url = apps_url + '/workflow/space/' + space_id + '/view/readonly/' + ins_id + '?username=' + username + '&password=' + password + '&hide_traces=1'
-
+	
 	result_html = HTTP.call('GET',instance_html_url)?.content
 
 	if result_html
 		try
-			object_name = RecordsQHD?.settings_records_qhd?.to_archive?.object_name
+			object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
 
 			collection = Creator.Collections["cms_files"]
 
@@ -357,10 +326,10 @@ _minxiInstanceTraces = (auditList, instance, record_id) ->
 # =============================================
 
 # spaces: Array 工作区ID
-# contract_flows： Array 合同类流程
-InstancesToArchive = (spaces, contract_flows, ins_ids) ->
+# flows: Array 需要归档的流程
+InstancesToArchive = (spaces, flows, ins_ids) ->
 	@spaces = spaces
-	@contract_flows = contract_flows
+	@flows = flows
 	@ins_ids = ins_ids
 	return
 
@@ -370,33 +339,7 @@ InstancesToArchive.success = (instance)->
 InstancesToArchive.failed = (instance, error)->
 	logger.error "failed, name is #{instance.name}, id is #{instance._id}. error: ", error
 
-#	获取非合同类的申请单：正常结束的(不包括取消申请、被驳回的申请单)
-InstancesToArchive::getNonContractInstances = ()->
-	query = {
-		space: {$in: @spaces},
-		flow: {$nin: @contract_flows},
-		# is_archived 字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
-		# 正常情况下，未归档的表单无 is_recorded 字段
-		$or: [
-			{is_recorded: false},
-			{is_recorded: {$exists: false}}
-		],
-		is_deleted: false,
-		state: "completed",
-		"values.record_need": "true"
-		# 重定位到结束的表单该值为 terminated，故取消此判断
-		# $or: [
-		# 	{final_decision: "approved"},
-		# 	{final_decision: {$exists: false}},
-		# 	{final_decision: ""}
-		# ]
-	}
-	if @ins_ids
-		query._id = {$in: @ins_ids}
-	return Creator.Collections["instances"].find(query, {fields: {_id: 1}}).fetch()
-
-
-InstancesToArchive.syncNonContractInstance = (instance, callback) ->
+InstancesToArchive.recordInstance = (instance, callback) ->
 	#	表单数据
 	formData = {}
 
@@ -405,13 +348,16 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 
 	_minxiInstanceData(formData, instance)
 
-	if _checkParameter(formData)
-		logger.debug("_sendContractInstance: #{instance._id}")
 
+	if _checkParameter(formData)
 		# 如果原来已经归档，则删除原来归档的记录
-		collection = Creator.Collections["archive_wenshu"]
+		# 对象名
+		object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
+		collection = Creator.Collections[object_name]
 
 		collection.remove({'external_id':instance._id})
+
+		console.log "formData,object_name",formData,object_name
 
 		record_id = collection.insert formData
 
@@ -432,20 +378,45 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 		InstancesToArchive.failed instance, "立档单位 不能为空"
 
 
-@Test = {}
-# Test.run('rJxkv4CPfgz598rRD')
-Test.run = (ins_id)->
-	instance = Creator.Collections["instances"].findOne({_id: ins_id})
-	if instance
-		InstancesToArchive.syncNonContractInstance instance
+#	获取申请单：正常结束的(不包括取消申请、被驳回的申请单)
+InstancesToArchive::getInstances = ()->
 
-InstancesToArchive::syncNonContractInstances = () ->
-	console.time("syncNonContractInstances")
-	instances = @getNonContractInstances()
+	query = {
+		space: {$in: @spaces},
+		flow: {$in: @flows},
+		# is_archived 字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
+		# 正常情况下，未归档的表单无 is_recorded 字段
+		$or: [
+			{is_recorded: false},
+			{is_recorded: {$exists: false}}
+		],
+		is_deleted: false
+	}
+	if @ins_ids
+		query._id = {$in: @ins_ids}
+	
+	return Creator.Collections["instances"].find(query, {fields: {_id: 1}}).fetch()
 
+InstancesToArchive::syncInstances = () ->
+	console.time("syncInstances")
+
+	instances = @getInstances()
 	that = @
 	instances.forEach (mini_ins)->
 		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
 		if instance
-			InstancesToArchive.syncNonContractInstance instance
-	console.timeEnd("syncNonContractInstances")
+			InstancesToArchive.recordInstance instance
+
+	console.timeEnd("syncInstances")
+
+
+# =================================================
+@Test = {}
+# Test.run('G9n4WNhjPAWCSvh33')
+Test.run = (ins_id)->
+	instance = Creator.Collections["instances"].findOne({_id: ins_id})
+	if instance
+
+		console.log "==========================="
+
+		InstancesToArchive.recordInstance instance
