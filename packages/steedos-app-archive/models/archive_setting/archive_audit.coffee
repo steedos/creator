@@ -40,7 +40,7 @@ Creator.Objects.archive_audit =
 		action_administrative_records_id:
 			label: "行为对象"
 			type: "master_detail"
-			reference_to: "archive_wenshu"
+			reference_to: "archive_gongwen"
 		instace_id:
 			label:"表单"
 			type:"text"

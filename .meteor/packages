@@ -135,6 +135,10 @@ http@1.2.9
 # steedos:mini-web
 
 steedos:app-archive
-steedos:qhd-archive-sync
-steedos:qhd-archive-xml
+
+# steedos:archive-sync-qhd
+# steedos:archive-xml-qhd
+
+
+steedos:dzgy-archive-sync
 

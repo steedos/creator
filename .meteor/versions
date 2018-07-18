@@ -165,6 +165,7 @@ steedos:creator@0.0.5
 steedos:creator-autoform-modals@0.0.1
 steedos:datatables-extensions@0.0.1
 steedos:devexpress@0.0.1
+steedos:dzgy-archive-sync@0.0.1
 steedos:e164-phones-countries@1.0.3
 steedos:filesize@0.0.1
 steedos:fullcalendar@3.4.0_3
@@ -182,8 +183,6 @@ steedos:object-database@0.0.1
 steedos:objects@0.0.1
 steedos:odata@0.0.1
 steedos:qcloud-smsqueue@0.0.2
-steedos:qhd-archive-sync@0.0.1
-steedos:qhd-archive-xml@0.0.1
 steedos:smsqueue@0.0.1
 steedos:sso@0.0.4
 steedos:theme@0.0.30

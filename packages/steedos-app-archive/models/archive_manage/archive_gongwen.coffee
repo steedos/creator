@@ -14,6 +14,13 @@ Creator.Objects.archive_gongwen =
 			required:true
 			sortable:true
 			searchable:true
+		
+		#如果是从OA归档过来的档案，则值为表单Id,否则不存在该字段
+		# OA系统的表单ID
+		external_id:
+			type:"text"
+			label:'表单ID'
+			hidden: true
 
 
 	list_views:
