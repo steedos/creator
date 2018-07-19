@@ -28,8 +28,6 @@ RecordsSync.run = ()->
 # RecordsSync.instanceToArchive(["jXib7XrPu6FqWSKXH"])
 RecordsSync.instanceToArchive = (ins_ids)->
 
-	console.log "0000000000000"
-
 	spaces = RecordsSync?.settings_records_sync?.spaces
 
 	# 需要同步的流程
@@ -44,8 +42,6 @@ RecordsSync.instanceToArchive = (ins_ids)->
 		return
 
 	instancesToArchive = new InstancesToArchive(spaces, need_recorded_flows, ins_ids)
-
-	console.log "11111111111"
 
 	instancesToArchive.syncInstances()
 

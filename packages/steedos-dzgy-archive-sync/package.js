@@ -30,6 +30,10 @@ Package.onUse(function (api) {
 	api.use('steedos:app-workflow');
 	api.use('steedos:app-archive');
 
+	api.addFiles('client/methods/call_sync_instances.coffee', 'client');
+
+	api.addFiles('server/methods/sync_instances.coffee', 'server');
+
 	api.addFiles('server/lib/instance_manager.coffee', 'server');
 
 	api.addFiles('server/lib/instances_to_archive.coffee', 'server');
