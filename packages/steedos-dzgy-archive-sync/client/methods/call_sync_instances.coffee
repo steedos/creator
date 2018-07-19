@@ -1,10 +1,13 @@
-Creator.syncInstances = (spaces, need_recorded_flows, ins_ids)->
-    if Steedos.isCloudAdmin()
-        if !spaces
-            return 'no spaces!'
+Creator.callSyncInstances = (need_recorded_flows, ins_ids)->
+    if Steedos.isSpaceAdmin()
         if !need_recorded_flows
             return 'no need recorded flows!'
-        Meteor.call("syncInstances",spaces, need_recorded_flows, ins_ids
+        spaces = []
+        spaceId = Steedos.spaceId()
+        spaces.push spaceId
+        if !spaces || spaces==[]
+            return 'no spaces!'
+        Meteor.call("syncArchives",spaces, need_recorded_flows, ins_ids
             (error,result) ->
                 console.log 'Success!'
         )

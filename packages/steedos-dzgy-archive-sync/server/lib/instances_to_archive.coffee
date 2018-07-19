@@ -2,8 +2,7 @@ request = Npm.require('request')
 path = Npm.require('path')
 fs = Npm.require('fs')
 
-logger = new Logger 'Records_QHD -> InstancesToArchive'
-
+logger = new Logger 'Records_Sync -> InstancesToArchive'
 
 #	校验必填
 _checkParameter = (formData) ->
@@ -30,9 +29,6 @@ _minxiInstanceData = (formData, instance) ->
 	# field_values = InstanceManager.handlerInstanceByFieldMap(instance)
 	
 	formData.title = instance.name
-
-	# 归档日期
-	formData.archive_date = moment(new Date()).format(dateFormat)
 
 	# OA表单的ID，作为判断OA归档的标志
 	formData.external_id = instance._id
@@ -252,6 +248,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 						collection.update(cmsFileId, {$set: {versions: versions}})
 				)
 		catch e
+			console.log "表单生成HTML失败：#{ins_id}. error: " + e
 			logger.error "表单生成HTML失败：#{ins_id}. error: " + e
 
 # 整理档案审计数据
@@ -326,6 +323,7 @@ _minxiInstanceTraces = (auditList, instance, record_id) ->
 
 # spaces: Array 工作区ID
 # flows: Array 需要归档的流程
+# ins_ids: Array 需要同步的表单ID
 InstancesToArchive = (spaces, flows, ins_ids) ->
 	@spaces = spaces
 	@flows = flows
@@ -358,17 +356,18 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 
 		record_id = collection.insert formData
 
+		# 整理关联档案
+		_minxiRelatedArchives(instance, record_id)
+
+		# 处理审计记录
+		_minxiInstanceTraces(auditList, instance, record_id)
+		
 		# 整理文件
 		_minxiAttachmentInfo(instance, record_id)
 
 		# 整理表单html
 		_minxiInstanceHtml(instance, record_id)
 
-		# 整理关联档案
-		_minxiRelatedArchives(instance, record_id)
-
-		# 处理审计记录
-		_minxiInstanceTraces(auditList, instance, record_id)
 
 		InstancesToArchive.success instance
 	else
@@ -377,7 +376,6 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 
 #	获取申请单：正常结束的(不包括取消申请、被驳回的申请单)
 InstancesToArchive::getInstances = ()->
-
 	query = {
 		space: {$in: @spaces},
 		flow: {$in: @flows},
@@ -400,9 +398,14 @@ InstancesToArchive::syncInstances = () ->
 	instances = @getInstances()
 	that = @
 	instances.forEach (mini_ins)->
+		console.log "mini_ins",mini_ins
 		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
 		if instance
-			InstancesToArchive.recordInstance instance
+			try
+				InstancesToArchive.recordInstance instance
+			catch e
+				console.log e
+				logger.error e
 
 	console.timeEnd("syncInstances")
 
@@ -413,7 +416,4 @@ InstancesToArchive::syncInstances = () ->
 Test.run = (ins_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
-
-		console.log "==========================="
-
 		InstancesToArchive.recordInstance instance
