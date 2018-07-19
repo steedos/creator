@@ -1,4 +1,5 @@
 Template.creator_view.onCreated ->
+	this.recordsTotal = new ReactiveVar({})
 
 Template.creator_view.onRendered ->
 	this.autorun ->
@@ -87,6 +88,13 @@ Template.creator_view.helpers
 		fields = Creator.getObject().fields
 		return fields[key]
 
+	full_screen: (key) ->
+		fields = Creator.getObject().fields
+		if fields[key].type is "markdown"
+			return true
+		else
+			return false
+
 	label: (key) ->
 		return AutoForm.getLabelForField(key)
 
@@ -134,9 +142,12 @@ Template.creator_view.helpers
 	related_list: ()->
 		return Creator.getRelatedList(Session.get("object_name"), Session.get("record_id"))
 
-	related_list_count: ()->
-		info = Tabular.tableRecords.findOne("creator_" + this.object_name)
-		return info?.recordsTotal
+	related_list_count: (obj)->
+		if obj
+			object_name = obj.object_name
+			recordsTotal = Template.instance().recordsTotal.get()
+			if !_.isEmpty(recordsTotal) and object_name
+				return recordsTotal[object_name]
 
 	related_selector: ()->
 		object_name = this.object_name
@@ -242,6 +253,10 @@ Template.creator_view.helpers
 		console.log data
 		return data
 
+	list_data: (obj) ->
+		console.log obj
+		related_object_name = obj.object_name
+		return {related_object_name: related_object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
 
 Template.creator_view.events
 
@@ -284,29 +299,29 @@ Template.creator_view.events
 	'dblclick #creator-quick-form .slds-form-element': (event) ->
 		$(".table-cell-edit", event.currentTarget).click();
 
-	'click #creator-tabular .table-cell-edit': (event, template) ->
-		field = this.field_name
-		if this.field.depend_on && _.isArray(this.field.depend_on)
-			field = _.clone(this.field.depend_on)
-			field.push(this.field_name)
-			field = field.join(",")
-
-		object_name = this.object_name
-		collection_name = Creator.getObject(object_name).label
-
-		dataTable = $(event.currentTarget).closest('table').DataTable()
-		tr = $(event.currentTarget).closest("tr")
-		rowData = dataTable.row(tr).data()
-
-		if rowData
-			Session.set("action_fields", field)
-			Session.set("action_collection", "Creator.Collections.#{object_name}")
-			Session.set("action_collection_name", collection_name)
-			Session.set("action_save_and_insert", false)
-			Session.set 'cmDoc', rowData
-
-			Meteor.defer ()->
-				$(".btn.creator-cell-edit").click()
+#	'click #creator-tabular .table-cell-edit': (event, template) ->
+#		field = this.field_name
+#		if this.field.depend_on && _.isArray(this.field.depend_on)
+#			field = _.clone(this.field.depend_on)
+#			field.push(this.field_name)
+#			field = field.join(",")
+#
+#		object_name = this.object_name
+#		collection_name = Creator.getObject(object_name).label
+#
+#		dataTable = $(event.currentTarget).closest('table').DataTable()
+#		tr = $(event.currentTarget).closest("tr")
+#		rowData = dataTable.row(tr).data()
+#
+#		if rowData
+#			Session.set("action_fields", field)
+#			Session.set("action_collection", "Creator.Collections.#{object_name}")
+#			Session.set("action_collection_name", collection_name)
+#			Session.set("action_save_and_insert", false)
+#			Session.set 'cmDoc', rowData
+#
+#			Meteor.defer ()->
+#				$(".btn.creator-cell-edit").click()
 
 	'click .group-section-control': (event, template) ->
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
@@ -355,6 +370,7 @@ Template.creator_view.events
 
 	'click #creator-quick-form .table-cell-edit': (event, template)->
 		# $(".creator-record-edit").click()
+		full_screen = this.full_screen
 		field = this.field_name
 		if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
@@ -365,6 +381,7 @@ Template.creator_view.events
 		doc = this.doc
 
 		if doc
+			Session.set("cmFullScreen", full_screen)
 			Session.set("action_fields", field)
 			Session.set("action_collection", "Creator.Collections.#{object_name}")
 			Session.set("action_collection_name", collection_name)
