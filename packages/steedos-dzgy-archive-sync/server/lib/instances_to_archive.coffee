@@ -387,6 +387,7 @@ InstancesToArchive::getInstances = ()->
 		],
 		is_deleted: false
 	}
+
 	if @ins_ids
 		query._id = {$in: @ins_ids}
 	
@@ -398,13 +399,12 @@ InstancesToArchive::syncInstances = () ->
 	instances = @getInstances()
 	that = @
 	instances.forEach (mini_ins)->
-		console.log "mini_ins",mini_ins
+	
 		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
 		if instance
 			try
 				InstancesToArchive.recordInstance instance
 			catch e
-				console.log e
 				logger.error e
 
 	console.timeEnd("syncInstances")

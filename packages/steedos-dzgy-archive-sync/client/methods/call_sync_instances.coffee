@@ -1,4 +1,4 @@
-Creator.callSyncInstances = (need_recorded_flows, ins_ids)->
+Creator.callSyncInstances = (spaces, need_recorded_flows,ins_ids)->
     if Steedos.isSpaceAdmin()
         if !need_recorded_flows
             return 'no need recorded flows!'
