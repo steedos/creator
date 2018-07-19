@@ -137,6 +137,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 				'metadata.current': {$ne: true},
 				"metadata.parent": cf.metadata.parent
 			}, {sort: {uploadedAt: -1}}).fetch()
+
 			# 把当前文件放在历史版本文件的最后
 			historyFiles.push(cf)
 
@@ -169,7 +170,6 @@ _minxiAttachmentInfo = (instance, record_id) ->
 			collection.update(cmsFileId, {$set: {versions: versions}})
 		catch e
 			logger.error "正文附件下载失败：#{cf._id}. error: " + e
-
 
 # 整理表单html
 _minxiInstanceHtml = (instance, record_id) ->
@@ -253,7 +253,6 @@ _minxiInstanceHtml = (instance, record_id) ->
 				)
 		catch e
 			logger.error "表单生成HTML失败：#{ins_id}. error: " + e
-
 
 # 整理档案审计数据
 _minxiInstanceTraces = (auditList, instance, record_id) ->
@@ -357,8 +356,6 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 
 		collection.remove({'external_id':instance._id})
 
-		console.log "formData,object_name",formData,object_name
-
 		record_id = collection.insert formData
 
 		# 整理文件
@@ -412,7 +409,7 @@ InstancesToArchive::syncInstances = () ->
 
 # =================================================
 @Test = {}
-# Test.run('G9n4WNhjPAWCSvh33')
+# Test.run('zuwJ7thtXn7ZxKcPZ')
 Test.run = (ins_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance

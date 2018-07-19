@@ -24,10 +24,10 @@ Creator.Objects.archive_gongwen =
 
 
 	list_views:
-		recent:
-			label: "最近查看"
-			filter_scope: "space"
-			columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
+		# recent:
+		# 	label: "最近查看"
+		# 	filter_scope: "space"
+		# 	columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
 		all:
 			label: "全部"
 			filter_scope: "space"
