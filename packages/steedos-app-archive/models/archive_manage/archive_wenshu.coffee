@@ -48,12 +48,12 @@ set_category_code = (doc)->
 	# 根据归档部门确定类别号
 	if doc?.archive_dept
 		keyword = doc?.archive_dept
-		rule = Creator.Collections["archive_rules"].findOne({ fieldname: 'dept', keywords: keyword})
-	if rule?.classification
+		classification = Creator.Collections["archive_classification"].findOne({keywords: keyword})
+	if classification?._id
 		Creator.Collections["archive_wenshu"].direct.update(doc._id,
 		{
 			$set:{
-				category_code:rule.classification
+				category_code:classification?._id
 			}
 		})
 
@@ -732,7 +732,7 @@ Creator.Objects.archive_wenshu =
 				# 设置保管期限
 				set_retention(doc)
 				# 设置分类号
-				# set_category_code(doc)
+				set_category_code(doc)
 				# 设置销毁期限
 				set_destory(doc)
 				return true
@@ -747,15 +747,13 @@ Creator.Objects.archive_wenshu =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				# console.log "userID",userId
-				# console.log "doc",doc
-				# console.log "fieldNames",fieldNames
-				# console.log "modifier",modifier
-				# console.log "options",options
 				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_identifier or modifier['$set']?.year
                     set_archivecode(doc._id)
                 if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
                 	set_destory(doc)
+				if modifier['$set']?.archive_dept
+					# 设置分类号
+					set_category_code(doc)
 				set_audit(doc?._id, doc?.space, userId)
 
 	actions:

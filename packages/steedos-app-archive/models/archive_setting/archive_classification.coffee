@@ -44,4 +44,4 @@ Creator.Objects.archive_classification =
 		all:
 			label:"所有分类"
 			filter_scope: "space"
-			columns:["name","parent","match_rules","sort_no"]
+			columns:["sort_no","name","parent"]
