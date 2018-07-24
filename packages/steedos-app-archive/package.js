@@ -18,16 +18,21 @@ Package.onUse(function(api) {
 
 	// 档案管理
 	api.addFiles('archive_manage.coffee');
+	api.addFiles('models/archive_manage/archive_chuantong.coffee');
+	api.addFiles('models/archive_manage/archive_dianzi.coffee');
+	api.addFiles('models/archive_manage/archive_dichan.coffee');
+	api.addFiles('models/archive_manage/archive_hetong.coffee');
 	api.addFiles('models/archive_manage/archive_keji.coffee');
 	api.addFiles('models/archive_manage/archive_kejiditu.coffee');
-	api.addFiles('models/archive_manage/archive_wenshu.coffee');
 	api.addFiles('models/archive_manage/archive_kuaiji.coffee');
-	api.addFiles('models/archive_manage/archive_kejiditu.coffee');
+	api.addFiles('models/archive_manage/archive_renshi.coffee');
 	api.addFiles('models/archive_manage/archive_rongyu.coffee');
 	api.addFiles('models/archive_manage/archive_shengxiang.coffee');
-	api.addFiles('models/archive_manage/archive_dianzi.coffee');
-	api.addFiles('models/archive_manage/archive_tongji.coffee');
 	api.addFiles('models/archive_manage/archive_shenji.coffee');
+	api.addFiles('models/archive_manage/archive_tongji.coffee');
+	api.addFiles('models/archive_manage/archive_wenshu.coffee');
+	api.addFiles('models/archive_manage/archive_wuzi.coffee');
+	api.addFiles('models/archive_manage/archive_yinjian.coffee');
 	
 	// 档案借阅
 	api.addFiles('archive_borrow.coffee');

@@ -113,7 +113,7 @@ set_audit = (record_id, space, userId)->
 Creator.Objects.archive_wenshu =
 	name: "archive_wenshu"
 	icon: "record"
-	label: "文书档案"
+	label: "文书简化"
 	enable_search: true
 	enable_files: true
 	enable_api: true

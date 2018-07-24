@@ -239,7 +239,10 @@ Template.creator_grid.onRendered ->
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
 
-		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
+		console.log('[grid Render]', Steedos.spaceId(), object_name, is_related, Creator.subs["CreatorListViews"].ready(), Creator.subs["TabularSetting"].ready())
+
+		if Steedos.spaceId() and object_name and (is_related or Creator.subs["CreatorListViews"].ready())
+			
 			if is_related
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
