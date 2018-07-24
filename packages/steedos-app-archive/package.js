@@ -59,9 +59,10 @@ Package.onUse(function(api) {
 	api.addFiles('models/archive_setting/archive_organization.coffee');
 	api.addFiles('models/archive_setting/archive_retention.coffee');
 	api.addFiles('models/archive_setting/archive_classification.coffee');
-
 	api.addFiles('models/archive_setting/archive_audit.coffee');
 	api.addFiles('models/archive_setting/archive_entity_relation.coffee');
+	api.addFiles('models/archive_setting/archive_rules.coffee');
+
 	
 	// 方法
 	api.addFiles('server/methods/archive_borrow.coffee', 'server');

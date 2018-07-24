@@ -27,7 +27,7 @@ Creator.Objects.archive_retention =
 			defaultValue: false
 	list_views:
 		all:
-			label:"所有"
+			label:"所有全宗"
 			filter_scope: "space"
 			columns:["name","code","years","is_default"]
 	permission_set:

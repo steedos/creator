@@ -5,26 +5,19 @@ Creator.Objects.archive_rules =
 	enable_search: false
 	fields:
 		fieldname:
-			type:"select"
 			label:"匹配字段"
-			options: [
-				{label:"标题",value:"title"},
-				{label:"归档部门",value:"dept"}
-			]
+			type:"lookup"
+			optionsFunction: (values)->
+				return Creator.getObjectLookupFieldOptions "archive_wenshu", true
 			defaultValue:"title"
 		keywords:
 			type:"[text]"
 			label:"关键词"
 			is_wide:true
-		classification:
-			type:"master_detail"
-			label:"设置为分类"
-			reference_to:"archive_classification"
 		retention:
 			type:"master_detail"
-			label:"设置为保管期限"
+			label:"保管期限"
 			reference_to:"archive_retention"
-		
 	permission_set:
 		user:
 			allowCreate: true
@@ -44,11 +37,5 @@ Creator.Objects.archive_rules =
 		all:
 			label:"保管期限规则"
 			filter_scope: "space"
-			filters: [["fieldname", "=", "title"]]
 			columns:["fieldname","keywords","retention"]
-		dept_rules:
-			label:"分类表规则"
-			filter_scope: "space"
-			filters: [["fieldname", "=", "dept"]]
-			columns:["fieldname","keywords","classification"]
 
