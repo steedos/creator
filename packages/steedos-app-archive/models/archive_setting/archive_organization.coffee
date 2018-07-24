@@ -19,7 +19,7 @@ Creator.Objects.archive_organization =
 		all:
 			columns:["name","code"]
 			filter_scope: "space"
-			label:"所有机构"
+			label:"全部"
 	permission_set:
 		user:
 			allowCreate: false

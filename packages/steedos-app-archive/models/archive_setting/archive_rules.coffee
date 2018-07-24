@@ -35,7 +35,7 @@ Creator.Objects.archive_rules =
 			viewAllRecords: true 
 	list_views:
 		all:
-			label:"保管期限规则"
+			label:"全部"
 			filter_scope: "space"
 			columns:["fieldname","keywords","retention"]
 

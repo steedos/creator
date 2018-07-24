@@ -45,9 +45,6 @@ Creator.Objects.archive_audit =
 			label:"表单"
 			type:"text"
 	list_views:
-		recent:
-			label: "最近查看"
-			filter_scope: "space"
 		all:
 			label: "全部"
 			filter_scope: "space"

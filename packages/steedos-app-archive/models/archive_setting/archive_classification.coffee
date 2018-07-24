@@ -42,6 +42,6 @@ Creator.Objects.archive_classification =
 			viewAllRecords: true 
 	list_views:
 		all:
-			label:"所有分类"
+			label:"全部"
 			filter_scope: "space"
 			columns:["sort_no","name","parent"]

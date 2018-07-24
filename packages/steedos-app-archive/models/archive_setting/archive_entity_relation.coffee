@@ -51,6 +51,6 @@ Creator.Objects.archive_entity_relation =
 			reference_to: "archive_wenshu"
 	list_views:
 		all:
-			label:"所有"
+			label:"全部"
 			filter_scope: "space"
 			columns:["entity_identifier","relation_type","relation","relation_description"]

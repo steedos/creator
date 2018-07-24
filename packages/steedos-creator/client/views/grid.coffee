@@ -358,7 +358,7 @@ Template.creator_grid.onRendered ->
 					pageSize: pageSize
 				pager: 
 					showPageSizeSelector: true,
-					allowedPageSizes: [10,25, 50, 100],
+					allowedPageSizes: [10, 50, 100, 200],
 					showInfo: false,
 					showNavigationButtons: true
 				export:

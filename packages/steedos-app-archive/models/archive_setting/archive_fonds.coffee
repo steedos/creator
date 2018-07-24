@@ -20,7 +20,7 @@ Creator.Objects.archive_fonds =
 		all:
 			columns:["name","code"]
 			filter_scope: "space"
-			label:"所有全宗"
+			label:"全部"
 	permission_set:
 		user:
 			allowCreate: false

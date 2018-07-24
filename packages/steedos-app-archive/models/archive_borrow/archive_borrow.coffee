@@ -9,9 +9,9 @@ Creator.Objects.archive_borrow =
 			label:"标题"
 			sortable:true
 			is_name:true
+			is_wide:true
 			required:true
 			searchable:true
-			#defaultValue:当前年度的借阅单总数+1
 		file_type:
 			type:"text"
 			label:"类别"
@@ -91,18 +91,17 @@ Creator.Objects.archive_borrow =
 						"archive_wenshu",
 						"archive_keji",
 						"archive_kejiditu",
-						
 						"archive_kuaiji",
-						"archive_rongyu"
-						# "archive_shengxiang",
-						# "archive_dianzi",
-						# "archive_tongji",
-						# "archive_shenji",
-						# "archive_hetong",
-						# "archive_dichan",
-						# "archive_yinjian",
-						# "archive_renshi",
-						# "archive_wuzi"
+						"archive_rongyu",
+						"archive_shengxiang",
+						"archive_dianzi",
+						"archive_tongji",
+						"archive_shenji",
+						"archive_hetong",
+						"archive_dichan",
+						"archive_yinjian",
+						"archive_renshi",
+						"archive_wuzi"
 					]
 		year:
 			type:"text"
@@ -143,12 +142,12 @@ Creator.Objects.archive_borrow =
 			omit:true 
 	list_views:
 		all:
-			label:"所有借阅记录"
+			label:"全部"
 			filter_scope: "space"
 			columns:["borrow_name","created","end_date","created_by","unit_info
 			","deparment_info","phone_number","relate_record","year"]
 		mine:
-			label:"我的借阅记录"
+			label:"我的"
 			filter_scope: "mine"
 			filters: [["state", "=", "approved"],["is_deleted", "=", false]]
 			columns:["borrow_name","relate_record","state","end_date"]
