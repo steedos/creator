@@ -18,10 +18,10 @@ Creator.Objects.love_about_me =
 			type:'date'
 			label:"你的生日？"
 		live:
-			type:'text'
+			type:'selectCity'
 			label:"你的现居地？"
 		hometown:
-			type:'text'
+			type:'selectCity'
 			label:"你的家乡？"
 		self_introduction:
 			type:'textarea'
