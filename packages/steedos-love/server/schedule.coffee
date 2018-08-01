@@ -13,6 +13,7 @@ if Meteor.settings.cron and Meteor.settings.cron.match
                 console.log "2"
                 aboutMe = Creator.getCollection('love_about_me').findOne({space: cust.space, owner: cust.owner})
                 answerMe = Creator.getCollection('love_answer').findOne({space: cust.space, owner: cust.owner})
+                resultMe = Creator.getCollection('love_result').findOne({space: cust.space, userA: cust.owner}, {fields: {_id: 1}})
                 answerMePoints = 0
                 answerQuestionsKeys.forEach (k)->
                     if answerMe[k+'_i']
@@ -87,14 +88,21 @@ if Meteor.settings.cron and Meteor.settings.cron.match
 
                 console.log "4"
                 if scoreA_B.length > 0 or scoreB_A.length > 0 or score.length > 0
-                    Creator.getCollection('love_result').insert({
-                        userA: cust.owner
-                        scoreA_B: scoreA_B
-                        scoreB_A: scoreB_A
-                        score: score
-                        owner: cust.owner
-                        space: cust.space
-                    })
+                    if resultMe
+                        Creator.getCollection('love_result').update(resultMe._id,{$set:{
+                            scoreA_B: scoreA_B
+                            scoreB_A: scoreB_A
+                            score: score
+                        }})
+                    else
+                        Creator.getCollection('love_result').insert({
+                            userA: cust.owner
+                            scoreA_B: scoreA_B
+                            scoreB_A: scoreB_A
+                            score: score
+                            owner: cust.owner
+                            space: cust.space
+                        })
 
         catch e
             console.error e.stack
