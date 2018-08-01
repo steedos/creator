@@ -8,7 +8,7 @@ Creator.Objects.love_invite_codes =
 			type:'text'
 			label:"邀请码"
 			index:true
-			
+
 		expired:
 			type:'datetime'
 			label:"截止日期"
@@ -25,7 +25,7 @@ Creator.Objects.love_invite_codes =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -39,11 +39,11 @@ Creator.Objects.love_invite_codes =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: false
 			allowDelete: false
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
