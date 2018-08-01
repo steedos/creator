@@ -22,6 +22,8 @@ Package.onUse(function(api) {
 	api.addFiles('models/love_result.coffee');
 	api.addFiles('models/love_work_experience.coffee');
 	api.addFiles('models/love_educational_experience.coffee');
+	api.addFiles('models/love_recommend.coffee');
+	api.addFiles('models/love_recommend_history.coffee');
 	// api.addFiles('models/love_city.coffee');
 	api.addFiles('server/schedule.coffee');
 })
