@@ -2,6 +2,8 @@ Template.standard_query_modal.onCreated ->
 	this.modalValue = new ReactiveVar()
 	standard_query = Session.get("standard_query")
 	if standard_query and standard_query.object_name == Session.get("object_name")
+		standard_query.query = {}
+		Session.set "standard_query", standard_query
 		this.modalValue.set(standard_query.query)
 
 Template.standard_query_modal.onRendered ->
@@ -98,7 +100,7 @@ Template.standard_query_modal.events
 		Meteor.setTimeout ->
 			template.$("input[type='number']").val("")
 			$("body").removeClass("loading")
-		, 100
+		, 300
 	
 	'click .btn-confirm': (event, template)->
 		query = AutoForm.getFormValues("standardQueryForm").insertDoc
