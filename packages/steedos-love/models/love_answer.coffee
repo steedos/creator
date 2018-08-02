@@ -14,7 +14,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		astrological_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -29,7 +29,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		employed_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -44,7 +44,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		body_type_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -59,7 +59,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		education_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -74,7 +74,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		morning_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -89,7 +89,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		messy_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -104,7 +104,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		scary_movie_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -119,7 +119,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		disgust_smoke_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -134,7 +134,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		jealousy_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -149,7 +149,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		spelling_mistake_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -164,7 +164,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		beer_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -179,7 +179,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		intellectual_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -194,7 +194,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		bedroom_tv_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -209,7 +209,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		married_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -224,7 +224,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		politics_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -239,7 +239,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		debt_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -254,7 +254,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		appeal_event_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -268,7 +268,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		value_most_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -283,7 +283,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		communicate_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -298,7 +298,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		worry_about_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -313,7 +313,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		do_nothing_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -328,7 +328,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		flicp_coin_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -343,7 +343,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		pet_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -363,7 +363,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		more_into_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -378,7 +378,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		meditate_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -393,7 +393,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		finance_budget_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -408,7 +408,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		dangerous_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -423,7 +423,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		intellectual_debate_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -438,7 +438,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		appearance_emphasia_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -453,7 +453,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		hurt_happened_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -468,7 +468,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		consider_adult_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -483,7 +483,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		parter_to_be_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -498,7 +498,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		first_date_say_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -513,7 +513,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		show_your_love_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -528,7 +528,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		parter_with_children_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -543,7 +543,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		inform_detail_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -558,7 +558,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		housemate_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -573,7 +573,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		quite_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -588,7 +588,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		before_meeting_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -603,7 +603,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		before_married_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -618,7 +618,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		simple_complex_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -633,7 +633,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		previous_picture_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -648,7 +648,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		sleeping_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -663,7 +663,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		children_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -678,7 +678,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		boyfriend_girlfriend_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -693,7 +693,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		challenge_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
@@ -708,7 +708,7 @@ Creator.Objects.love_answer =
 			multiple:true
 		dinner_i:
 			type:'select'
-			label:[{label:'跳过',value:-1},
+			options:[{label:'跳过',value:-1},
 					{label:'全选',value:0},
 					{label:'未全选',value:1},
 					{label:'重要',value:2}]
