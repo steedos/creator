@@ -112,3 +112,7 @@ Creator.Objects.love_about_me =
 					constellation = getAstro(birthday_month,birthday_day)
 					zodiac = getzodiac(birthday_year)
 					Creator.Collections['love_about_me'].direct.update({_id:doc._id},{$set:{age:age,zodiac:zodiac,constellation:constellation}})
+
+				if modifier?.$set?.name
+					Creator.Collections['users'].direct.update({_id: doc.owner}, {$set: {name: modifier.$set.name}})
+					Creator.Collections['vip_customers'].direct.update({owner: doc.owner}, {$set: {name: modifier.$set.name}}, {multi: true})
