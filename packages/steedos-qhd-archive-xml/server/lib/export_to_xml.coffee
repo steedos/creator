@@ -16,17 +16,20 @@ ExportToXML = (spaces, record_ids) ->
 
 # 存储为编码数据，base64字符串
 converterBase64 = (file_obj, callback)->
-	bmsj = ""
-	stream = file_obj.createReadStream('files')
-	# buffer the read chunks
-	chunks = []
-	stream.on 'data', (chunk) ->
-		chunks.push chunk
-	stream.on 'end', () ->
-		file_data = Buffer.concat(chunks)
-		bmsj = file_data.toString('base64')
-		callback("", bmsj)
-		return
+	try 
+		bmsj = ""
+		stream = file_obj.createReadStream('files')
+		# buffer the read chunks
+		chunks = []
+		stream.on 'data', (chunk) ->
+			chunks.push chunk
+		stream.on 'end', () ->
+			file_data = Buffer.concat(chunks)
+			bmsj = file_data.toString('base64')
+			callback("", bmsj)
+			return
+	catch e
+		console.log "e",e
 
 async_converterBase64 = Meteor.wrapAsync(converterBase64)
 
@@ -269,6 +272,8 @@ ExportToXML.export2xml = (record_obj, callback) ->
 	# 封装被签名对象
 	bqmdx_json = encapsulation(record_obj)
 
+	console.log "======bqmdx_json====="
+
 	if bqmdx_json
 		# 转xml
 		builder = new xml2js.Builder()
@@ -278,6 +283,7 @@ ExportToXML.export2xml = (record_obj, callback) ->
 		# 生成签名
 		private_key_file = Meteor.settings?.records_xml?.archive?.private_key_file
 		if private_key_file
+			console.log "执行导入-------------"
 			buffer_bqmdx = new Buffer bqmdx_xml
 
 			# key
@@ -352,6 +358,7 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			fs.writeFile fileAddress, stream, Meteor.bindEnvironment(
 				(err) ->
 					if err
+						console.log "#{record_obj._id}写入xml文件失败",err
 						logger.error "#{record_obj._id}写入xml文件失败",err
 				)
 
@@ -385,5 +392,11 @@ ExportToXML::DoExport = () ->
 		# 档案记录
 		record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':record?._id})
 		if record_obj
-			ExportToXML.export2xml(record_obj)
+			console.log "=======export2xml======="
+			try
+				ExportToXML.export2xml(record_obj)
+			catch e
+				console.log "e",e
+				console.error("ExportToXML.export2xml", e)
+				return
 	console.timeEnd("syncRecords")
