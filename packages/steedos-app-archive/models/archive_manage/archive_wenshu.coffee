@@ -93,7 +93,6 @@ set_destory = (doc)->
 
 # 日志记录
 set_audit = (record_id, space, userId)->
-
 	doc = {
 		business_status: "历史行为",
 		business_activity: "修改文书档案",
@@ -108,6 +107,15 @@ set_audit = (record_id, space, userId)->
 		space: space
 	}
 	Creator.Collections["archive_audit"].insert(doc)
+
+# 设置重新封装
+set_hasXml = (record_id)->
+	Creator.Collections["archive_wenshu"].direct.update({_id:record_id},
+		{
+			$set:{
+				has_xml:false
+				}
+		})
 
 
 Creator.Objects.archive_wenshu =
@@ -735,6 +743,8 @@ Creator.Objects.archive_wenshu =
 				set_category_code(doc)
 				# 设置销毁期限
 				set_destory(doc)
+				# 设置重新封装
+				set_hasXml(doc._id)
 				return true
 
 		# "before.update.server.default":
@@ -754,6 +764,9 @@ Creator.Objects.archive_wenshu =
 				if modifier['$set']?.archive_dept
 					# 设置分类号
 					set_category_code(doc)
+				# 设置重新封装
+				set_hasXml(doc._id)
+				# 日志记录
 				set_audit(doc?._id, doc?.space, userId)
 
 	actions:
