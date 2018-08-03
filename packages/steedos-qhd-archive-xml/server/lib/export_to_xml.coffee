@@ -156,18 +156,19 @@ encapsulation = (record_obj) ->
 	# 文件数据
 	WJSJ = []
 	# 读取文档
-	cms_files.forEach (cms_file, index)->
-		WDSJ = readFileInfo(cms_file)
-		wdzcsm = "附属文档"
-		if cms_file?.main
-			wdzcsm = "主文档"
-		WD = {
-			"文档标识符": cms_file?._id,
-			"文档序号": index,
-			"文档主从声明": wdzcsm,
-			"文档数据": WDSJ
-		}
-		WJSJ.push WD
+	# 暂时不开放
+	# cms_files.forEach (cms_file, index)->
+	# 	WDSJ = readFileInfo(cms_file)
+	# 	wdzcsm = "附属文档"
+	# 	if cms_file?.main
+	# 		wdzcsm = "主文档"
+	# 	WD = {
+	# 		"文档标识符": cms_file?._id,
+	# 		"文档序号": index,
+	# 		"文档主从声明": wdzcsm,
+	# 		"文档数据": WDSJ
+	# 	}
+	# 	WJSJ.push WD
 
 	# 文件实体
 	WJST = {
@@ -271,9 +272,6 @@ encapsulation = (record_obj) ->
 ExportToXML.export2xml = (record_obj, callback) ->
 	# 封装被签名对象
 	bqmdx_json = encapsulation(record_obj)
-
-	console.log "======bqmdx_json====="
-
 	if bqmdx_json
 		# 转xml
 		builder = new xml2js.Builder()
@@ -283,7 +281,7 @@ ExportToXML.export2xml = (record_obj, callback) ->
 		# 生成签名
 		private_key_file = Meteor.settings?.records_xml?.archive?.private_key_file
 		if private_key_file
-			console.log "执行导入-------------"
+		
 			buffer_bqmdx = new Buffer bqmdx_xml
 
 			# key
@@ -294,7 +292,10 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			# 参数1：需要签名的数据
 			# 参数2：加密后返回的格式
 			# 参数3：签名数据编码
-			signature = key.sign(buffer_bqmdx, 'base64', 'utf8');
+			try
+				signature = key.sign(buffer_bqmdx, 'base64', 'utf8');
+			catch e
+				console.log "签名错误",e
 
 			# 电子签名
 			qmbsf = "修改0-签名1"
@@ -379,7 +380,7 @@ ExportToXML::getNonExportedRecords = ()->
 			{has_xml: {$exists: false}}
 		]
 	}
-	if @record_ids
+	if @record_ids and @record_ids?.length>0
 		query._id = {$in: @record_ids}
 	return Creator.Collections["archive_wenshu"].find(query, {fields: {_id: 1}}).fetch()
 
@@ -387,16 +388,14 @@ ExportToXML::DoExport = () ->
 	console.time("syncRecords")
 	records = @getNonExportedRecords()
 	that = @
-	console.log "records.length is #{records.length}"
 	records.forEach (record)->
 		# 档案记录
 		record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':record?._id})
 		if record_obj
-			console.log "=======export2xml======="
 			try
-				ExportToXML.export2xml(record_obj)
+				ExportToXML.export2xml record_obj
+				ExportToXML.success record_obj
 			catch e
-				console.log "e",e
-				console.error("ExportToXML.export2xml", e)
+				ExportToXML.failed record_obj,e
 				return
 	console.timeEnd("syncRecords")
