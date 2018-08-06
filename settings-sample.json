@@ -1,70 +1,26 @@
 {
-    "public": {
-        "cfs": {
-            "store": "" // 值为空或者未配置此属性表示文件存本地，OSS表示存阿里云， S3表示存AWS
-        }
-    },
-    "cron": {
-        "instancerecordqueue_interval": 10000 // creator同步instance到record队列执行间隔
-    },
-    "cfs": {
-        "aliyun": {
-            "region": "xxxxxx",
-            "internal": false,
-            "bucket": "xxxxxx",
-            "folder": "xxxxxx",
-            "accessKeyId": "xxxxxx",
-            "secretAccessKey": "xxxxxx"
-        },
-        "aws": {
-            "region": "xxxxxx",
-            "bucket": "xxxxxx",
-            "folder": "xxxxxx",
-            "accessKeyId": "xxxxxx",
-            "secretAccessKey": "xxxxxx"
-        }
-    },
-    // 效率统计
-    "instances_stat": {
-        "space": "Af8eM6mAHo7wMDqD3",
-        "schedule": "10 10 0 * * *" //每天的晚上的 0点10分10秒调用执行
-    },
-    "weixin": {
-        "invite": {
-            "iv": "", // 密钥，16位字符串
-            "validity_period": 86400 //有效期，默认值24小时
-        },
-        "appSecret": {
-            "应用ID": "应用secret"
-        }
-    },
-    // 微信支付
-    "billing": {
-        "service_mch": {
-            "appid": "公众账号ID",
-            "mch_id": "服务商商户号",
-            "partner_key": "服务商平台API密钥"
-        },
-        "normal_mch": {
-            "appid": "公众账号ID",
-            "mch_id": "普通商户商户号",
-            "partner_key": "商户平台API密钥"
-        }
-    },
-    //sms短信平台账户配置相关，优先识别海外平台，即twilio
-    "sms": {
-        //海外短信平台账户相关
-        "twilio": {
-            "FROM": "XXXXXXXXXXXX",
-            "ACCOUNT_SID": "XXXXXXXXXXXX",
-            "AUTH_TOKEN": "XXXXXXXXXXXX"
-        },
-        // 腾讯云短信服务
-        "qcloud": {
-            "smsqueue_interval": 1000,
-            "sdkappid": "xxx",
-            "appkey": "xxx",
-            "signname": "xxx" // 短信签名
-        }
+  "records_qhd": {
+    "spaces": ["Af8eM6mAHo7wMDqD3"],
+    "-recurrenceRule": "* /10 * * * *",
+    "to_archive": {
+      "contract_instances": {
+        "flows": [
+          "49cd342e-76a3-41ed-bbd6-e0921be9f004",
+          "2d6055de-53d2-4d65-8e56-0df9862b3226",
+          "25d7f36f-747d-4031-b767-e3023783846f",
+          "6a520bf56a83eac20a604bde",
+          "f0a3f03c7a64c6cc2cb2d40b"
+        ]
+      }
     }
+  },
+  "records_xml":{
+    "spaces":["Af8eM6mAHo7wMDqD3"],
+    "-recurrenceRule": "/20 * * * * *",
+    "archive":{
+      "private_key_file":"../../../ca/archive.key",
+      "signaturer":"Archive",
+      "public_key_file": "../../../ca/archive.csr"
+    }
+  }
 }
