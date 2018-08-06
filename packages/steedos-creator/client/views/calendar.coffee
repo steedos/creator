@@ -130,8 +130,6 @@ Template.creator_calendar.onRendered ->
 				}, "month"]
 				currentView: "day"
 				currentDate: new Date()
-				crossScrollingEnabled: true,
-				showAllDayPanel: false,
 				firstDayOfWeek: 1
 				startDayHour: 8
 				endDayHour: 18
@@ -139,7 +137,7 @@ Template.creator_calendar.onRendered ->
 				endDateExpr: "end"
 				startDateExpr: "start"
 				timeZone: "Asia/Shanghai"
-				showAllDayPanel: false,
+				# showAllDayPanel: false,
 				height: "100%"
 				# groups: ["room"]
 				crossScrollingEnabled: true
@@ -211,24 +209,29 @@ Template.creator_calendar.onRendered ->
 				onCellClick: (e) ->
 					console.log('[onCellClick]', e)
 					cellData = e.cellData
-					roomAdmins = getRoomAdmin(cellData.groups.room)
-					isOpen = getRoomPermission(cellData.groups.room)
-					if roomAdmins.indexOf(Meteor.userId())>-1 or isOpen
-					# debugger
-						doc = {
-							start: cellData.startDate
-							end: cellData.endDate
-						}
+					doc = {
+								start: cellData.startDate
+								end: cellData.endDate
+							}
 
-						if cellData.groups?.room
-							doc.room = cellData.groups.room
-						
+					if cellData?.groups?.room
+						roomAdmins = getRoomAdmin(cellData.groups.room)
+						isOpen = getRoomPermission(cellData.groups.room)
+						if roomAdmins.indexOf(Meteor.userId())>-1 or isOpen
+						# debugger
+							if cellData.groups?.room
+								doc.room = cellData.groups.room
+								if Session.get("cmDoc") and _.isEqual(doc, Session.get("cmDoc"))
+									_insertData()
+								else
+									Session.set("cmDoc", doc)
+						else
+							toastr.error("此会议室为特约会议室，您暂无权限。")
+					else
 						if Session.get("cmDoc") and _.isEqual(doc, Session.get("cmDoc"))
 							_insertData()
 						else
 							Session.set("cmDoc", doc)
-					else
-						toastr.error("此会议室为特约会议室，您暂无权限。")
 				onAppointmentUpdating: (e)->
 					e.cancel = true
 					doc = {}

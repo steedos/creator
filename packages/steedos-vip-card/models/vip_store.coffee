@@ -81,6 +81,7 @@ Creator.Objects.vip_store =
 		featured:
 			label:'发布到首页'
 			type:'boolean'
+			index:true
 			group:'-'
 		cash_back_enabled:
 			label:'启用转发返现'
@@ -100,6 +101,16 @@ Creator.Objects.vip_store =
 			type:'number'
 			readonly:true
 			omit:true
+		show_space_info:
+			label:'是否显示商户信息'
+			type:'boolean'
+			group:'-'
+			defaultValue:true
+		show_post:
+			label:'是否显示动态'
+			type:'boolean'
+			group:'-'
+			defaultValue:true
 		# post_types:
 		# 	label:'信息分类'
 		# 	type:'select'

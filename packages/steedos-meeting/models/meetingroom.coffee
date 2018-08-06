@@ -8,7 +8,6 @@ Creator.Objects.meetingroom =
 			label:'会议室'
 			type:'text'
 			is_wide:true
-			sortable:true
 		# number:
 		#     label:'编号'
 		# 	type:'text'
@@ -100,5 +99,7 @@ Creator.Objects.meetingroom =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				doc.admins.push doc.owner
-				
+				if !doc?.admins
+					doc['admins'] = []
+				if doc?.admins.indexOf(doc.owner)<0
+					doc.admins.push doc.owner
