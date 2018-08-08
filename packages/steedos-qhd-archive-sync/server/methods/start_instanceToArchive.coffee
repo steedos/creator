@@ -1,5 +1,5 @@
 Meteor.methods
-	start_instanceToArchive: (spaces, flows, sDate, fDate) ->
+	start_instanceToArchive: (sDate, fDate) ->
 		try
 			ins_ids = []
 			# 获取某时间段需要同步的申请单
@@ -15,8 +15,8 @@ Meteor.methods
 				instances.forEach (ins)->
 					ins_ids.push(ins._id)
 			
-			instancesToArchive = new InstancesToArchive(spaces, flows, ins_ids)
-			instancesToArchive.syncNonContractInstances()
+			RecordsQHD.instanceToArchive(ins_ids)
+			
 			return result
 		catch e
 			error = e

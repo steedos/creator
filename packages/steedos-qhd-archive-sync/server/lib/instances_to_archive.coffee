@@ -444,8 +444,15 @@ InstancesToArchive::syncNonContractInstances = () ->
 	instances = @getNonContractInstances()
 
 	that = @
-	instances.forEach (mini_ins)->
-		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
-		if instance
-			InstancesToArchive.syncNonContractInstance instance
+	try
+		instances.forEach (mini_ins)->
+			console.log "----------",mini_ins?._id
+			instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
+			if instance
+				InstancesToArchive.syncNonContractInstance instance
+
+	catch e
+		error = e
+		console.log "---------error---", e
+	
 	console.timeEnd("syncNonContractInstances")
