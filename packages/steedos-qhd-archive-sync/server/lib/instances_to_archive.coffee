@@ -414,20 +414,24 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 		collection.remove({'external_id':instance._id})
 
 		record_id = collection.insert formData
+		try 
 
-		# 整理文件
-		_minxiAttachmentInfo(instance, record_id)
+			# 整理文件
+			_minxiAttachmentInfo(instance, record_id)
 
-		# 整理表单html
-		_minxiInstanceHtml(instance, record_id)
+			# 整理表单html
+			_minxiInstanceHtml(instance, record_id)
 
-		# 整理关联档案
-		_minxiRelatedArchives(instance, record_id)
+			# 整理关联档案
+			_minxiRelatedArchives(instance, record_id)
 
-		# 处理审计记录
-		_minxiInstanceTraces(auditList, instance, record_id)
+			# 处理审计记录
+			_minxiInstanceTraces(auditList, instance, record_id)
 
-		InstancesToArchive.success instance
+			InstancesToArchive.success instance
+		catch e
+			logger.error e
+			console.log e
 	else
 		InstancesToArchive.failed instance, "立档单位 不能为空"
 
@@ -442,17 +446,13 @@ Test.run = (ins_id)->
 InstancesToArchive::syncNonContractInstances = () ->
 	console.time("syncNonContractInstances")
 	instances = @getNonContractInstances()
-
 	that = @
-	try
-		instances.forEach (mini_ins)->
-			console.log "----------",mini_ins?._id
-			instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
-			if instance
+	instances.forEach (mini_ins)->
+		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
+		if instance
+			try
 				InstancesToArchive.syncNonContractInstance instance
-
-	catch e
-		error = e
-		console.log "---------error---", e
-	
+			catch e
+				logger.error e
+				console.log e
 	console.timeEnd("syncNonContractInstances")
