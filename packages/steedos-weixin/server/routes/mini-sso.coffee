@@ -117,7 +117,12 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 				return s
 			)
 
+		customers = Creator.getCollection("vip_customers").find({
+			owner: ret_data.user_id
+		}).fetch()
+
 		ret_data.my_spaces = space_users
+		ret_data.my_customers = customers
 
 		#设置sessionKey
 		Creator.getCollection("users").direct.update({
@@ -133,6 +138,8 @@ JsonRoutes.add 'post', '/mini/vip/sso', (req, res, next) ->
 		ret_data.sex = user.profile?.sex
 		ret_data.birthdate = user.profile?.birthdate
 		ret_data.avatar = user.profile?.avatar
+
+		ret_data.love = Meteor.settings.love
 
 		JsonRoutes.sendResult res, {
 			code: 200,

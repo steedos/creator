@@ -15,8 +15,8 @@ Creator.Objects.post =
 			omit:true
 		description:
 			label:'正文'
-			is_wide:false
-			type:'textarea'
+			is_wide:true
+			type:'markdown'
 			rows: 8
 		comment_count:
 			label:'评论数'
@@ -76,6 +76,7 @@ Creator.Objects.post =
 			type:'lookup'
 			reference_to:'post_category'
 			multiple:true
+			index:true
 		type:
 			label:'信息分类'
 			type:'select'
@@ -115,6 +116,7 @@ Creator.Objects.post =
 		featured:
 			label:'推荐'
 			type:'boolean'
+			index:true
 			group:'-'
 	list_views:
 		all:

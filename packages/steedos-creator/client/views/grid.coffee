@@ -1,4 +1,4 @@
-# dxDataGridInstance = null
+dxDataGridInstance = null
 
 _standardQuery = (curObjectName)->
 	standard_query = Session.get("standard_query")
@@ -62,7 +62,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
 				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
-					self.dxDataGridInstance.refresh()
+					dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
@@ -163,6 +163,8 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
 				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
+				if field.type is "markdown"
+					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		
 		if grid_settings and grid_settings.settings
@@ -456,6 +458,7 @@ Template.creator_grid.onRendered ->
 					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
 					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 			self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
+			dxDataGridInstance = self.dxDataGridInstance
 			self.dxDataGridInstance.pageSize(pageSize)
 			
 Template.creator_grid.helpers Creator.helpers
@@ -465,18 +468,20 @@ Template.creator_grid.events
 	'click .table-cell-edit': (event, template) ->
 		is_related = template.data.is_related
 		field = this.field_name
+		full_screen = this.full_screen
 
 		if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
 			field.push(this.field_name)
 			field = field.join(",")
 
-		objectName = if is_related then Session.get("related_object_name") else Session.get("object_name")
+		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else Session.get("object_name")
 		collection_name = Creator.getObject(objectName).label
 		# rowData = this.doc
 
 		Meteor.call "object_record", objectName, this._id, (error, result)->
 			if result
+				Session.set("cmFullScreen", full_screen)
 				Session.set 'cmDoc', result
 				Session.set("action_fields", field)
 				Session.set("action_collection", "Creator.Collections.#{objectName}")

@@ -204,8 +204,8 @@ Meteor.startup ->
 						fields = Creator.getObject(key).fields
 						_.each readable_fields,(field)->
 							if field.indexOf('$')<0
-								if fields[field]?.multiple!= true
-									createQuery.projection[field] = 1
+								#if fields[field]?.multiple!= true
+								createQuery.projection[field] = 1
 					if not permissions.viewAllRecords
 						if object.enable_share
 							# 满足共享规则中的记录也要搜索出来
@@ -251,6 +251,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -305,6 +308,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -364,8 +370,8 @@ Meteor.startup ->
 						fields = Creator.getObject(key).fields
 						_.each readable_fields,(field)->
 							if field.indexOf('$')<0
-								if fields[field]?.multiple!= true
-									createQuery.projection[field] = 1
+								#if fields[field]?.multiple!= true
+								createQuery.projection[field] = 1
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					entities_index = []
@@ -406,6 +412,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -459,6 +468,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -591,6 +603,9 @@ Meteor.startup ->
 					error = {}
 					error['message'] = e.message
 					error['code'] = 500
+					error['error'] = e.error
+					error['details'] = e.details
+					error['reason'] = e.reason
 					body['error'] = error
 					return {
 						statusCode: 500
@@ -661,6 +676,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -715,11 +733,70 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
 					body:body
 				}
+	})
+
+	SteedosOdataAPI.addRoute(':object_name/:_id/:methodName', {authRequired: true, spaceRequired: false}, {
+		post: ()->
+			try
+				key = @urlParams.object_name
+				if not Creator.objectsByName[key]?.enable_api
+					return{
+						statusCode: 401
+						body: setErrorMessage(401)
+					}
+				collection = Creator.Collections[key]
+				if not collection
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
+
+				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
+				if permissions.allowRead
+					methodName = @urlParams.methodName
+					methods = Creator.Objects[key]?.methods || {}
+					if methods.hasOwnProperty(methodName)
+						thisObj = {
+							object_name: key
+							record_id: @urlParams._id
+							space_id: @urlParams.spaceId
+							user_id: @userId
+							permissions: permissions
+						}
+						methods[methodName].apply(thisObj, [@bodyParams])
+						{}
+					else
+						return {
+							statusCode: 404
+							body: setErrorMessage(404,collection,key)
+						}
+				else
+					return {
+						statusCode: 403
+						body: setErrorMessage(403,collection,key)
+					}
+			catch e
+				body = {}
+				error = {}
+				error['message'] = e.message
+				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
+				body['error'] = error
+				return {
+					statusCode: 500
+					body:body
+				}
+
 	})
 
 	#TODO remove
