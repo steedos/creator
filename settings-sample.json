@@ -3,6 +3,12 @@
     "spaces": ["Af8eM6mAHo7wMDqD3"],
     "-recurrenceRule": "* /10 * * * *",
     "to_archive": {
+      "object_name":"archive_wenshu",
+      "admin":{
+        "userid":"hPgDcEd9vKQxwndQR",
+        "username":"Administrator",
+        "password":"123456"
+      },
       "contract_instances": {
         "flows": [
           "49cd342e-76a3-41ed-bbd6-e0921be9f004",
