@@ -1,7 +1,7 @@
 Creator.Objects.vip_customers =
 	name: "vip_customers"
 	label: "客户"
-	icon: "person_account"
+	icon: "client"
 	fields:
 		name:
 			label: '姓名'
