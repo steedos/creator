@@ -57,6 +57,17 @@ set_category_code = (doc)->
 			}
 		})
 
+# 设置初始条件
+set_init = (record_id)->
+	Creator.Collections["archive_wenshu"].direct.update(record_id,
+	{
+		$set:{
+			is_received: false
+			is_destroyed: false
+			is_borrowed: false
+		}
+	})
+
 # 设置档号
 set_archivecode = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_identifier:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
@@ -734,9 +745,8 @@ Creator.Objects.archive_wenshu =
 			on: "server"
 			when: "after.insert"
 			todo: (userId, doc)->
-				doc.is_received = false
-				doc.is_destroyed = false
-				doc.is_borrowed = false
+				# 保存初始条件
+				set_init(doc._id)
 				# 设置保管期限
 				set_retention(doc)
 				# 设置分类号
@@ -746,12 +756,6 @@ Creator.Objects.archive_wenshu =
 				# 设置重新封装
 				set_hasXml(doc._id)
 				return true
-
-		# "before.update.server.default":
-		# 	on: "server"
-		# 	when: "before.update"
-		# 	todo: (userId, doc, fieldNames, modifier, options)->
-		# 		doc.retention_peroid = ""
 
 		"after.update.server.default":
 			on: "server"
