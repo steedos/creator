@@ -232,7 +232,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 
 			data_buffer = new Buffer(result_html.toString())
 
-			file_name = instance?.name + '.html'
+			file_name = instance?._id + '.html'
 
 			file_size = data_buffer?.length
 		
