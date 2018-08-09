@@ -216,6 +216,8 @@ _minxiInstanceHtml = (instance, record_id) ->
 
 	instance_html_url = apps_url + '/workflow/space/' + space_id + '/view/readonly/' + ins_id + '?username=' + username + '&password=' + password + '&hide_traces=1'
 
+	console.log "instance_html_url",instance_html_url
+	
 	result_html = HTTP.call('GET',instance_html_url)?.content
 
 	if result_html
@@ -437,11 +439,13 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 
 
 @Test = {}
-# Test.run('rJxkv4CPfgz598rRD')
-Test.run = (ins_id)->
+# Test.run('sMwemMTZDkmCSpSuC','5Jhi3dArqvCPgpLWQ')
+Test.run = (ins_id, record_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
-		InstancesToArchive.syncNonContractInstance instance
+		# InstancesToArchive.syncNonContractInstance instance
+		# 整理表单html
+		_minxiInstanceHtml(instance, record_id)
 
 InstancesToArchive::syncNonContractInstances = () ->
 	console.time("syncNonContractInstances")
