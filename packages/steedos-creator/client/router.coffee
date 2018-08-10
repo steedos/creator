@@ -56,9 +56,13 @@ FlowRouter.route '/app',
 				c.stop()
 				$("body").removeClass("loading")
 				apps = Creator.getVisibleApps()
-				firstAppId = apps[0]?._id
-				if firstAppId
-					FlowRouter.go '/app/' + firstAppId
+				default_app = Meteor?.settings?.public?.default_app_id
+				if default_app
+					FlowRouter.go '/app/' + default_app
+				else
+					firstAppId = apps[0]?._id
+					if firstAppId
+						FlowRouter.go '/app/' + firstAppId
 
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned, initLayout ],
