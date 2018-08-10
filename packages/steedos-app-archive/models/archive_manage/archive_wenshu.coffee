@@ -840,6 +840,6 @@ Creator.Objects.archive_wenshu =
 			todo:(object_name, record_id, fields)->
 				has_xml = Creator.Collections[object_name].findOne({_id:record_id})?.has_xml
 				if has_xml
-					window.location = "/view/encapsulation/xml?filename=#{record_id}.xml"
+					window.location = Steedos.absoluteUrl "/view/encapsulation/xml?filename=#{record_id}.xml"
 				else
 					swal("该档案暂无XML封装文件")
