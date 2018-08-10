@@ -1,8 +1,9 @@
 Meteor.methods
-	start_exportxml: (space, record_ids) ->
+	start_exportxml: (spaces, record_ids) ->
 		try
-			if space and record_ids
-				exportToXML = new ExportToXML(space, record_ids)
+			console.log "space, record_ids========",spaces, record_ids
+			if spaces and record_ids
+				exportToXML = new ExportToXML(spaces, record_ids)
 				exportToXML.DoExport()
 				return result
 		catch e
