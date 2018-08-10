@@ -26,11 +26,11 @@ Creator.Objects.archive_borrow =
 		deparment_info:
 			type:"text"
 			label:"部门"
-			required:true
+			# required:true
 		phone_number:
 			type:"text"
 			label:"联系方式"
-			required:true
+			# required:true
 		start_date:
 			type:"date"
 			label:"借阅日期"
