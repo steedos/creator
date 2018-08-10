@@ -271,7 +271,12 @@ encapsulation = (record_obj) ->
 # 导出为xml文件
 ExportToXML.export2xml = (record_obj, callback) ->
 	# 封装被签名对象
-	bqmdx_json = encapsulation(record_obj)
+	try
+		bqmdx_json = encapsulation(record_obj)
+	catch e
+		console.log "e",e
+		logger.error "#{record_obj._id}封装失败",e
+
 	if bqmdx_json
 		# 转xml
 		builder = new xml2js.Builder()
@@ -285,8 +290,11 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			buffer_bqmdx = new Buffer bqmdx_xml
 
 			# key
-			readStream = fs.readFileSync private_key_file,{encoding:'utf8'}
-			key = new NodeRSA(readStream,'pkcs8');
+			try
+				readStream = fs.readFileSync private_key_file,{encoding:'utf8'}
+				key = new NodeRSA(readStream,'pkcs8');
+			catch e
+				console.log "未获取私钥文件",e
 
 			# 签名
 			# 参数1：需要签名的数据
@@ -352,6 +360,8 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			fileName = record_obj?._id + ".xml"
 			fileAddress = path.join filePath, fileName
 
+			console.log "fileAddress",fileAddress
+
 			if !fs.existsSync filePath
 				mkdirp.sync filePath
 
@@ -365,23 +375,29 @@ ExportToXML.export2xml = (record_obj, callback) ->
 
 
 ExportToXML.success = (record_obj)->
-	Creator.Collections["archive_wenshu"].update({_id: record_obj._id}, {$set: {has_xml: true}})
+	console.log "封装成功"
+	Creator.Collections["archive_wenshu"].direct.update({_id: record_obj._id}, {$set: {has_xml: true}})
 
 ExportToXML.failed = (record_obj, error)->
 	logger.error "failed, name is #{record_obj.title}, id is #{record_obj._id}. error: " + error
 
 #获取所有未导出为xml的文书records
 ExportToXML::getNonExportedRecords = ()->
-	query = {
-		space: {$in: @spaces},
-		# has_xml是否导出为xml
-		$or: [
-			{has_xml: false},
-			{has_xml: {$exists: false}}
-		]
-	}
+	query = {}
 	if @record_ids and @record_ids?.length>0
-		query._id = {$in: @record_ids}
+		query = {
+			space: {$in: @spaces},
+			_id: {$in: @record_ids}
+			}
+	else
+		query = {
+			space: {$in: @spaces},
+			# has_xml是否导出为xml
+			$or: [
+				{has_xml: false},
+				{has_xml: {$exists: false}}
+			]
+		}
 	return Creator.Collections["archive_wenshu"].find(query, {fields: {_id: 1}}).fetch()
 
 ExportToXML::DoExport = () ->

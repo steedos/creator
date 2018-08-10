@@ -6,7 +6,10 @@ Creator.startExportXml = (record_ids)->
         spaces.push spaceId
         Meteor.call("start_exportxml", spaces, record_ids, 
             (error,result) ->
-                console.log 'Success'
+                if result
+                    console.log 'Success'
+                else
+                    console.log 'Error',error
         )
         return
     else
