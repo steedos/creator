@@ -51,6 +51,9 @@ _minxiInstanceData = (formData, instance) ->
 	if fondObj
 		formData.fonds_identifier = fondObj?._id
 		formData.fonds_name = fondObj?.name
+	else
+		formData.fonds_identifier = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.id
+		formData.fonds_name = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.name
 
 	# 保管期限代码查找
 	retentionObj = Creator.Collections["archive_retention"].findOne({'name':field_values?.baocunqixian})
