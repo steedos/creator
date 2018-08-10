@@ -255,7 +255,7 @@ Creator.Objects.archive_wenshu =
 			type:"date"
 			label:"文件日期"
 			format:"YYYYMMDD"
-			required:true
+			# required:true
 			group:"内容描述"
 			sortable:true
 

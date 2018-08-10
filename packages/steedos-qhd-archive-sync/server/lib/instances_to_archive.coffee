@@ -285,7 +285,11 @@ _minxiInstanceHtml = (instance, record_id) ->
 						collection.update(cmsFileId, {$set: {versions: versions}})
 				)
 		catch e
-			logger.error "表单生成HTML失败：#{ins_id}. error: " + e
+			logger.error "存储HTML失败：#{ins_id}. error: " + e
+	
+	else
+		logger.error "表单生成HTML失败：#{ins_id}. error: " + e
+
 
 
 # 整理档案审计数据
@@ -409,14 +413,14 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 
 	if _checkParameter(formData)
 		logger.debug("_sendContractInstance: #{instance._id}")
-
-		# 如果原来已经归档，则删除原来归档的记录
-		collection = Creator.Collections["archive_wenshu"]
-
-		collection.remove({'external_id':instance._id})
-
-		record_id = collection.insert formData
+		
 		try 
+			# 如果原来已经归档，则删除原来归档的记录
+			collection = Creator.Collections["archive_wenshu"]
+
+			collection.remove({'external_id':instance._id})
+
+			record_id = collection.insert formData
 
 			# 整理文件
 			_minxiAttachmentInfo(instance, record_id)
