@@ -28,6 +28,10 @@ set_retention = (doc)->
 		retention = Creator.Collections["archive_retention"].findOne({is_default:true})		
 	# 设置保管期限和销毁日期
 	if retention?.years
+		# 没有文件日期默认为当前日期
+		if !doc.document_date
+			doc.document_date = new Date()
+		
 		duration = retention?.years
 		year = doc.document_date?.getFullYear() + duration
 		month = doc.document_date?.getMonth()
@@ -40,7 +44,7 @@ set_retention = (doc)->
 				retention: retention,
 				destroy_date: destroy_date,
 				destroy_date_timestamp: destroy_date_timestamp
-				}
+			}
 		})
 
 # 设置类别号
