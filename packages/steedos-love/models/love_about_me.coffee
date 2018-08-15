@@ -20,13 +20,12 @@ Creator.Objects.love_about_me =
 		sex:
 			type:'select'
 			label:"你的性别？"
-			options:[{label:'男生',value:'男'},{label:'女生',value:'女'}]	
+			options:[{label:'男生',value:'男'},{label:'女生',value:'女'}]
 		
 		height:
 			type:'select'
 			label:"你的身高？"
 			options:"140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200"
-# 
 		
 		birthday:
 			type:'date'
@@ -39,10 +38,17 @@ Creator.Objects.love_about_me =
 		hometown:
 			type:'selectCity'
 			label:"你的家乡？"
+		#暂时去掉
+		# photos:
+		# 	label:'照片'
+		# 	type:'image'
+		# 	multiple:true
+		# 	max: 9
+		# 	group:'-'
 		
 		self_introduction:
 			type:'textarea'
-			is_wide:true	
+			is_wide:true
 			label:"自我介绍:"
 		
 		age:
@@ -63,7 +69,7 @@ Creator.Objects.love_about_me =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "mobile", "sex", "birthday","live", "height", "weight", "self_introduction" ]
+			columns: ["name", "age", "sex", "birthday","live", "height", "hometown", "constellation", "zodiac" ]
 			filter_scope: "space"
 		
 	permission_set:

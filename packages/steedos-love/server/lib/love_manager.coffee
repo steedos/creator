@@ -8,20 +8,35 @@ LoveManager.caculateResult = (loveSpaceId) ->
 
     topNumber = 10
 
+    loveAboutMeCollection = Creator.getCollection('love_about_me')
+    loveAnswerCollection = Creator.getCollection('love_answer')
+    loveAnswer2Collection = Creator.getCollection('love_answer2')
+    loveResultCollection = Creator.getCollection('love_result')
+    loveLookingForCollection = Creator.getCollection('love_looking_for')
+    loveHobbyCollection = Creator.getCollection('love_hobby')
+    loveEducationalExperienceCollection = Creator.getCollection('love_educational_experience')
+    loveWorkExperienceCollection = Creator.getCollection('love_work_experience')
+    loveRecommendHistoryCollection = Creator.getCollection('love_recommend_history')
+
     # 数据加载到内存
     data = {}
-    Creator.getCollection('vip_customers').find({ space: loveSpaceId, questionnaire_progess: 4 }).forEach (cust)->
+    customQuery = { space: loveSpaceId, $or: [] }
+    answerObjectNames.forEach (objName) ->
+        customQuery.$or.push { questionnaire_progess: objName }
+    console.log customQuery
+
+    Creator.getCollection('vip_customers').find(customQuery).forEach (cust)->
         owner = cust.owner
         data[owner] = {
-            love_about_me: Creator.getCollection('love_about_me').findOne({ space: loveSpaceId, owner: owner })
-            love_answer: Creator.getCollection('love_answer').findOne({ space: loveSpaceId, owner: owner })
-            love_answer2: Creator.getCollection('love_answer2').findOne({ space: loveSpaceId, owner: owner })
-            love_result: Creator.getCollection('love_result').findOne({ space: loveSpaceId, userA: owner }, { fields: { _id: 1 } })
-            love_looking_for: Creator.getCollection('love_looking_for').findOne({ space: loveSpaceId, owner: owner })
-            love_hobby: Creator.getCollection('love_hobby').findOne({ space: loveSpaceId, owner: owner })
-            love_educational_experience: Creator.getCollection('love_educational_experience').findOne({ space: loveSpaceId, owner: owner })
-            love_work_experience: Creator.getCollection('love_work_experience').findOne({ space: loveSpaceId, owner: owner })
-            love_recommend_history: Creator.getCollection('love_recommend_history').find({ space: loveSpaceId, user_a: owner }).fetch()
+            love_about_me: loveAboutMeCollection.findOne({ space: loveSpaceId, owner: owner })
+            love_answer: loveAnswerCollection.findOne({ space: loveSpaceId, owner: owner })
+            love_answer2: loveAnswer2Collection.findOne({ space: loveSpaceId, owner: owner })
+            love_result: loveResultCollection.findOne({ space: loveSpaceId, userA: owner }, { fields: { _id: 1 } })
+            love_looking_for: loveLookingForCollection.findOne({ space: loveSpaceId, owner: owner })
+            love_hobby: loveHobbyCollection.findOne({ space: loveSpaceId, owner: owner })
+            love_educational_experience: loveEducationalExperienceCollection.findOne({ space: loveSpaceId, owner: owner })
+            love_work_experience: loveWorkExperienceCollection.findOne({ space: loveSpaceId, owner: owner })
+            love_recommend_history: loveRecommendHistoryCollection.find({ space: loveSpaceId, user_a: owner }).fetch()
         }
 
     # 获取题目字段key
@@ -46,8 +61,8 @@ LoveManager.caculateResult = (loveSpaceId) ->
         query.age = { $gte: parseInt(ageMin), $lte: parseInt(ageMax) }
         query.height = { $gte: heightMin, $lte: heightMax }
 
-        console.log 'query: ', query
-        Creator.getCollection('love_about_me').find(query, { fields: { owner: 1, name: 1 } }).fetch().forEach (aboutMe) ->
+        # console.log 'query: ', query
+        loveAboutMeCollection.find(query, { fields: { owner: 1, name: 1 } }).fetch().forEach (aboutMe) ->
             if not data[aboutMe.owner]
                 return
 
@@ -57,7 +72,7 @@ LoveManager.caculateResult = (loveSpaceId) ->
             if lrh
                 return
 
-            console.log userId + '>>' + aboutMe.owner
+            # console.log userId + '>>' + aboutMe.owner
 
             owner = aboutMe.owner
             name = aboutMe.name
@@ -70,7 +85,7 @@ LoveManager.caculateResult = (loveSpaceId) ->
             questionsNumber = 0
             answerObjectNames.forEach (objName) ->
                 if dv[objName] and data[owner][objName] # 当两人都做了同一套问卷时计算分数
-                    console.log objName
+                    # console.log objName
                     r = LoveManager.getMatchScores(answerKeyObj[objName], dv[objName], data[owner][objName])
                     aFullPoints += r.aFullPoints
                     bGotPoints += r.bGotPoints
@@ -78,9 +93,9 @@ LoveManager.caculateResult = (loveSpaceId) ->
                     aGotPoints += r.aGotPoints
                     questionsNumber += r.questionsNumber
 
-            console.log { aFullPoints, bGotPoints, bFullPoints, aGotPoints, questionsNumber }
+            # console.log { aFullPoints, bGotPoints, bFullPoints, aGotPoints, questionsNumber }
 
-            aToB = parseFloat((bGotPoints/aFullPoints).toFixed('2'))
+            aToB = bGotPoints/aFullPoints || 0
             if scoreA_B.length < topNumber
                 scoreA_B.push({userB: owner, BName: name, score: aToB})
             else
@@ -91,7 +106,7 @@ LoveManager.caculateResult = (loveSpaceId) ->
                         break
                     i++
 
-            bToA = parseFloat((aGotPoints/bFullPoints).toFixed('2'))
+            bToA = aGotPoints/bFullPoints || 0
             if scoreB_A.length < topNumber
                 scoreB_A.push({userB: owner, BName: name, score: bToA})
             else
@@ -102,7 +117,7 @@ LoveManager.caculateResult = (loveSpaceId) ->
                         break
                     i++
 
-            match = parseFloat((Math.pow(aToB*bToA, 1/questionsNumber)).toFixed('2'))
+            match = Math.pow(aToB*bToA, 1/2)
             if score.length < topNumber
                 score.push({userB: owner, BName: name, score: match})
             else
@@ -115,13 +130,13 @@ LoveManager.caculateResult = (loveSpaceId) ->
 
         if scoreA_B.length > 0 or scoreB_A.length > 0 or score.length > 0
             if resultMe
-                Creator.getCollection('love_result').direct.update(resultMe._id,{$set:{
+                loveResultCollection.direct.update(resultMe._id,{$set:{
                     scoreA_B: scoreA_B
                     scoreB_A: scoreB_A
                     score: score
                 }})
             else
-                Creator.getCollection('love_result').direct.insert({
+                loveResultCollection.direct.insert({
                     userA: userId
                     scoreA_B: scoreA_B
                     scoreB_A: scoreB_A
@@ -137,7 +152,7 @@ LoveManager.caculateResult = (loveSpaceId) ->
 LoveManager.getQuestionKeys = (objectName) ->
     keys = []
     _.each Creator.Objects[objectName].fields, (v, k) ->
-        if k.substr(k.length-2,2) is '_o' or k.substr(k.length-2,2) is '_i'
+        if k.endsWith('_o') or k.endsWith('_i')
             return
         else
             keys.push k
@@ -154,24 +169,32 @@ LoveManager.getMatchScores = (questionKeys, aAnswer, bAnswer) ->
     questionsNumber = 0
 
     questionKeys.forEach (ak) ->
-        if aAnswer[ak+'_i'] > -1 and bAnswer[ak+'_i'] > -1
+        akI = ak+'_i'
+        akO = ak+'_o'
+        if aAnswer[akI] > -1 and bAnswer[akI] > -1
             questionsNumber++
-            if aAnswer[ak+'_i'] is 1
+            if aAnswer[akI] is 0
                 aFullPoints += normalP
-                if bAnswer[ak+'_o'] and bAnswer[ak+'_o'].includes(aAnswer[ak])
+                bGotPoints += normalP
+            else if aAnswer[akI] is 1
+                aFullPoints += normalP
+                if aAnswer[akO] and aAnswer[akO].includes(bAnswer[ak])
                     bGotPoints += normalP
-            else if aAnswer[ak+'_i'] is 2
+            else if aAnswer[akI] is 2
                 aFullPoints += importP
-                if bAnswer[ak+'_o'] and bAnswer[ak+'_o'].includes(aAnswer[ak])
+                if aAnswer[akO] and aAnswer[akO].includes(bAnswer[ak])
                     bGotPoints += importP
 
-            if bAnswer[ak+'_i'] is 1
+            if bAnswer[akI] is 0
                 bFullPoints += normalP
-                if aAnswer[ak+'_o'] and aAnswer[ak+'_o'].includes(bAnswer[ak])
+                aGotPoints += normalP
+            else if bAnswer[akI] is 1
+                bFullPoints += normalP
+                if bAnswer[akO] and bAnswer[akO].includes(aAnswer[ak])
                     aGotPoints += normalP
-            else if bAnswer[ak+'_i'] is 2
+            else if bAnswer[akI] is 2
                 bFullPoints += importP
-                if aAnswer[ak+'_o'] and aAnswer[ak+'_o'].includes(bAnswer[ak])
+                if bAnswer[akO] and bAnswer[akO].includes(aAnswer[ak])
                     aGotPoints += importP
 
     return { aFullPoints, bGotPoints, bFullPoints, aGotPoints, questionsNumber }
@@ -200,59 +223,159 @@ LoveManager.createResultScoreView = () ->
 LoveManager.caculateRecommend = () ->
     console.time 'caculateRecommend'
 
-    if not LoveManager.resultScoreViewCollection
-        throw new Meteor.Error('caculateRecommend', "No LoveManager.resultScoreViewCollection")
-
     Creator.getCollection('love_recommend').remove({})
 
     newRecommendUserIds = []
+    limit = 10000
+    skip = 0
+    scoreCount = 0
+    recommendColl = Creator.getCollection('love_recommend')
+    recommendHistColl = Creator.getCollection('love_recommend_history')
+    tempScoreResult = []
 
-    LoveManager.resultScoreViewCollection.find({}, { sort: { 'score': -1 } }).forEach (r) ->
-        if newRecommendUserIds.includes r.userA or newRecommendUserIds.includes r.userB
-            return
+    Meteor.wrapAsync((callback) ->
 
-        if r.score
-
-            user_a = r.userA
-            user_b = r.userB
-            score = r.score
-
-            if Creator.getCollection('love_recommend').find({ user_a: user_a }).count() > 0 or Creator.getCollection('love_recommend_history').find({ user_a: user_a, user_b: user_b }).count() > 0
+        Creator.getCollection('love_result').rawCollection().aggregate([{ $unwind: '$score' }, { $project: { userA: "$userA", userB: "$score.userB", BName: "$score.BName", score: "$score.score" } }, { $count: 'count' }], (err, data)->
+            if err
+                console.error err
                 return
 
-            newRecommendUserIds.push user_a
-            newRecommendUserIds.push user_b
+            scoreCount = data[0].count
 
-            now = new Date()
+            if callback && _.isFunction(callback)
+                callback()
+            return
+        )
 
-            Creator.getCollection('love_recommend').direct.insert({
-                user_a: user_a
-                user_b: user_b
-                match: score
-                recommend_date: now
-            })
+    )()
 
-            Creator.getCollection('love_recommend_history').direct.insert({
-                user_a: user_a
-                user_b: user_b
-                match: score
-                recommend_date: now
-            })
+    console.log 'scoreCount: ', scoreCount
 
-            Creator.getCollection('love_recommend').direct.insert({
-                user_a: user_b
-                user_b: user_a
-                match: score
-                recommend_date: now
-            })
+    wrapFunc = Meteor.wrapAsync((callback) ->
+        console.log 'skip: ', skip
+        Creator.getCollection('love_result').rawCollection().aggregate([{ $unwind: '$score' }, { $project: { userA: "$userA", userB: "$score.userB", BName: "$score.BName", score: "$score.score" } }, { $sort: { 'score': -1 } }, { $skip: skip }, { $limit: limit }], { allowDiskUse: true }, (err, data)->
+            if err
+                console.error err
+                return
 
-            Creator.getCollection('love_recommend_history').direct.insert({
-                user_a: user_b
-                user_b: user_a
-                match: score
-                recommend_date: now
-            })
+            data.forEach (r) ->
+                tempScoreResult.push r
 
+            if callback && _.isFunction(callback)
+                callback()
+            return
+        )
+    )
+
+    while skip < scoreCount
+
+        wrapFunc()
+
+        tempScoreResult.forEach (r)->
+            skip++
+            if newRecommendUserIds.includes(r.userA) or newRecommendUserIds.includes(r.userB)
+                return
+
+            if r.score
+
+                user_a = r.userA
+                user_b = r.userB
+                score = r.score
+
+                if recommendColl.find({ user_a: user_a }).count() > 0 or recommendHistColl.find({ user_a: user_a, user_b: user_b }).count() > 0
+                    return
+
+                newRecommendUserIds.push user_a
+                newRecommendUserIds.push user_b
+
+                now = new Date()
+
+                recommendColl.direct.insert({
+                    user_a: user_a
+                    user_b: user_b
+                    match: score
+                    recommend_date: now
+                })
+
+                recommendHistColl.direct.insert({
+                    user_a: user_a
+                    user_b: user_b
+                    match: score
+                    recommend_date: now
+                })
+
+                recommendColl.direct.insert({
+                    user_a: user_b
+                    user_b: user_a
+                    match: score
+                    recommend_date: now
+                })
+
+                recommendHistColl.direct.insert({
+                    user_a: user_b
+                    user_b: user_a
+                    match: score
+                    recommend_date: now
+                })
+
+        tempScoreResult = []
 
     console.timeEnd 'caculateRecommend'
     return
+
+LoveManager.caculateFriendsScore = (objectName, userId, spaceId, rest) ->
+    answerObjectNames = ['love_answer','love_answer2']
+    customQuery = { space: spaceId, owner: '', $or: [] }
+    customCollection = Creator.getCollection('vip_customers')
+    friendCollection = Creator.getCollection('love_friends')
+
+    # 获取题目字段key
+    answerKeyObj = {}
+    dv = {}
+    answerObjectNames.forEach (objName) ->
+        answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
+        dv[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
+        customQuery.$or.push { questionnaire_progess: objName }
+
+    query = { space: spaceId, owner: userId }
+    if rest
+        query.match = { $exists: false }
+
+    friendCollection.find({ space: spaceId, owner: userId }).forEach (lf) ->
+        try
+            customQuery.owner = lf.user_b
+            unless customCollection.find(customQuery).count()
+                friendCollection.update(lf._id, { $unset: { a_to_b: 1, b_to_a: 1, match: 1 } })
+                friendCollection.update({ space: spaceId, owner: lf.user_b, user_b: userId }, { $unset: { a_to_b: 1, b_to_a: 1, match: 1 } })
+                return
+
+            # 计算分子、分母
+            aFullPoints = 0
+            bGotPoints = 0
+            bFullPoints = 0
+            aGotPoints = 0
+            questionsNumber = 0
+            answerObjectNames.forEach (objName) ->
+                bAnswer = Creator.getCollection(objName).findOne({ space: spaceId, owner: lf.user_b })
+                if dv[objName] and bAnswer # 当两人都做了同一套问卷时计算分数
+                    # console.log objName
+                    r = LoveManager.getMatchScores(answerKeyObj[objName], dv[objName], bAnswer)
+                    aFullPoints += r.aFullPoints
+                    bGotPoints += r.bGotPoints
+                    bFullPoints += r.bFullPoints
+                    aGotPoints += r.aGotPoints
+                    questionsNumber += r.questionsNumber
+
+            aToB = bGotPoints/aFullPoints || 0
+
+            bToA = aGotPoints/bFullPoints || 0
+
+            match = Math.pow(aToB*bToA, 1/2)
+
+            friendCollection.update(lf._id, { $set: { a_to_b: aToB, b_to_a: bToA, match: match } })
+            friendCollection.update({ space: spaceId, owner: lf.user_b, user_b: userId }, { $set: { a_to_b: bToA, b_to_a: aToB, match: match } })
+        catch e
+            console.error e.stack
+    return
+
+
