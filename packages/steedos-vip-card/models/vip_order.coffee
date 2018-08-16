@@ -154,6 +154,9 @@ Creator.Objects.vip_order =
 			label:'留言'
 			type: "textarea"
 			is_wide:true
+		canceled_time:
+			label: '取消时间'
+			type: 'datetime'
 	permission_set:
 		user:
 			allowCreate: false
@@ -232,6 +235,9 @@ Creator.Objects.vip_order =
 			todo: (userId, doc, fieldNames, modifier, options)->
 				if modifier.$set?.status is 'paid'
 					modifier.$set.paid_time = new Date()
+				else if modifier.$set?.status is 'canceled'
+					modifier.$set.canceled_time = new Date()
+
 
 		"after.update.server.vip_order":
 			on: "server"
