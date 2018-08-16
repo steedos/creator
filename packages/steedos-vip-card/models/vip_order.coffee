@@ -52,6 +52,9 @@ Creator.Objects.vip_order =
 		paid_by: # alipay, weixin, bank, cash, card
 			label: '支付方式'
 			type: 'text'
+		paid_time:
+			label: '支付时间'
+			type: 'datetime'
 
 		card_balance:
 			label: '卡内余额'
@@ -222,6 +225,13 @@ Creator.Objects.vip_order =
 			when: "before.insert"
 			todo: (userId, doc)->
 				doc.out_trade_no = moment().format('YYYYMMDDHHmmssSSS') + '001'
+
+		"before.update.server.vip_order":
+			on: "server"
+			when: "before.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				if modifier.$set?.status is 'paid'
+					modifier.$set.paid_time = new Date()
 
 		"after.update.server.vip_order":
 			on: "server"
