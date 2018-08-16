@@ -280,6 +280,9 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "location"
 			fs.autoform.system = field.system || "wgs84"
 			fs.blackbox = true
+		else if field.type == "markdown"
+			fs.type = String
+			fs.autoform.type = "steedos-markdown"
 		else
 			fs.type = field.type
 
@@ -313,6 +316,7 @@ Creator.getObjectSchema = (obj) ->
 					return Creator.Formular.run(field.defaultValue)
 			else
 				fs.autoform.defaultValue = field.defaultValue
+				fs.defaultValue = field.defaultValue
 
 		if field.readonly
 			fs.autoform.readonly = true
