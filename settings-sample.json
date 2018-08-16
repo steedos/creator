@@ -1,32 +1,43 @@
 {
+  "public": {
+    "default_app_id": "archive_manage"
+  },
+  "cron": {
+      "instancerecordqueue_interval": 10000
+  },
   "records_qhd": {
-    "spaces": ["Af8eM6mAHo7wMDqD3"],
-    "-recurrenceRule": "* /10 * * * *",
-    "to_archive": {
-      "object_name":"archive_wenshu",
-      "admin":{
-        "userid":"hPgDcEd9vKQxwndQR",
-        "username":"Administrator",
-        "password":"123456"
-      },
-      "contract_instances": {
-        "flows": [
-          "49cd342e-76a3-41ed-bbd6-e0921be9f004",
-          "2d6055de-53d2-4d65-8e56-0df9862b3226",
-          "25d7f36f-747d-4031-b767-e3023783846f",
-          "6a520bf56a83eac20a604bde",
-          "f0a3f03c7a64c6cc2cb2d40b"
-        ]
+      "spaces": ["Af8eM6mAHo7wMDqD3"],
+      "-recurrenceRule": "* /10 * * * *",
+      "to_archive": {
+          "object_name":"archive_wenshu",
+          "fond":{
+              "id":"Ps59yg3qYKGXZe8e5",
+              "name":"集团公司"
+          },
+          "admin":{
+              "userid":"hPgDcEd9vKQxwndQR",
+              "username":"hPgDcEd9vKQxwndQR",
+              "password":"123456"
+          },
+          "apps_url":"http://192.168.0.23",
+          "contract_instances": {
+              "flows": [
+                  "49cd342e-76a3-41ed-bbd6-e0921be9f004",
+                  "2d6055de-53d2-4d65-8e56-0df9862b3226",
+                  "25d7f36f-747d-4031-b767-e3023783846f",
+                  "6a520bf56a83eac20a604bde",
+                  "f0a3f03c7a64c6cc2cb2d40b"
+              ]
+          }
       }
-    }
   },
   "records_xml":{
-    "spaces":["Af8eM6mAHo7wMDqD3"],
-    "-recurrenceRule": "/20 * * * * *",
-    "archive":{
-      "private_key_file":"../../../ca/archive.key",
-      "signaturer":"Archive",
-      "public_key_file": "../../../ca/archive.csr"
-    }
+      "spaces":["Af8eM6mAHo7wMDqD3"],
+      "-recurrenceRule": "/20 * * * * *",
+      "archive":{
+          "private_key_file":"../../../ca/archive.key",
+          "signaturer":"Archive",
+          "public_key_file": "../../../ca/archive.csr"
+      }
   }
 }
