@@ -37,7 +37,7 @@ set_retention = (doc)->
 		month = doc.document_date?.getMonth()
 		day = doc.document_date?.getDate()
 		destroy_date = new Date(year,month,day)
-		destroy_date_timestamp = destroy_date?.getTime()
+		destroy_date_timestamp = parseInt(destroy_date?.getTime())
 		Creator.Collections["archive_wenshu"].direct.update(doc._id,
 		{
 			$set:{
@@ -97,7 +97,7 @@ set_destory = (doc)->
 			month = doc.document_date.getMonth()
 			day = doc.document_date.getDate()
 			destroy_date = new Date(year,month,day)
-			destroy_date_timestamp = destroy_date?.getTime()
+			destroy_date_timestamp = parseInt(destroy_date?.getTime())
 			Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
 				{
 					$set:{
@@ -277,14 +277,14 @@ Creator.Objects.archive_wenshu =
 
 		destroy_date:
 			type:"date"
-			label:"销毁日期"
+			label:"销毁期限"
 			format:"YYYYMMDD"
 			group:"内容描述"
 			omit:true
 		
 		destroy_date_timestamp:
 			type:"number"
-			label:"销毁日期时间戳"
+			label:"销毁期限时间戳"
 			group:"内容描述"
 			hidden:true
 		
@@ -703,8 +703,9 @@ Creator.Objects.archive_wenshu =
 		all:
 			label: "全部"
 			filter_scope: "space"
-			filters: [["is_received", "=", true]]
-			columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
+			filters: [["is_received", "=", true],["is_destroyed", "=", false]]
+			# columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
+			columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation"]
 # 		borrow:
 #             label:"查看"
 #             filter_scope: "space"
@@ -714,11 +715,12 @@ Creator.Objects.archive_wenshu =
 			label:"待接收"
 			filter_scope: "space"
 			filters: [["is_received", "=", false]]
-		transfered:
-			label:"已移交"
-			filter_scope: "space"
-			filters: [["is_transfered", "=", true]]
-			columns:["title","fonds_name","archive_transfer_id","transfered","transfered_by"]
+		# 已移交功能去掉===============
+		# transfered:
+		# 	label:"已移交"
+		# 	filter_scope: "space"
+		# 	filters: [["is_transfered", "=", true]]
+		# 	columns:["title","fonds_name","archive_transfer_id","transfered","transfered_by"]
 		destroy:
 			label:"待销毁"
 			filter_scope: "space"
