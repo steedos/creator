@@ -87,22 +87,7 @@ Creator.Objects.archive_borrow =
 			type:"lookup"
 			label:"题名"
 			is_wide:true
-			reference_to:[
-						"archive_wenshu",
-						"archive_keji",
-						"archive_kejiditu",
-						"archive_kuaiji",
-						"archive_rongyu",
-						"archive_shengxiang",
-						"archive_dianzi",
-						"archive_tongji",
-						"archive_shenji",
-						"archive_hetong",
-						"archive_dichan",
-						"archive_yinjian",
-						"archive_renshi",
-						"archive_wuzi"
-					]
+			reference_to: "archive_wenshu"
 		year:
 			type:"text"
 			label:"年度"
@@ -147,19 +132,21 @@ Creator.Objects.archive_borrow =
 			columns:["borrow_name","created","end_date","created_by","unit_info
 			","deparment_info","phone_number","relate_record","year"]
 		mine:
-			label:"我的"
+			label:"已审批"
 			filter_scope: "mine"
 			filters: [["state", "=", "approved"],["is_deleted", "=", false]]
 			columns:["borrow_name","relate_record","state","end_date"]
+		
+		pending:
+			label:"审批中"
+			filters: [["state","=","pending"]]
+			columns:["borrow_name","relate_record","created","end_date","created_by"]
+		
 		draft:
 			label:"草稿"
 			filter_scope: "mine"
 			filters: [["state", "=", "draft"]]
 			columns:["borrow_name","created","end_date","created_by"]
-		pending:
-			label:"审批中"
-			filters: [["state","=","pending"]]
-			columns:["borrow_name","relate_record","created","end_date","created_by"]
 	triggers:
 		"before.insert.server.borrow": 
 			on: "server"
