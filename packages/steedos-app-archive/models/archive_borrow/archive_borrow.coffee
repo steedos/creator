@@ -112,12 +112,11 @@ Creator.Objects.archive_borrow =
 			type:"select"
 			label:"状态"
 			options:[
-				{label:"草稿",value:"draft"},
 				{label:"审批中",value:"pending"},
 				{label:"已核准",value:"approved"},
 				{label:"已驳回",value:"rejected"}
 			]
-			defaultValue:"draft"
+			defaultValue:"pending"
 			omit:true
 		#我的借阅记录是可以被删除的，不过是假删除
 		is_deleted:
@@ -129,24 +128,21 @@ Creator.Objects.archive_borrow =
 		all:
 			label:"全部"
 			filter_scope: "space"
-			columns:["borrow_name","created","end_date","created_by","unit_info
-			","deparment_info","phone_number","relate_record","year"]
-		mine:
-			label:"已审批"
+			filters: [["is_deleted", "=", false]]
+			columns:["borrow_name","relate_record","state","created","end_date","created_by"]
+
+		approved:
+			label:"已核准"
 			filter_scope: "mine"
 			filters: [["state", "=", "approved"],["is_deleted", "=", false]]
-			columns:["borrow_name","relate_record","state","end_date"]
-		
-		pending:
-			label:"审批中"
-			filters: [["state","=","pending"]]
 			columns:["borrow_name","relate_record","created","end_date","created_by"]
 		
-		draft:
-			label:"草稿"
+		rejected:
+			label:"已驳回"
 			filter_scope: "mine"
-			filters: [["state", "=", "draft"]]
-			columns:["borrow_name","created","end_date","created_by"]
+			filters: [["state","=","rejected"],["is_deleted", "=", false]]
+			columns:["borrow_name","relate_record","created","end_date","created_by"]
+		
 	triggers:
 		"before.insert.server.borrow": 
 			on: "server"
@@ -157,7 +153,7 @@ Creator.Objects.archive_borrow =
 				# doc.created = now
 				# doc.owner = userId
 				doc.is_deleted = false
-				doc.state = "draft"
+				doc.state = "pending"
 				doc.year = now.getFullYear().toString()
 				return true
 		"before.insert.client.default": 
