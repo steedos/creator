@@ -12,6 +12,7 @@ Creator.Objects.archive_destroy =
 			required:true
 			searchable:true
 			index:true
+
 		destroy_category:
 			type: "select"
 			label:"档案门类"
@@ -27,25 +28,29 @@ Creator.Objects.archive_destroy =
 			]
 			allowedValues:["archive_wenshu","destroy_category","archive_keji","archive_kejiditu","archive_kuaiji","archive_rongyu","archive_shengxiang","archive_dianzi","archive_shenji"]
 			required: true
-		destroy_reason:
-			label:"销毁原因"
-			type:"textarea"
-			is_wide:true
-		state:
-			type:"select"
-			label:"审批状态"
-			options:[
-				{label:"草稿",value:"draft"},
-				{label:"审批中",value:"pending"},
-				{label:"已核准",value:"approved"},
-				{label:"已驳回",value:"rejected"}
-			]
-			defaultValue:"draft"
+
 		destroy_state:
 			type:"text"
 			label:"销毁状态"
 			defaultValue:"未销毁"
 			omit:true
+
+		destroy_reason:
+			label:"销毁原因"
+			type:"textarea"
+			is_wide:true
+		
+		# state:
+		# 	type:"select"
+		# 	label:"审批状态"
+		# 	options:[
+		# 		{label:"草稿",value:"draft"},
+		# 		{label:"审批中",value:"pending"},
+		# 		{label:"已核准",value:"approved"},
+		# 		{label:"已驳回",value:"rejected"}
+		# 	]
+		# 	defaultValue:"draft"
+		
 		destroy_time:
 			type:"datetime"
 			label:"销毁时间"
@@ -91,14 +96,15 @@ Creator.Objects.archive_destroy =
 				space = Session.get("spaceId")
 				Meteor.call("archive_destroy",record_id,space,
 					(error,result) ->
-						if !result[0]
-							swal("请先添加档案至此销毁单")
+						if result
+							swal("销毁成功")
 							return
 						else
-							text = "共销毁"+result[0]+"条,"+"成功"+result[1]+"条"
-							swal(text)
-						if result[0] == result[1]
-							Creator.Collections["archive_destroy"].update({_id:record_id},{$set:{destroy_state:"已销毁",destroy_time:new Date(),destroyed_by:Meteor.userId()}})	
+							swal("销毁失败")
+							return
+						if error
+							swal(error)
+							return
 					)
 
 
