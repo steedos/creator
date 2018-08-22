@@ -218,7 +218,7 @@ Creator.Objects.archive_borrow =
 				Meteor.call('renew',object_name,record_id,Session.get("spaceId"),
 					(error,result)->
 						if !error
-							swal("续借成功")
+							swal("续借成功，请再次发起审批")
 						else
 							swal("续借失败")
 						)

@@ -38,7 +38,7 @@ Meteor.methods
 		now = new Date()
 		start_date = now
 		end_date =new Date(now.getTime()+7*24*3600*1000)
-		Creator.Collections["archive_borrow"].update({_id:record_id},{$set:{start_date:start_date,end_date:end_date,state:"draft"}},
+		Creator.Collections["archive_borrow"].update({_id:record_id},{$set:{start_date:start_date,end_date:end_date,state:"pending"}},
 			(error,result)->
 				if !error
 					relate_record = Creator.Collections["archive_borrow"].findOne({_id:record_id})?.relate_record
