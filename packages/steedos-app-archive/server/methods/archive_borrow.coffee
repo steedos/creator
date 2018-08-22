@@ -11,8 +11,7 @@ Meteor.methods
 				file_obj = cfs.files.findOne({
 					'metadata.record_id': record_id,
 					'metadata.main': true,
-					'metadata.current': true,
-					'metadata.is_private': false})
+					'metadata.current': true})
 				result['fileId'] = file_obj?._id
 			else
 				result['state'] = obj.state
