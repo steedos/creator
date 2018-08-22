@@ -87,7 +87,7 @@ Creator.Objects.archive_borrow =
 			type:"lookup"
 			label:"题名"
 			is_wide:true
-			reference_to: "archive_wenshu"
+			reference_to: ["archive_wenshu"]
 		year:
 			type:"text"
 			label:"年度"
@@ -165,13 +165,16 @@ Creator.Objects.archive_borrow =
 			on: "server"
 			when: "after.insert"
 			todo: (userId, doc)->
-				Creator.Collections[doc.relate_record?.o].direct.update({_id:doc.relate_record?.ids},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})
-				borrow_entity = Creator.Collections["archive_borrow"].findOne doc._id
-				if borrow_entity
-					Meteor.call("archive_new_audit",doc.relate_record.ids[0],"借阅档案","成功",doc.space)
+				if doc.relate_record?.o
+					Creator.Collections[doc.relate_record?.o].direct.update({_id:doc.relate_record?.ids},{$set:{is_borrowed:true,borrowed:new Date(),borrowed_by:userId}})
+					borrow_entity = Creator.Collections["archive_borrow"].findOne doc._id
+					if borrow_entity
+						Meteor.call("archive_new_audit",doc.relate_record.ids[0],"借阅档案","成功",doc.space)
+					else
+						Meteor.call("archive_new_audit",doc.relate_record.ids[0],"借阅档案","失败",doc.space)
+					return true
 				else
-					Meteor.call("archive_new_audit",doc.relate_record.ids[0],"借阅档案","失败",doc.space)
-				return true
+					return
 		"after.insert.client.default": 
 			on: "client"
 			when: "after.insert"
