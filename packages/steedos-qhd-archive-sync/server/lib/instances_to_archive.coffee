@@ -451,9 +451,7 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 Test.run = (ins_id, record_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
-		# InstancesToArchive.syncNonContractInstance instance
-		# 整理表单html
-		_minxiInstanceHtml(instance, record_id)
+		InstancesToArchive.syncNonContractInstance instance
 
 InstancesToArchive::syncNonContractInstances = () ->
 	console.time("syncNonContractInstances")
