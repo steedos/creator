@@ -9,7 +9,7 @@ Meteor.methods
 				cfs.files = Creator.Collections["cfs.files.filerecord"]
 				
 				file_obj = cfs.files.findOne({
-					'metadata.record_id': obj.relate_record?.ids[0],
+					'metadata.record_id': record_id,
 					'metadata.main': true,
 					'metadata.current': true,
 					'metadata.is_private': false})
