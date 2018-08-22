@@ -60,6 +60,7 @@ Creator.Objects.archive_borrow =
 			]
 			allowedValues:["工作查考","遍史修志","学术研究","经济建设","宣传教育"]
 			sortable:true
+
 		use_fashion:
 			type:"select"
 			label:"利用方式"
@@ -70,44 +71,23 @@ Creator.Objects.archive_borrow =
 			]
 			allowedValues:["实体借阅","实体外借"]
 			sortable:true
-		approve:
-			type:"textarea"
-			label:"单位审批"
-			is_wide:true
-			readonly:true
+
 		description:
 			type:"textarea"
 			label:"备注"
 			is_wide:true
-		relate_object:
-			type:"text"
-			label:"档案门类"
-			omit:true
+
 		relate_record:
 			type:"lookup"
 			label:"题名"
 			is_wide:true
 			reference_to: ["archive_wenshu"]
+
 		year:
 			type:"text"
 			label:"年度"
 			omit:true
-		detail_status:
-			type:"select"
-			label:"明细状态"
-			omit:true
-			options:[
-				{label:"申请中",value:"申请中"},
-				{label:"不予批准",value:"不予批准"},
-				{label:"已批准",value:"已批准"},
-				{label:"审批中",value:"审批中"},
-				{label:"续借审批中",value:"续借审批中"},
-				{label:"续借已审批",value:"续借已审批"},
-				{label:"已归还",value:"已归还"},
-				{label:"逾期",value:"逾期"}
-				]
-			allowedValues:["申请中","不予批准","已批准","审批中","续借审批中","续借已审批","已归还","逾期"]
-			sortable:true
+
 		state:
 			type:"select"
 			label:"状态"
@@ -118,12 +98,14 @@ Creator.Objects.archive_borrow =
 			]
 			defaultValue:"pending"
 			omit:true
+		
 		#我的借阅记录是可以被删除的，不过是假删除
 		is_deleted:
 			type:"boolean"
 			label:"已删除"
 			defaultValue:false
-			omit:true 
+			omit:true
+
 	list_views:
 		all:
 			label:"全部"

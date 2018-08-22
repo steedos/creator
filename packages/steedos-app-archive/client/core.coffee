@@ -9,7 +9,5 @@ Archive.createBorrowObject = (object_name, record_id)->
 	doc.use_fashion = "实体借阅"
 	doc.file_type = "立卷方式(文件级)"
 	doc.space = Session.get("spaceId")
-	doc.is_approved = false
 	doc.relate_record = record_id
-	doc.relate_object = object_name
 	return doc
