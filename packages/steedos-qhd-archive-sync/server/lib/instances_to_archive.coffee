@@ -192,7 +192,8 @@ _minxiAttachmentInfo = (instance, record_id) ->
 							record_id: record_id,
 							object_name: object_name,
 							parent: cmsFileId,
-							current: hf.metadata?.current
+							current: hf.metadata?.current,
+							main: hf.metadata?.main
 						}
 						newFile.metadata = metadata
 						fileObj = cfs.files.insert(newFile)
