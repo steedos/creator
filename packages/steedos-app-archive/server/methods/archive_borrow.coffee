@@ -7,7 +7,6 @@ Meteor.methods
 		if (obj.end_date - new Date()) >0		
 			if obj.state == "approved"
 				cfs.files = Creator.Collections["cfs.files.filerecord"]
-				
 				file_obj = cfs.files.findOne({
 					'metadata.record_id': record_id,
 					'metadata.main': true,
