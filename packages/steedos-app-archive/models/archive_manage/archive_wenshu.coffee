@@ -115,7 +115,7 @@ set_audit = (record_id, space, userId)->
 		action_time: new Date(),
 		action_user: userId,
 		action_mandate: "",
-		action_description: "成功",
+		action_description: "",
 		action_administrative_records_id: record_id,
 		created_by: userId,
 		created: new Date(),
@@ -288,20 +288,6 @@ Creator.Objects.archive_wenshu =
 			label:"销毁期限时间戳"
 			group:"内容描述"
 			hidden:true
-		
-		archival_category_code:
-			type: "text"
-			label:"档案门类代码"
-			defaultValue: "WS"
-			group:"内容描述"
-			omit:true
-
-		electronic_record_code:
-			type: "text"
-			label:"电子文件号"
-			defaultValue: ""
-			group:"内容描述"
-			omit:true
 
 		prinpipal_receiver:
 			type:"text",
@@ -318,41 +304,7 @@ Creator.Objects.archive_wenshu =
 			type:"text",
 			label:"抄报",
 			group:"内容描述"
-
-		applicant_name:
-			type:"text"
-			label:"拟稿人"
-			group:"内容描述"
-
-		applicant_organization_name:
-			type:"text"
-			label:"拟稿单位"
-			group:"内容描述"
 		
-		main_dept:
-			type:"text",
-			label:"主办部室",
-			is_wide:true
-			defaultValue: ""
-			group:"内容描述"
-
-		storage_location:
-			type:"text"
-			label:"存放位置"
-			group:"内容描述"
-		
-		annotation:
-			type:"textarea",
-			label:"备注"
-			is_wide:true
-			group:"内容描述"
-
-		reference:
-			type: "text"
-			label:"参见"
-			is_wide:true
-			group:"内容描述"
-
 		security_classification:
 			type:"select"
 			label:"密级"
@@ -381,6 +333,40 @@ Creator.Objects.archive_wenshu =
 			allowedValues:["10年","20年","30年"],			
 			group:"内容描述"
 		
+		applicant_organization_name:
+			type:"text"
+			label:"拟稿单位"
+			group:"内容描述"
+
+		applicant_name:
+			type:"text"
+			label:"拟稿人"
+			group:"内容描述"
+		
+		main_dept:
+			type:"text",
+			label:"主办部室",
+			is_wide:true
+			defaultValue: ""
+			group:"内容描述"
+
+		storage_location:
+			type:"text"
+			label:"存放位置"
+			group:"内容描述"
+		
+		annotation:
+			type:"textarea",
+			label:"备注"
+			is_wide:true
+			group:"内容描述"
+
+		reference:
+			type: "text"
+			label:"参见"
+			is_wide:true
+			group:"内容描述"
+		
 		descriptor:
 			type:"text"
 			label:"主题词"
@@ -399,22 +385,21 @@ Creator.Objects.archive_wenshu =
 			is_wide:true
 			group:"内容描述"
 		
-		# ########形式特征###########
-		archive_dept:
-			type:"text"
-			label:"归档部门"
-			group:"形式特征"
+		archival_category_code:
+			type: "text"
+			label:"档案门类代码"
+			defaultValue: "WS"
+			group:"内容描述"
+			omit:true
+
+		electronic_record_code:
+			type: "text"
+			label:"电子文件号"
+			defaultValue: ""
+			group:"内容描述"
+			omit:true
 		
-		archive_date:
-			type:"date"
-			label:"归档日期"
-			group:"形式特征"
-
-		document_type:
-			type:"text"
-			label:"文件类型"
-			group:"形式特征"
-
+		# ########形式特征###########
 		document_aggregation:
 			type:"select",
 			label:"文件组合类型",
@@ -425,7 +410,23 @@ Creator.Objects.archive_wenshu =
 			],
 			allowedValues:["单件","组合文件"],			
 			group:"形式特征"
-			
+		total_number_of_items:
+			type: "number"
+			label:"卷内文件数"
+			group:"形式特征"
+		total_number_of_pages:
+			type:"number"
+			label:"页数"
+			group:"形式特征"
+		language:
+			type:"text"
+			label:"语种"
+			defaultValue: "汉语"
+			group:"形式特征"
+		document_type:
+			type:"text"
+			label:"文件类型"
+			group:"形式特征"
 		produce_flag:
 			type:"select",
 			label:"处理标志",
@@ -439,23 +440,24 @@ Creator.Objects.archive_wenshu =
 			],
 			allowedValues:["在档","暂存","移出","销毁","出借"],		
 			group:"形式特征"
-		
-		language:
+		archive_dept:
 			type:"text"
-			label:"语种"
-			defaultValue: "汉语"
+			label:"归档部门"
 			group:"形式特征"
-
-		total_number_of_items:
-			type: "number"
-			label:"卷内文件数"
+		archive_date:
+			type:"date"
+			label:"归档日期"
 			group:"形式特征"
-
-		total_number_of_pages:
-			type:"number"
-			label:"页数"
+		orignal_document_creation_way:
+			type:"text"
+			label:"电子档案生成方式"
+			defaultValue: "原生"
+			options: [
+				{label: "数字化", value: "数字化"},
+				{label: "原生", value: "原生"}
+			],
+			allowedValues:["数字化","原生"],		
 			group:"形式特征"
-
 		document_status:
 			type:"select",
 			label:"文件状态",
@@ -469,18 +471,6 @@ Creator.Objects.archive_wenshu =
 			]
 			allowedValues:["不归档","电子归档","待归档","暂存","实物归档"]
 			group:"形式特征"
-
-		orignal_document_creation_way:
-			type:"text"
-			label:"电子档案生成方式"
-			defaultValue: "原生"
-			options: [
-				{label: "数字化", value: "数字化"},
-				{label: "原生", value: "原生"}
-			],
-			allowedValues:["数字化","原生"],		
-			group:"形式特征"
-
 		aggregation_level:
 			type: "select"
 			label:"聚合层次"
@@ -490,22 +480,6 @@ Creator.Objects.archive_wenshu =
 				{label:"文件",value:"文件"}],
 			allowedValues:["案卷","文件"]
 			group:"形式特征"
-		# ########存储位置###########
-		current_location:
-			type:"text"
-			label:"当前位置"
-			is_wide:true
-			group:"存储位置"
-
-		offline_medium_identifier:
-			type:"text"
-			label:"脱机载体编号"
-			group:"存储位置"
-
-		offline_medium_storage_location:
-			type:"text"
-			label:"脱机载体存址"
-			group:"存储位置"
 
 		# ########权限管理###########
 		intelligent_property_statement:
@@ -567,7 +541,78 @@ Creator.Objects.archive_wenshu =
 			type: "text"
 			label:"机构人员隶属"
 			group:"机构人员"
+		
+		# ########数字化属性###########
+		physical_record_characteristics:
+			type: "text"
+			label:"数字化对象形态"
+			defaultValue: ""
+			group:"数字化属性"
+		scanning_resolution:
+			type: "text"
+			label:"扫描分辨率"
+			defaultValue: ""
+			group:"数字化属性"
+		scanning_color_model:
+			type: "text"
+			label:"扫描色彩模式"
+			defaultValue: ""
+			group:"数字化属性"
+		image_compression_scheme:
+			type: "text"
+			label:"图像压缩方案"
+			defaultValue: ""
+			group:"数字化属性"
+		
+		# ########数字化设备信息###########
+		device_type:
+			type: "text"
+			label:"设备类型"
+			defaultValue: ""
+			group:"数字化设备信息"
+		device_manufacturer:
+			type: "text"
+			label:"设备制造商"
+			defaultValue: ""
+			group:"数字化设备信息"
+		device_model_number:
+			type: "text"
+			label:"设备型号"
+			defaultValue: ""
+			group:"数字化设备信息"
+		device_model_serial_number:
+			type: "text"
+			label:"设备序列号"
+			defaultValue: ""
+			group:"数字化设备信息"
+		software_type:
+			type: "text"
+			label:"软件类型"
+			defaultValue: ""
+			group:"数字化设备信息"
+		software_name:
+			type: "text"
+			label:"软件名称"
+			defaultValue: ""
+			group:"数字化设备信息"
+		
+		# ########存储位置###########
+		current_location:
+			type:"text"
+			label:"当前位置"
+			is_wide:true
+			group:"存储位置"
 
+		offline_medium_identifier:
+			type:"text"
+			label:"脱机载体编号"
+			group:"存储位置"
+
+		offline_medium_storage_location:
+			type:"text"
+			label:"脱机载体存址"
+			group:"存储位置"
+		
 		# ########来源###########
 		archives_name:
 			type:"text"
