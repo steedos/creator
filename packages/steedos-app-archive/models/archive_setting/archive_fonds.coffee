@@ -15,12 +15,19 @@ Creator.Objects.archive_fonds =
 			type:"text"
 			label:"全宗号"
 			is_wide:true
-			required:true
+			# required:true
+
+		organization:
+			label: "对应组织"
+			type: "lookup"
+			reference_to: "organizations"
+
 	list_views:
 		all:
-			columns:["name","code"]
+			columns:["name","code","organization"]
 			filter_scope: "space"
 			label:"全部"
+			
 	permission_set:
 		user:
 			allowCreate: false
