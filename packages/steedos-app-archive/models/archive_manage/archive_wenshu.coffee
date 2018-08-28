@@ -81,13 +81,14 @@ set_archivecode = (record_id)->
 		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
 		year = record.year
 		item_number = (Array(6).join('0') + record.item_number).slice(-4)
-		archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
-		Creator.Collections["archive_wenshu"].direct.update(record_id,
-		{
-			$set:{
-				archival_code:archive_code
-			}
-		})
+		if fonds_code and year and retention_peroid_code and organizational_structure_code and item_number
+			archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
+			Creator.Collections["archive_wenshu"].direct.update(record_id,
+			{
+				$set:{
+					archival_code:archive_code
+				}
+			})
 
 set_destory = (doc)->
 	if doc?.retention_peroid and doc?.document_date
