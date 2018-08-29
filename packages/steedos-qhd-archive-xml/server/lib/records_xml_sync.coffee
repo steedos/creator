@@ -26,7 +26,7 @@ XMLSync.run = ()->
 	catch  e
 		logger.error "XML_Sync.records2Xml()", e
 
-# XMLSync.startExport()
+# XMLSync.startExport(["WoZpCZ3HHyZpxnodG"])
 XMLSync.startExport = (record_ids)->
 
 	spaces = XMLSync?.settings_records_xml?.spaces

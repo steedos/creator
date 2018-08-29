@@ -54,8 +54,12 @@ readFileInfo = (cms_file) ->
 		bmms = "本封装包中“编码数据”元素存储的是计算机文件二进制流的Base64编码，有关Base64编码规则参见IETF RFC 2045多用途邮件扩展（MIME）第一部分：互联网信息体格式。当提取和显现封装在编码数据元素中的计算机文件时，应对Base64编码进行反编码，并依据封装包中“反编码关键字”元素中记录的值还原计算机文件的扩展名"
 
 		fbmms = "base64-" + file_obj?.getExtension()
-
-		bmsj = async_converterBase64(file_obj)
+		
+		# 读取文件内容
+		# bmsj = async_converterBase64(file_obj)
+		# 读取数据库内容-'base64'编码
+		str_file = JSON.stringify(file_obj)
+		bmsj = new Buffer(str_file).toString('base64')
 		
 		BM = {
 			"编码ID": file_obj?._id,
@@ -156,19 +160,18 @@ encapsulation = (record_obj) ->
 	# 文件数据
 	WJSJ = []
 	# 读取文档
-	# 暂时不开放
-	# cms_files.forEach (cms_file, index)->
-	# 	WDSJ = readFileInfo(cms_file)
-	# 	wdzcsm = "附属文档"
-	# 	if cms_file?.main
-	# 		wdzcsm = "主文档"
-	# 	WD = {
-	# 		"文档标识符": cms_file?._id,
-	# 		"文档序号": index,
-	# 		"文档主从声明": wdzcsm,
-	# 		"文档数据": WDSJ
-	# 	}
-	# 	WJSJ.push WD
+	cms_files.forEach (cms_file, index)->
+		WDSJ = readFileInfo(cms_file)
+		wdzcsm = "附属文档"
+		if cms_file?.main
+			wdzcsm = "主文档"
+		WD = {
+			"文档标识符": cms_file?._id,
+			"文档序号": index,
+			"文档主从声明": wdzcsm,
+			"文档数据": WDSJ
+		}
+		WJSJ.push WD
 
 	# 文件实体
 	WJST = {
@@ -282,13 +285,10 @@ ExportToXML.export2xml = (record_obj, callback) ->
 		builder = new xml2js.Builder()
 		# 被签名对象
 		bqmdx_xml = builder.buildObject bqmdx_json
-
 		# 生成签名
 		private_key_file = Meteor.settings?.records_xml?.archive?.private_key_file
 		if private_key_file
-		
 			buffer_bqmdx = new Buffer bqmdx_xml
-
 			# key
 			try
 				readStream = fs.readFileSync private_key_file,{encoding:'utf8'}
@@ -360,8 +360,6 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			fileName = record_obj?._id + ".xml"
 			fileAddress = path.join filePath, fileName
 
-			console.log "fileAddress",fileAddress
-
 			if !fs.existsSync filePath
 				mkdirp.sync filePath
 
@@ -405,12 +403,13 @@ ExportToXML::DoExport = () ->
 	records = @getNonExportedRecords()
 	that = @
 	records.forEach (record)->
+		console.log "DoExport - ",record?._id
 		# 档案记录
 		record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':record?._id})
 		if record_obj
 			try
 				ExportToXML.export2xml record_obj
-				ExportToXML.success record_obj
+				# ExportToXML.success record_obj
 			catch e
 				ExportToXML.failed record_obj,e
 				return
