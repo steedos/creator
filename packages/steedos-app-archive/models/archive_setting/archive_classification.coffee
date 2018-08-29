@@ -22,7 +22,7 @@ Creator.Objects.archive_classification =
 			multiple:true
 		keywords:
 			type:"[text]"
-			label:"关键词"
+			label:"所属部门"
 			is_wide:true
 
 	permission_set:
@@ -44,4 +44,4 @@ Creator.Objects.archive_classification =
 		all:
 			label:"全部"
 			filter_scope: "space"
-			columns:["sort_no","name","parent"]
+			columns:["sort_no","name","parent","keywords"]
