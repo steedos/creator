@@ -409,7 +409,7 @@ ExportToXML::DoExport = () ->
 		if record_obj
 			try
 				ExportToXML.export2xml record_obj
-				# ExportToXML.success record_obj
+				ExportToXML.success record_obj
 			catch e
 				ExportToXML.failed record_obj,e
 				return
