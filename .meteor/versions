@@ -200,6 +200,7 @@ steedos:useraccounts-flow-routing@1.14.2_4
 steedos:vip-card@0.0.1
 steedos:vip-post@0.0.1
 steedos:weixin@0.0.1
+steedos:hospital@0.0.1
 steedos:weixin-aes@0.0.1
 steedos:weixin-template-message-queue@0.0.1
 tap:i18n@1.8.2
