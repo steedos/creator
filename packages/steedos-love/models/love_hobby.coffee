@@ -7,6 +7,7 @@ Creator.Objects.love_hobby =
 		sport:
 			type:'text'
 			label:"你最喜欢的运动？"
+			is_name: true
 		star:
 			type:'text'
 			label:"你最喜欢的明星？"
@@ -38,7 +39,7 @@ Creator.Objects.love_hobby =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -52,12 +53,12 @@ Creator.Objects.love_hobby =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: true
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 

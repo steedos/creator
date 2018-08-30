@@ -10,10 +10,12 @@ Creator.Apps.love =
 		"love_about_me",
 		"love_answer",
 		"love_answer2",
+		"love_test",
 		"love_hobby",
 		"love_invite_codes",
 		"love_looking_for",
 		"love_result",
+		"love_friends",
 		"love_educational_experience",
 		"love_work_experience"
 		]

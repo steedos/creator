@@ -162,6 +162,7 @@ Package.onUse(function (api) {
 
 	api.addFiles('server/routes/s3.coffee', 'server');
 	api.addFiles('server/routes/api_workflow_drafts.coffee', 'server');
+	api.addFiles('server/routes/account_binding.coffee', 'server');
 
 	api.addFiles('server/routes/bootstrap.coffee', 'server');
 	api.addFiles('client/views/_helpers.coffee', 'client');
@@ -232,6 +233,8 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/home.html', 'client');
 	api.addFiles('client/views/home.coffee', 'client');
 	api.addFiles('client/views/home.less', 'client');
+	api.addFiles('client/views/list_tree.html', 'client');
+	api.addFiles('client/views/list_tree.coffee', 'client');
 	api.addFiles('client/views/list_wrapper.html', 'client');
 	api.addFiles('client/views/list_wrapper.coffee', 'client');
 	api.addFiles('client/views/list_wrapper.less', 'client');

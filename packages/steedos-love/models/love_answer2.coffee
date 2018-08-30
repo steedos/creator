@@ -3,7 +3,7 @@ Creator.Objects.love_answer2 =
 	label: "蔷薇卷"
 	icon: "feed"
 	enable_search: true
-	fields:						
+	fields:				
 		jealousy:
 			type:'select'
 			label:"你认为吃醋是对恋情有益的吗？"
@@ -101,17 +101,6 @@ Creator.Objects.love_answer2 =
 			type:'number'
 			label:'重要程度'
 				
-		before_meeting:
-			type:'select'
-			label:"你至少需要和对方聊多久，才愿意出来见面？"
-			options:'立刻，如果是我喜欢的类型,几天,几周,几个月'
-		before_meeting_o:
-			type:'select'
-			label:"约会之前"
-			multiple:true
-		before_meeting_i:
-			type:'number'
-			label:'重要程度'
 		
 		appearance_emphasia:
 			type:'select'
@@ -125,29 +114,8 @@ Creator.Objects.love_answer2 =
 			type:'number'
 			label:'重要程度'
 		
-		dinner:
-			type:'select'
-			label:"Ta的前任来到你们的城市，Ta计划独自与前任共进晚餐，你会怎么做？"
-			options:'相信爱情，不反对,不会激动，但会跟着去,绝不允许'
-		dinner_o:
-			type:'select'
-			label:"共进晚餐"
-			multiple:true
-		dinner_i:
-			type:'number'
-			label:'重要程度'
+		
 
-		first_date_say:
-			type:'select'
-			label:"你和刚认识的某人第一次约会，临别时对方说爱上你了，你会觉得？"
-			options:'甜蜜,可怕'
-		first_date_say_o:
-			type:'select'
-			label:"第一次约会之后，Ta说喜欢你"
-			multiple:true
-		first_date_say_i:
-			type:'number'
-			label:'重要程度'
 
 		parter_with_children:
 			type:'select'
@@ -225,6 +193,7 @@ Creator.Objects.love_answer2 =
 			type:'select'
 			label:"你更喜欢单纯还是精明的人？"
 			options:'单纯,精明'
+			is_name: true
 		simple_complex_o:
 			type:'select'
 			label:"单纯还是精明"
@@ -293,22 +262,14 @@ Creator.Objects.love_answer2 =
 			type:'number'
 			label:'重要程度'
 		
-		challenge:
-			type:'select'
-			label:"你面临一项挑战，几乎不可能完成，你希望Ta会怎么做？"
-			options:'全力支持,提醒你认清现实,不介入，失败的时候安慰你'
-		challenge_o:
-			type:'select'
-			label:"面临一项挑战"
-			multiple:true
-		challenge_i:
-			type:'number'
-			label:'重要程度'
 		
 	list_views:
 		all:
 			label: "所有"
-			columns: ["challenge", "dangerous", "politics", "housemate","sleeping", "simple_complex"]
+			columns: ["jealousy", "before_married", "flicp_coin", "minimum_page", "intellectual", "debt", "do_nothing", 
+			"show_your_love", "before_meeting", "appearance_emphasia", "dinner", "first_date_say", "parter_with_children", 
+			"thing_work_out", "alone", "married", "high_income", "intellectual_debate", "simple_complex", "sleeping", "children", 
+			"housemate", "worry_about", "meditate", "challenge"]
 			filter_scope: "space"
 		
 	permission_set:
@@ -318,7 +279,7 @@ Creator.Objects.love_answer2 =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowDelete: true
 			allowEdit: true
@@ -331,11 +292,11 @@ Creator.Objects.love_answer2 =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: true
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true

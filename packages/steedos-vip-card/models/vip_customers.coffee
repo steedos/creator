@@ -12,6 +12,12 @@ Creator.Objects.vip_customers =
 			type: 'lookup'
 			reference_to: 'users'
 
+		froms:
+			label: '推荐人历史'
+			type: 'lookup'
+			reference_to: 'users'
+			multiple: true
+
 		space:
 			label: '商户'
 
@@ -63,10 +69,33 @@ Creator.Objects.vip_customers =
 		questionnaire_progess: # 1:about_me, 2:about_you, 3:questions, 4:completed
 			label: '问卷回答进度'
 			type: '[text]'
+
+		avatar:
+			label:'头像'
+			type:'image'
+
+		cover:
+			label:'封面'
+			type:'image'
+
+		enable_match:
+			label: '开启匹配'
+			type: "boolean"
+
 		disable:
 			label: '停用'
 			type: 'text'
 			omit:true
+
+		privacy_protection:
+			label: '隐私保护'
+			type: 'select'
+			multiple:true
+			options: "姓名:name,身高:height,年龄:age,现居地:live,家乡:hometown,照片:photos,,兴趣爱好:love_hobby,教育经历:love_educational_experience" #工作经历:love_work_experience
+
+		matching_filter_caculate_time:
+			label: '计算是否满足筛选条件的时间'
+			type: 'datetime'
 
 	list_views:
 		all:
@@ -110,9 +139,11 @@ Creator.Objects.vip_customers =
 			todo: (userId, doc)->
 				share_id = doc?.share
 				space_id = doc?.space
-				customer = Creator.getCollection("vip_customers").findOne({space: space_id, owner: userId});
-				if customer
-					throw new Meteor.Error 405, "同一商家不能重复新建客户"
+				if userId
+					# userId存在说明是前端新建记录，需要判断重复，反之，后台调用不用判断
+					customer = Creator.getCollection("vip_customers").findOne({space: space_id, owner: userId}, fields:{name:1});
+					if customer
+						throw new Meteor.Error 405, "同一商家不能重复新建客户"
 				if share_id
 					store = Creator.getCollection("vip_store").findOne({_id: space_id}, {fields: {cash_back_enabled:1,cash_back_percentage:1,cash_back_period:1}})
 					if(store and store.cash_back_enabled)
