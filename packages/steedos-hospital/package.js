@@ -13,4 +13,5 @@ Package.onUse(function(api) {
 	api.addFiles('steedos-hospital.coffee');
 	api.addFiles('models/care_records.coffee');
 	api.addFiles('models/surgery_records.coffee');
+	api.addFiles('models/healthy_records.coffee');
 })
