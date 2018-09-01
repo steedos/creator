@@ -6,6 +6,25 @@ SyncSpaceUserCompany = (spaceId, user_ids) ->
 	@user_ids = user_ids
 	return
 
+# 非递归
+SyncSpaceUserCompany.getNoUserCompany = (organization_id)->
+    company = Creator.Collections["organizations"].findOne({
+        '_id': organization_id
+    })
+    if company?.is_subcompany == true
+        return company
+    else
+        length = company?.parents?.length
+        i = 0
+        while i<length
+            i = i + 1
+            company = Creator.Collections["organizations"].findOne({
+                '_id': company?.parent
+            })
+            if company?.is_subcompany == true
+                break
+        return company
+
 # 递归
 SyncSpaceUserCompany.getUserCompany = (organization_id)->
     console.log "getUserCompany", organization_id
@@ -44,8 +63,9 @@ SyncSpaceUserCompany::DoSync = () ->
     space_user_ids = @getSpaceUserIds()
     that = @
     if space_user_ids?.length > 0
+        console.log "space_user_ids?.length",space_user_ids?.length
         space_user_ids.forEach (space_user)->
-            company = SyncSpaceUserCompany.getUserCompany(space_user?.organization)
+            company = SyncSpaceUserCompany.getNoUserCompany(space_user?.organization)
             console.log "company",company?.name
             if company
                 company_id = company?._id
