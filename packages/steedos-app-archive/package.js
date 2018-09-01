@@ -71,4 +71,11 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/archive_new_audit.coffee', 'server');
 	api.addFiles('server/methods/archive_receive.coffee', 'server');
 	api.addFiles('server/methods/archive_transfer.coffee', 'server');
+
+	//同步用户 space_user表的company字段
+	api.export('SyncSpaceUserCompany');
+	api.addFiles('server/methods/start_SyncSpaceUserCompany.coffee', 'server');
+	api.addFiles('server/lib/syncSpaceUserCompany.coffee', 'server');
+
+	api.addFiles('client/methods/call_syncSpaceUserCompany.coffee', 'client');	
 })
