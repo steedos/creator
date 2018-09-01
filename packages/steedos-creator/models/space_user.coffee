@@ -51,6 +51,11 @@ Creator.Objects.space_users =
 			type: "master_detail"
 			reference_to: "organizations"
 			omit: true
+		company: 
+			type: "master_detail"
+			label: '所属公司'
+			reference_to: "organizations"
+			# omit: true
 		user_accepted:
 			type: "boolean"
 			label:'接受状态'
@@ -60,31 +65,35 @@ Creator.Objects.space_users =
 			label: "邀请状态"
 			type: "text"
 			omit: true
-		profile:
-			label: "用户身份"
-			type: "select"
-			defaultValue: "user"
-			options: [
-				{label: "员工", value: "user"}, 
-				{label: "会员", value: "member"}
-			]
+		# profile:
+		# 	label: "用户身份"
+		# 	type: "select"
+		# 	defaultValue: "user"
+		# 	options: [
+		# 		{label: "员工", value: "user"}, 
+		# 		{label: "会员", value: "member"}
+		# 	]
 		user:
 			type: "master_detail"
 			reference_to: "users"
 			index:true
 			# required: true
 			omit: true
-	list_views:	
-		user:
-			label: "员工"
-			columns: ["name", "organization", "position", "mobile", "email", "sort_no"]
-			filter_scope: "space"
-			filters: [["profile", "=", "user"]]
-		member:
-			label: "会员"
-			columns: ["name", "mobile", "email", "sort_no"]
-			filter_scope: "space"
-			filters: [["profile", "=", "member"]]
+	list_views:
+		all:
+			label: "所有人员"
+			columns: ["name", "organization","company", "position", "mobile", "email", "sort_no"]
+			filter_scope: "space"	
+		# user:
+		# 	label: "员工"
+		# 	columns: ["name", "organization", "position", "mobile", "email", "sort_no"]
+		# 	filter_scope: "space"
+		# 	filters: [["profile", "=", "user"]]
+		# member:
+		# 	label: "会员"
+		# 	columns: ["name", "mobile", "email", "sort_no"]
+		# 	filter_scope: "space"
+		# 	filters: [["profile", "=", "member"]]
 		# guest:
 		# 	label: "游客"
 		# 	columns: ["name",  "mobile", "email", "sort_no"]
