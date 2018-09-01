@@ -13,7 +13,7 @@ SyncSpaceUserCompany.getUserCompany = (organization_id)->
         '_id': organization_id
     })
     console.log "organization", organization?.name
-    if organization?.is_company == true
+    if organization?.is_subcompany == true
         return organization
     if organization?.parent
         console.log "organization?.parent"
