@@ -60,8 +60,13 @@ Template.standard_query_modal.helpers
 				schema[field].autoform.omit = false
 				delete schema[field].autoform.defaultValue
 
+			if schema[field].defaultValue
+				delete schema[field].defaultValue
+
 			obj = _.pick(obj_schema, field + ".$")
 			_.extend(schema, obj)
+
+		console.log(schema)
 
 		return new SimpleSchema(schema)
 
