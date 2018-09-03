@@ -17,7 +17,7 @@ getTreeData = ()->
 		if item.is_company
 			item.state = {opened: true, selected: true}
 		else
-			item.filter = ['sub_company', '=', item._id]
+			item.filter = ['company', '=', item._id]
 		parent = findParent(subCompany, item)
 		if parent
 			item.parent = parent._id
