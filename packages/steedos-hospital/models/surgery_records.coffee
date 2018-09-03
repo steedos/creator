@@ -13,17 +13,9 @@ Creator.Objects.surgery_records =
 
 		username: 
 			type: "lookup"
-			label:"孩子姓名"
+			label:"cch编号和孩子姓名"
 			reference_to: "care_records"
 			required: true
-			group:'患者信息'
-
-		cch: 
-			type: "text"
-			label:"孩子cch编号"
-			required: true
-			searchable:true
-			index:true
 			group:'患者信息'
 
 
@@ -164,7 +156,7 @@ Creator.Objects.surgery_records =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "username","cch", "hospital","surgery","surgery_type", "surgery_date", "surgery_self_cost","surgery_tp_cost","smile", 
+			columns: ["name", "username", "hospital","surgery","surgery_type", "surgery_date", "surgery_self_cost","surgery_tp_cost","smile", 
 			"others","inpatient_record_number","tp_type", "province"]
 			filter_scope: "space"
 

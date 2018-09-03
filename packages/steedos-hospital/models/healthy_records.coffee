@@ -13,13 +13,13 @@ Creator.Objects.healthy_records =
 
 		username: 
 			type: "lookup"
-			label:"孩子姓名"
+			label:"cch编号和孩子姓名"
 			required: true
 			reference_to: "care_records"
 
 		age: 
 			type: "number"
-			label:"孩子年龄"
+			label:"孩子年龄（月）"
 			required: true
 			index:true
 

@@ -6,15 +6,7 @@ Creator.Objects.care_records =
 	fields:
 		name: 
 			type: "text"
-			label:"孩子姓名"
-			required: true
-			searchable:true
-			index:true
-			group:'基本信息'
-
-		cch: 
-			type: "text"
-			label:"孩子cch编号"
+			label:"cch编号和孩子姓名"
 			required: true
 			searchable:true
 			index:true
@@ -181,13 +173,13 @@ Creator.Objects.care_records =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			columns: ["name", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
 
 		week:
 			label: "复查提醒（前一周）"
-			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			columns: ["name", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
 			filters: [{
@@ -205,7 +197,7 @@ Creator.Objects.care_records =
 
 		third:
 			label: "复查提醒（前三天）"
-			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			columns: ["name", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
 			filters: [{
@@ -223,7 +215,7 @@ Creator.Objects.care_records =
 		
 		first:
 			label: "复查提醒（前一天）"
-			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			columns: ["name", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
 			filters: [{
