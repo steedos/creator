@@ -158,6 +158,20 @@ Creator.Objects.care_records =
 		
 		owner:
 			hidden:true
+
+		created:
+			hidden:true
+
+		created_by:
+			hidden:true
+
+		modified:
+			hidden:true
+		
+		modified_by:
+			hidden:true
+
+		
 		
 	list_views:
 		all:

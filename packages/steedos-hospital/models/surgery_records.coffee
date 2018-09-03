@@ -8,12 +8,14 @@ Creator.Objects.surgery_records =
 			type: "text"
 			label:"手术名称"
 			searchable:true
+			required: true
 			index:true
 
 		username: 
 			type: "lookup"
 			label:"孩子姓名"
 			reference_to: "care_records"
+			required: true
 			group:'患者信息'
 
 		cch: 
@@ -145,6 +147,18 @@ Creator.Objects.surgery_records =
 		
 		
 		owner:
+			hidden:true
+
+		created:
+			hidden:true
+
+		created_by:
+			hidden:true
+
+		modified:
+			hidden:true
+		
+		modified_by:
 			hidden:true
 		
 	list_views:

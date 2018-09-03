@@ -5,8 +5,16 @@ Creator.Objects.healthy_records =
 	enable_search: true
 	fields:
 		name: 
+			type: "textarea"
+			label:"疾病名称"
+			required: true
+			searchable:true
+			index:true
+
+		username: 
 			type: "lookup"
 			label:"孩子姓名"
+			required: true
 			reference_to: "care_records"
 
 		age: 
@@ -26,12 +34,6 @@ Creator.Objects.healthy_records =
 			label:"体重（kg）"
 			index:true
 
-		disease: 
-			type: "textarea"
-			label:"疾病名称"
-			searchable:true
-			index:true
-
 
 		care_records: 
 			type: "textarea"
@@ -42,11 +44,23 @@ Creator.Objects.healthy_records =
 
 		owner:
 			hidden:true
+
+		created:
+			hidden:true
+
+		created_by:
+			hidden:true
+
+		modified:
+			hidden:true
+		
+		modified_by:
+			hidden:true
 		
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "age", "height","weight","disease", "care_records"]
+			columns: ["name", "username", "age", "height","weight","care_records"]
 			filter_scope: "space"
 
 	permission_set:
