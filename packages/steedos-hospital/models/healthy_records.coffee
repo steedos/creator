@@ -4,18 +4,17 @@ Creator.Objects.healthy_records =
 	label: "健康记录"
 	enable_search: true
 	fields:
-		name: 
-			type: "textarea"
-			label:"疾病名称"
-			required: true
-			searchable:true
-			index:true
-
 		username: 
 			type: "lookup"
 			label:"cch编号和孩子姓名"
 			required: true
 			reference_to: "care_records"
+		
+		name: 
+			type: "textarea"
+			label:"疾病名称"
+			searchable:true
+			index:true
 
 		age: 
 			type: "number"

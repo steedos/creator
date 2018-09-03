@@ -5,4 +5,4 @@ Creator.Apps.hospital =
 	icon_slds: "document" 
 	visible:true 
 	is_creator:true
-	objects: ["care_records","surgery_records","healthy_records","reports"]
+	objects: ["care_records","surgery_records","healthy_records"]

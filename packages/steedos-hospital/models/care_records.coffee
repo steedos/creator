@@ -17,10 +17,7 @@ Creator.Objects.care_records =
 			label:"性别（Gender）"
 			searchable:true
 			index:true
-			options:[
-				{label: "男孩", value: "boy"},
-				{label: "女孩", value: "girl"}
-			]
+			options: "男孩: boy, 女孩:girl"
 			group:'基本信息'
 
 		birthday: 
@@ -43,12 +40,7 @@ Creator.Objects.care_records =
 			label:"孩子现状（Status）"
 			searchable:true
 			index:true
-			options:[
-				{label: "在关爱", value: "last"},
-				{label: "在医院", value: "hospital"},
-				{label: "回SWI", value: "SWI"},
-				{label: "RIP", value: "RIP"}
-			]	
+			options: "在关爱:last,在医院:hospital,回SWI:SWI,RIP:RIP"	
 			group:'医疗记录'
 
 		cch_receiving: 
@@ -236,7 +228,8 @@ Creator.Objects.care_records =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				doc.reexamination_date_stamp = doc.reexamination_date.getTime()
+				if doc.reexamination_date
+					doc.reexamination_date_stamp = doc.reexamination_date.getTime()
 		"before.update.server.care_records":
 			on: "server"
 			when: "before.update"

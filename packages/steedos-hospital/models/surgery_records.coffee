@@ -31,11 +31,7 @@ Creator.Objects.surgery_records =
 			label:"手术类别"
 			searchable:true
 			index:true
-			options:[
-				{label: "CCH-SH", value: "CCH-SH"},
-				{label: "CCH-AC", value: "CCH-AC"},
-				{label: "ST-CP", value: "ST-CP"}
-			]
+			options: "CCH-SH,CCH-AC,ST-CP"
 			group:'手术记录'
 
 		surgery_date: 
@@ -92,42 +88,7 @@ Creator.Objects.surgery_records =
 			label:"省份"
 			searchable:true
 			index:true
-			options:[
-				{label: "北京", value: "北京"},
-				{label: "上海", value: "上海"},
-				{label: "天津", value: "天津"},
-				{label: "重庆", value: "重庆"},
-				{label: "辽宁", value: "辽宁"},
-				{label: "吉林", value: "吉林"},
-				{label: "黑龙江", value: "黑龙江"},
-				{label: "河北", value: "河北"},
-				{label: "山西", value: "山西"},
-				{label: "陕西", value: "陕西"},
-				{label: "山东", value: "山东"},
-				{label: "安徽", value: "安徽"},
-				{label: "江苏", value: "江苏"},
-				{label: "浙江", value: "浙江"},
-				{label: "河南", value: "河南"},
-				{label: "湖北", value: "湖北"},
-				{label: "湖南", value: "湖南"},
-				{label: "江西", value: "江西"},
-				{label: "台湾", value: "台湾"},
-				{label: "福建", value: "福建"},
-				{label: "云南", value: "云南"},
-				{label: "海南", value: "海南"},
-				{label: "四川", value: "四川"},
-				{label: "贵州", value: "贵州"},
-				{label: "广东", value: "广东"},
-				{label: "甘肃", value: "甘肃"},
-				{label: "青海", value: "青海"},
-				{label: "西藏", value: "西藏"},
-				{label: "新疆", value: "新疆"},
-				{label: "广西", value: "广西"},
-				{label: "内蒙古", value: "内蒙古"},
-				{label: "宁夏", value: "宁夏"},
-				{label: "香港", value: "香港"},
-				{label: "澳门", value: "澳门"}
-			]
+			options: "北京,上海,天津,重庆,辽宁,吉林,黑龙江,河北,山西,陕西,山东,安徽,江苏,浙江,河南,湖北,湖南,江西,台湾,福建,云南,海南,四川,贵州,广东,甘肃,青海,西藏,新疆,广西,内蒙古,宁夏,香港,澳门"
 			group:'其他'
 
 		notes: 
