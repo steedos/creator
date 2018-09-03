@@ -24,7 +24,7 @@ Creator.Objects.archive_fonds =
 
 	list_views:
 		all:
-			columns:["name","code","organization"]
+			columns:["name","code","company"]
 			filter_scope: "space"
 			label:"全部"
 			
