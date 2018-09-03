@@ -73,9 +73,9 @@ set_init = (record_id)->
 	})
 
 set_company = (record_id)->
-	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_identifier:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
-	if record?.fonds_identifier
-		fonds_company = Creator.Collections["archive_fonds"].findOne(record.fonds_identifier,{fields:{company:1}})?.company
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
+	if record?.fonds_name
+		fonds_company = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{company:1}})?.company
 		if fonds_company
 			Creator.Collections["archive_wenshu"].direct.update(record_id,
 			{
@@ -86,9 +86,9 @@ set_company = (record_id)->
 		
 # 设置档号
 set_archivecode = (record_id)->
-	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_identifier:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
-	if record?.item_number and record?.fonds_identifier and record?.retention_peroid and record?.organizational_structure and record?.year
-		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_identifier,{fields:{code:1}})?.code
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
+	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.organizational_structure and record?.year
+		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
 		retention_peroid_code = Creator.Collections["archive_retention"].findOne(record.retention_peroid,{fields:{code:1}})?.code
 		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
 		year = record.year
@@ -163,9 +163,15 @@ Creator.Objects.archive_wenshu =
 			group:"档号"
 			omit:true
 
-		fonds_identifier:
+		# fonds_identifier:
+		# 	type:"text"
+		# 	label:"全宗号"
+		# 	group:"档号"
+		# 	omit:true
+		
+		fonds_name:
 			type:"master_detail"
-			label:"所属全宗"
+			label:"全宗名称"
 			reference_to:"archive_fonds"
 			group:"档号"
 
@@ -637,12 +643,6 @@ Creator.Objects.archive_wenshu =
 			label:"档案馆代码"
 			group:"来源"
 
-		fonds_name:
-			type:"text"
-			label:"全宗名称"
-			group:"来源"
-			hidden:true
-
 		fonds_constituting_unit_name:
 			type: "text"
 			label:"立档单位名称"
@@ -834,9 +834,9 @@ Creator.Objects.archive_wenshu =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if modifier['$set']?.fonds_identifier
+				if modifier['$set']?.fonds_name
 					set_company(doc._id)
-				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_identifier or modifier['$set']?.year
+				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_name or modifier['$set']?.year
                     set_archivecode(doc._id)
                 if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
                 	set_destory(doc)

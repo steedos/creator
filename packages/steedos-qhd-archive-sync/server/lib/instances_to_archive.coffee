@@ -49,11 +49,11 @@ _minxiInstanceData = (formData, instance) ->
 	# 根据FONDSID查找全宗号和全总名称
 	fondObj = Creator.Collections["archive_fonds"].findOne({'name':field_values?.FONDSID})
 	if fondObj
-		formData.fonds_identifier = fondObj?._id
-		formData.fonds_name = fondObj?.name
+		# formData.fonds_identifier = fondObj?.code
+		formData.fonds_name = fondObj?._id
 	else
-		formData.fonds_identifier = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.id
-		formData.fonds_name = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.name
+		# formData.fonds_identifier = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.code
+		formData.fonds_name = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.id
 
 	# 保管期限代码查找
 	retentionObj = Creator.Collections["archive_retention"].findOne({'name':field_values?.baocunqixian})
