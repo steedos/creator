@@ -17,7 +17,7 @@ Creator.Objects.archive_fonds =
 			is_wide:true
 			# required:true
 
-		organization:
+		company:
 			label: "对应组织"
 			type: "lookup"
 			reference_to: "organizations"

@@ -72,6 +72,18 @@ set_init = (record_id)->
 		}
 	})
 
+set_company = (record_id)->
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_identifier:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
+	if record?.fonds_identifier
+		fonds_company = Creator.Collections["archive_fonds"].findOne(record.fonds_identifier,{fields:{company:1}})?.company
+		if fonds_company
+			Creator.Collections["archive_wenshu"].direct.update(record_id,
+			{
+				$set:{
+					company: fonds_company
+				}
+			})
+		
 # 设置档号
 set_archivecode = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_identifier:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
@@ -742,6 +754,12 @@ Creator.Objects.archive_wenshu =
 			type:"boolean"
 			label:"是否封装xml"
 			hidden: true
+		
+		company: 
+			type: "master_detail"
+			label: '所属公司'
+			reference_to: "organizations"
+			hidden: true
 
 	list_views:
 		recent:
@@ -800,6 +818,8 @@ Creator.Objects.archive_wenshu =
 			todo: (userId, doc)->
 				# 保存初始条件
 				set_init(doc._id)
+				# 设置公司
+				set_company(doc._id)
 				# 设置保管期限
 				set_retention(doc)
 				# 设置分类号
@@ -814,13 +834,15 @@ Creator.Objects.archive_wenshu =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
+				if modifier['$set']?.fonds_identifier
+					set_company(doc._id)
 				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_identifier or modifier['$set']?.year
                     set_archivecode(doc._id)
                 if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
                 	set_destory(doc)
-				if modifier['$set']?.archive_dept
-					# 设置分类号
+				if modifier['$set']?.archive_dept # 设置分类号
 					set_category_code(doc)
+				
 				# 设置重新封装
 				set_hasXml(doc._id)
 				# 日志记录
