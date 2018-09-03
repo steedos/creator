@@ -4,7 +4,7 @@ Creator.Objects.healthy_records =
 	label: "健康记录"
 	enable_search: true
 	fields:
-		username: 
+		name: 
 			type: "lookup"
 			label:"孩子姓名"
 			reference_to: "care_records"
@@ -32,10 +32,6 @@ Creator.Objects.healthy_records =
 			searchable:true
 			index:true
 
-		name: 
-			type: "date"
-			label:"复查时间"
-			index:true
 
 		care_records: 
 			type: "textarea"
@@ -50,24 +46,9 @@ Creator.Objects.healthy_records =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "age", "height","weight","disease","username", "care_records"]
+			columns: ["name", "age", "height","weight","disease", "care_records"]
 			filter_scope: "space"
 
-		week:
-			label: "复查提醒（前一周）"
-			columns: ["name", "age", "height","weight","disease","username", "care_records"]
-			filter_scope: "space"
-
-		third:
-			label: "复查提醒（前三天）"
-			columns: ["name", "age", "height","weight","disease","username", "care_records"]
-			filter_scope: "space"
-
-		first:
-			label: "复查提醒（前一天）"
-			columns: ["name", "age", "height","weight","disease","username", "care_records"]
-			filter_scope: "space"
-	
 	permission_set:
 		user:
 			allowCreate: false

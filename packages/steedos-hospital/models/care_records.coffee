@@ -104,6 +104,12 @@ Creator.Objects.care_records =
 			index:true
 			group:'医疗记录'
 
+		reexamination_date: 
+			type: "date"
+			label:"复查时间"
+			index:true
+			group:'医疗记录'
+
 		surgeries: 
 			type: "number"
 			label:"手术次数（Number of surgeries）"
@@ -156,11 +162,28 @@ Creator.Objects.care_records =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "cch_sickroom","cch_departure",
-			"gone", "disease","surgeries"
-			]
-			# "birthday","care_record","medical_condition","reminders","notes", "follow_up","photo_link"
+			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			"gone", "disease","surgeries"]
 			filter_scope: "space"
+
+		week:
+			label: "复查提醒（前一周）"
+			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			"gone", "disease","surgeries"]
+			filter_scope: "space"
+
+		third:
+			label: "复查提醒（前三天）"
+			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			"gone", "disease","surgeries"]
+			filter_scope: "space"
+
+		first:
+			label: "复查提醒（前一天）"
+			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
+			"gone", "disease","surgeries"]
+			filter_scope: "space"
+	
 
 	permission_set:
 		user:
