@@ -190,31 +190,54 @@ Creator.Objects.care_records =
 			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
-			filters: [["reexamination_date_stamp", ">=", new Date(new Date().toLocaleDateString()).getTime()
-			], 
-			["reexamination_date_stamp", "<", new Date(new Date().toLocaleDateString()).getTime() + 
-				8* 24 * 60*60*1000
-			]]
+			filters: [{
+				'field':"reexamination_date_stamp", 
+				'operation':">=", 
+				'value':new Date(new Date().toLocaleDateString()).getTime()
+			}, 
+			{	
+				'field':"reexamination_date_stamp", 
+				'operation':"<", 
+				'value':new Date(new Date().toLocaleDateString()).getTime() + 
+					8* 24 * 60*60*1000
+			}
+			]
 
 		third:
 			label: "复查提醒（前三天）"
 			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
-			filters: [["reexamination_date_stamp", ">=", new Date(new Date().toLocaleDateString()).getTime()
-			], 
-			["reexamination_date_stamp", "<", new Date(new Date().toLocaleDateString()).getTime()+4*24*60*60*1000
-			]]
+			filters: [{
+				'field':"reexamination_date_stamp", 
+				'operation':">=", 
+				'value':new Date(new Date().toLocaleDateString()).getTime()
+			}, 
+			{	
+				'field':"reexamination_date_stamp", 
+				'operation':"<", 
+				'value':new Date(new Date().toLocaleDateString()).getTime() + 
+					4* 24 * 60*60*1000
+			}
+			]
 		
 		first:
 			label: "复查提醒（前一天）"
 			columns: ["name", "cch", "gender","swi","current_status","cch_receiving", "reexamination_date", "cch_sickroom","cch_departure",
 			"gone", "disease","surgeries"]
 			filter_scope: "space"
-			filters: [["reexamination_date_stamp", ">=", new Date(new Date().toLocaleDateString()).getTime()
-			], 
-			["reexamination_date_stamp", "<", new Date(new Date().toLocaleDateString()).getTime()+2*24*60*60*1000
-			]]
+			filters: [{
+				'field':"reexamination_date_stamp", 
+				'operation':">=", 
+				'value':new Date(new Date().toLocaleDateString()).getTime()
+			}, 
+			{	
+				'field':"reexamination_date_stamp", 
+				'operation':"<", 
+				'value':new Date(new Date().toLocaleDateString()).getTime() + 
+					2* 24 * 60*60*1000
+			}
+			]
 
 	triggers:
 		"before.insert.server.care_records":
