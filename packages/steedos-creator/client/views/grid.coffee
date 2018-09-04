@@ -241,7 +241,7 @@ Template.creator_grid.onRendered ->
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
 
-		listTreeFilter = Session.get('listTreeFilter')
+		listTreeCompany = Session.get('listTreeCompany')
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
@@ -269,8 +269,10 @@ Template.creator_grid.onRendered ->
 				if !filter
 					filter = ["_id", "<>", -1]
 
-				if listTreeFilter
+				if listTreeCompany
+					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [filter, "and", listTreeFilter]
+
 
 			curObjectName = if is_related then related_object_name else object_name
 
