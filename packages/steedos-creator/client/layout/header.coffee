@@ -30,3 +30,6 @@ Template.creatorHeader.events
 
 	'click .creator-button-help': (e, t)->
 		Steedos.openWindow("https://www.steedos.com/cn/help/creator/")
+
+	'click .creator-button-toggle': (e, t)->
+		Modal.show("list_tree_modal")
