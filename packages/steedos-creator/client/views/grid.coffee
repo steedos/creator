@@ -269,9 +269,9 @@ Template.creator_grid.onRendered ->
 				if !filter
 					filter = ["_id", "<>", -1]
 
-				if listTreeCompany
+				if listTreeCompany and  listTreeCompany!='undefined' and creator_obj?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
-					filter = [filter, "and", listTreeFilter]
+					filter = [ filter, "and", listTreeFilter ]
 
 
 			curObjectName = if is_related then related_object_name else object_name

@@ -154,6 +154,7 @@ Creator.Objects.archive_wenshu =
 	enable_files: true
 	enable_api: true
 	enable_tree: false
+	filter_company: true
 	fields:
 		# ########档号###########
 		archival_code:
