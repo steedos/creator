@@ -40,6 +40,22 @@ _minxiInstanceData = (formData, instance) ->
 	formData.author = field_values?.FILE_CODE_fzr
 	formData.title = instance.name
 
+	# 默认值
+	formData.archival_category_code = "WS"
+	formData.aggregation_level = "文件"
+	formData.document_aggregation = "单件"
+	formData.language = "汉语"
+	formData.orignal_document_creation_way = "原生"
+	# 数字化属性
+	formData.physical_record_characteristics = "PDF"
+	formData.scanning_resolution = "250dpi"
+	formData.scanning_color_model = "彩色"
+	formData.image_compression_scheme = "无损压缩"
+	# 存储位置
+	formData.当前位置 = "\\\\192.168.0.151\\beta\\data\\oafile"
+	# 机构人员类型
+	formData.agent_type = "部门"
+
 	# 机构：FILING_DEPT字段（发文是拟稿单位，收文是所属部门）
 	if field_values?.FILING_DEPT
 		orgObj = Creator.Collections["archive_organization"].findOne({'name':field_values?.FILING_DEPT})
