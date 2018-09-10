@@ -1,10 +1,10 @@
-LoveManager = {}
+LoveManager = {
+    answerObjectNames: ['love_answer','love_answer2','love_test']
+}
 
 LoveManager.caculateResult = (loveSpaceId, userIds) ->
     check loveSpaceId, String
     console.time 'caculateScore'
-
-    answerObjectNames = ['love_answer','love_answer2','love_test']
 
     topNumber = 10
 
@@ -18,11 +18,12 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
     loveWorkExperienceCollection = Creator.getCollection('love_work_experience')
     loveRecommendHistoryCollection = Creator.getCollection('love_recommend_history')
     loveFriendsCollection = Creator.getCollection('love_friends')
+    loveTestCollection = Creator.getCollection('love_test')
 
     # 数据加载到内存
     data = {}
     customQuery = { space: loveSpaceId, $or: [] }
-    answerObjectNames.forEach (objName) ->
+    LoveManager.answerObjectNames.forEach (objName) ->
         customQuery.$or.push { questionnaire_progess: objName }
     # 双方必须已经填写手机号才能计算推荐
     customQuery.mobile = { $exists: true }
@@ -34,6 +35,7 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
             love_about_me: loveAboutMeCollection.findOne({ space: loveSpaceId, owner: owner })
             love_answer: loveAnswerCollection.findOne({ space: loveSpaceId, owner: owner })
             love_answer2: loveAnswer2Collection.findOne({ space: loveSpaceId, owner: owner })
+            love_test: loveTestCollection.findOne({ space: loveSpaceId, owner: owner })
             love_result: loveResultCollection.findOne({ space: loveSpaceId, userA: owner }, { fields: { _id: 1 } })
             love_looking_for: loveLookingForCollection.findOne({ space: loveSpaceId, owner: owner })
             # love_hobby: loveHobbyCollection.findOne({ space: loveSpaceId, owner: owner })
@@ -44,7 +46,7 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
 
     # 获取题目字段key
     answerKeyObj = {}
-    answerObjectNames.forEach (objName) ->
+    LoveManager.answerObjectNames.forEach (objName) ->
         answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
 
     _.each data, (dv, userId) ->
@@ -65,7 +67,7 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
         ageMax = lookingFor.age_max
         heightMin = lookingFor.height
         heightMax = lookingFor.height_max
-        query = { space: loveSpaceId }
+        query = { space: loveSpaceId, owner: { $ne: userId } }
         query.sex = gender
         query.age = { $gte: parseInt(ageMin), $lte: parseInt(ageMax) }
         query.height = { $gte: heightMin, $lte: heightMax }
@@ -90,25 +92,11 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
             owner = aboutMe.owner
             name = aboutMe.name
 
-            # 计算分子、分母
-            aFullPoints = 0
-            bGotPoints = 0
-            bFullPoints = 0
-            aGotPoints = 0
-            questionsNumber = 0
-            answerObjectNames.forEach (objName) ->
-                if dv[objName] and data[owner][objName] # 当两人都做了同一套问卷时计算分数
-                    # console.log objName
-                    r = LoveManager.getMatchScores(answerKeyObj[objName], dv[objName], data[owner][objName])
-                    aFullPoints += r.aFullPoints
-                    bGotPoints += r.bGotPoints
-                    bFullPoints += r.bFullPoints
-                    aGotPoints += r.aGotPoints
-                    questionsNumber += r.questionsNumber
+            r = LoveManager.caculateScore(dv, data[owner], answerKeyObj)
+            aToB = r.a_to_b
+            bToA = r.b_to_a
+            match = r.match
 
-            # console.log { aFullPoints, bGotPoints, bFullPoints, aGotPoints, questionsNumber }
-
-            aToB = bGotPoints/aFullPoints || 0
             if scoreA_B.length < topNumber
                 scoreA_B.push({userB: owner, BName: name, score: aToB})
             else
@@ -119,7 +107,6 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
                         break
                     i++
 
-            bToA = aGotPoints/bFullPoints || 0
             if scoreB_A.length < topNumber
                 scoreB_A.push({userB: owner, BName: name, score: bToA})
             else
@@ -130,26 +117,27 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
                         break
                     i++
 
-            match = Math.pow(aToB*bToA, 1/2)
-            if score.length < topNumber
-                score.push({userB: owner, BName: name, score: match})
-            else
-                i = 0
-                while i<score.length
-                    if score[i].score < match
-                        score[i] = {userB: owner, BName: name, score: match}
-                        break
-                    i++
+            # 互相匹配超过60%才算入匹配结果
+            if match > 0.6
+                if score.length < topNumber
+                    score.push({userB: owner, BName: name, score: match})
+                else
+                    i = 0
+                    while i<score.length
+                        if score[i].score < match
+                            score[i] = {userB: owner, BName: name, score: match}
+                            break
+                        i++
 
         if scoreA_B.length > 0 or scoreB_A.length > 0 or score.length > 0
             if resultMe
-                loveResultCollection.direct.update(resultMe._id,{$set:{
+                loveResultCollection.update(resultMe._id,{$set:{
                     scoreA_B: scoreA_B
                     scoreB_A: scoreB_A
                     score: score
                 }})
             else
-                loveResultCollection.direct.insert({
+                loveResultCollection.insert({
                     userA: userId
                     scoreA_B: scoreA_B
                     scoreB_A: scoreB_A
@@ -160,7 +148,6 @@ LoveManager.caculateResult = (loveSpaceId, userIds) ->
 
     console.timeEnd 'caculateScore'
     return
-
 
 LoveManager.getQuestionKeys = (objectName) ->
     keys = []
@@ -303,7 +290,7 @@ LoveManager.caculateRecommend = (spaceId) ->
 
                 now = new Date()
 
-                recommendColl.direct.insert({
+                recommendColl.insert({
                     user_a: user_a
                     user_b: user_b
                     match: score
@@ -312,7 +299,7 @@ LoveManager.caculateRecommend = (spaceId) ->
                     space: spaceId
                 })
 
-                recommendHistColl.direct.insert({
+                recommendHistColl.insert({
                     user_a: user_a
                     user_b: user_b
                     match: score
@@ -321,7 +308,7 @@ LoveManager.caculateRecommend = (spaceId) ->
                     space: spaceId
                 })
 
-                recommendColl.direct.insert({
+                recommendColl.insert({
                     user_a: user_b
                     user_b: user_a
                     match: score
@@ -330,7 +317,7 @@ LoveManager.caculateRecommend = (spaceId) ->
                     space: spaceId
                 })
 
-                recommendHistColl.direct.insert({
+                recommendHistColl.insert({
                     user_a: user_b
                     user_b: user_a
                     match: score
@@ -344,18 +331,76 @@ LoveManager.caculateRecommend = (spaceId) ->
     console.timeEnd 'caculateRecommend'
     return
 
+LoveManager.caculateLoveTags = (userId, spaceId, objectName) ->
+    vipCustomersCollection = Creator.getCollection('vip_customers')
+    if objectName == "love_test"
+        loveTestCollection = Creator.getCollection('love_test')
+        loveTestAnswer = loveTestCollection.findOne({
+                space: spaceId,
+                owner: userId
+            }, {
+                fields: {
+                    education: 1,
+                    body_type: 1,
+                    employed: 1,
+                    disgust_smoke: 1,
+                    pet: 1,
+                    messy: 1,
+                    previous_picture: 1 ,
+                    parents_influence: 1 ,
+                    finance_budget: 1 ,
+                    communicate: 1
+                }
+            })
+        tags = []
+        unless loveTestAnswer
+            return;
+        if loveTestAnswer.education
+            education = loveTestAnswer.education
+            if education != "高中及以下"
+                tags.push "#{education}学历"
+        if loveTestAnswer.body_type
+            tags.push "#{loveTestAnswer.body_type}身材"
+        if loveTestAnswer.employed
+            tags.push "#{loveTestAnswer.employed}"
+        if loveTestAnswer.disgust_smoke and loveTestAnswer.disgust_smoke == "是"
+            tags.push "不吸烟"
+        if loveTestAnswer.pet and loveTestAnswer.pet == "会"
+            tags.push "超爱宠物"
+        if (loveTestAnswer.pet and loveTestAnswer.pet == "不会") or (loveTestAnswer.messy and loveTestAnswer.messy == "介意")
+            tags.push "爱干净"
+        if loveTestAnswer.previous_picture and loveTestAnswer.previous_picture == "会"
+            tags.push "占有欲强"
+        else if loveTestAnswer.previous_picture and loveTestAnswer.previous_picture == "不会"
+            tags.push "宽容"
+        if loveTestAnswer.parents_influence and loveTestAnswer.parents_influence == "我自己做主"
+            tags.push "独立"
+        else if loveTestAnswer.parents_influence and "我通常会听父母的,完全听父母的".split(",").indexOf(loveTestAnswer.parents_influence) > -1
+            tags.push "乖宝宝"
+        if loveTestAnswer.finance_budget and loveTestAnswer.finance_budget == "会"
+            tags.push "未来的有钱人"
+        if loveTestAnswer.communicate and loveTestAnswer.communicate == "是的，雷打不动"
+            tags.push "粘人"
+        vipCustomersCollection.update({
+                space: spaceId,
+                owner: userId
+            }, {
+                $set: {
+                   love_test_tags: tags
+                }
+            })
+
 LoveManager.caculateFriendsScore = (userId, spaceId, rest, matchingFilterEnable) ->
-    answerObjectNames = ['love_answer','love_answer2','love_test']
     customQuery = { space: spaceId, owner: {}, $or: [] }
     vipCustomersCollection = Creator.getCollection('vip_customers')
     loveFriendsCollection = Creator.getCollection('love_friends')
 
     # 获取题目字段key
     answerKeyObj = {}
-    dv = {}
-    answerObjectNames.forEach (objName) ->
+    aAnswers = {}
+    LoveManager.answerObjectNames.forEach (objName) ->
         answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
-        dv[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
+        aAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
         customQuery.$or.push { questionnaire_progess: objName }
 
     query = { space: spaceId, owner: userId }
@@ -369,36 +414,23 @@ LoveManager.caculateFriendsScore = (userId, spaceId, rest, matchingFilterEnable)
     vipCustomersCollection.find(customQuery).forEach (cust) ->
         try
             userB = cust.owner
-            # 计算分子、分母
-            aFullPoints = 0
-            bGotPoints = 0
-            bFullPoints = 0
-            aGotPoints = 0
-            questionsNumber = 0
-            answerObjectNames.forEach (objName) ->
-                bAnswer = Creator.getCollection(objName).findOne({ space: spaceId, owner: userB })
-                if dv[objName] and bAnswer # 当两人都做了同一套问卷时计算分数
-                    r = LoveManager.getMatchScores(answerKeyObj[objName], dv[objName], bAnswer)
-                    aFullPoints += r.aFullPoints
-                    bGotPoints += r.bGotPoints
-                    bFullPoints += r.bFullPoints
-                    aGotPoints += r.aGotPoints
-                    questionsNumber += r.questionsNumber
 
-            aToB = bGotPoints/aFullPoints || 0
+            bAnswers = {}
+            LoveManager.answerObjectNames.forEach (objName) ->
+                bAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userB })
 
-            bToA = aGotPoints/bFullPoints || 0
-
-            match = Math.pow(aToB*bToA, 1/2)
+            r = LoveManager.caculateScore(aAnswers, bAnswers, answerKeyObj)
+            aToB = r.a_to_b
+            bToA = r.b_to_a
+            match = r.match
 
             loveFriendsCollection.update({ space: spaceId, owner: userId, user_b: userB }, { $set: { a_to_b: aToB, b_to_a: bToA, match: match } })
             loveFriendsCollection.update({ space: spaceId, owner: userB, user_b: userId }, { $set: { a_to_b: bToA, b_to_a: aToB, match: match } })
         catch e
             console.error e.stack
 
-    # 暂时注释掉以兼容 老的小程序版本，待新小程序版本发布后 可开放
-    # if matchingFilterEnable
-    #     LoveManager.caculateFriendsIsLookingFor(userId, spaceId)
+    if matchingFilterEnable
+        LoveManager.caculateFriendsIsLookingFor(userId, spaceId)
 
     LoveManager.caculateFriendsIsLookingFor(userId, spaceId)
 
@@ -406,7 +438,6 @@ LoveManager.caculateFriendsScore = (userId, spaceId, rest, matchingFilterEnable)
 
 # 缘分榜加筛选条件功能，每次刷新调用answered接口应该计算is_looking_for属性值并保存 #572
 LoveManager.caculateFriendsIsLookingFor = (userId, spaceId) ->
-    answerObjectNames = ['love_answer','love_answer2','love_test']
     customQuery = { space: spaceId, owner: {}, $or: [] }
     now = new Date()
     loveFriendsCollection = Creator.getCollection('love_friends')
@@ -414,7 +445,7 @@ LoveManager.caculateFriendsIsLookingFor = (userId, spaceId) ->
     loveAboutMeCollection = Creator.getCollection('love_about_me')
     vipCustomersCollection = Creator.getCollection('vip_customers')
 
-    answerObjectNames.forEach (objName) ->
+    LoveManager.answerObjectNames.forEach (objName) ->
         customQuery.$or.push { questionnaire_progess: objName }
 
     customer = vipCustomersCollection.findOne({ space: spaceId, owner: userId }, { fields: { matching_filter_caculate_time: 1 } })
@@ -462,7 +493,6 @@ LoveManager.caculateFriendsIsLookingFor = (userId, spaceId) ->
 
 # 摇一摇：计算与好友的好友匹配 #609
 LoveManager.caculateShakeFriendsScore = (userId, spaceId) ->
-    answerObjectNames = ['love_answer','love_answer2','love_test']
     customQuery = { space: spaceId, $or: [] }
     customCollection = Creator.getCollection('vip_customers')
     friendCollection = Creator.getCollection('love_friends')
@@ -481,13 +511,13 @@ LoveManager.caculateShakeFriendsScore = (userId, spaceId) ->
     data = {}
     # 获取题目字段key
     answerKeyObj = {}
-    userAData = {}
-    answerObjectNames.forEach (objName) ->
+    aAnswers = {}
+    LoveManager.answerObjectNames.forEach (objName) ->
         answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
-        dv[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
+        aAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
         customQuery.$or.push { questionnaire_progess: objName }
 
-    Creator.getCollection('vip_customers').find(customQuery).forEach (cust)->
+    customCollection.find(customQuery).forEach (cust)->
         owner = cust.owner
         data[owner] = {
             love_about_me: loveAboutMeCollection.findOne({ space: loveSpaceId, owner: owner })
@@ -506,34 +536,16 @@ LoveManager.caculateShakeFriendsScore = (userId, spaceId) ->
     # 我的好友的好友
     bFriendsIds = _.uniq _.pluck(friendCollection.find({ space: spaceId, owner: { $in: bIds }, user_b: { $ne: userId } }, { fields: { user_b: 1 } }).fetch(), 'user_b')
 
-
-
-
     bFriendsIds.forEach (lf) ->
         try
+            bAnswers = {}
+            LoveManager.answerObjectNames.forEach (objName) ->
+                bAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: lf.user_b })
 
-            # 计算分子、分母
-            aFullPoints = 0
-            bGotPoints = 0
-            bFullPoints = 0
-            aGotPoints = 0
-            questionsNumber = 0
-            answerObjectNames.forEach (objName) ->
-                bAnswer = Creator.getCollection(objName).findOne({ space: spaceId, owner: lf.user_b })
-                if dv[objName] and bAnswer # 当两人都做了同一套问卷时计算分数
-                    # console.log objName
-                    r = LoveManager.getMatchScores(answerKeyObj[objName], dv[objName], bAnswer)
-                    aFullPoints += r.aFullPoints
-                    bGotPoints += r.bGotPoints
-                    bFullPoints += r.bFullPoints
-                    aGotPoints += r.aGotPoints
-                    questionsNumber += r.questionsNumber
-
-            aToB = bGotPoints/aFullPoints || 0
-
-            bToA = aGotPoints/bFullPoints || 0
-
-            match = Math.pow(aToB*bToA, 1/2)
+            r = LoveManager.caculateScore(aAnswers, bAnswers, answerKeyObj)
+            aToB = r.a_to_b
+            bToA = r.b_to_a
+            match = r.match
 
             friendCollection.update(lf._id, { $set: { a_to_b: aToB, b_to_a: bToA, match: match } })
             friendCollection.update({ space: spaceId, owner: lf.user_b, user_b: userId }, { $set: { a_to_b: bToA, b_to_a: aToB, match: match } })
@@ -544,17 +556,16 @@ LoveManager.caculateShakeFriendsScore = (userId, spaceId) ->
 
 
 LoveManager.caculateFriendsOfFriendScore = (userId, friendId, spaceId) ->
-    answerObjectNames = ['love_answer','love_answer2','love_test']
     customQuery = { space: spaceId, owner: '', $or: [] }
     customCollection = Creator.getCollection('vip_customers')
     friendCollection = Creator.getCollection('love_friends')
 
     # 获取题目字段key
     answerKeyObj = {}
-    dv = {}
-    answerObjectNames.forEach (objName) ->
+    aAnswers = {}
+    LoveManager.answerObjectNames.forEach (objName) ->
         answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
-        dv[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
+        aAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
         customQuery.$or.push { questionnaire_progess: objName }
 
     query = { space: spaceId, owner: friendId }
@@ -567,27 +578,11 @@ LoveManager.caculateFriendsOfFriendScore = (userId, friendId, spaceId) ->
                 friendCollection.update({ space: spaceId, owner: lf.user_b, user_b: friendId }, { $unset: { a_to_b: 1, b_to_a: 1, match: 1 } })
                 return
 
-            # 计算分子、分母
-            aFullPoints = 0
-            bGotPoints = 0
-            bFullPoints = 0
-            aGotPoints = 0
-            questionsNumber = 0
-            answerObjectNames.forEach (objName) ->
-                bAnswer = Creator.getCollection(objName).findOne({ space: spaceId, owner: lf.user_b })
-                if dv[objName] and bAnswer # 当两人都做了同一套问卷时计算分数
-                    r = LoveManager.getMatchScores(answerKeyObj[objName], dv[objName], bAnswer)
-                    aFullPoints += r.aFullPoints
-                    bGotPoints += r.bGotPoints
-                    bFullPoints += r.bFullPoints
-                    aGotPoints += r.aGotPoints
-                    questionsNumber += r.questionsNumber
+            bAnswers = {}
+            LoveManager.answerObjectNames.forEach (objName) ->
+                bAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: lf.user_b })
 
-            aToB = bGotPoints/aFullPoints || 0
-
-            bToA = aGotPoints/bFullPoints || 0
-
-            match = Math.pow(aToB*bToA, 1/2)
+            r = LoveManager.caculateScore(aAnswers, bAnswers, answerKeyObj)
 
             # beenFriend =
 
@@ -605,7 +600,6 @@ LoveManager.caculateFriendsOfFriendScore = (userId, friendId, spaceId) ->
 两个人都喜欢男生/女生
 ###
 LoveManager.caculateLoveEnemyScore = (userId, friendId, spaceId) ->
-    answerObjectNames = ['love_answer','love_answer2','love_test']
     customQuery = { space: spaceId, owner: '', $or: [] }
     vipCustomersCollection = Creator.getCollection('vip_customers')
     friendCollection = Creator.getCollection('love_friends')
@@ -675,7 +669,7 @@ LoveManager.caculateLoveEnemyScore = (userId, friendId, spaceId) ->
     # 获取题目字段key
     answerKeyObj = {}
     dv = {}
-    answerObjectNames.forEach (objName) ->
+    LoveManager.answerObjectNames.forEach (objName) ->
         answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
         dv[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
         customQuery.$or.push { questionnaire_progess: objName }
@@ -689,7 +683,7 @@ LoveManager.caculateLoveEnemyScore = (userId, friendId, spaceId) ->
     # 计算分子、分母
     score = 0
     questionsNumber = 0
-    answerObjectNames.forEach (objName) ->
+    LoveManager.answerObjectNames.forEach (objName) ->
         if questionnaireProgess.includes(objName) and friendQuestionnaireProgess.includes(objName)
             console.log 'objName: ', objName
             bAnswer = Creator.getCollection(objName).findOne({ space: spaceId, owner: friendId })
@@ -722,3 +716,46 @@ LoveManager.getLoveEnemyScore = (questionKeys, aAnswer, bAnswer) ->
                 score += common.length/aAnswer[akO].length
 
     return { score: score, questionsNumber: questionsNumber }
+
+LoveManager.caculateOneToOneScore = (userId, userB, spaceId) ->
+    customQuery = { space: spaceId, owner: userB, $or: [] }
+    customCollection = Creator.getCollection('vip_customers')
+
+    # 获取题目字段key
+    answerKeyObj = {}
+    aAnswers = {}
+    bAnswers = {}
+    LoveManager.answerObjectNames.forEach (objName) ->
+        answerKeyObj[objName] = LoveManager.getQuestionKeys(objName)
+        aAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userId })
+        bAnswers[objName] = Creator.getCollection(objName).findOne({ space: spaceId, owner: userB })
+        customQuery.$or.push { questionnaire_progess: objName }
+
+    unless customCollection.find(customQuery).count()
+        return
+
+    return LoveManager.caculateScore(aAnswers, bAnswers, answerKeyObj)
+
+LoveManager.caculateScore = (aAnswers, bAnswers, answerKeyObj) ->
+    # 计算分子、分母
+    aFullPoints = 0
+    bGotPoints = 0
+    bFullPoints = 0
+    aGotPoints = 0
+    questionsNumber = 0
+    _.each answerKeyObj, (keys, objName) ->
+        if aAnswers[objName] and bAnswers[objName] # 当两人都做了同一套问卷时计算分数
+            r = LoveManager.getMatchScores(keys, aAnswers[objName], bAnswers[objName])
+            aFullPoints += r.aFullPoints
+            bGotPoints += r.bGotPoints
+            bFullPoints += r.bFullPoints
+            aGotPoints += r.aGotPoints
+            questionsNumber += r.questionsNumber
+
+    a_to_b = bGotPoints/aFullPoints || 0
+
+    b_to_a = aGotPoints/bFullPoints || 0
+
+    match = Math.pow(a_to_b*b_to_a, 1/2)
+
+    return { a_to_b, b_to_a, match }

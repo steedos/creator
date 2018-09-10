@@ -55,15 +55,21 @@ Creator.Objects.organizations =
 			reference_to: "users"
 			multiple: true
 
-		hidden:
-			label: "隐藏"
-			type: "boolean"
-
 		is_company:
-			label: "隐藏"
+			label: "根部门"
 			type: "boolean"
 			omit: true
 			index:true
+		
+		is_subcompany:
+			label: "子公司"
+			type: "boolean"
+			defaultValue: false
+			index:true
+		
+		hidden:
+			label: "隐藏"
+			type: "boolean"
 
 	list_views:
 	
@@ -86,4 +92,9 @@ Creator.Objects.organizations =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true
+
+
+if Meteor.isServer
+	Meteor.publish "subCompany", (space_id)->
+		return Creator.Collections.organizations.find({space: space_id, $or: [{is_subcompany: true}, is_company: true]}, {fields: {_id: 1, name: 1, parent: 1, parents: 1, space: 1, is_subcompany: 1, is_company: 1}})

@@ -1,4 +1,4 @@
-JsonRoutes.add 'post', '/api/mini/vip/love/enemy', (req, res, next) ->
+JsonRoutes.add 'post', '/api/mini/vip/single/match', (req, res, next) ->
 	try
 		userId = Steedos.getUserIdFromAuthToken(req, res);
 
@@ -12,16 +12,16 @@ JsonRoutes.add 'post', '/api/mini/vip/love/enemy', (req, res, next) ->
 		if !spaceId
 			throw new Meteor.Error(500, "No spaceId")
 
-		friendId = req.query.friend_id || body.friend_id
+		userB = req.query.user_id || body.user_id
 
-		if !friendId
-			throw new Meteor.Error(500, "No friendId")
+		if !userB
+			throw new Meteor.Error(500, "No user_id")
 
-		r = LoveManager.caculateLoveEnemyScore userId, friendId, spaceId
+		result = LoveManager.caculateOneToOneScore(userId, userB, spaceId)
 
 		JsonRoutes.sendResult res, {
 			code: 200,
-			data: r || 0
+			data: result
 		}
 		return
 	catch e
