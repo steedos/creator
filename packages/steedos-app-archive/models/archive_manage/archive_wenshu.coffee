@@ -566,22 +566,22 @@ Creator.Objects.archive_wenshu =
 		physical_record_characteristics:
 			type: "text"
 			label:"数字化对象形态"
-			defaultValue: ""
+			defaultValue: "PDF"
 			group:"数字化属性"
 		scanning_resolution:
 			type: "text"
 			label:"扫描分辨率"
-			defaultValue: ""
+			defaultValue: "250dpi"
 			group:"数字化属性"
 		scanning_color_model:
 			type: "text"
 			label:"扫描色彩模式"
-			defaultValue: ""
+			defaultValue: "彩色"
 			group:"数字化属性"
 		image_compression_scheme:
 			type: "text"
 			label:"图像压缩方案"
-			defaultValue: ""
+			defaultValue: "无损压缩"
 			group:"数字化属性"
 		
 		# ########数字化设备信息###########
