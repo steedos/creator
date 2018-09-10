@@ -177,13 +177,15 @@ Creator.Objects.care_records =
 			filters: [{
 				'field':"reexamination_date_stamp", 
 				'operation':">=", 
-				'value':new Date(new Date().toLocaleDateString()).getTime()
+				'value': ()->
+					return new Date(new Date().toLocaleDateString()).getTime()
 			}, 
 			{	
 				'field':"reexamination_date_stamp", 
 				'operation':"<", 
-				'value':new Date(new Date().toLocaleDateString()).getTime() + 
-					8* 24 * 60*60*1000
+				'value': ()->
+					return new Date(new Date().toLocaleDateString()).getTime() +
+						8* 24 * 60*60*1000
 			}
 			]
 
@@ -195,13 +197,15 @@ Creator.Objects.care_records =
 			filters: [{
 				'field':"reexamination_date_stamp", 
 				'operation':">=", 
-				'value':new Date(new Date().toLocaleDateString()).getTime()
+				'value': ()->
+					return new Date(new Date().toLocaleDateString()).getTime()
 			}, 
 			{	
 				'field':"reexamination_date_stamp", 
 				'operation':"<", 
-				'value':new Date(new Date().toLocaleDateString()).getTime() + 
-					4* 24 * 60*60*1000
+				'value': ()->
+					return new Date(new Date().toLocaleDateString()).getTime() +
+						4* 24 * 60*60*1000
 			}
 			]
 		
@@ -213,13 +217,15 @@ Creator.Objects.care_records =
 			filters: [{
 				'field':"reexamination_date_stamp", 
 				'operation':">=", 
-				'value':new Date(new Date().toLocaleDateString()).getTime()
+				'value': ()->
+					return new Date(new Date().toLocaleDateString()).getTime()
 			}, 
 			{	
 				'field':"reexamination_date_stamp", 
 				'operation':"<", 
-				'value':new Date(new Date().toLocaleDateString()).getTime() + 
-					2* 24 * 60*60*1000
+				'value': ()->
+					return new Date(new Date().toLocaleDateString()).getTime() +
+						2* 24 * 60*60*1000
 			}
 			]
 
