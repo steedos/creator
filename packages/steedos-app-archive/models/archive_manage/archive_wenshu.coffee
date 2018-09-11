@@ -155,85 +155,55 @@ Creator.Objects.archive_wenshu =
 	enable_api: true
 	enable_tree: false
 	filter_company: true
-	fields:
+	fields:	
+		electronic_record_code:
+			type: "text"
+			label:"电子文件号"
+			# group:"内容描述"
+			omit:true
 		# ########档号###########
 		archival_code:
 			type:"text"
 			label:"档号"
-			is_wide:true
-			group:"档号"
+			# group:"档号"
 			omit:true
-
-		# fonds_identifier:
-		# 	type:"text"
-		# 	label:"全宗号"
-		# 	group:"档号"
-		# 	omit:true
 		
-		fonds_name:
-			type:"master_detail"
-			label:"全宗名称"
-			reference_to:"archive_fonds"
-			group:"档号"
-
 		year:
 			type: "text"
 			label:"年度"
-			defaultValue: "2018"
 			sortable:true
-			group:"档号"
+			# group:"档号"
 
 		retention_peroid:
 			type:"master_detail"
 			label:"保管期限"
 			reference_to:"archive_retention"
 			sortable:true
-			group:"档号"
-
-		category_code:
+			# group:"档号"
+		
+		item_number:
+			type: "number"
+			label:"件号"
+			sortable:true
+			# group:"档号"
+		
+		fonds_name:
 			type:"master_detail"
-			label:"类别号"
-			reference_to: "archive_classification"
-			group:"档号"
+			label:"全宗名称"
+			reference_to:"archive_fonds"
+			# group:"档号"
 
 		organizational_structure:
 			type:"master_detail"
 			label:"机构"
 			reference_to: "archive_organization"
-			group:"档号"
-		
-		item_number:
-			type: "number"
-			label:"件号"
-			group:"档号"
-			sortable:true
-		
-		# organizational_structure_code:
-		# 	type:"master_detail"
-		# 	label:"机构代码"
-		# 	reference_to: "archive_organization"
-		# 	group:"档号"
-
-		file_number:
-			type:"text"
-			label:"保管卷号"
-			group:"档号"
-
-		classification_number:
-			type:"text"
-			label:"分类卷号"
-			group:"档号"
+			# group:"档号"
 
 		document_sequence_number:
 			type: "number"
 			label:"文档序号"
-			group:"档号"
-
-		page_number:
-			type: "number"
-			label:"页号"
-			group:"档号"
-
+			# group:"档号"
+		
 		# ########内容描述###########
 		title:
 			type:"textarea"
@@ -243,87 +213,46 @@ Creator.Objects.archive_wenshu =
 			required:true
 			sortable:true
 			searchable:true
-			group:"内容描述"
-
-		parallel_title:
-			type: "text"
-			label:"并列题名"
-			group:"内容描述"
-
-		other_title_information:
-			type:"text"
-			label:"说明题名文字"
-			group:"内容描述"
-
-		annex_title:
-			type:"textarea"
-			label:"附件题名"
-			group:"内容描述"
-		
-		personal_name:
-			type:"text"
-			label:"人名"
-			group:"内容描述"
+			# group:"内容描述"
 
 		document_number:
 			type:"text"
 			label:"文件编号"
-			group:"内容描述"
+			# group:"内容描述"
 			sortable:true
-			
-		author:
-			type:"text"
-			label:"责任者"
-			group:"内容描述"
 		
 		document_date:
 			type:"date"
 			label:"文件日期"
 			format:"YYYYMMDD"
-			# required:true
-			group:"内容描述"
+			# group:"内容描述"
 			sortable:true
+			
+		category_code:
+			type:"master_detail"
+			label:"类别号"
+			reference_to: "archive_classification"
+			# group:"档号"
 
-		start_date:
-			type:"date"
-			label:"起始日期"
-			format:"YYYYMMDD"
-			group:"内容描述"
+		author:
+			type:"text"
+			label:"责任者"
+			# group:"内容描述"
 
-		closing_date:
+		archive_date:
 			type:"date"
-			label:"截止日期"
-			format:"YYYYMMDD"
-			group:"内容描述"
+			label:"归档日期"
+			# group:"形式特征"
 
-		destroy_date:
-			type:"date"
-			label:"销毁期限"
-			format:"YYYYMMDD"
-			group:"内容描述"
-			omit:true
+		archive_dept:
+			type:"text"
+			label:"归档部门"
+			# group:"形式特征"
 		
-		destroy_date_timestamp:
-			type:"number"
-			label:"销毁期限时间戳"
-			group:"内容描述"
-			hidden:true
-
-		prinpipal_receiver:
-			type:"text",
-			label:"主送",
+		descriptor:
+			type:"text"
+			label:"主题词"
 			is_wide:true
-			group:"内容描述"
-
-		other_receivers:
-			type:"text",
-			label:"抄送",
-			group:"内容描述"
-
-		report:
-			type:"text",
-			label:"抄报",
-			group:"内容描述"
 		
 		security_classification:
 			type:"select"
@@ -340,7 +269,7 @@ Creator.Objects.archive_wenshu =
 			]
 			allowedValues:["公开","限制","秘密","机密","绝密","非密","普通"]
 			sortable:true
-			group:"内容描述"
+			# group:"内容描述"
 
 		secrecy_period:
 			type:"select"
@@ -351,102 +280,13 @@ Creator.Objects.archive_wenshu =
 				{label: "30年", value: "30年"}
 			],
 			allowedValues:["10年","20年","30年"],			
-			group:"内容描述"
+			# group:"内容描述"
 		
-		applicant_organization_name:
-			type:"text"
-			label:"拟稿单位"
-			group:"内容描述"
-
-		applicant_name:
-			type:"text"
-			label:"拟稿人"
-			group:"内容描述"
-		
-		main_dept:
-			type:"text",
-			label:"主办部室",
-			is_wide:true
-			defaultValue: ""
-			group:"内容描述"
-
-		storage_location:
-			type:"text"
-			label:"存放位置"
-			group:"内容描述"
-		
-		annotation:
-			type:"textarea",
-			label:"备注"
-			is_wide:true
-			group:"内容描述"
-
-		reference:
-			type: "text"
-			label:"参见"
-			is_wide:true
-			group:"内容描述"
-		
-		descriptor:
-			type:"text"
-			label:"主题词"
-			is_wide:true
-			group:"内容描述"
-
-		keyword:
-			type:"text"
-			label:"关键词"
-			omit:true
-			group:"内容描述"
-
-		abstract:
-			type:"text"
-			label:"摘要"
-			is_wide:true
-			group:"内容描述"
-		
-		archival_category_code:
-			type: "text"
-			label:"档案门类代码"
-			defaultValue: "WS"
-			group:"内容描述"
-			omit:true
-
-		electronic_record_code:
-			type: "text"
-			label:"电子文件号"
-			defaultValue: ""
-			group:"内容描述"
-			omit:true
-		
-		# ########形式特征###########
-		document_aggregation:
-			type:"select",
-			label:"文件组合类型",
-			defaultValue: "单件"
-			options: [
-				{label: "单件", value: "单件"},
-				{label: "组合文件", value: "组合文件"}
-			],
-			allowedValues:["单件","组合文件"],			
-			group:"形式特征"
-		total_number_of_items:
-			type: "number"
-			label:"卷内文件数"
-			group:"形式特征"
 		total_number_of_pages:
 			type:"number"
 			label:"页数"
-			group:"形式特征"
-		language:
-			type:"text"
-			label:"语种"
-			defaultValue: "汉语"
-			group:"形式特征"
-		document_type:
-			type:"text"
-			label:"文件类型"
-			group:"形式特征"
+			# group:"形式特征"
+
 		produce_flag:
 			type:"select",
 			label:"处理标志",
@@ -459,25 +299,25 @@ Creator.Objects.archive_wenshu =
 				{label: "出借", value: "出借"}
 			],
 			allowedValues:["在档","暂存","移出","销毁","出借"],		
-			group:"形式特征"
-		archive_dept:
+			# group:"形式特征"
+
+		document_type:
 			type:"text"
-			label:"归档部门"
-			group:"形式特征"
-		archive_date:
-			type:"date"
-			label:"归档日期"
-			group:"形式特征"
-		orignal_document_creation_way:
+			label:"文件类型"
+			# group:"形式特征"
+		
+		applicant_organization_name:
 			type:"text"
-			label:"电子档案生成方式"
-			defaultValue: "原生"
-			options: [
-				{label: "数字化", value: "数字化"},
-				{label: "原生", value: "原生"}
-			],
-			allowedValues:["数字化","原生"],		
-			group:"形式特征"
+			label:"拟稿单位"
+			# group:"内容描述"
+
+		
+		main_dept:
+			type:"text",
+			label:"主办部室",
+			is_wide:true
+			# group:"内容描述"
+
 		document_status:
 			type:"select",
 			label:"文件状态",
@@ -490,7 +330,145 @@ Creator.Objects.archive_wenshu =
 				{label: "实物归档", value: "实物归档"}
 			]
 			allowedValues:["不归档","电子归档","待归档","暂存","实物归档"]
+			# group:"形式特征"
+
+		annotation:
+			type:"textarea",
+			label:"备注"
+			# is_wide:true
+			# group:"内容描述"
+		
+		prinpipal_receiver:
+			type:"text",
+			label:"主送",
+			is_wide:true
+			# group:"内容描述"
+
+		storage_location:
+			type:"text"
+			label:"存放位置"
+			# group:"内容描述"
+		
+		applicant_name:
+			type:"text"
+			label:"拟稿人"
+			# group:"内容描述"
+
+		start_date:
+			type:"date"
+			label:"起始日期"
+			format:"YYYYMMDD"
+			# group:"内容描述"
+
+		closing_date:
+			type:"date"
+			label:"截止日期"
+			format:"YYYYMMDD"
+			# group:"内容描述"
+
+		destroy_date:
+			type:"date"
+			label:"销毁期限"
+			format:"YYYYMMDD"
+			# group:"内容描述"
+			omit:true
+		
+		destroy_date_timestamp:
+			type:"number"
+			label:"销毁期限时间戳"
+			# group:"内容描述"
+			hidden:true
+
+		other_receivers:
+			type:"text",
+			label:"抄送",
+			# group:"内容描述"
+
+		report:
+			type:"text",
+			label:"抄报",
+			# group:"内容描述"
+
+		reference:
+			type: "text"
+			label:"参见"
+			# is_wide:true
+			# group:"内容描述"
+		
+		keyword:
+			type:"text"
+			label:"关键词"
+			omit:true
+			# group:"内容描述"
+
+		abstract:
+			type:"text"
+			label:"摘要"
+			# is_wide:true
+			# group:"内容描述"
+		
+		archival_category_code:
+			type: "text"
+			label:"档案门类代码"
+			defaultValue: "WS"
+			# group:"内容描述"
+			omit:true
+		
+		parallel_title:
+			type: "text"
+			label:"并列题名"
+			# group:"内容描述"
+
+		other_title_information:
+			type:"text"
+			label:"说明题名文字"
+			# group:"内容描述"
+
+		annex_title:
+			type:"textarea"
+			label:"附件题名"
+			# group:"内容描述"
+		
+		personal_name:
+			type:"text"
+			label:"人名"
+			# group:"内容描述"
+
+		# ########形式特征###########
+		document_aggregation:
+			type:"select",
+			label:"文件组合类型",
+			defaultValue: "单件"
+			options: [
+				{label: "单件", value: "单件"},
+				{label: "组合文件", value: "组合文件"}
+			],
+			allowedValues:["单件","组合文件"],			
 			group:"形式特征"
+
+		total_number_of_items:
+			type: "number"
+			label:"卷内文件数"
+			group:"形式特征"
+		
+		language:
+			type:"text"
+			label:"语种"
+			defaultValue: "汉语"
+			group:"形式特征"
+		
+		
+		orignal_document_creation_way:
+			type:"text"
+			label:"电子档案生成方式"
+			defaultValue: "原生"
+			options: [
+				{label: "数字化", value: "数字化"},
+				{label: "原生", value: "原生"}
+			],
+			allowedValues:["数字化","原生"],		
+			group:"形式特征"
+		
 		aggregation_level:
 			type: "select"
 			label:"聚合层次"
@@ -638,11 +616,13 @@ Creator.Objects.archive_wenshu =
 			type:"text"
 			label:"档案馆名称"
 			group:"来源"
+			hidden:true
 
 		archives_identifier:
 			type:"text"
 			label:"档案馆代码"
 			group:"来源"
+			hidden:true
 
 		fonds_constituting_unit_name:
 			type: "text"
@@ -653,7 +633,6 @@ Creator.Objects.archive_wenshu =
 		related_archives:
 			label:'关联文件'
 			type:'lookup'
-			is_wide:true
 			reference_to:'archive_wenshu'
 			multiple:true
 			group:"来源"
