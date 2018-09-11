@@ -571,7 +571,7 @@ Creator.Objects.archive_wenshu =
 		scanning_resolution:
 			type: "text"
 			label:"扫描分辨率"
-			defaultValue: "250dpi"
+			defaultValue: "220dpi"
 			group:"数字化属性"
 		scanning_color_model:
 			type: "text"

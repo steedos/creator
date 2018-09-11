@@ -46,10 +46,10 @@ _minxiInstanceData = (formData, instance) ->
 	formData.document_aggregation = "单件"
 	formData.language = "汉语"
 	formData.orignal_document_creation_way = "原生"
-	
+
 	# 数字化属性
 	formData.physical_record_characteristics = "PDF"
-	formData.scanning_resolution = "250dpi"
+	formData.scanning_resolution = "220dpi"
 	formData.scanning_color_model = "彩色"
 	formData.image_compression_scheme = "无损压缩"
 
