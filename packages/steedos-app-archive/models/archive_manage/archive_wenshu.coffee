@@ -771,7 +771,7 @@ Creator.Objects.archive_wenshu =
 			filter_scope: "space"
 			filters: [["is_received", "=", true],["is_destroyed", "=", false]]
 			# columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
-			columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation"]
+			columns:["title",'archival_code','item_number',"author","electronic_record_code","total_number_of_pages","annotation"]
 # 		borrow:
 #             label:"查看"
 #             filter_scope: "space"

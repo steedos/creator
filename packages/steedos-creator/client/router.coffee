@@ -8,7 +8,14 @@ checkUserSigned = (context, redirect) ->
 	if listTreeCompany
 		Session.set('listTreeCompany', listTreeCompany);
 	else
-		Session.set('listTreeCompany', null);
+		# 从当前用户的space_users表中获取
+		s_user = db.space_users.findOne()
+		console.log "s_user",s_user?.company
+		if s_user?.company
+			localStorage.setItem("listTreeCompany", s_user?.company)
+			Session.set('listTreeCompany', s_user?.company);
+		else
+			Session.set('listTreeCompany', null);
 	
 	if !Meteor.userId()
 		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
