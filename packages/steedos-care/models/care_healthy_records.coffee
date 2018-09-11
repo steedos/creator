@@ -1,5 +1,5 @@
-Creator.Objects.healthy_records = 
-	name: "healthy_records"
+Creator.Objects.care_healthy_records = 
+	name: "care_healthy_records"
 	icon: "contact"
 	label: "健康记录"
 	enable_search: true
@@ -8,7 +8,7 @@ Creator.Objects.healthy_records =
 			type: "lookup"
 			label:"cch编号和孩子姓名"
 			required: true
-			reference_to: "care_records"
+			reference_to: "care_medical_records"
 		
 		name: 
 			type: "textarea"

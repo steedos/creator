@@ -1,5 +1,5 @@
-Creator.Objects.surgery_records = 
-	name: "surgery_records"
+Creator.Objects.care_surgery_records = 
+	name: "care_surgery_records"
 	icon: "contact"
 	label: "手术记录"
 	enable_search: true
@@ -14,7 +14,7 @@ Creator.Objects.surgery_records =
 		username: 
 			type: "lookup"
 			label:"cch编号和孩子姓名"
-			reference_to: "care_records"
+			reference_to: "care_medical_records"
 			required: true
 			group:'患者信息'
 

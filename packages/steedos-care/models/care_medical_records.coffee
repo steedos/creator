@@ -1,5 +1,5 @@
-Creator.Objects.care_records = 
-	name: "care_records"
+Creator.Objects.care_medical_records = 
+	name: "care_medical_records"
 	icon: "contact"
 	label: "医疗康复记录"
 	enable_search: true
@@ -10,21 +10,33 @@ Creator.Objects.care_records =
 			required: true
 			searchable:true
 			index:true
-			group:'基本信息'
 
 		gender: 
 			type: "select"
 			label:"性别（Gender）"
 			searchable:true
 			index:true
-			options: "男孩: boy, 女孩:girl"
-			group:'基本信息'
+			options: "男孩,女孩"
 
 		birthday: 
 			type: "date"
 			label:"生日（Date of Birth）"
 			searchable:true
 			index:true
+			group:'基本信息'
+
+		nickname: 
+			type: "text"
+			label:"昵称"
+			searchable:true
+			index:true
+			group:'基本信息'
+
+		photo: 
+			type: "image"
+			label:"头像"
+			searchable:true
+			index:true	
 			group:'基本信息'
 
 

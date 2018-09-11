@@ -104,7 +104,7 @@ steedos:sso
 #steedos:app-crm
 #steedos:app-informations
 #steedos:app-cms
-steedos:hospital
+steedos:care
 steedos:app-workflow
 steedos:app-admin
 #steedos:app-example
