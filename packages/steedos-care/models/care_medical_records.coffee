@@ -71,7 +71,6 @@ Creator.Objects.care_medical_records =
 			type: "textarea"
 			label:"医疗康复记录（Care Records）"
 			searchable:true
-			index:true
 			is_wide:true
 
 		disease: 
