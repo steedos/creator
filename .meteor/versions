@@ -141,6 +141,7 @@ steedos:autoform-file@0.4.2_3
 steedos:autoform-lookup@0.3.10
 steedos:base@0.0.84
 steedos:bootstrap3-datetimepicker@4.17.47
+steedos:care@0.0.1
 steedos:cfs-access-point@0.1.50
 steedos:cfs-aliyun@0.1.0
 steedos:cfs-base-package@0.0.30
@@ -200,7 +201,6 @@ steedos:useraccounts-flow-routing@1.14.2_4
 steedos:vip-card@0.0.1
 steedos:vip-post@0.0.1
 steedos:weixin@0.0.1
-steedos:hospital@0.0.1
 steedos:weixin-aes@0.0.1
 steedos:weixin-template-message-queue@0.0.1
 tap:i18n@1.8.2
