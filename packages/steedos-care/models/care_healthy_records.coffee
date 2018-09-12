@@ -11,10 +11,9 @@ Creator.Objects.care_healthy_records =
 			reference_to: "care_medical_records"
 		
 		name: 
-			type: "textarea"
+			type: "text"
 			label:"疾病名称"
 			searchable:true
-			index:true
 
 		age: 
 			type: "number"
@@ -33,13 +32,22 @@ Creator.Objects.care_healthy_records =
 			label:"体重（kg）"
 			index:true
 
+		photo_link: 
+			type: "image"
+			label:"照片"
+			multiple : true
+
+		story:
+			type: "textarea"
+			label:"成长小故事"
+			is_wide:true
+
+
 
 		care_records: 
 			type: "textarea"
 			label:"就医过程"
-			searchable:true
 			is_wide: true
-			index:true
 
 		owner:
 			hidden:true
@@ -59,7 +67,7 @@ Creator.Objects.care_healthy_records =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "username", "age", "height","weight","care_records"]
+			columns: ["name", "username", "age", "height","weight","story","care_records"]
 			filter_scope: "space"
 
 	permission_set:
