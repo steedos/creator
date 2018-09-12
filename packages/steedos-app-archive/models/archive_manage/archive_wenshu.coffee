@@ -598,6 +598,7 @@ Creator.Objects.archive_wenshu =
 		current_location:
 			type:"text"
 			label:"当前位置"
+			defaultValue:"\\\\192.168.0.151\\beta\\data\\oafile"
 			is_wide:true
 			group:"存储位置"
 
