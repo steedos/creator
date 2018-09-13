@@ -415,7 +415,7 @@ Creator.Objects.archive_wenshu =
 			label:"档案门类代码"
 			defaultValue: "WS"
 			# group:"内容描述"
-			omit:true
+			# omit:true
 		
 		parallel_title:
 			type: "text"
