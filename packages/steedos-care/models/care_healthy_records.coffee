@@ -5,7 +5,7 @@ Creator.Objects.care_healthy_records =
 	enable_search: true
 	fields:
 		username: 
-			type: "lookup"
+			type: "master_detail"
 			label:"cch编号和孩子姓名"
 			required: true
 			reference_to: "care_medical_records"

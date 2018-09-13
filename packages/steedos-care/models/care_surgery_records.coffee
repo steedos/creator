@@ -12,7 +12,7 @@ Creator.Objects.care_surgery_records =
 			index:true
 
 		username: 
-			type: "lookup"
+			type: "master_detail"
 			label:"cch编号和孩子姓名"
 			reference_to: "care_medical_records"
 			required: true
