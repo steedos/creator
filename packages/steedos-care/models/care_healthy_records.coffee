@@ -90,7 +90,6 @@ Creator.Objects.care_healthy_records =
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
-				console.log('before.insert.server.care_healthy_records。。。')
 				if doc.username
 					res = Creator.getCollection("care_medical_records").findOne({_id: doc.username}, {fields: {birthday: 1}})
 					if res.birthday
