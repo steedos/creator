@@ -70,11 +70,8 @@ _minxiInstanceData = (formData, instance) ->
 	# 根据FONDSID查找全宗号和全总名称
 	fondObj = Creator.Collections["archive_fonds"].findOne({'name':field_values?.FONDSID})
 	if fondObj
-		# formData.fonds_identifier = fondObj?.code
 		formData.fonds_name = fondObj?._id
-	else
-		# formData.fonds_identifier = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.code
-		formData.fonds_name = RecordsQHD?.settings_records_qhd?.to_archive?.fond?.id
+		formData.company = fondObj?.company
 
 	# 保管期限代码查找
 	retentionObj = Creator.Collections["archive_retention"].findOne({'name':field_values?.baocunqixian})
@@ -464,7 +461,7 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 			logger.error e
 			console.log e
 	else
-		InstancesToArchive.failed instance, "立档单位 不能为空"
+		InstancesToArchive.failed instance, "立档单位未找到"
 
 
 @Test = {}
