@@ -87,7 +87,7 @@ set_company = (record_id)->
 # 设置档号
 set_archivecode = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
-	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.year
+	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.year and record?.organizational_structure
 		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
 		retention_peroid_code = Creator.Collections["archive_retention"].findOne(record.retention_peroid,{fields:{code:1}})?.code
 		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
