@@ -87,14 +87,17 @@ set_company = (record_id)->
 # 设置档号
 set_archivecode = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
-	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.organizational_structure and record?.year
+	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.year
 		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
 		retention_peroid_code = Creator.Collections["archive_retention"].findOne(record.retention_peroid,{fields:{code:1}})?.code
 		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
 		year = record.year
 		item_number = (Array(6).join('0') + record.item_number).slice(-4)
-		if fonds_code and year and retention_peroid_code and organizational_structure_code and item_number
-			archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
+		if fonds_code and year and retention_peroid_code and item_number
+			if organizational_structure_code
+				archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
+			else
+				archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+item_number
 			Creator.Collections["archive_wenshu"].direct.update(record_id,
 			{
 				$set:{
