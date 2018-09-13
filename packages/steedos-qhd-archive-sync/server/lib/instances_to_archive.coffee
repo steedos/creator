@@ -29,9 +29,9 @@ _minxiInstanceData = (formData, instance) ->
 	field_values = InstanceManager.handlerInstanceByFieldMap(instance)
 
 	formData.applicant_name = field_values?.nigaorens
-	formData.document_status = field_values?.guidangzhuangtai
+	formData.document_status = "电子归档"
 	formData.archive_dept = field_values?.guidangbumen
-	formData.applicant_organization_name=field_values?.nigaodanwei || field_values?.FILE_CODE_fzr
+	formData.applicant_organization_name = field_values?.nigaodanwei || field_values?.FILE_CODE_fzr
 	formData.total_number_of_pages = field_values?.PAGE_COUNT
 	formData.security_classification = field_values?.miji
 	formData.document_type = field_values?.wenjianleixing
@@ -39,6 +39,8 @@ _minxiInstanceData = (formData, instance) ->
 	formData.document_number = field_values?.wenjianzihao
 	formData.author = field_values?.FILE_CODE_fzr
 	formData.title = instance.name
+	formData.prinpipal_receiver = field_values?.zhusong
+	formData.year = formData.suoshuniandu
 
 	# 默认值
 	formData.archival_category_code = "WS"

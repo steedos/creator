@@ -321,7 +321,7 @@ Creator.Objects.archive_wenshu =
 		document_status:
 			type:"select",
 			label:"文件状态",
-			defaultValue: "暂存"
+			defaultValue: "电子归档"
 			options: [
 				{label: "不归档", value: "不归档"},
 				{label: "电子归档", value: "电子归档"},
@@ -330,7 +330,7 @@ Creator.Objects.archive_wenshu =
 				{label: "实物归档", value: "实物归档"}
 			]
 			allowedValues:["不归档","电子归档","待归档","暂存","实物归档"]
-			# group:"形式特征"
+			group:"形式特征"
 
 		annotation:
 			type:"textarea",
@@ -344,9 +344,9 @@ Creator.Objects.archive_wenshu =
 			is_wide:true
 			# group:"内容描述"
 
-		storage_location:
-			type:"text"
-			label:"存放位置"
+		# storage_location:
+		# 	type:"text"
+		# 	label:"存放位置"
 			# group:"内容描述"
 		
 		applicant_name:
