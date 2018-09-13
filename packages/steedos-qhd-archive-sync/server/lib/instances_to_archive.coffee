@@ -40,7 +40,7 @@ _minxiInstanceData = (formData, instance) ->
 	formData.author = field_values?.FILE_CODE_fzr
 	formData.title = instance.name
 	formData.prinpipal_receiver = field_values?.zhusong
-	formData.year = formData.suoshuniandu
+	formData.year = field_values.suoshuniandu
 
 	# 默认值
 	formData.archival_category_code = "WS"
@@ -468,8 +468,8 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 
 
 @Test = {}
-# Test.run('sMwemMTZDkmCSpSuC','5Jhi3dArqvCPgpLWQ')
-Test.run = (ins_id, record_id)->
+# Test.run('sMwemMTZDkmCSpSuC')
+Test.run = (ins_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
 		InstancesToArchive.syncNonContractInstance instance
