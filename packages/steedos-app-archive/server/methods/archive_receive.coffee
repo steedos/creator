@@ -14,8 +14,8 @@ Meteor.methods
 				if record?.fonds_name and record?.archival_category_code and record?.year and record?.external_id
 					fonds_name_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
 					year = record.year
-					external_id = record.external_id
-					electronic_record_code = fonds_name_code + "WS" + year + external_id
+					id = record._id
+					electronic_record_code = fonds_name_code + "WS" + year + id
 					collection.direct.update(selectedId,{$set:{electronic_record_code:electronic_record_code}})
 				Meteor.call("archive_new_audit",selectedId,"接收档案","成功",space)
 			else

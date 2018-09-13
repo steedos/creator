@@ -30,3 +30,33 @@ Meteor.methods
 		catch e
 			error = e
 			return error
+	
+	syncEcode: (spaces, year) ->
+		try
+			if spaces and year
+				# 查找当年度不存在电子文件号的文件
+				query = {
+					space: {$in: spaces},
+					year: year
+				}
+				console.log "query",query
+				record_objs = Creator.Collections["archive_wenshu"].find(query,
+					{fields: {_id: 1, year: 1, archival_category_code: 1,fonds_name: 1}}).fetch()
+				console.log "record_objs",record_objs?.length
+				record_objs.forEach (record)->
+					# 更新电子文件号
+					if record?.fonds_name and record?.archival_category_code and record?.year and record?._id
+						fonds_name_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
+						year = record.year
+						id = record._id
+						electronic_record_code = fonds_name_code + "WS" + year + id
+						console.log "record._id",record._id
+						Creator.Collections["archive_wenshu"].direct.update(record._id,
+							{$set:{electronic_record_code:electronic_record_code}})
+
+				return 'success'
+			else
+				return 'No spaces and record_ids'
+		catch e
+			error = e
+			return error

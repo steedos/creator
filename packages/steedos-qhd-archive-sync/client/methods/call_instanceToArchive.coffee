@@ -43,3 +43,20 @@ Creator.syncZhusong = (record_ids)->
             return 'Parameter should be [object Array]!'
     else
         return 'You are not CloudAdmin!'
+
+# 更新电子文件号
+Creator.syncEcode = (year)->
+    if Steedos.isCloudAdmin()
+        spaceId = Steedos.spaceId()
+        spaces = []
+        spaces.push spaceId
+        Meteor.call("syncEcode", spaces, year, 
+            (error,result) ->
+                if result
+                    console.log 'Success'
+                else
+                    console.log 'Error',error
+        )
+        return
+    else
+        return 'You are not CloudAdmin!'
