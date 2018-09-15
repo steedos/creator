@@ -34,6 +34,8 @@ Creator.loadObjects = (obj, object_name)->
 	if !obj.list_views
 		obj.list_views = {}
 
+	console.log('loadObjects', obj.name, object_name)
+
 	Creator.convertObject(obj)
 	new Creator.Object(obj);
 

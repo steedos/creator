@@ -109,6 +109,7 @@ Creator.Objects.object_actions =
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
 				if modifier?.$set?.name && isRepeatedName(doc, modifier.$set.name)
+					console.log("update actions对象名称不能重复#{doc.name}")
 					throw new Meteor.Error 500, "对象名称不能重复"
 
 		"before.insert.server.object_actions":
@@ -117,4 +118,5 @@ Creator.Objects.object_actions =
 			todo: (userId, doc)->
 				doc.visible = true
 				if isRepeatedName(doc)
-					throw new Meteor.Error 500, "对象名称不能重复"
+					console.log("insert actions对象名称不能重复#{doc.name}")
+					throw new Meteor.Error 500, "对象名称不能重复#{doc.name}"

@@ -116,24 +116,26 @@ Creator.Objects.object_triggers =
 			todo: (userId, doc)->
 				_syncToObject(doc)
 
-		"before.delete.server.object_actions":
+		"before.delete.server.object_triggers":
 			on: "server"
 			when: "before.remove"
 			todo: (userId, doc)->
 				check(userId, doc)
 
-		"before.update.server.object_actions":
+		"before.update.server.object_triggers":
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
 				check(userId, doc)
 				if modifier?.$set?.name && isRepeatedName(doc, modifier.$set.name)
-					throw new Meteor.Error 500, "对象名称不能重复"
+					console.log("update triggers对象名称不能重复#{doc.name}")
+					throw new Meteor.Error 500, "对象名称不能重复#{doc.name}"
 
-		"before.insert.server.object_actions":
+		"before.insert.server.object_triggers":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
 				check(userId, doc)
 				if isRepeatedName(doc)
+					console.log("insert triggers对象名称不能重复#{doc.name}")
 					throw new Meteor.Error 500, "对象名称不能重复"

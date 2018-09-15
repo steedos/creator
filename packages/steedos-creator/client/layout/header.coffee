@@ -22,6 +22,9 @@ Template.creatorHeader.helpers
 	signOutUrl: ()->
 		return Creator.getRelativeUrl("/steedos/logout")
 
+	isAdmin: ()->
+		return Steedos.isSpaceAdmin()
+
 
 Template.creatorHeader.events
 
@@ -30,3 +33,6 @@ Template.creatorHeader.events
 
 	'click .creator-button-help': (e, t)->
 		Steedos.openWindow("https://www.steedos.com/cn/help/creator/")
+
+	'click .creator-button-shopping': (e, t)->
+		Modal.show('template_apps_list_modal')

@@ -7,6 +7,11 @@ Creator.deps = {
 	object: new Tracker.Dependency
 };
 
+Creator._TEMPLATE = {
+	Apps: {},
+	Objects: {}
+}
+
 Creator.getObject = (object_name)->
 	if Meteor.isClient
 		Creator.deps?.object?.depend()

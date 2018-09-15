@@ -109,7 +109,7 @@ Creator.getObjectSchema = (obj) ->
 								fs.autoform.create = true
 								fs.createFunction = (lookup_field)->
 									Modal.show("CreatorObjectModal", {
-										collection: "Creator.Collections.#{field.reference_to}",
+										collection: "Creator.Collections.#{Creator.getCollection(field.reference_to)._name}",
 										formId: "new#{field.reference_to}",
 										object_name: "#{field.reference_to}",
 										operation: "insert",
