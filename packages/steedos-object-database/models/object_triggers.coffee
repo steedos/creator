@@ -29,6 +29,7 @@ check = (userId, doc)->
 	if Steedos.isSpaceAdmin(userId, doc.space)
 		throw new Meteor.Error 500, "只有工作去管理员才能配置触发器"
 
+	#TODO 校验关键字：remove、 drop、delete、db、collection、eval等，然后取消 企业版版限制
 	if doc.on == 'server' && !Steedos.isLegalVersion(doc.space,"workflow.enterprise")
 		throw new Meteor.Error 500, "只有企业版支持配置服务端的触发器"
 
