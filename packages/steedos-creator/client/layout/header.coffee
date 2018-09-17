@@ -26,7 +26,7 @@ Template.creatorHeader.helpers
 		return Steedos.isSpaceAdmin()
 
 	showShopping: ()->
-		return Steedos.isSpaceAdmin() && Creator._TEMPLATE?.Apps?.length > 0
+		return Steedos.isSpaceAdmin() && !_.isEmpty(Creator?._TEMPLATE?.Apps)
 
 
 Template.creatorHeader.events

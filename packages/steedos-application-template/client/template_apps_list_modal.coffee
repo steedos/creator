@@ -22,7 +22,8 @@ Template.template_apps_list_modal.helpers
 
 Template.template_apps_list_modal.events
 	'click .template-install': (e, template)->
-		console.log('this', this)
+		if !Steedos.isLegalVersion(Session.get("spaceId"),"workflow.enterprise")
+			return Steedos.spaceUpgradedModal()
 		self = this
 		swal
 			title: "安装#{this.name}"
@@ -44,6 +45,8 @@ Template.template_apps_list_modal.events
 
 
 	'click .template-upgrade': (e, template)->
+		if !Steedos.isLegalVersion(Session.get("spaceId"),"workflow.enterprise")
+			return Steedos.spaceUpgradedModal()
 		console.log('template-upgrade this', this)
 		self = this
 		swal
@@ -65,6 +68,8 @@ Template.template_apps_list_modal.events
 							, 1000 * 1.3
 
 	'click .template-uninstall': (e, template)->
+		if !Steedos.isLegalVersion(Session.get("spaceId"),"workflow.enterprise")
+			return Steedos.spaceUpgradedModal()
 		console.log('template-uninstall this', this)
 		self = this
 		swal
