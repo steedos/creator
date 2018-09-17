@@ -179,7 +179,14 @@ Creator.getObjectSchema = (obj) ->
 										return "/app/#{Session.get('app_id')}/#{_reference}/view/"
 								}
 							else
-								throw new Meteor.Error("Creator.getObjectSchema", "#{obj.name}.#{field_name} reference_to #{_reference} Can not find.")
+
+								fs.autoform.references.push {
+									object: _reference
+									link: ()->
+										return "/app/#{Session.get('app_id')}/#{_reference}/view/"
+								}
+
+#								throw new Meteor.Error("Creator.getObjectSchema", "#{obj.name}.#{field_name} reference_to #{_reference} Can not find.")
 			else
 				fs.autoform.type = "steedosLookups"
 				fs.autoform.defaultIcon = field.defaultIcon

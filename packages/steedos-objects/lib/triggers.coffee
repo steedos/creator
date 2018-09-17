@@ -33,7 +33,7 @@ cleanTrigger = (object_name)->
 		_hook.remove()
 
 Creator.initTriggers = (object_name)->
-
+#	console.log('Creator.initTriggers object_name', object_name)
 	obj = Creator.getObject(object_name)
 
 	cleanTrigger(object_name)

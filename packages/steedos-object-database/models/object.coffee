@@ -1,6 +1,6 @@
 #TODO object的name不能重复，需要考虑到系统表
 isRepeatedName = (doc)->
-	other = Creator.getCollection("objects").find({_id: {$ne: doc._id}, name: doc.name}, {fields:{_id: 1}})
+	other = Creator.getCollection("objects").find({_id: {$ne: doc._id}, space: doc.space, name: doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false

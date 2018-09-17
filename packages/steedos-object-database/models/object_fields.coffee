@@ -1,5 +1,5 @@
 _syncToObject = (doc) ->
-	object_fields = Creator.getCollection("object_fields").find({object: doc.object}, {
+	object_fields = Creator.getCollection("object_fields").find({space: doc.space, object: doc.object}, {
 		fields: {
 			created: 0,
 			modified: 0,
@@ -30,13 +30,13 @@ _syncToObject = (doc) ->
 				fields[k].fields = {}
 			_.extend(fields[k].fields, f)
 
-	Creator.getCollection("objects").update({name: doc.object}, {
+	Creator.getCollection("objects").update({space: doc.space, name: doc.object}, {
 		$set:
 			fields: fields
 	})
 
 isRepeatedName = (doc, name)->
-	other = Creator.getCollection("object_fields").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
+	other = Creator.getCollection("object_fields").find({object: doc.object,  space: doc.space, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false

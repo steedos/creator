@@ -1,5 +1,5 @@
 _syncToObject = (doc) ->
-	object_triggers = Creator.getCollection("object_triggers").find({object: doc.object, is_enable: true}, {
+	object_triggers = Creator.getCollection("object_triggers").find({space: doc.space, object: doc.object, is_enable: true}, {
 		fields: {
 			created: 0,
 			modified: 0,
@@ -14,13 +14,13 @@ _syncToObject = (doc) ->
 	_.forEach object_triggers, (f)->
 		triggers[f.name] = f
 
-	Creator.getCollection("objects").update({name: doc.object}, {
+	Creator.getCollection("objects").update({space: doc.space, name: doc.object}, {
 		$set:
 			triggers: triggers
 	})
 
 isRepeatedName = (doc, name)->
-	other = Creator.getCollection("object_triggers").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
+	other = Creator.getCollection("object_triggers").find({object: doc.object,  space: doc.space, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false

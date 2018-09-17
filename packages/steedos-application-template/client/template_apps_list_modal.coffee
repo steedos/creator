@@ -40,7 +40,7 @@ Template.template_apps_list_modal.events
 							toastr.success("安装完成")
 							Meteor.setTimeout ()->
 								window.location.reload()
-							, 1000 * 3
+							, 1000 * 1.3
 
 
 	'click .template-upgrade': (e, template)->
@@ -62,7 +62,7 @@ Template.template_apps_list_modal.events
 							toastr.success("升级完成")
 							Meteor.setTimeout ()->
 								window.location.reload()
-							, 1000 * 3
+							, 1000 * 1.3
 
 	'click .template-uninstall': (e, template)->
 		console.log('template-uninstall this', this)
@@ -84,4 +84,4 @@ Template.template_apps_list_modal.events
 
 							Meteor.setTimeout ()->
 								window.location.reload()
-							, 1000 * 3
+							, 1000 * 1.3
