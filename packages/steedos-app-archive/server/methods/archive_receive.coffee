@@ -10,12 +10,13 @@ Meteor.methods
 			successNum = successNum+ newSuccessNum
 			if newSuccessNum
 				record = collection.findOne(selectedId,{fields:{fonds_name:1,archival_category_code:1,year:1,external_id:1}})
-				#sequence = collection.find({year:record?.year,is_received:true},{fields:{_id: 1}}).count()+1
-				if record?.fonds_name and record?.archival_category_code and record?.year and record?.external_id
+				if record?.fonds_name and record?.year
 					fonds_name_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
 					year = record.year
-					id = record._id
-					electronic_record_code = fonds_name_code + "WS" + year + id
+					count = collection.find({year:year,is_received:true}).count()
+					strcount = "0000000" + count
+					count_code = strcount.substr(strcount.length-6)
+					electronic_record_code = fonds_name_code + "WS" + year + count_code
 					collection.direct.update(selectedId,{$set:{electronic_record_code:electronic_record_code}})
 				Meteor.call("archive_new_audit",selectedId,"接收档案","成功",space)
 			else
