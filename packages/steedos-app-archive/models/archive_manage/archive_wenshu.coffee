@@ -357,16 +357,16 @@ Creator.Objects.archive_wenshu =
 			label:"拟稿人"
 			# group:"内容描述"
 
-		start_date:
-			type:"date"
-			label:"起始日期"
-			format:"YYYYMMDD"
+		# start_date:
+		# 	type:"date"
+		# 	label:"起始日期"
+		# 	format:"YYYYMMDD"
 			# group:"内容描述"
 
-		closing_date:
-			type:"date"
-			label:"截止日期"
-			format:"YYYYMMDD"
+		# closing_date:
+		# 	type:"date"
+		# 	label:"截止日期"
+		# 	format:"YYYYMMDD"
 			# group:"内容描述"
 
 		destroy_date:
@@ -449,10 +449,10 @@ Creator.Objects.archive_wenshu =
 			allowedValues:["单件","组合文件"],			
 			group:"形式特征"
 
-		total_number_of_items:
-			type: "number"
-			label:"卷内文件数"
-			group:"形式特征"
+		# total_number_of_items:
+		# 	type: "number"
+		# 	label:"卷内文件数"
+		# 	group:"形式特征"
 		
 		language:
 			type:"text"
@@ -746,9 +746,9 @@ Creator.Objects.archive_wenshu =
 			hidden: true
 
 	list_views:
-		recent:
-			label: "最近查看"
-			filter_scope: "space"
+		# recent:
+		# 	label: "最近查看"
+		# 	filter_scope: "space"
 		all:
 			label: "全部"
 			filter_scope: "space"
