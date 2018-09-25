@@ -183,6 +183,10 @@ Creator.Objects.archive_wenshu =
 			label:"电子文件号"
 			omit:true
 		
+		document_type:
+			type:"text"
+			label:"文件类型"
+		
 		archival_code:
 			type:"text"
 			label:"档号"
@@ -434,11 +438,6 @@ Creator.Objects.archive_wenshu =
 				{label: "原生", value: "原生"}
 			],
 			allowedValues:["数字化","原生"],		
-			group:"形式特征"
-		
-		document_type:
-			type:"text"
-			label:"文件类型"
 			group:"形式特征"
 		
 		document_status:
