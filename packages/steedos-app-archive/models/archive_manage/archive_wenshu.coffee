@@ -72,6 +72,22 @@ set_init = (record_id)->
 		}
 	})
 
+# 设置电子文件号
+set_electronic_record_code = (record_id)->
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,year:1}})
+	if record?.fonds_name and record?.year
+		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
+		count = Creator.Collections["archive_wenshu"].find({year:year}).count()
+		strcount = "0000000" + count
+		count_code = strcount.substr(strcount.length-6)
+		electronic_record_code = fonds_code + "WS" + record?.year + count_code
+		Creator.Collections["archive_wenshu"].direct.update(record_id,
+		{
+			$set:{
+				electronic_record_code: electronic_record_code
+			}
+		})
+
 set_company = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
 	if record?.fonds_name
@@ -758,6 +774,8 @@ Creator.Objects.archive_wenshu =
 			todo: (userId, doc)->
 				# 保存初始条件
 				set_init(doc._id)
+				# 设置电子文件号
+				set_electronic_record_code(doc._id)
 				# 设置公司
 				set_company(doc._id)
 				# 设置保管期限
