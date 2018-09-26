@@ -9,6 +9,7 @@ Meteor.methods
 		auditdoc.space = space
 		auditdoc.action_administrative_records_id = record_id
 		Creator.Collections["archive_audit"].insert auditdoc
+		
 	archive_item_number: (object_name,SelectedIds,init_num) ->
 		SelectedIds.forEach (SelectedId)->
 			Creator.Collections[object_name].update(SelectedId,{$set:item_number:init_num})

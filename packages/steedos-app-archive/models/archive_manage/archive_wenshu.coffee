@@ -102,6 +102,7 @@ set_company = (record_id)->
 		
 # 设置档号
 set_archivecode = (record_id)->
+	console.log "修改档号"
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
 	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.year and record?.organizational_structure
 		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
@@ -793,9 +794,9 @@ Creator.Objects.archive_wenshu =
 				if modifier['$set']?.fonds_name
 					set_company(doc._id)
 				if modifier['$set']?.item_number or modifier['$set']?.organizational_structure or modifier['$set']?.retention_peroid or modifier['$set']?.fonds_name or modifier['$set']?.year
-                    set_archivecode(doc._id)
-                if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
-                	set_destory(doc)
+					set_archivecode(doc._id)
+				if modifier['$set']?.retention_peroid || modifier['$set']?.document_date
+					set_destory(doc)
 				if modifier['$set']?.archive_dept # 设置分类号
 					set_category_code(doc)
 				
