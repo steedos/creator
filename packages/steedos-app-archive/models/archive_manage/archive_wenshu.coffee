@@ -323,7 +323,7 @@ Creator.Objects.archive_wenshu =
 		security_classification:
 			type:"select"
 			label:"密级"
-			defaultValue: "公开"
+			defaultValue:"公开"
 			options: [
 				{label: "公开", value: "公开"},
 				{label: "限制", value: "限制"},

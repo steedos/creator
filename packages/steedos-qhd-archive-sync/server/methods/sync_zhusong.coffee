@@ -75,7 +75,7 @@ Meteor.methods
 					instance = Creator.Collections["instances"].findOne({_id: record_obj.external_id}, {fields: {values: 1}})
 					if instance
 						# 查找全宗
-						
+						console.log "instance"
 						# Creator.Collections["archive_wenshu"].update(
 						# 	{_id: record_obj._id}, {
 						# 	$set: {
