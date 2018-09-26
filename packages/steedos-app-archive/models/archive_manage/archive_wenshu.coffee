@@ -241,7 +241,7 @@ Creator.Objects.archive_wenshu =
 			is_wide:true
 			is_name:true
 			required:true
-			sortable:true
+			# sortable:true
 			searchable:true
 			group:"内容描述"
 		
@@ -368,8 +368,6 @@ Creator.Objects.archive_wenshu =
 			label:"参见"
 			group:"内容描述"
 		
-		
-
 		archive_dept:
 			type:"text"
 			label:"归档部门"
