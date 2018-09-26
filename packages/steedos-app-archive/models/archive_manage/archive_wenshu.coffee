@@ -77,7 +77,7 @@ set_electronic_record_code = (record_id)->
 	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,year:1}})
 	if record?.fonds_name and record?.year
 		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
-		count = Creator.Collections["archive_wenshu"].find({year:year}).count()
+		count = Creator.Collections["archive_wenshu"].find({year:record?.year}).count()
 		strcount = "0000000" + count
 		count_code = strcount.substr(strcount.length-6)
 		electronic_record_code = fonds_code + "WS" + record?.year + count_code
@@ -111,9 +111,9 @@ set_archivecode = (record_id)->
 		item_number = (Array(6).join('0') + record.item_number).slice(-4)
 		if fonds_code and year and retention_peroid_code and item_number
 			if organizational_structure_code
-				archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+ organizational_structure_code + "-"+item_number
+				archive_code = fonds_code + "-WS" + "-" + year + "-"+ retention_peroid_code + "-" + organizational_structure_code + "-"+item_number
 			else
-				archive_code = fonds_code + "-WS" + "-"+year + "-"+ retention_peroid_code + "-"+item_number
+				archive_code = fonds_code + "-WS" + "-" + year + "-"+ retention_peroid_code + "-" + item_number
 			Creator.Collections["archive_wenshu"].direct.update(record_id,
 			{
 				$set:{
@@ -174,7 +174,6 @@ Creator.Objects.archive_wenshu =
 	enable_tree: false
 	filter_company: true
 	fields:
-		
 		archival_category_code:
 			type: "text"
 			label:"档案门类代码"
@@ -257,7 +256,6 @@ Creator.Objects.archive_wenshu =
 			is_wide:true
 			is_name:true
 			required:true
-			# sortable:true
 			searchable:true
 			group:"内容描述"
 		
