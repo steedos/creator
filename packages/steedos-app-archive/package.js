@@ -13,7 +13,7 @@ Package.onUse(function(api) {
 
 	api.addFiles('core.coffee');	
 	api.addFiles('client/core.coffee','client');
-
+	api.addFiles('client/archive.css','client');
 
 
 	// 档案管理
