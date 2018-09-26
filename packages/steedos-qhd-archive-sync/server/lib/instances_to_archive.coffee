@@ -4,12 +4,22 @@ fs = Npm.require('fs')
 
 logger = new Logger 'Records_QHD -> InstancesToArchive'
 
+setFileName = (record_id, file_prefix) ->
+	file_name = "未命名"
+	collection = Creator.Collections["cms_files"]
+	count = collection.find({"parent.ids": record_id}).count()
+	count = count + 1
+	strcount = "00" + count
+	count_code = strcount.substr(strcount.length-2)
+	file_name =  file_prefix + "-" + count_code
+	return file_name
 
 #	校验必填
 _checkParameter = (formData) ->
 	if !formData.fonds_name
 		return false
 	return true
+
 
 # 整理档案表数据
 _minxiInstanceData = (formData, instance) ->
@@ -29,10 +39,10 @@ _minxiInstanceData = (formData, instance) ->
 	field_values = InstanceManager.handlerInstanceByFieldMap(instance)
 
 	formData.applicant_name = field_values?.nigaorens
-	formData.document_status = "电子归档"
+	
 	formData.archive_dept = field_values?.guidangbumen
 	formData.applicant_organization_name = field_values?.nigaodanwei || field_values?.FILE_CODE_fzr
-	formData.total_number_of_pages = field_values?.PAGE_COUNT
+	
 	formData.security_classification = field_values?.miji
 	formData.document_type = field_values?.wenjianleixing
 	formData.document_date = field_values?.wenjianriqi
@@ -40,14 +50,27 @@ _minxiInstanceData = (formData, instance) ->
 	formData.author = field_values?.FILE_CODE_fzr
 	formData.title = instance.name
 	formData.prinpipal_receiver = field_values?.zhusong
-	formData.year = field_values.suoshuniandu
+	formData.year = field_values?.suoshuniandu
+
+	# 设置页数
+	if field_values?.PAGE_COUNT
+		old_page = field_values?.PAGE_COUNT || "00"
+		str_page_count = old_page.substr(0,old_page.length-1);
+		if str_page_count
+			formData.total_number_of_pages = parseInt(str_page_count) + 1
+	else
+		formData.total_number_of_pages = "1"
 
 	# 默认值
+	formData.fonds_constituting_unit_name = "河北港口集团有限公司"
 	formData.archival_category_code = "WS"
 	formData.aggregation_level = "文件"
 	formData.document_aggregation = "单件"
 	formData.language = "汉语"
+
 	formData.orignal_document_creation_way = "原生"
+	formData.document_status = "电子归档"
+
 
 	# 数字化属性
 	formData.physical_record_characteristics = "PDF"
@@ -66,17 +89,20 @@ _minxiInstanceData = (formData, instance) ->
 		orgObj = Creator.Collections["archive_organization"].findOne({'name':field_values?.FILING_DEPT})
 	if orgObj
 		formData.organizational_structure = orgObj._id
+		formData.organizational_structure_code = orgObj.code
 
 	# 根据FONDSID查找全宗号和全总名称
 	fondObj = Creator.Collections["archive_fonds"].findOne({'name':field_values?.FONDSID})
 	if fondObj
 		formData.fonds_name = fondObj?._id
 		formData.company = fondObj?.company
+		formData.fonds_code = fondObj?.code
 
 	# 保管期限代码查找
 	retentionObj = Creator.Collections["archive_retention"].findOne({'name':field_values?.baocunqixian})
 	if retentionObj
 		formData.retention_peroid = retentionObj?._id
+		formData.retention_peroid_code = retentionObj?.code
 		# 根据保管期限,处理标志
 		if retentionObj?.years >= 10
 			formData.produce_flag = "在档"
@@ -144,7 +170,7 @@ _minxiRelatedArchives = (instance, record_id) ->
 					})
 
 # 整理文件数据
-_minxiAttachmentInfo = (instance, record_id) ->
+_minxiAttachmentInfo = (instance, record_id, file_prefix) ->
 	# 对象名
 	object_name = RecordsQHD?.settings_records_qhd?.to_archive?.object_name
 	parents = []
@@ -158,11 +184,13 @@ _minxiAttachmentInfo = (instance, record_id) ->
 
 	collection = Creator.Collections["cms_files"]
 
-	currentFiles.forEach (cf)->
+	currentFiles.forEach (cf, index)->
 		try
 			versions = []
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
+
+			file_name = setFileName(record_id, file_prefix) + "." + cf.extension()
 			
 			collection.insert({
 					_id: cmsFileId,
@@ -178,7 +206,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 					},
 					modified_by: cf?.metadata?.modified_by,
 					created: cf?.metadata?.created,
-					name: cf.name(),
+					name: file_name,
 					space: spaceId,
 					extention: cf.extension()
 				})
@@ -225,7 +253,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 
 
 # 整理表单html
-_minxiInstanceHtml = (instance, record_id) ->
+_minxiInstanceHtml = (instance, record_id, file_prefix) ->
 	admin = RecordsQHD?.settings_records_qhd?.to_archive?.admin
 	apps_url = RecordsQHD?.settings_records_qhd?.to_archive?.apps_url
 	
@@ -238,7 +266,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 
 	instance_html_url = apps_url + '/workflow/space/' + space_id + '/view/readonly/' + ins_id + '?username=' + username + '&password=' + password + '&hide_traces=1'
 
-	console.log "instance_html_url",instance_html_url
+	# console.log "instance_html_url",instance_html_url
 	
 	result_html = HTTP.call('GET',instance_html_url)?.content
 
@@ -254,7 +282,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 
 			data_buffer = new Buffer(result_html.toString())
 
-			file_name = instance?._id + '.html'
+			file_name = setFileName(record_id, file_prefix) + '.html'
 
 			file_size = data_buffer?.length
 		
@@ -432,23 +460,33 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 	auditList = []
 
 	_minxiInstanceData(formData, instance)
-
+	
+	# console.log "formData", formData
 	if _checkParameter(formData)
 		logger.debug("_sendContractInstance: #{instance._id}")
 		
 		try 
+			file_prefix = 	formData?.fonds_code + "-" + 
+							formData?.archival_category_code + "·" + 
+							formData?.year + "-" +
+							formData?.retention_peroid_code + "-" +
+							formData?.organizational_structure_code
 			# 如果原来已经归档，则删除原来归档的记录
 			collection = Creator.Collections["archive_wenshu"]
 
 			collection.remove({'external_id':instance._id})
 
+			# console.log "插入档案"
 			record_id = collection.insert formData
 
-			# 整理文件
-			_minxiAttachmentInfo(instance, record_id)
-
 			# 整理表单html
-			_minxiInstanceHtml(instance, record_id)
+			# console.log "整理表单html"
+			# console.log "file_prefix",file_prefix
+			_minxiInstanceHtml(instance, record_id, file_prefix)
+
+			# 整理文件
+			# console.log "整理文件"
+			_minxiAttachmentInfo(instance, record_id, file_prefix)
 
 			# 整理关联档案
 			_minxiRelatedArchives(instance, record_id)
@@ -459,13 +497,13 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 			InstancesToArchive.success instance
 		catch e
 			logger.error e
-			console.log e
+			console.log "#{instance._id}表单归档失败，", e
 	else
 		InstancesToArchive.failed instance, "立档单位未找到"
 
 
 @Test = {}
-# Test.run('sMwemMTZDkmCSpSuC')
+# Test.run('iTRRqEfHYGhDeWwaC')
 Test.run = (ins_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
