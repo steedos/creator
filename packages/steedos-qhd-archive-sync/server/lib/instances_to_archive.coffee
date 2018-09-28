@@ -54,7 +54,9 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 设置页数
 	if field_values?.PAGE_COUNT
-		old_page = field_values?.PAGE_COUNT || "00"
+		old_page = field_values?.PAGE_COUNT.toString() || "00"
+		# console.log "old_page: ",old_page;
+		# console.log "instance._id: ",instance._id;
 		str_page_count = old_page.substr(0,old_page.length-1);
 		if str_page_count
 			formData.total_number_of_pages = parseInt(str_page_count) + 1
@@ -224,30 +226,33 @@ _minxiAttachmentInfo = (instance, record_id, file_prefix) ->
 			# 历史版本文件+当前文件 上传到creator
 			historyFiles.forEach (hf) ->
 				instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
-				newFile = new FS.File()
-				newFile.attachData(
-					fs.createReadStream(instance_file_key),
-					{type: hf.original.type},
-					(err)->
-						if err
-							throw new Meteor.Error(err.error, err.reason)
-						newFile.name hf.name()
-						newFile.size hf.size()
-						metadata = {
-							owner: hf.metadata.owner,
-							owner_name: hf.metadata?.owner_name,
-							space: spaceId,
-							record_id: record_id,
-							object_name: object_name,
-							parent: cmsFileId,
-							current: hf.metadata?.current,
-							main: hf.metadata?.main
-						}
-						newFile.metadata = metadata
-						fileObj = cfs.files.insert(newFile)
-						if fileObj
-							versions.push(fileObj._id)
-					)
+
+				if fs.existsSync(instance_file_key)
+					# console.log "createReadStream: ",hf?.copies?.instances?.key
+					newFile = new FS.File()
+					newFile.attachData(
+						fs.createReadStream(instance_file_key),
+						{type: hf.original.type},
+						(err)->
+							if err
+								throw new Meteor.Error(err.error, err.reason)
+							newFile.name hf.name()
+							newFile.size hf.size()
+							metadata = {
+								owner: hf.metadata.owner,
+								owner_name: hf.metadata?.owner_name,
+								space: spaceId,
+								record_id: record_id,
+								object_name: object_name,
+								parent: cmsFileId,
+								current: hf.metadata?.current,
+								main: hf.metadata?.main
+							}
+							newFile.metadata = metadata
+							fileObj = cfs.files.insert(newFile)
+							if fileObj
+								versions.push(fileObj._id)
+						)
 			# 把 cms_files 记录的 versions 更新
 			collection.update(cmsFileId, {$set: {versions: versions}})
 		catch e
