@@ -199,15 +199,12 @@ Creator.Objects.archive_wenshu =
 			label:"电子文件号"
 			omit:true
 		
-		document_type:
-			type:"text"
-			label:"文件类型"
-		
 		archival_code:
 			type:"text"
 			label:"档号"
 			is_wide:true
 			omit:true
+			group:"档号"
 		
 		fonds_name:
 			type:"master_detail"
@@ -371,26 +368,10 @@ Creator.Objects.archive_wenshu =
 			type:"text"
 			label:"拟稿人"
 			group:"内容描述"
-		
-		annotation:
-			type:"textarea",
-			label:"备注"
-			is_wide:true
-			group:"内容描述"
 
 		reference:
 			type: "text"
 			label:"参见"
-			group:"内容描述"
-		
-		archive_dept:
-			type:"text"
-			label:"归档部门"
-			group:"内容描述"   
-
-		archive_date:
-			type:"date"
-			label:"归档日期"
 			group:"内容描述"
 		
 		destroy_date:
@@ -404,6 +385,12 @@ Creator.Objects.archive_wenshu =
 			type:"number"
 			label:"销毁期限时间戳"
 			hidden:true
+			group:"内容描述"
+		
+		annotation:
+			type:"textarea",
+			label:"备注"
+			is_wide:true
 			group:"内容描述"
 
 		document_aggregation:
@@ -426,6 +413,11 @@ Creator.Objects.archive_wenshu =
 			type:"text"
 			label:"语种"
 			defaultValue: "汉语"
+			group:"形式特征"
+		
+		document_type:
+			type:"text"
+			label:"文件类型"
 			group:"形式特征"
 		
 		produce_flag:
@@ -465,6 +457,16 @@ Creator.Objects.archive_wenshu =
 				{label: "实物归档", value: "实物归档"}
 			]
 			allowedValues:["不归档","电子归档","待归档","暂存","实物归档"]
+			group:"形式特征"
+				
+		archive_dept:
+			type:"text"
+			label:"归档部门"
+			group:"形式特征"   
+
+		archive_date:
+			type:"date"
+			label:"归档日期"
 			group:"形式特征"
 		
 		physical_record_characteristics:
