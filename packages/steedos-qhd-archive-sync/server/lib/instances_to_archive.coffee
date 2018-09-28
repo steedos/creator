@@ -186,6 +186,7 @@ _minxiAttachmentInfo = (instance, record_id, file_prefix) ->
 
 	currentFiles.forEach (cf, index)->
 		try
+			instance_file_path = RecordsQHD?.settings_records_qhd?.instance_file_path
 			versions = []
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
@@ -222,9 +223,10 @@ _minxiAttachmentInfo = (instance, record_id, file_prefix) ->
 
 			# 历史版本文件+当前文件 上传到creator
 			historyFiles.forEach (hf) ->
+				instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
 				newFile = new FS.File()
 				newFile.attachData(
-					hf.createReadStream('instances'),
+					fs.createReadStream(instance_file_key),
 					{type: hf.original.type},
 					(err)->
 						if err
