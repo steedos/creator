@@ -330,6 +330,20 @@ ExportToXML.export2xml = (record_obj, callback) ->
 				"证书块": zsk,
 				"签名算法标识": qmsfbs
 			}
+
+			# 在数据库中保存
+			Creator.Collections["archive_wenshu"].direct.update(record_obj._id,
+				{
+					$set:{
+						signature_rules:qmgz,
+						signature_time:qmsj,
+						signer:qmr,
+						signature:signature,
+						certificate:zs,
+						certificate_reference:zsyz,
+						signature_algorithmidentifier:qmsfbs,
+					}
+				})
 			
 			DZWJFZB = {
 				"封装包格式描述": "本EEP根据中华人民共和国档案行业标准DA/T HGWS《基于XML的电子文件封装规范》生成",
@@ -347,7 +361,7 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			# 参数2：签名结果
 			# 参数3：被签名对象的编码格式
 			# 参数4：签名的编码格式
-			result = key.verify(buffer_bqmdx, signature, 'utf8', 'base64')
+			# result = key.verify(buffer_bqmdx, signature, 'utf8', 'base64')
 
 			# 根据当天时间的年月日作为存储路径
 			now = new Date

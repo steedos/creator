@@ -469,6 +469,50 @@ Creator.Objects.archive_wenshu =
 			label:"归档日期"
 			group:"形式特征"
 		
+		signature_rules:
+			type:"text"
+			label:"签名规则"
+			omit:true
+			group:"电子签名" 		
+
+		signature_time:
+			type:"date"
+			label:"签名时间"
+			omit:true
+			group:"电子签名" 
+
+		signer:
+			type:"text"
+			label:"签名人"
+			omit:true
+			group:"电子签名"
+		
+		signature_algorithmidentifier:
+			type:"text"
+			label:"签名算法标识"
+			omit:true
+			group:"电子签名"
+
+		signature:
+			type:"text"
+			label:"签名结果"
+			omit:true
+			is_wide:true
+			group:"电子签名"
+
+		certificate:
+			type:"text"
+			label:"证书"
+			omit:true
+			is_wide:true
+			group:"电子签名"
+
+		certificate_reference:
+			type:"text"
+			label:"证书引证"
+			omit:true
+			group:"电子签名"
+		
 		physical_record_characteristics:
 			type: "text"
 			label:"数字化对象形态"
