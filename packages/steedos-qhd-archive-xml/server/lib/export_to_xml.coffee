@@ -370,20 +370,22 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			day = now.getDate()
 
 			# 文件路径
-			filePath = path.join(__meteor_bootstrap__.serverDir,'../../../export/encapsulation')
-			fileName = record_obj?._id + ".xml"
-			fileAddress = path.join filePath, fileName
+			xml_file_path = Meteor.settings?.records_xml?.xml_file_path
+			if xml_file_path
+				filePath = path.join(xml_file_path)
+				fileName = record_obj?._id + ".xml"
+				fileAddress = path.join filePath, fileName
 
-			if !fs.existsSync filePath
-				mkdirp.sync filePath
+				if !fs.existsSync filePath
+					mkdirp.sync filePath
 
-			# 写入文件Meteor.bindEnvironment(InstancesStat.run)
-			fs.writeFile fileAddress, stream, Meteor.bindEnvironment(
-				(err) ->
-					if err
-						console.log "#{record_obj._id}写入xml文件失败",err
-						logger.error "#{record_obj._id}写入xml文件失败",err
-				)
+				# 写入文件Meteor.bindEnvironment(InstancesStat.run)
+				fs.writeFile fileAddress, stream, Meteor.bindEnvironment(
+					(err) ->
+						if err
+							console.log "#{record_obj._id}写入xml文件失败",err
+							logger.error "#{record_obj._id}写入xml文件失败",err
+					)
 
 
 ExportToXML.success = (record_obj)->
