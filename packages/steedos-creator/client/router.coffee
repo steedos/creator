@@ -15,7 +15,7 @@ checkUserSigned = (context, redirect) ->
 			localStorage.setItem("listTreeCompany", s_user?.company)
 			Session.set('listTreeCompany', s_user?.company);
 		else
-			Session.set('listTreeCompany', null);
+			Session.set('listTreeCompany', "-1");
 	
 	if !Meteor.userId()
 		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;

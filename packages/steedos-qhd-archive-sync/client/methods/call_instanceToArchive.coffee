@@ -1,3 +1,4 @@
+# 同步附件
 Creator.startSyncAttachs = (sDate, fDate)->
 # ---------------------------------------------------
     if Steedos.isCloudAdmin()
