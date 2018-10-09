@@ -90,7 +90,7 @@ Template.creator_table_cell.helpers
 		else if _field.type == "location"
 			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
-
+			debugger;
 			# 有optionsFunction的情况下，reference_to不考虑数组
 			if _.isFunction(_field.optionsFunction) && !reference_to
 				_values = this.doc || {}
