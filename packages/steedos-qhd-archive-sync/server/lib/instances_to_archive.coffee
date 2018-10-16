@@ -45,7 +45,8 @@ _minxiInstanceData = (formData, instance) ->
 	
 	formData.security_classification = field_values?.miji
 	formData.document_type = field_values?.wenjianleixing
-	formData.document_date = field_values?.wenjianriqi
+	if field_values?.wenjianriqi
+		formData.document_date = new Date(field_values?.wenjianriqi)
 	formData.document_number = field_values?.wenjianzihao
 	formData.author = field_values?.FILE_CODE_fzr
 	formData.title = instance.name
