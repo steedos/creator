@@ -477,8 +477,7 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 			file_prefix = 	formData?.fonds_code + "-" + 
 							formData?.archival_category_code + "·" + 
 							formData?.year + "-" +
-							formData?.retention_peroid_code + "-" +
-							formData?.organizational_structure_code
+							formData?.retention_peroid_code
 			# 如果原来已经归档，则删除原来归档的记录
 			collection = Creator.Collections["archive_wenshu"]
 
