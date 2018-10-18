@@ -39,3 +39,6 @@ Template.creatorHeader.events
 
 	'click .creator-button-shopping': (e, t)->
 		Modal.show('template_apps_list_modal')
+		
+	'click .creator-button-toggle': (e, t)->
+		Modal.show("list_tree_modal")
