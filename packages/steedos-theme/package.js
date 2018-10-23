@@ -47,8 +47,9 @@ Package.onUse(function(api) {
   api.addAssets("client/images/icon_blue.png", "client");
   api.addAssets("client/images/logo.png", "client");
   api.addAssets("client/images/logo_en.png", "client");
-  api.addAssets("client/images/logo_custome.png", "client");
-
+  api.addAssets("client/images/logo_login_custome.png", "client");
+  api.addAssets("client/images/logo_main_custome.png", "client");
+  
   api.export('Theme');
 
 });

@@ -30,9 +30,9 @@ Theme =
 
 if Meteor.isClient
 	Meteor.startup ->
-		logo_url = Meteor?.settings?.public?.theme?.logo
-		if logo_url
-			Theme.logo = logo_url
+		logo_login_custome = Meteor?.settings?.public?.theme?.logo_login_custome
+		if logo_login_custome
+			Theme.logo = logo_login_custome
 		# 登录窗口标题
 		if AccountsTemplates.texts?.title?.signIn
 			if Steedos.isMobile()
