@@ -39,6 +39,7 @@ Creator.Objects.spaces =
 			label: "管理员"
 			type: "lookup"
 			reference_to: "users"
+			index:true
 			multiple: true
 		apps:
 			label: "应用"
@@ -66,28 +67,28 @@ Creator.Objects.spaces =
 			filters: [["_id", "=", "{spaceId}"]]
 	permission_set:
 		user:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		admin:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		member:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		guest:
-			allowCreate: false
+			allowCreate: true
 			allowDelete: false
 			allowEdit: false
 			allowRead: true

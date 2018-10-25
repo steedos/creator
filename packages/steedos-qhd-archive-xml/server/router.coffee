@@ -8,15 +8,19 @@ WebApp.connectHandlers.use '/view/encapsulation/xml', (req, res, next) ->
     # // 实现文件下载 
     fileName = req?.query?.filename
 
-    filePath = path.join(__meteor_bootstrap__.serverDir, "../../../export/encapsulation")
+    xml_file_path = Meteor.settings?.records_xml?.xml_file_path
 
-    fileAddress = path.join filePath, fileName
+    if xml_file_path
 
-    stats = fs.statSync fileAddress
+        fileAddress = path.join xml_file_path, fileName
 
-    if stats.isFile()
-        res.setHeader("Content-type", "application/octet-stream")
-        res.setHeader("Content-Disposition", "attachment;filename=" + encodeURI(fileName))
-        fs.createReadStream(fileAddress).pipe(res);
+        stats = fs.statSync fileAddress
+
+        if stats.isFile()
+            res.setHeader("Content-type", "application/octet-stream")
+            res.setHeader("Content-Disposition", "attachment;filename=" + encodeURI(fileName))
+            fs.createReadStream(fileAddress).pipe(res);
+        else
+            res.end 404
     else
         res.end 404

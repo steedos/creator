@@ -30,7 +30,7 @@ Creator.editObject = (object_name,record_id)->
 	Session.set('action_object_name',object_name)
 	Session.set("action_record_id",record_id)
 	Session.set("action_fields",undefined)
-	Meteor.call "object_record", object_name, record_id, (error, result)->
+	Meteor.call "object_record", Session.get("spaceId"), object_name, record_id, (error, result)->
 		if result
 			Session.set 'cmDoc', result
 			$(".btn.creator-edit").click()
@@ -98,6 +98,9 @@ if Meteor.isClient
 					if selector.length > 0
 						selector.push "and"
 					filters = _.map filters, (obj)->
+						if Meteor.isClient
+							if _.isString(obj?._value)
+								return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
 						return [obj.field, obj.operation, obj.value]
 					
 					filters = Creator.formatFiltersToDev(filters)
@@ -119,7 +122,12 @@ if Meteor.isClient
 							selector.push "and"
 						_.each filters, (filter)->
 							if object_name != 'spaces' || (filter.length > 0 && filter[0] != "_id")
-								selector.push filter
+								if filter.length ==3 && _.isFunction(filter[2])
+									_filter = _.clone(filter)
+									_filter[2] = filter[2]()
+									selector.push _filter
+								else
+									selector.push filter
 
 					if list_view.filter_scope == "mine"
 						if selector.length > 0
@@ -177,10 +185,10 @@ if Meteor.isClient
 Tracker.autorun ()->
 	if Session.get("spaceId")
 		_.each Creator.Objects, (obj, object_name)->
-			if Creator.Collections[object_name]
+			if Creator.getCollection(object_name)
 				_.each obj.fields, (field, field_name)->
 					if field.type == "master_detail" or field.type == "lookup"
-						_schema = Creator.Collections[object_name]?._c2?._simpleSchema?._schema
+						_schema = Creator.getCollection(object_name)?._c2?._simpleSchema?._schema
 						_schema?[field_name]?.autoform?.optionsMethodParams?.space = Session.get("spaceId")
 
 

@@ -95,9 +95,28 @@ WXMini.addUserToSpace = (userId, spaceId, userName, profile)->
 
 WXMini.updateUser = (userId, options)->
 	if options.$set.mobile
-		options.$set.phone = {number: "+86" + options.$set.mobile,verified:true}
+		options.$set.phone = {number: "+86" + options.$set.mobile, mobile: options.$set.mobile, verified:true, modified:new Date()}
+	
+	# 同步头像avatar/profile.avatar字段值到头像URLavatarUrl
+	profileAvatar = options.$set.profile?.avatar or options.$set["profile.avatar"]
+	if options.$set.avatar
+		options.$set.avatarUrl = "/api/files/avatars/" + options.$set.avatar
+	else if profileAvatar
+		user = Creator.getCollection("users").findOne({_id: userId}, fields: {avatarUrl: 1})
+		unless user.avatarUrl
+			options.$set.avatarUrl = profileAvatar
+	
 	Creator.getCollection("users").direct.update({_id: userId}, options)
 
+	if Creator.getCollection("vip_customers")
+		c_options = {$set: {}}
+		if options.$set.mobile
+			c_options.$set.mobile = options.$set.mobile
+		if options.$set.name
+			c_options.$set.name = options.$set.name
+
+		if !_.isEmpty(c_options.$set)
+			Creator.getCollection("vip_customers").update({owner: userId}, c_options, {multi: true})
 
 # 微信相关接口 #
 # 获取access_token

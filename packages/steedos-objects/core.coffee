@@ -7,12 +7,38 @@ Creator.deps = {
 	object: new Tracker.Dependency
 };
 
-Creator.getObject = (object_name)->
+Creator._TEMPLATE = {
+	Apps: {},
+	Objects: {}
+}
+
+Creator.getObjectName = (object) ->
+	if object.space
+		return "c_#{object.space}_#{object.name}"
+	return object.name
+
+Creator.getObject = (object_name, space_id)->
+	if _.isArray(object_name)
+		return ;
 	if Meteor.isClient
 		Creator.deps?.object?.depend()
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
+	if !space_id && object_name
+		if Meteor.isClient && !object_name.startsWith('c_')
+			space_id = Session.get("spaceId")
+
 	if object_name
+		if space_id
+			obj = Creator.objectsByName["c_#{space_id}_#{object_name}"]
+			if obj
+				return obj
+
+		obj = _.find Creator.objectsByName, (o)->
+				return o._collection_name == object_name
+		if obj
+			return obj
+
 		return Creator.objectsByName[object_name]
 
 Creator.getObjectById = (object_id)->
@@ -23,11 +49,11 @@ Creator.removeObject = (object_name)->
 	delete Creator.Objects[object_name]
 	delete Creator.objectsByName[object_name]
 
-Creator.getCollection = (object_name)->
+Creator.getCollection = (object_name, spaceId)->
 	if !object_name
 		object_name = Session.get("object_name")
 	if object_name
-		return Creator.Collections[object_name]
+		return Creator.Collections[Creator.getObject(object_name, spaceId)?._collection_name]
 
 Creator.removeCollection = (object_name)->
 	delete Creator.Collections[object_name]

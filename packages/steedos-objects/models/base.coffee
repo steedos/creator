@@ -95,6 +95,11 @@ Creator.baseObject =
 			type: "text"
 			omit:true
 			hidden: true
+		# chat_messages的related_to表统一记录消息数量
+		message_count:
+			label:'评论数'
+			type:'number'
+			omit:true
 	permission_set:
 		none:
 			allowCreate: false
@@ -128,6 +133,9 @@ Creator.baseObject =
 				if userId
 					unless doc.owner
 						doc.owner = userId
+					if doc.owner == '{userId}'
+						doc.owner = userId
+
 					doc.created_by = userId;
 					doc.modified_by = userId;
 
@@ -135,10 +143,10 @@ Creator.baseObject =
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				modifier.$set?.modified = new Date();
+				modifier.$set = modifier.$set || {}
+				modifier.$set.modified = new Date()
 				if userId
-					modifier.$set = modifier.$set || {};
-					modifier.$set?.modified_by = userId
+					modifier.$set.modified_by = userId
 
 		"before.insert.client.default":
 			on: "client"

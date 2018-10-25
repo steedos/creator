@@ -12,14 +12,17 @@ JsonRoutes.add 'put', '/mini/vip/user', (req, res, next) ->
 			throw new Meteor.Error(500, "姓名为必填")
 
 		updateDoc.name = data.name
-
+		if data.qrcode
+			updateDoc.qrcode = data.qrcode
 #		if data.phoneNumber
 #			updateDoc.mobile = data.phoneNumber
 
 		if data.sex
+			updateDoc["sex"] = data.sex
 			updateDoc["profile.sex"] = data.sex
 
 		if data.birthdate
+			updateDoc["birthday"] = data.birthdate
 			updateDoc["profile.birthdate"] = data.birthdate
 		
 		if data.avatar
@@ -31,10 +34,10 @@ JsonRoutes.add 'put', '/mini/vip/user', (req, res, next) ->
 		})
 		
 		#不需要同步到space_users
-#		if data.phoneNumber
-#			Creator.getCollection("space_users").direct.update({
-#				user: userId
-#			}, {$set: {mobile: data.phoneNumber}}, {multi: true})
+		if data.name
+			Creator.getCollection("space_users").direct.update({
+				user: userId
+			}, {$set: {name: data.name}}, {multi: true})
 
 		JsonRoutes.sendResult res, {
 			code: 200,

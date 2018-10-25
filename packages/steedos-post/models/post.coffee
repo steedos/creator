@@ -15,13 +15,9 @@ Creator.Objects.post =
 			omit:true
 		description:
 			label:'正文'
-			is_wide:false
-			type:'textarea'
+			is_wide:true
+			type:'markdown'
 			rows: 8
-		comment_count:
-			label:'评论数'
-			type:'number'
-			omit:true
 		star_count:
 			label:'点赞数'
 			type:'number'
@@ -76,6 +72,7 @@ Creator.Objects.post =
 			type:'lookup'
 			reference_to:'post_category'
 			multiple:true
+			index:true
 		type:
 			label:'信息分类'
 			type:'select'
@@ -115,6 +112,7 @@ Creator.Objects.post =
 		featured:
 			label:'推荐'
 			type:'boolean'
+			index:true
 			group:'-'
 	list_views:
 		all:
@@ -153,9 +151,9 @@ Creator.Objects.post =
 
 	permission_set:
 		user:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
@@ -167,16 +165,16 @@ Creator.Objects.post =
 			modifyAllRecords: true
 			viewAllRecords: true
 		guest:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
 		member:
-			allowCreate: false
-			allowDelete: false
-			allowEdit: false
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true

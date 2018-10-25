@@ -12,10 +12,16 @@ Creator.Objects.vip_share =
 			label: "商品"
 			type: "lookup"
 			reference_to: 'vip_product'
-		way:
-			label:'分享方式'
-			type:'text'
-			#可能取值[分享给好友weixin，分享至朋友圈friend_circle]
+			index:true
+		post:
+			label: "动态"
+			type: "lookup"
+			reference_to: 'post'
+			index:true
+		other:#记录URL值
+			label: "其他"
+			type: "text"
+			index:true
 	list_views:
 		all:
 			label: "所有"
@@ -42,15 +48,24 @@ Creator.Objects.vip_share =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: true
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 
-		
+	triggers:
+		"before.insert.server.vip_share":
+			on: "server"
+			when: "before.insert"
+			todo: (userId, doc)->
+				share = Creator.getCollection("vip_share").findOne({other:'love', owner:userId},{fields:{name:1}})
+				if share
+					throw new Meteor.Error 'repeat', "不能重复添加share记录"
 
-		
+
+
+

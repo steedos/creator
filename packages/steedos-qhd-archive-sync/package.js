@@ -36,6 +36,12 @@ Package.onUse(function (api) {
 
 	api.addFiles('server/lib/records_qhd.coffee', 'server');
 
+	api.addFiles('server/methods/start_instanceToArchive.coffee', 'server');
+
+	api.addFiles('server/methods/sync_zhusong.coffee', 'server');
+
+	api.addFiles('client/methods/call_instanceToArchive.coffee', 'client');
+
 	api.export('steedosRequest');
 
 	api.export('InstancesToArchive');

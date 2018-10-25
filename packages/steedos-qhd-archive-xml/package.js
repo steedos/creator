@@ -38,8 +38,12 @@ Package.onUse(function (api) {
 	api.addFiles('server/router.coffee', 'server');
 
 	api.addFiles('server/lib/export_to_xml.coffee', 'server');
-	// api.addFiles('server/lib/encapsulation.coffee', 'server');
+	
 	api.addFiles('server/lib/records_xml_sync.coffee', 'server');
+
+	api.addFiles('server/methods/start_exportxml.coffee', 'server');
+
+	api.addFiles('client/methods/call_exportxml.coffee', 'client');	
 
 	api.export('XMLSync');
 

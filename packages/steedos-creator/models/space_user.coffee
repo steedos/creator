@@ -1,10 +1,10 @@
-Creator.Objects.space_users = 
+Creator.Objects.space_users =
 	name: "space_users"
 	label: "人员"
 	icon: "user"
 	enable_search: true
 	fields:
-		name: 
+		name:
 			label: "姓名"
 			type: "text"
 			defaultValue: ""
@@ -16,18 +16,18 @@ Creator.Objects.space_users =
 		position:
 			type: "text"
 			label:'职务'
-		
+
 		mobile:
 			type: "text"
 			label:'手机'
 			group:'-'
 		email:
 			type: "text"
-			label:'邮件'		
+			label:'邮件'
 		work_phone:
 			type: "text"
-			label:'工作电话'		
-		
+			label:'工作电话'
+
 		company:
 			type: "text"
 			label:'单位'
@@ -42,15 +42,20 @@ Creator.Objects.space_users =
 			type: "lookup"
 			label:'上级主管'
 			reference_to: "users"
-		
+
 		sort_no:
 			type: "number"
 			label:'排序号'
 			group:'-'
-		organization: 
+		organization:
 			type: "master_detail"
 			reference_to: "organizations"
 			omit: true
+		company: 
+			type: "master_detail"
+			label: '所属公司'
+			reference_to: "organizations"
+			# omit: true
 		user_accepted:
 			type: "boolean"
 			label:'接受状态'
@@ -65,15 +70,20 @@ Creator.Objects.space_users =
 			type: "select"
 			defaultValue: "user"
 			options: [
-				{label: "员工", value: "user"}, 
+				{label: "员工", value: "user"},
 				{label: "会员", value: "member"}
 			]
 		user:
 			type: "master_detail"
 			reference_to: "users"
+			index:true
 			# required: true
 			omit: true
-	list_views:	
+	list_views:
+		all:
+			label: "所有人员"
+			columns: ["name", "organization","company", "position", "mobile", "email", "sort_no"]
+			filter_scope: "space"	
 		user:
 			label: "员工"
 			columns: ["name", "organization", "position", "mobile", "email", "sort_no"]
@@ -96,7 +106,7 @@ Creator.Objects.space_users =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true 
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true

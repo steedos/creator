@@ -81,6 +81,7 @@ Creator.Objects.vip_order =
 				{label:'已完成',value:'completed'},
 				{label:'已取消',value:'canceled'}]
 			omit:true
+			index:true
 		store:
 			label:'门店'
 			type:'lookup'
@@ -91,6 +92,11 @@ Creator.Objects.vip_order =
 			label:'会员卡'
 			type:'master_detail'
 			reference_to:'vip_card'
+			index:true
+		card_rule:
+			label:'卡项'
+			type:'master_detail'
+			reference_to:'vip_card_rule'
 
 		# type: # recharge, pay, ...
 		# 	label: '类型'
@@ -227,34 +233,35 @@ Creator.Objects.vip_order =
 			on: "server"
 			when: "after.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
-				if modifier.$set?.status is 'completed' and this.previous.status isnt 'completed'
-					if doc.type is 'recharge'
-						console.log 'recharge'
-						amount = doc.amount
+				if modifier.$set?.status is 'paid' and this.previous.status isnt 'paid'
+					if doc.card_rule
+						amount = doc.amount_paid
 						cardId = doc.card
-						point = parseInt(doc.amount)
-						if doc.is_actived
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point } })
-						else
-							Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point }, $set: { is_actived: true } })
-							#用户没有已经加入商户工作区时，先加入
-							space_user = Creator.getCollection("space_users").findOne({user: doc.owner, space: doc.space}, {fields: {_id: 1}})
-							if !space_user
-								u = Meteor.users.findOne(doc.owner, { fields: { name: 1 } })
-								WXMini.addUserToSpace(doc.owner, doc.space, u.name, "member")
+						point = parseInt(doc.amount_paid)
+						Creator.getCollection('vip_card').update({ _id: cardId }, { $inc: { balance: amount, points: point }, $set: { is_actived: true } })
 
-						newestCard = Creator.getCollection('vip_card').findOne(cardId, { fields: { balance: 1 } })
-						Creator.getCollection('vip_billing').insert({
-							amount: amount
-							store: doc.store
-							card: cardId
-							description: doc.name
-							owner: doc.owner
-							space: doc.space
-							balance: newestCard.balance
-						})
-					else if doc.type is 'pay'
-						console.log 'pay'
-						point = parseInt(doc.amount)
-						if point > 0
-							Creator.getCollection('vip_card').update({ _id: doc.card }, { $inc: { points: point } })
+				if modifier.$set?.status is 'completed' and this.previous.status isnt 'completed'
+					customer = Creator.getCollection('vip_customers').findOne({ space: doc.space, owner: doc.owner })
+					if customer and customer.from and customer.share and customer.cash_back_percentage and customer.cash_back_expired
+						if customer.cash_back_expired > new Date()
+							cashBack = doc.amount_paid*customer.cash_back_percentage
+							Creator.getCollection('vip_share_gift').insert({
+								name: '转发返现'
+								share: customer.share
+								order: doc._id
+								amount: cashBack
+								owner: customer.from
+								space: doc.space
+							})
+							Creator.getCollection('vip_customers').update({ space: doc.space, owner: customer.from }, { $inc: { balance: cashBack } })
+
+	methods:
+		# 可通过this获取到object_name, record_id, space_id, user_id; params为request的body
+		confirmReceipt: (params) ->
+			Creator.getCollection('vip_order').update({ _id: this.record_id, owner: this.user_id, status: 'delivered' },
+				{$set: { status: 'completed' } })
+			return true
+		cancelOrder: (params) ->
+			Creator.getCollection('vip_order').update({ _id: this.record_id, owner: this.user_id, status: 'pending' },
+				{$set: { status: 'canceled' } })
+			return true

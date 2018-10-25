@@ -17,6 +17,7 @@ Creator.getObjectSchema = (obj) ->
 			fs.regEx = field.regEx
 		fs.autoform = {}
 		fs.autoform.multiple = field.multiple
+		fs.autoform.reference_to = field.reference_to
 
 		autoform_type = field.autoform?.type
 
@@ -109,7 +110,7 @@ Creator.getObjectSchema = (obj) ->
 								fs.autoform.create = true
 								fs.createFunction = (lookup_field)->
 									Modal.show("CreatorObjectModal", {
-										collection: "Creator.Collections.#{field.reference_to}",
+										collection: "Creator.Collections.#{Creator.getCollection(field.reference_to)._name}",
 										formId: "new#{field.reference_to}",
 										object_name: "#{field.reference_to}",
 										operation: "insert",
@@ -134,9 +135,6 @@ Creator.getObjectSchema = (obj) ->
 				else if field.reference_to == "organizations"
 					fs.autoform.type = "selectorg"
 				else
-					fs.autoform.type = "steedosLookups"
-					fs.autoform.optionsMethod = field.optionsMethod || "creator.object_options"
-
 					if typeof(field.reference_to) == "function"
 						_reference_to = field.reference_to()
 					else
@@ -159,27 +157,35 @@ Creator.getObjectSchema = (obj) ->
 
 					else
 						_reference_to = [_reference_to]
+					
+					_object = Creator.Objects[_reference_to[0]]
+					if _object and _object.enable_tree
+						fs.autoform.type = "selectTree"
+					else
+						fs.autoform.type = "steedosLookups"
+						fs.autoform.optionsMethod = field.optionsMethod || "creator.object_options"
 
-					if Meteor.isClient
+						if Meteor.isClient
+							fs.autoform.optionsMethodParams = ()->
+								return {space: Session.get("spaceId")}
+							fs.autoform.references = []
+							_reference_to.forEach (_reference)->
+								_object = Creator.Objects[_reference]
+								if _object
+									fs.autoform.references.push {
+										object: _reference
+										label: _object?.label
+										icon: _object?.icon
+										link: ()->
+											return "/app/#{Session.get('app_id')}/#{_reference}/view/"
+									}
+								else
+									fs.autoform.references.push {
+										object: _reference
+										link: ()->
+											return "/app/#{Session.get('app_id')}/#{_reference}/view/"
+									}
 
-						fs.autoform.optionsMethodParams = ()->
-							return {space: Session.get("spaceId")}
-
-						fs.autoform.references = []
-
-						_reference_to.forEach (_reference)->
-							_object = Creator.Objects[_reference]
-
-							if _object
-								fs.autoform.references.push {
-									object: _reference
-									label: _object?.label
-									icon: _object?.icon
-									link: ()->
-										return "/app/#{Session.get('app_id')}/#{_reference}/view/"
-								}
-							else
-								throw new Meteor.Error("Creator.getObjectSchema", "#{obj.name}.#{field_name} reference_to #{_reference} Can not find.")
 			else
 				fs.autoform.type = "steedosLookups"
 				fs.autoform.defaultIcon = field.defaultIcon
@@ -249,6 +255,19 @@ Creator.getObjectSchema = (obj) ->
 				fs.autoform.type = 'fileUpload'
 				fs.autoform.collection = 'images'
 				fs.autoform.accept = 'image/*'
+		else if field.type == "avatar"
+			if field.multiple
+				fs.type = [String]
+				schema[field_name + ".$"] =
+					autoform:
+						type: 'fileUpload'
+						collection: 'avatars'
+						accept: 'image/*'
+			else
+				fs.type = String
+				fs.autoform.type = 'fileUpload'
+				fs.autoform.collection = 'avatars'
+				fs.autoform.accept = 'image/*'
 		else if field.type == "audio"
 			if field.multiple
 				fs.type = [String]
@@ -280,6 +299,9 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "location"
 			fs.autoform.system = field.system || "wgs84"
 			fs.blackbox = true
+		else if field.type == "markdown"
+			fs.type = String
+			fs.autoform.type = "steedos-markdown"
 		else
 			fs.type = field.type
 
@@ -313,6 +335,7 @@ Creator.getObjectSchema = (obj) ->
 					return Creator.Formular.run(field.defaultValue)
 			else
 				fs.autoform.defaultValue = field.defaultValue
+				fs.defaultValue = field.defaultValue
 
 		if field.readonly
 			fs.autoform.readonly = true

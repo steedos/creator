@@ -34,9 +34,15 @@ Creator.loadObjects = (obj, object_name)->
 	if !obj.list_views
 		obj.list_views = {}
 
-	Creator.convertObject(obj)
-	new Creator.Object(obj);
+	if obj.space
+		object_name = 'c_' + obj.space + '_' + obj.name
 
+#	console.log('loadObjects', obj.name, object_name)
+
+	Creator.convertObject(obj)
+#	console.log('new Creator.Object(obj)', obj.name, object_name)
+	new Creator.Object(obj);
+#	console.log('new Creator.Object(obj) end...')
 	Creator.initTriggers(object_name)
 	Creator.initListViews(object_name)
 	# if Meteor.isServer
@@ -171,6 +177,9 @@ Creator.getObjectRelateds = (object_name)->
 	if !_object
 		return related_objects
 
+	if _object.enable_files
+		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
+		
 	_.each Creator.Objects, (related_object, related_object_name)->
 		_.each related_object.fields, (related_field, related_field_name)->
 			if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
@@ -180,8 +189,6 @@ Creator.getObjectRelateds = (object_name)->
 				else
 					related_objects.push {object_name:related_object_name, foreign_key: related_field_name}
 
-	if _object.enable_files
-		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
 	if _object.enable_tasks
 		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
 	if _object.enable_notes
@@ -474,7 +481,11 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 	if !_object
 		return related_object_names
 
-	related_object_names = _.pluck(_object.related_objects,"object_name")
+#	related_object_names = _.pluck(_object.related_objects,"object_name")
+
+	related_objects = Creator.getObjectRelateds(object_name)
+
+	related_object_names = _.pluck(related_objects,"object_name")
 	if related_object_names?.length == 0
 		return related_object_names
 
@@ -482,7 +493,7 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 	unrelated_objects = permissions.unrelated_objects
 
 	related_object_names = _.difference related_object_names, unrelated_objects
-	return _.filter _object.related_objects, (related_object)->
+	return _.filter related_objects, (related_object)->
 		related_object_name = related_object.object_name
 		isActive = related_object_names.indexOf(related_object_name) > -1
 		allowRead = Creator.getPermissions(related_object_name, spaceId, userId)?.allowRead

@@ -1,4 +1,4 @@
-# dxDataGridInstance = null
+dxDataGridInstance = null
 
 _standardQuery = (curObjectName)->
 	standard_query = Session.get("standard_query")
@@ -62,7 +62,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
 				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
-					self.dxDataGridInstance.refresh()
+					dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
@@ -122,12 +122,12 @@ _expandFields = (object_name, columns)->
 	fields = Creator.getObject(object_name).fields
 	_.each columns, (n)->
 		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
-			if fields[n].optionsFunction
-				ref = fields[n].optionsFunction({}).getProperty("value")
-			else  
+			if fields[n].reference_to
 				ref = fields[n].reference_to
 				if _.isFunction(ref)
 					ref = ref()
+			else
+				ref = fields[n].optionsFunction({}).getProperty("value")
 
 			if !_.isArray(ref)
 				ref = [ref]
@@ -141,7 +141,9 @@ _expandFields = (object_name, columns)->
 			ref = _.uniq(ref)
 			
 			ref = ref.join(",")
-			expand_fields.push(n + "($select=" + ref + ")")
+
+			if ref
+				expand_fields.push(n + "($select=" + ref + ")")
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
 
@@ -163,6 +165,8 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
 				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
+				if field.type is "markdown"
+					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		
 		if grid_settings and grid_settings.settings
@@ -213,7 +217,7 @@ _depandOnFields = (object_name, columns)->
 	fields = Creator.getObject(object_name).fields
 	depandOnFields = []
 	_.each columns, (column)->
-		if fields[column].depend_on
+		if fields[column]?.depend_on
 			depandOnFields = _.union(fields[column].depend_on)
 	return depandOnFields
 
@@ -238,6 +242,8 @@ Template.creator_grid.onRendered ->
 		related_object_name = self.data.related_object_name || Session.get("related_object_name")
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
+
+		listTreeCompany = Session.get('listTreeCompany')
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
@@ -265,6 +271,11 @@ Template.creator_grid.onRendered ->
 				if !filter
 					filter = ["_id", "<>", -1]
 
+				if listTreeCompany and  listTreeCompany!='undefined' and creator_obj?.filter_company==true
+					listTreeFilter = [ "company", "=" , listTreeCompany ]
+					filter = [ filter, "and", listTreeFilter ]
+
+
 			curObjectName = if is_related then related_object_name else object_name
 
 			selectColumns = Tracker.nonreactive ()->
@@ -291,6 +302,8 @@ Template.creator_grid.onRendered ->
 					return 0
 
 			extra_columns = ["owner"]
+			if creator_obj.enable_tree
+				extra_columns.push("parent")
 			object = Creator.getObject(curObjectName)
 			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
 			if defaultExtraColumns
@@ -328,17 +341,36 @@ Template.creator_grid.onRendered ->
 							</span>
 						"""
 						$("<div>").append(htmlText).appendTo(container);
-			showColumns.splice 0, 0, 
-				dataField: "_id_checkbox"
-				width: 60
-				allowExporting: false
-				allowSorting: false
-				allowReordering: false
-				headerCellTemplate: (container) ->
-					Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
-				cellTemplate: (container, options) ->
-					Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 			
+			unless creator_obj.enable_tree
+				showColumns.splice 0, 0,
+					dataField: "_index"
+					width: 60
+					allowExporting: true
+					allowSorting: false
+					allowReordering: false
+					caption: "序号"
+					cellTemplate: (container, options) ->
+						pageSize = self.dxDataGridInstance.pageSize();
+						pageIndex = self.dxDataGridInstance.pageIndex();
+						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
+						# Template.instance().dxDataGridInstance.pageIndex()
+						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
+						$("<div>").append(htmlText).appendTo(container);
+				
+				showColumns.splice 0, 0, 
+					dataField: "_id_checkbox"
+					width: 60
+					allowExporting: false
+					allowSorting: false
+					allowReordering: false
+					headerCellTemplate: (container) ->
+						Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
+					cellTemplate: (container, options) ->
+						# console.log('[container]', container)
+						# console.log('[options]', options)
+						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
+		
 			# console.log "selectColumns", selectColumns
 			console.log "filter", filter
 			# console.log "expand_fields", expand_fields
@@ -348,14 +380,13 @@ Template.creator_grid.onRendered ->
 				pageSize = 10
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
-			# fileName
 			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
 				pager: 
 					showPageSizeSelector: true,
-					allowedPageSizes: [10,25, 50, 100],
+					allowedPageSizes: [10, 50, 100, 200],
 					showInfo: false,
 					showNavigationButtons: true
 				export:
@@ -420,6 +451,7 @@ Template.creator_grid.onRendered ->
 					expand: expand_fields
 				columns: showColumns
 				customizeExportData: (col, row)->
+					fields = creator_obj.fields
 					_.each row, (r)->
 						_.each r.values, (val, index)->
 							if val
@@ -434,9 +466,14 @@ Template.creator_grid.onRendered ->
 											_val.push(_v.name)
 									r.values[index] = _val.join(",")
 								else if val.constructor == Date
-									utcOffset = moment().utcOffset() / 60
-									val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
-									r.values[index] = val
+									dataField = col[index]?.dataField
+									if fields and fields[dataField]?.type == "date"
+										val = moment(val).format('YYYY-MM-DD')
+										r.values[index] = val
+									else
+										utcOffset = moment().utcOffset() / 60
+										val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
+										r.values[index] = val
 				onCellClick: (e)->
 					console.log "curObjectName", curObjectName
 					if e.column?.dataField ==  "_id_actions"
@@ -449,11 +486,23 @@ Template.creator_grid.onRendered ->
 						recordsTotal = self.data.recordsTotal.get()
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
-					current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
+					if creator_obj.enable_tree
+						current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
+						self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
+					else
+						current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
+						self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
-					self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
-			self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
-			self.dxDataGridInstance.pageSize(pageSize)
+			if creator_obj.enable_tree
+				dxOptions.keyExpr = "_id"
+				dxOptions.parentIdExpr = "parent._id"
+				dxOptions.autoExpandAll = true
+				delete dxOptions.paging # 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
+				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
+			else
+				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
+				self.dxDataGridInstance.pageSize(pageSize)
+			dxDataGridInstance = self.dxDataGridInstance
 			
 Template.creator_grid.helpers Creator.helpers
 
@@ -462,18 +511,20 @@ Template.creator_grid.events
 	'click .table-cell-edit': (event, template) ->
 		is_related = template.data.is_related
 		field = this.field_name
+		full_screen = this.full_screen
 
 		if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
 			field.push(this.field_name)
 			field = field.join(",")
 
-		objectName = if is_related then Session.get("related_object_name") else Session.get("object_name")
+		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else Session.get("object_name")
 		collection_name = Creator.getObject(objectName).label
 		# rowData = this.doc
 
-		Meteor.call "object_record", objectName, this._id, (error, result)->
+		Meteor.call "object_record", Session.get("spaceId"), objectName, this._id, (error, result)->
 			if result
+				Session.set("cmFullScreen", full_screen)
 				Session.set 'cmDoc', result
 				Session.set("action_fields", field)
 				Session.set("action_collection", "Creator.Collections.#{objectName}")

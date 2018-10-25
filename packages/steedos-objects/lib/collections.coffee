@@ -13,16 +13,16 @@ Meteor.startup ()->
 
 Creator.createCollection = (object)->
 	collection_key = object.name
-	if object.custom && object.space
+	if object.space #object.custom &&
 		collection_key = "c_" + object.space + "_" + object.name
 
-	if db[object.name]
-		return db[object.name]
+	if db[collection_key]
+		return db[collection_key]
 	else if object.db
 		return object.db
 
-	if Creator.Collections[object.name]
-		return Creator.Collections[object.name]
+	if Creator.Collections[collection_key]
+		return Creator.Collections[collection_key]
 	else
 		if object.custom
 			return new Meteor.Collection(collection_key, Creator._CREATOR_DATASOURCE)

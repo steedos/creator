@@ -46,7 +46,7 @@ Template.creator_table_cell.onRendered ->
 						cellTemplate: (container, options) ->
 							field_name = _field.name + ".$." + column
 							field_name = field_name.replace(/\$\./,"")
-							cellOption = {_id: options.data._id, val: options.data[column], doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true}
+							cellOption = {_id: options.data._id, val: options.data[column], record_val: record, doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true}
 							Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 					return columnItem
 				
@@ -62,6 +62,15 @@ Template.creator_table_cell.onRendered ->
 Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
+	openWindow: ()->
+		object_name = this.object_name
+		this_object = Creator.getObject(object_name)
+		if this_object?.open_window == true
+			return true
+		else
+			return false 
+
+
 	cellData: ()->
 		data = []
 
@@ -90,28 +99,29 @@ Template.creator_table_cell.helpers
 		else if _field.type == "location"
 			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
-
 			# 有optionsFunction的情况下，reference_to不考虑数组
 			if _.isFunction(_field.optionsFunction)
 				_values = this.doc || {}
+				_record_val = this.record_val
 				_val = val
 				if _val
 					if !_.isArray(_val)
-						_val = [_val]
-					selectedOptions = _.filter _field.optionsFunction(_values), (_o)->
-						return _val.indexOf(_o.value) > -1
+						if _.isObject(_val)
+							_val = [_val._id]
+						else
+							_val = [_val]
+					selectedOptions = _.filter _field.optionsFunction(_record_val || _values), (_o)->
+						return _val.indexOf(_o?.value) > -1
 					if selectedOptions
 						if val && _.isArray(val) && _.isArray(selectedOptions)
 							selectedOptions = Creator.getOrderlySetByIds(selectedOptions, val, "value")
 						val = selectedOptions.getProperty("label")
-
-				if reference_to
+				if reference_to && false
 					_.each val, (v)->
 						href = Creator.getObjectUrl(reference_to, v)
 						data.push {reference_to: reference_to,  rid: v, value: v, id: this._id, href: href}
 				else
 					data.push {value: val, id: this._id}
-
 			else
 				if this.agreement == "odata"
 					if !_.isArray(val)
@@ -121,7 +131,7 @@ Template.creator_table_cell.helpers
 						reference_to_object_name_field_key = Creator.getObject(reference_to)?.NAME_FIELD_KEY
 						href = Creator.getObjectUrl(reference_to, v._id)
 						data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
-					
+
 				else
 					if _.isArray(reference_to) && _.isObject(val)
 						reference_to = val.o
@@ -142,17 +152,38 @@ Template.creator_table_cell.helpers
 						reference_to_sort = {}
 						reference_to_sort[reference_to_object_name_field_key] = -1
 
-
-						values = Creator.Collections[reference_to].find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
-
-						values = Creator.getOrderlySetByIds(values, val)
-
-						values.forEach (v)->
-							href = Creator.getObjectUrl(reference_to, v._id)
-							data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
+						if _.isFunction(_field.optionsFunction)
+							_values = this.doc || {}
+							_record_val = this.record_val
+							_val = val
+							if _val
+								if !_.isArray(_val)
+									if _.isObject(_val)
+										_val = [_val._id]
+									else
+										_val = [_val]
+								selectedOptions = _.filter _field.optionsFunction(_record_val || _values), (_o)->
+									return _val.indexOf(_o?.value) > -1
+								if selectedOptions
+									if val && _.isArray(val) && _.isArray(selectedOptions)
+										selectedOptions = Creator.getOrderlySetByIds(selectedOptions, val, "value")
+									val = selectedOptions.getProperty("label").join(',')
+									data.push {value: val}
+						else
+							values = Creator.Collections[reference_to].find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
+							values = Creator.getOrderlySetByIds(values, val)
+							values.forEach (v)->
+								href = Creator.getObjectUrl(reference_to, v._id)
+								data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
 					catch e
 						console.error(reference_to, e)
 						return
+		else if _field.type == "image"
+			if typeof val is "string"
+				data.push {value: val, id: this._id, isImage: true}
+			else
+				data.push {value: val, id: this._id, isImages: true}
+				 
 		else
 			if (val instanceof Date)
 				if this.agreement == "odata"
@@ -204,6 +235,8 @@ Template.creator_table_cell.helpers
 				val = formatFileSize(val)
 			else if _field.type == "number" && val
 				val = Number(val).toFixed(_field.scale)
+			else if _field.type == "markdown"
+				val = Spacebars.SafeString(marked(val))
 
 			if this.parent_view != 'record_details' && this.field_name == this_name_field_key
 				href = Creator.getObjectUrl(this.object_name, this._id)
@@ -232,3 +265,6 @@ Template.creator_table_cell.helpers
 		if this.hideIcon
 			return false
 		return true
+
+	isMarkdown: (type)->
+		return type is "markdown"

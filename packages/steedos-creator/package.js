@@ -128,6 +128,7 @@ Package.onUse(function (api) {
 	api.addFiles('models/cfs_images.coffee');
 	api.addFiles('models/cfs_audios.coffee');
 	api.addFiles('models/cfs_videos.coffee');
+	api.addFiles('models/cfs_avatars.coffee');
 
 	api.addFiles('models/reports.coffee');
 	api.addFiles('models/tasks.coffee');
@@ -232,6 +233,10 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/home.html', 'client');
 	api.addFiles('client/views/home.coffee', 'client');
 	api.addFiles('client/views/home.less', 'client');
+	api.addFiles('client/views/list_tree.html', 'client');
+	api.addFiles('client/views/list_tree.coffee', 'client');
+	api.addFiles('client/views/list_tree_modal.html', 'client');
+	api.addFiles('client/views/list_tree_modal.coffee', 'client');
 	api.addFiles('client/views/list_wrapper.html', 'client');
 	api.addFiles('client/views/list_wrapper.coffee', 'client');
 	api.addFiles('client/views/list_wrapper.less', 'client');

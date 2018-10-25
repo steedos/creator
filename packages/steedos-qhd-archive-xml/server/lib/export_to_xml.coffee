@@ -16,17 +16,20 @@ ExportToXML = (spaces, record_ids) ->
 
 # 存储为编码数据，base64字符串
 converterBase64 = (file_obj, callback)->
-	bmsj = ""
-	stream = file_obj.createReadStream('files')
-	# buffer the read chunks
-	chunks = []
-	stream.on 'data', (chunk) ->
-		chunks.push chunk
-	stream.on 'end', () ->
-		file_data = Buffer.concat(chunks)
-		bmsj = file_data.toString('base64')
-		callback("", bmsj)
-		return
+	try 
+		bmsj = ""
+		stream = file_obj.createReadStream('files')
+		# buffer the read chunks
+		chunks = []
+		stream.on 'data', (chunk) ->
+			chunks.push chunk
+		stream.on 'end', () ->
+			file_data = Buffer.concat(chunks)
+			bmsj = file_data.toString('base64')
+			callback("", bmsj)
+			return
+	catch e
+		console.log "e",e
 
 async_converterBase64 = Meteor.wrapAsync(converterBase64)
 
@@ -51,8 +54,12 @@ readFileInfo = (cms_file) ->
 		bmms = "本封装包中“编码数据”元素存储的是计算机文件二进制流的Base64编码，有关Base64编码规则参见IETF RFC 2045多用途邮件扩展（MIME）第一部分：互联网信息体格式。当提取和显现封装在编码数据元素中的计算机文件时，应对Base64编码进行反编码，并依据封装包中“反编码关键字”元素中记录的值还原计算机文件的扩展名"
 
 		fbmms = "base64-" + file_obj?.getExtension()
-
-		bmsj = async_converterBase64(file_obj)
+		
+		# 读取文件内容
+		# bmsj = async_converterBase64(file_obj)
+		# 读取数据库内容-'base64'编码
+		str_file = JSON.stringify(file_obj)
+		bmsj = new Buffer(str_file).toString('base64')
 		
 		BM = {
 			"编码ID": file_obj?._id,
@@ -267,28 +274,36 @@ encapsulation = (record_obj) ->
 # 导出为xml文件
 ExportToXML.export2xml = (record_obj, callback) ->
 	# 封装被签名对象
-	bqmdx_json = encapsulation(record_obj)
+	try
+		bqmdx_json = encapsulation(record_obj)
+	catch e
+		console.log "e",e
+		logger.error "#{record_obj._id}封装失败",e
 
 	if bqmdx_json
 		# 转xml
 		builder = new xml2js.Builder()
 		# 被签名对象
 		bqmdx_xml = builder.buildObject bqmdx_json
-
 		# 生成签名
 		private_key_file = Meteor.settings?.records_xml?.archive?.private_key_file
 		if private_key_file
 			buffer_bqmdx = new Buffer bqmdx_xml
-
 			# key
-			readStream = fs.readFileSync private_key_file,{encoding:'utf8'}
-			key = new NodeRSA(readStream,'pkcs8');
+			try
+				readStream = fs.readFileSync private_key_file,{encoding:'utf8'}
+				key = new NodeRSA(readStream,'pkcs8');
+			catch e
+				console.log "未获取私钥文件",e
 
 			# 签名
 			# 参数1：需要签名的数据
 			# 参数2：加密后返回的格式
 			# 参数3：签名数据编码
-			signature = key.sign(buffer_bqmdx, 'base64', 'utf8');
+			try
+				signature = key.sign(buffer_bqmdx, 'base64', 'utf8');
+			catch e
+				console.log "签名错误",e
 
 			# 电子签名
 			qmbsf = "修改0-签名1"
@@ -315,6 +330,20 @@ ExportToXML.export2xml = (record_obj, callback) ->
 				"证书块": zsk,
 				"签名算法标识": qmsfbs
 			}
+
+			# 在数据库中保存
+			Creator.Collections["archive_wenshu"].direct.update(record_obj._id,
+				{
+					$set:{
+						signature_rules:qmgz,
+						signature_time:qmsj,
+						signer:qmr,
+						signature:signature,
+						certificate:zs,
+						certificate_reference:zsyz,
+						signature_algorithmidentifier:qmsfbs,
+					}
+				})
 			
 			DZWJFZB = {
 				"封装包格式描述": "本EEP根据中华人民共和国档案行业标准DA/T HGWS《基于XML的电子文件封装规范》生成",
@@ -332,7 +361,7 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			# 参数2：签名结果
 			# 参数3：被签名对象的编码格式
 			# 参数4：签名的编码格式
-			result = key.verify(buffer_bqmdx, signature, 'utf8', 'base64')
+			# result = key.verify(buffer_bqmdx, signature, 'utf8', 'base64')
 
 			# 根据当天时间的年月日作为存储路径
 			now = new Date
@@ -341,49 +370,63 @@ ExportToXML.export2xml = (record_obj, callback) ->
 			day = now.getDate()
 
 			# 文件路径
-			filePath = path.join(__meteor_bootstrap__.serverDir,'../../../export/encapsulation')
-			fileName = record_obj?._id + ".xml"
-			fileAddress = path.join filePath, fileName
+			xml_file_path = Meteor.settings?.records_xml?.xml_file_path
+			if xml_file_path
+				filePath = path.join(xml_file_path)
+				fileName = record_obj?._id + ".xml"
+				fileAddress = path.join filePath, fileName
 
-			if !fs.existsSync filePath
-				mkdirp.sync filePath
+				if !fs.existsSync filePath
+					mkdirp.sync filePath
 
-			# 写入文件Meteor.bindEnvironment(InstancesStat.run)
-			fs.writeFile fileAddress, stream, Meteor.bindEnvironment(
-				(err) ->
-					if err
-						logger.error "#{record_obj._id}写入xml文件失败",err
-				)
+				# 写入文件Meteor.bindEnvironment(InstancesStat.run)
+				fs.writeFile fileAddress, stream, Meteor.bindEnvironment(
+					(err) ->
+						if err
+							console.log "#{record_obj._id}写入xml文件失败",err
+							logger.error "#{record_obj._id}写入xml文件失败",err
+					)
 
 
 ExportToXML.success = (record_obj)->
-	Creator.Collections["archive_wenshu"].update({_id: record_obj._id}, {$set: {has_xml: true}})
+	console.log "封装成功"
+	Creator.Collections["archive_wenshu"].direct.update({_id: record_obj._id}, {$set: {has_xml: true}})
 
 ExportToXML.failed = (record_obj, error)->
 	logger.error "failed, name is #{record_obj.title}, id is #{record_obj._id}. error: " + error
 
 #获取所有未导出为xml的文书records
 ExportToXML::getNonExportedRecords = ()->
-	query = {
-		space: {$in: @spaces},
-		# has_xml是否导出为xml
-		$or: [
-			{has_xml: false},
-			{has_xml: {$exists: false}}
-		]
-	}
-	if @record_ids
-		query._id = {$in: @record_ids}
+	query = {}
+	if @record_ids and @record_ids?.length>0
+		query = {
+			space: {$in: @spaces},
+			_id: {$in: @record_ids}
+			}
+	else
+		query = {
+			space: {$in: @spaces},
+			# has_xml是否导出为xml
+			$or: [
+				{has_xml: false},
+				{has_xml: {$exists: false}}
+			]
+		}
 	return Creator.Collections["archive_wenshu"].find(query, {fields: {_id: 1}}).fetch()
 
 ExportToXML::DoExport = () ->
 	console.time("syncRecords")
 	records = @getNonExportedRecords()
 	that = @
-	console.log "records.length is #{records.length}"
 	records.forEach (record)->
+		console.log "DoExport - ",record?._id
 		# 档案记录
 		record_obj = Creator.Collections["archive_wenshu"].findOne({'_id':record?._id})
 		if record_obj
-			ExportToXML.export2xml(record_obj)
+			try
+				ExportToXML.export2xml record_obj
+				ExportToXML.success record_obj
+			catch e
+				ExportToXML.failed record_obj,e
+				return
 	console.timeEnd("syncRecords")

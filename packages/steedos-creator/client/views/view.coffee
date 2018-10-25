@@ -24,14 +24,14 @@ Template.creator_view.onRendered ->
 			_.each fields, (f)->
 				if f.indexOf(".")  < 0
 					ref_fields[f] = 1
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields
+			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
 
 Template.creator_view.helpers Creator.helpers
 
 Template.creator_view.helpers
 
 	collection: ()->
-		return "Creator.Collections." + Session.get("object_name")
+		return "Creator.Collections." + Creator.getObject(Session.get("object_name"))._collection_name
 
 	schema: ()->
 		schema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(Session.get("object_name"))))
@@ -88,6 +88,13 @@ Template.creator_view.helpers
 		fields = Creator.getObject().fields
 		return fields[key]
 
+	full_screen: (key) ->
+		fields = Creator.getObject().fields
+		if fields[key].type is "markdown"
+			return true
+		else
+			return false
+
 	label: (key) ->
 		return AutoForm.getLabelForField(key)
 
@@ -120,7 +127,7 @@ Template.creator_view.helpers
 	recordPerminssion: (permissionName)->
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		record = Creator.Collections[object_name].findOne record_id
+		record = Creator.getCollection(object_name).findOne record_id
 		recordPerminssion = Creator.getRecordPermissions object_name, record, Meteor.userId()
 		if recordPerminssion
 			return recordPerminssion[permissionName]
@@ -254,13 +261,14 @@ Template.creator_view.helpers
 Template.creator_view.events
 
 	'click .record-action-custom': (event, template) ->
+		console.log('click record-action-custom')
 		record = Creator.getObjectRecord()
 		recordId = record._id
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)
 		collection_name = object.label
 		Session.set("action_fields", undefined)
-		Session.set("action_collection", "Creator.Collections.#{objectName}")
+		Session.set("action_collection", "Creator.Collections.#{object._collection_name}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
 		if this.todo == "standard_delete"
@@ -292,29 +300,29 @@ Template.creator_view.events
 	'dblclick #creator-quick-form .slds-form-element': (event) ->
 		$(".table-cell-edit", event.currentTarget).click();
 
-	'click #creator-tabular .table-cell-edit': (event, template) ->
-		field = this.field_name
-		if this.field.depend_on && _.isArray(this.field.depend_on)
-			field = _.clone(this.field.depend_on)
-			field.push(this.field_name)
-			field = field.join(",")
-
-		object_name = this.object_name
-		collection_name = Creator.getObject(object_name).label
-
-		dataTable = $(event.currentTarget).closest('table').DataTable()
-		tr = $(event.currentTarget).closest("tr")
-		rowData = dataTable.row(tr).data()
-
-		if rowData
-			Session.set("action_fields", field)
-			Session.set("action_collection", "Creator.Collections.#{object_name}")
-			Session.set("action_collection_name", collection_name)
-			Session.set("action_save_and_insert", false)
-			Session.set 'cmDoc', rowData
-
-			Meteor.defer ()->
-				$(".btn.creator-cell-edit").click()
+#	'click #creator-tabular .table-cell-edit': (event, template) ->
+#		field = this.field_name
+#		if this.field.depend_on && _.isArray(this.field.depend_on)
+#			field = _.clone(this.field.depend_on)
+#			field.push(this.field_name)
+#			field = field.join(",")
+#
+#		object_name = this.object_name
+#		collection_name = Creator.getObject(object_name).label
+#
+#		dataTable = $(event.currentTarget).closest('table').DataTable()
+#		tr = $(event.currentTarget).closest("tr")
+#		rowData = dataTable.row(tr).data()
+#
+#		if rowData
+#			Session.set("action_fields", field)
+#			Session.set("action_collection", "Creator.Collections.#{object_name}")
+#			Session.set("action_collection_name", collection_name)
+#			Session.set("action_save_and_insert", false)
+#			Session.set 'cmDoc', rowData
+#
+#			Meteor.defer ()->
+#				$(".btn.creator-cell-edit").click()
 
 	'click .group-section-control': (event, template) ->
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
@@ -322,7 +330,7 @@ Template.creator_view.events
 	'click .add-related-object-record': (event, template) ->
 		object_name = event.currentTarget.dataset.objectName
 		collection_name = Creator.getObject(object_name).label
-		collection = "Creator.Collections.#{object_name}"
+		collection = "Creator.Collections.#{Creator.getObject(object_name)._collection_name}"
 
 		relatedKey = ""
 		relatedValue = Session.get("record_id")
@@ -352,7 +360,7 @@ Template.creator_view.events
 		action = object.actions[actionKey]
 		collection_name = object.label
 		Session.set("action_fields", undefined)
-		Session.set("action_collection", "Creator.Collections.#{objectName}")
+		Session.set("action_collection", "Creator.Collections.#{object._collection_name}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
 		Creator.executeAction objectName, action, recordId
@@ -363,6 +371,7 @@ Template.creator_view.events
 
 	'click #creator-quick-form .table-cell-edit': (event, template)->
 		# $(".creator-record-edit").click()
+		full_screen = this.full_screen
 		field = this.field_name
 		if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
@@ -373,8 +382,9 @@ Template.creator_view.events
 		doc = this.doc
 
 		if doc
+			Session.set("cmFullScreen", full_screen)
 			Session.set("action_fields", field)
-			Session.set("action_collection", "Creator.Collections.#{object_name}")
+			Session.set("action_collection", "Creator.Collections.#{Creator.getObject(object_name)._collection_name}")
 			Session.set("action_collection_name", collection_name)
 			Session.set("action_save_and_insert", false)
 			Session.set 'cmDoc', doc

@@ -17,11 +17,11 @@ Meteor.startup ->
 			parsedOpt.sort = visitor.sort
 
 		parsedOpt
-	dealWithExpand = (createQuery, entities, key,action)->
+	dealWithExpand = (createQuery, entities, key, spaceId)->
 		if _.isEmpty createQuery.includes
 			return
 
-		obj = Creator.objectsByName[key]
+		obj = Creator.getObject(key, spaceId)
 		_.each createQuery.includes, (include)->
 			# console.log 'include: ', include
 			navigationProperty = include.navigationProperty
@@ -33,7 +33,7 @@ Meteor.startup ->
 				if field.reference_to
 					queryOptions = visitorParser(include)
 					if _.isString field.reference_to
-						referenceToCollection = Creator.Collections[field.reference_to]
+						referenceToCollection = Creator.getCollection(field.reference_to, spaceId)
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]
 								if field.multiple
@@ -53,7 +53,8 @@ Meteor.startup ->
 					if _.isArray field.reference_to
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]?.ids
-								referenceToCollection = Creator.Collections[entity[navigationProperty].o]
+								_o = entity[navigationProperty].o
+								referenceToCollection = Creator.getCollection(entity[navigationProperty].o, spaceId)
 								if referenceToCollection
 									if field.multiple
 										_ids = _.clone(entity[navigationProperty].ids)
@@ -68,6 +69,7 @@ Meteor.startup ->
 										entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions)
 										if entities[idx][navigationProperty]
 											entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
+											entities[idx][navigationProperty]['reference_to._o'] = _o
 
 				else
 				# TODO
@@ -130,19 +132,19 @@ Meteor.startup ->
 		get: ()->
 			try
 				key = @urlParams.object_name
-				object = Creator.objectsByName[key]
+				spaceId = @urlParams.spaceId
+				object = Creator.getObject(key, spaceId)
 				if not object?.enable_api
 					return {
 						statusCode: 401
 						body:setErrorMessage(401)
 					}
-				collection = Creator.Collections[key]
+				collection = Creator.getCollection(key, spaceId)
 				if not collection
 					return {
 						statusCode: 404
 						body:setErrorMessage(404,collection,key)
 					}
-				spaceId = @urlParams.spaceId
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				if permissions.viewAllRecords or (permissions.allowRead and @userId)
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
@@ -153,7 +155,7 @@ Meteor.startup ->
 						if spaceId isnt 'guest'
 							createQuery.query._id = spaceId
 					else
-						if spaceId isnt 'guest'
+						if spaceId isnt 'guest' and key != "users"
 							createQuery.query.space = spaceId
 
 					if Creator.isCommonSpace(spaceId)
@@ -201,11 +203,11 @@ Meteor.startup ->
 						createQuery.projection = projection
 					if not createQuery.projection or !_.size(createQuery.projection)
 						readable_fields = Creator.getFields(key, spaceId, @userId)
-						fields = Creator.getObject(key).fields
+						fields = Creator.getObject(key, spaceId).fields
 						_.each readable_fields,(field)->
 							if field.indexOf('$')<0
-								if fields[field]?.multiple!= true
-									createQuery.projection[field] = 1
+								#if fields[field]?.multiple!= true
+								createQuery.projection[field] = 1
 					if not permissions.viewAllRecords
 						if object.enable_share
 							# 满足共享规则中的记录也要搜索出来
@@ -223,7 +225,7 @@ Meteor.startup ->
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
 					if entities
-						dealWithExpand(createQuery, entities, key)
+						dealWithExpand(createQuery, entities, key, spaceId)
 						#scannedCount = entities.length
 						body = {}
 						headers = {}
@@ -251,6 +253,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -259,19 +264,19 @@ Meteor.startup ->
 		post: ()->
 			try
 				key = @urlParams.object_name
-				if not Creator.objectsByName[key]?.enable_api
+				spaceId = @urlParams.spaceId
+				if not Creator.getObject(key, spaceId)?.enable_api
 					return {
 						statusCode: 401
 						body:setErrorMessage(401)
 				}
 
-				collection = Creator.Collections[key]
+				collection = Creator.getCollection(key, spaceId)
 				if not collection
 					return {
 						statusCode: 404
 						body:setErrorMessage(404,collection,key)
 					}
-				spaceId = @urlParams.spaceId
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				if permissions.allowCreate
 					@bodyParams.space = spaceId
@@ -305,6 +310,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -316,12 +324,12 @@ Meteor.startup ->
 		get:()->
 			try
 				key = @urlParams.object_name
-				if not Creator.objectsByName[key]?.enable_api
+				if not Creator.getObject(key, @urlParams.spaceId)?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
 					}
-				collection = Creator.Collections[key]
+				collection = Creator.getCollection(key, @urlParams.spaceId)
 				if not collection
 					return {
 						statusCode: 404
@@ -361,11 +369,11 @@ Meteor.startup ->
 						createQuery.projection = projection
 					if not createQuery.projection or !_.size(createQuery.projection)
 						readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
-						fields = Creator.getObject(key).fields
+						fields = Creator.getObject(key, @urlParams.spaceId).fields
 						_.each readable_fields,(field)->
 							if field.indexOf('$')<0
-								if fields[field]?.multiple!= true
-									createQuery.projection[field] = 1
+								#if fields[field]?.multiple!= true
+								createQuery.projection[field] = 1
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					entities_index = []
@@ -379,7 +387,7 @@ Meteor.startup ->
 					else
 						sort_entities = entities
 					if sort_entities
-						dealWithExpand(createQuery, sort_entities, key)
+						dealWithExpand(createQuery, sort_entities, key, @urlParams.spaceId)
 						body = {}
 						headers = {}
 						body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key)
@@ -406,6 +414,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -417,12 +428,12 @@ Meteor.startup ->
 		post: ()->
 			try
 				key = @urlParams.object_name
-				if not Creator.objectsByName[key]?.enable_api
+				if not Creator.getObject(key, @urlParams.spaceId)?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
 					}
-				collection = Creator.Collections[key]
+				collection = Creator.getCollection(key, @urlParams.spaceId)
 				if not collection
 					return{
 						statusCode: 404
@@ -459,6 +470,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -476,7 +490,7 @@ Meteor.startup ->
 				collectionName = collectionInfoSplit[0]
 				id = collectionInfoSplit[1].split('\'')[1]
 
-				collection = Creator.Collections[collectionName]
+				collection = Creator.getCollection(collectionName, @urlParams.spaceId)
 				fieldsOptions = {}
 				fieldsOptions[fieldName] = 1
 				entity = collection.findOne({_id: id}, {fields: fieldsOptions})
@@ -485,12 +499,12 @@ Meteor.startup ->
 				if entity
 					fieldValue = entity[fieldName]
 
-				obj = Creator.objectsByName[collectionName]
+				obj = Creator.getObject(collectionName, @urlParams.spaceId)
 				field = obj.fields[fieldName]
 
 				if field  and fieldValue and (field.type is 'lookup' or field.type is 'master_detail')
-					lookupCollection = Creator.Collections[field.reference_to]
-					lookupObj = Creator.objectsByName[field.reference_to]
+					lookupCollection = Creator.getCollection(field.reference_to, @urlParams.spaceId)
+					lookupObj = Creator.getObject(field.reference_to, @urlParams.spaceId)
 					queryOptions = {fields: {}}
 					_.each lookupObj.fields, (v, k)->
 						queryOptions.fields[k] = 1
@@ -512,13 +526,13 @@ Meteor.startup ->
 				{body: body, headers: headers}
 			else
 				try
-					object = Creator.objectsByName[key]
+					object = Creator.getObject(key, @urlParams.spaceId)
 					if not object?.enable_api
 						return {
 							statusCode: 401
 							body: setErrorMessage(401)
 						}
-					collection = Creator.Collections[key]
+					collection = Creator.getCollection(key, @urlParams.spaceId)
 					if not collection
 						return{
 							statusCode: 404
@@ -533,7 +547,7 @@ Meteor.startup ->
 						createQuery.query._id =  @urlParams._id
 						if key is 'cfs.files.filerecord'
 							createQuery.query['metadata.space'] = @urlParams.spaceId
-						else
+						else if key != 'spaces'
 							createQuery.query.space =  @urlParams.spaceId
 						unreadable_fields = permissions.unreadable_fields || []
 						#fields = Creator.getObject(key).fields
@@ -564,7 +578,7 @@ Meteor.startup ->
 								body = {}
 								headers = {}
 								entities.push entity
-								dealWithExpand(createQuery, entities, key)
+								dealWithExpand(createQuery, entities, key, @urlParams.spaceId)
 								body['@odata.context'] = SteedosOData.getODataContextPath(@urlParams.spaceId, key) + '/$entity'
 								entity_OdataProperties = setOdataProperty(entities,@urlParams.spaceId, key)
 								_.extend body,entity_OdataProperties[0]
@@ -591,6 +605,9 @@ Meteor.startup ->
 					error = {}
 					error['message'] = e.message
 					error['code'] = 500
+					error['error'] = e.error
+					error['details'] = e.details
+					error['reason'] = e.reason
 					body['error'] = error
 					return {
 						statusCode: 500
@@ -600,14 +617,14 @@ Meteor.startup ->
 		put:()->
 			try
 				key = @urlParams.object_name
-				object = Creator.objectsByName[key]
+				object = Creator.getObject(key, @urlParams.spaceId)
 				if not object?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
 					}
 
-				collection = Creator.Collections[key]
+				collection = Creator.getCollection(key, @urlParams.spaceId)
 				if not collection
 					return{
 						statusCode: 404
@@ -615,11 +632,14 @@ Meteor.startup ->
 					}
 				spaceId = @urlParams.spaceId
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
-				record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
+				if key == "users"
+					record_owner = @urlParams._id
+				else
+					record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
 				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId )
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
-					if spaceId is 'guest'
+					if spaceId is 'guest' or spaceId is 'common' or key == "users"
 						delete selector.space
 					fields_editable = true
 					_.keys(@bodyParams.$set).forEach (key)->
@@ -661,6 +681,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -669,14 +692,14 @@ Meteor.startup ->
 		delete:()->
 			try
 				key = @urlParams.object_name
-				object = Creator.objectsByName[key]
+				object = Creator.getObject(key, @urlParams.spaceId)
 				if not object?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
 						}
 
-				collection = Creator.Collections[key]
+				collection = Creator.getCollection(key, @urlParams.spaceId)
 				if not collection
 					return{
 						statusCode: 404
@@ -715,6 +738,9 @@ Meteor.startup ->
 				error = {}
 				error['message'] = e.message
 				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
 				body['error'] = error
 				return {
 					statusCode: 500
@@ -722,14 +748,70 @@ Meteor.startup ->
 				}
 	})
 
+	# _id可传all
+	SteedosOdataAPI.addRoute(':object_name/:_id/:methodName', {authRequired: true, spaceRequired: false}, {
+		post: ()->
+			try
+				key = @urlParams.object_name
+				if not Creator.getObject(key, @urlParams.spaceId)?.enable_api
+					return{
+						statusCode: 401
+						body: setErrorMessage(401)
+					}
+				collection = Creator.getCollection(key, @urlParams.spaceId)
+				if not collection
+					return{
+						statusCode: 404
+						body: setErrorMessage(404,collection,key)
+					}
+
+				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
+				if permissions.allowRead
+					methodName = @urlParams.methodName
+					methods = Creator.Objects[key]?.methods || {}
+					if methods.hasOwnProperty(methodName)
+						thisObj = {
+							object_name: key
+							record_id: @urlParams._id
+							space_id: @urlParams.spaceId
+							user_id: @userId
+							permissions: permissions
+						}
+						return methods[methodName].apply(thisObj, [@bodyParams]) || {}
+					else
+						return {
+							statusCode: 404
+							body: setErrorMessage(404,collection,key)
+						}
+				else
+					return {
+						statusCode: 403
+						body: setErrorMessage(403,collection,key)
+					}
+			catch e
+				body = {}
+				error = {}
+				error['message'] = e.message
+				error['code'] = 500
+				error['error'] = e.error
+				error['details'] = e.details
+				error['reason'] = e.reason
+				body['error'] = error
+				return {
+					statusCode: 500
+					body:body
+				}
+
+	})
+
 	#TODO remove
 	_.each [], (value, key, list)-> #Creator.Collections
-		if not Creator.objectsByName[key]?.enable_api
+		if not Creator.getObject(key)?.enable_api
 			return
 
 		if SteedosOdataAPI
 
-			SteedosOdataAPI.addCollection Creator.Collections[key],
+			SteedosOdataAPI.addCollection Creator.getCollection(key),
 				excludedEndpoints: []
 				routeOptions:
 					authRequired: true
@@ -737,7 +819,7 @@ Meteor.startup ->
 				endpoints:
 					getAll:
 						action: ->
-							collection = Creator.Collections[key]
+							collection = Creator.getCollection(key)
 							if not collection
 								statusCode: 404
 								body: {status: 'fail', message: 'Collection not found'}
@@ -761,7 +843,7 @@ Meteor.startup ->
 									scannedCount = collection.find(createQuery.query).count()
 
 									if entities
-										dealWithExpand(createQuery, entities, key)
+										dealWithExpand(createQuery, entities, key, @urlParams.spaceId)
 
 										body = {}
 										headers = {}
@@ -779,7 +861,7 @@ Meteor.startup ->
 								body: {status: 'fail', message: 'Action not permitted'}
 					post:
 						action: ->
-							collection = Creator.Collections[key]
+							collection = Creator.getCollection(key)
 							if not collection
 								statusCode: 404
 								body: {status: 'fail', message: 'Collection not found'}
@@ -800,7 +882,7 @@ Meteor.startup ->
 								body: {status: 'fail', message: 'Action not permitted'}
 					get:
 						action: ->
-							collection = Creator.Collections[key]
+							collection = Creator.getCollection(key)
 							if not collection
 								statusCode: 404
 								body: {status: 'fail', message: 'Collection not found'}
@@ -819,7 +901,7 @@ Meteor.startup ->
 								body: {status: 'fail', message: 'Action not permitted'}
 					put:
 						action: ->
-							collection = Creator.Collections[key]
+							collection = Creator.getCollection(key)
 							if not collection
 								statusCode: 404
 								body: {status: 'fail', message: 'Collection not found'}
@@ -839,7 +921,7 @@ Meteor.startup ->
 								body: {status: 'fail', message: 'Action not permitted'}
 					delete:
 						action: ->
-							collection = Creator.Collections[key]
+							collection = Creator.getCollection(key)
 							if not collection
 								statusCode: 404
 								body: {status: 'fail', message: 'Collection not found'}

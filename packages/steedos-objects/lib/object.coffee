@@ -33,6 +33,9 @@ Creator.Object = (options)->
 	self.custom = options.custom
 	self.enable_share = options.enable_share
 	self.enable_instances = options.enable_instances
+	self.enable_tree = options.enable_tree
+	self.open_window = options.open_window
+	self.filter_company = options.filter_company
 	self.calendar = _.clone(options.calendar)
 	if (!options.fields)
 		throw new Error('Creator.Object options must specify name');
@@ -131,18 +134,23 @@ Creator.Object = (options)->
 	else
 		self.permissions = null
 
-	Creator.Collections[self.name] = Creator.createCollection(options)
-	self.db = Creator.Collections[self.name]
+	_db = Creator.createCollection(options)
+
+	Creator.Collections[_db._name] = _db
+
+	self.db = _db
+
+	self._collection_name = _db._name
 
 	schema = Creator.getObjectSchema(self)
 	self.schema = new SimpleSchema(schema)
 	if self.name != "users" and self.name != "cfs.files.filerecord" && !self.is_view
 		if Meteor.isClient
-			Creator.Collections[self.name].attachSchema(self.schema, {replace: true})
+			_db.attachSchema(self.schema, {replace: true})
 		else
-			Creator.Collections[self.name].attachSchema(self.schema)
-
-	Creator.objectsByName[self.name] = self
+			_db.attachSchema(self.schema, {replace: true})
+#	console.log('Creator.objectsByName---------->', self._collection_name, self.name)
+	Creator.objectsByName[self._collection_name] = self
 
 	return self
 
