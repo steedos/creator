@@ -52,7 +52,7 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			omit: true
 		company: 
-			type: "master_detail"
+			type: "lookup"
 			label: '所属公司'
 			reference_to: "organizations"
 			# omit: true
@@ -65,20 +65,13 @@ Creator.Objects.space_users =
 			label: "邀请状态"
 			type: "text"
 			omit: true
-		profile:
-			label: "用户身份"
-			type: "select"
-			defaultValue: "user"
-			options: [
-				{label: "员工", value: "user"},
-				{label: "会员", value: "member"}
-			]
 		user:
 			type: "master_detail"
 			reference_to: "users"
 			index:true
 			# required: true
 			omit: true
+			hidden: true
 	list_views:
 		all:
 			label: "所有人员"
