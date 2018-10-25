@@ -10,6 +10,7 @@ Creator.Objects.archive_document =
 			type: "text"
 			label: "分类ID"
 			reference_to: "archive_classification"
+			hidden: true
 		name:
 			type: "text"
 			label: "标题"
@@ -17,6 +18,9 @@ Creator.Objects.archive_document =
 			type: "lookup"
 			label: "提交人"
 			reference_to: "users"
+		organization:
+			type: "text"
+			label: "部门"
 		submit_date:
 			type: "datetime"
 			label: "提交时间"
@@ -28,13 +32,20 @@ Creator.Objects.archive_document =
 		outbox_users:
 			type: ["text"]
 			label: "处理人"
+			omit: true
 		flow_name:
 			type: "text"
 			label: "流程归档时候的名称"
 		state:
 			type: "text"
 			label: "审批结果"
-		organization:
-			type: "text"
-			label: "部门"
+
+	list_views:
+		recent:
+			label: "最近查看"
+			filter_scope: "space"
+		all:
+			label: "全部"
+			filter_scope: "space"
+			columns:["name","submitter","submit_date","archive_date","outbox_users","flow_name","state","organization"]
 		
