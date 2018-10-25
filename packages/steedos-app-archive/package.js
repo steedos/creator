@@ -17,7 +17,8 @@ Package.onUse(function(api) {
 	api.addFiles('models/archive_manage/archive_document.coffee');
 
 	// 公文维护
+	api.addFiles('archive_setting.coffee');
+
 	api.addFiles('models/archive_setting/archive_classification.coffee');
 	
-	// 方法
 })
