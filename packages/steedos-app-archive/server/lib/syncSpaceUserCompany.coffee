@@ -1,13 +1,13 @@
 # =============================================
 # spaceId: 工作区ID
 # user_ids Array 用户ID
-SyncSpaceUserCompany = (spaceId, user_ids) ->
+SyncSpaceUserOrganizationCompany = (spaceId, user_ids) ->
 	@spaceId = spaceId
 	@user_ids = user_ids
 	return
 
 # 非递归
-SyncSpaceUserCompany.getNoUserCompany = (organization_id)->
+SyncSpaceUserOrganizationCompany.getOrganizationCompany = (organization_id)->
     company = Creator.Collections["organizations"].findOne({
         '_id': organization_id
     })
@@ -24,21 +24,6 @@ SyncSpaceUserCompany.getNoUserCompany = (organization_id)->
             if company?.is_subcompany == true
                 break
         return company
-
-# 递归
-SyncSpaceUserCompany.getUserCompany = (organization_id)->
-    console.log "getUserCompany", organization_id
-    organization = Creator.Collections["organizations"].findOne({
-        '_id': organization_id
-    })
-    console.log "organization", organization?.name
-    if organization?.is_subcompany == true
-        return organization
-    if organization?.parent
-        console.log "organization?.parent"
-        SyncSpaceUserCompany.getUserCompany(organization.parent)
-    else
-        return null
 
 #获取所有用户
 SyncSpaceUserCompany::getSpaceUserIds = () ->
@@ -65,7 +50,7 @@ SyncSpaceUserCompany::DoSync = () ->
     if space_user_ids?.length > 0
         console.log "space_user_ids?.length",space_user_ids?.length
         space_user_ids.forEach (space_user)->
-            company = SyncSpaceUserCompany.getNoUserCompany(space_user?.organization)
+            company = SyncSpaceUserOrganizationCompany.getOrganizationCompany(space_user?.organization)
             console.log "company",company?.name
             if company
                 company_id = company?._id
@@ -73,6 +58,6 @@ SyncSpaceUserCompany::DoSync = () ->
                     {_id: space_user._id},
                     {
                         $set: {
-                            company: company_id
+                            organization_company: company_id
                         }
                     })

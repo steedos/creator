@@ -1,9 +1,9 @@
-Creator.syncSpaceUserCompany = (user_ids)->
+Creator.syncSpaceUserOrganizationCompany = (user_ids)->
 # ---------------------------------------------------
     if Steedos.isCloudAdmin()
         if Object.prototype.toString.call(user_ids) == "[object Array]"
             spaceId = Steedos.spaceId()
-            Meteor.call("syncSpaceUserCompany", spaceId, user_ids, 
+            Meteor.call("syncSpaceUserOrganizationCompany", spaceId, user_ids, 
                 (error,result) ->
                     if result
                         console.log 'Success'
