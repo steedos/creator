@@ -125,7 +125,6 @@ _minxiAttachmentInfo = (instance, record_id) ->
 	currentFiles.forEach (cf)->
 		try
 			instance_file_path = RecordsSync?.settings_records_sync?.instance_file_path
-			console.log "instance_file_path--------",instance_file_path
 			versions = []
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
@@ -158,14 +157,10 @@ _minxiAttachmentInfo = (instance, record_id) ->
 
 			# 把当前文件放在历史版本文件的最后
 			historyFiles.push(cf)
-			console.log "historyFiles",historyFiles
 			# 历史版本文件+当前文件 上传到creator
 			historyFiles.forEach (hf) ->
 				instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
-				console.log "instance_file_key",instance_file_key
 				if fs.existsSync(instance_file_key)
-					console.log "fs.existsSync(instance_file_key)---------"
-					console.log "hf.createReadStream(instance_file_key)",fs.createReadStream(instance_file_key)
 					newFile = new FS.File()
 					newFile.attachData(
 						fs.createReadStream(instance_file_key),
@@ -389,7 +384,6 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 	# _minxiInstanceTraces(auditList, instance, record_id)
 	
 	# 整理文件
-	console.log "_minxiAttachmentInfo-----------"
 	_minxiAttachmentInfo(instance, record_id)
 
 	# 整理表单html
