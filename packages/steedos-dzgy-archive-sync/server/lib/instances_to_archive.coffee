@@ -21,6 +21,8 @@ _minxiInstanceData = (formData, instance) ->
 
 	formData.submitter = instance.submitter
 
+	formData.created_by = instance.submitter
+
 	formData.owner = instance.submitter
 
 	formData.space = instance.space
@@ -122,6 +124,8 @@ _minxiAttachmentInfo = (instance, record_id) ->
 
 	currentFiles.forEach (cf)->
 		try
+			instance_file_path = RecordsSync?.settings_records_sync?.instance_file_path
+			console.log "instance_file_path--------",instance_file_path
 			versions = []
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
@@ -154,32 +158,37 @@ _minxiAttachmentInfo = (instance, record_id) ->
 
 			# 把当前文件放在历史版本文件的最后
 			historyFiles.push(cf)
-
+			console.log "historyFiles",historyFiles
 			# 历史版本文件+当前文件 上传到creator
 			historyFiles.forEach (hf) ->
-				newFile = new FS.File()
-				newFile.attachData(
-					hf.createReadStream('instances'),
-					{type: hf.original.type},
-					(err)->
-						if err
-							throw new Meteor.Error(err.error, err.reason)
-						newFile.name hf.name()
-						newFile.size hf.size()
-						metadata = {
-							owner: hf.metadata.owner,
-							owner_name: hf.metadata?.owner_name,
-							space: spaceId,
-							record_id: record_id,
-							object_name: object_name,
-							parent: cmsFileId,
-							current: hf.metadata?.current
-						}
-						newFile.metadata = metadata
-						fileObj = cfs.files.insert(newFile)
-						if fileObj
-							versions.push(fileObj._id)
-					)
+				instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
+				console.log "instance_file_key",instance_file_key
+				if fs.existsSync(instance_file_key)
+					console.log "fs.existsSync(instance_file_key)---------"
+					console.log "hf.createReadStream(instance_file_key)",fs.createReadStream(instance_file_key)
+					newFile = new FS.File()
+					newFile.attachData(
+						fs.createReadStream(instance_file_key),
+						{type: hf.original.type},
+						(err)->
+							if err
+								throw new Meteor.Error(err.error, err.reason)
+							newFile.name hf.name()
+							newFile.size hf.size()
+							metadata = {
+								owner: hf.metadata.owner,
+								owner_name: hf.metadata?.owner_name,
+								space: spaceId,
+								record_id: record_id,
+								object_name: object_name,
+								parent: cmsFileId,
+								current: hf.metadata?.current
+							}
+							newFile.metadata = metadata
+							fileObj = cfs.files.insert(newFile)
+							if fileObj
+								versions.push(fileObj._id)
+						)
 			# 把 cms_files 记录的 versions 更新
 			collection.update(cmsFileId, {$set: {versions: versions}})
 		catch e
@@ -380,6 +389,7 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 	# _minxiInstanceTraces(auditList, instance, record_id)
 	
 	# 整理文件
+	console.log "_minxiAttachmentInfo-----------"
 	_minxiAttachmentInfo(instance, record_id)
 
 	# 整理表单html
