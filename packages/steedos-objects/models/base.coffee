@@ -7,7 +7,8 @@ Creator.baseObject =
 			sortable: true
 			index: true
 			defaultValue: "{userId}"
-			# group:"记录"
+			group:"记录"
+			omit: true
 		space:
 			type: "lookup"
 			label:"所属工作区"

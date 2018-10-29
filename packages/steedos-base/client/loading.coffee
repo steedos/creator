@@ -22,8 +22,12 @@ Steedos.isLoading = ()->
 
 Meteor.startup ->
 	Tracker.autorun (c) ->
-		if Steedos.isLoading()
+		if Steedos.isLoading()  
 			$("body").addClass("loading")
-		else
-			$("body").removeClass("loading")
+
+		if !Steedos.isLoading()  
+			setTimeout ->
+				if !Steedos.isLoading() 
+					$("body").removeClass("loading")
+			, 500
 
