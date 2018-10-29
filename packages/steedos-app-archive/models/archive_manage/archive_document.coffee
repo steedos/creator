@@ -1,7 +1,7 @@
 Creator.Objects.archive_document = 
 	name: "archive_document"
 	icon: "record"
-	label: "公文管理"
+	label: "文件归档"
 	enable_search: true
 	enable_files: true
 	enable_api: true
@@ -21,6 +21,7 @@ Creator.Objects.archive_document =
 		organization:
 			type: "text"
 			label: "部门"
+			hidden: true
 		submit_date:
 			type: "datetime"
 			label: "提交时间"
@@ -33,12 +34,18 @@ Creator.Objects.archive_document =
 			type: ["text"]
 			label: "处理人"
 			omit: true
+			hidden: true
 		flow_name:
 			type: "text"
 			label: "流程归档时候的名称"
+		external_id:
+			type:"text"
+			label:'表单ID'
+			hidden: true
 		state:
 			type: "text"
 			label: "审批结果"
+			hidden: true
 
 	list_views:
 		recent:

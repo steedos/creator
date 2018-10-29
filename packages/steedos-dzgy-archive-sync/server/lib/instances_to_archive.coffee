@@ -17,18 +17,36 @@ _minxiInstanceData = (formData, instance) ->
 		return
 	dateFormat = "YYYY-MM-DD HH:mm:ss"
 
-	formData.space = instance.space
+	formData.outbox_users = instance.outbox_users
+
+	formData.submitter = instance.submitter
 
 	formData.owner = instance.submitter
 
-	formData.created_by = instance.created_by
+	formData.space = instance.space
 
-	formData.created = new Date()
+	formData.submit_date = instance.submit_date
+
+	formData.archive_date = moment(new Date()).format(dateFormat)
+
+	formData.state = instance.state
 
 	# 字段映射:表单字段对应到formData
 	# field_values = InstanceManager.handlerInstanceByFieldMap(instance)
 	
-	formData.title = instance.name
+	formData.name = instance.name
+
+	# 获取当前归档流程的名称
+	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1}})
+	
+	if flow
+		formData.flow_name = flow.name
+
+	# 获取提交者主部门id
+	spaceUser = Creator.Collections["space_users"].findOne({space:instance.space, user:instance.submitter},{fields:{organization:1}})
+
+	if spaceUser
+		formData.organization = spaceUser.organization
 
 	# OA表单的ID，作为判断OA归档的标志
 	formData.external_id = instance._id
@@ -344,34 +362,29 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 	auditList = []
 
 	_minxiInstanceData(formData, instance)
+	
+	# 如果原来已经归档，则删除原来归档的记录
+	# 对象名
+	object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
+	collection = Creator.Collections[object_name]
 
+	collection.remove({'external_id':instance._id})
 
-	if _checkParameter(formData)
-		# 如果原来已经归档，则删除原来归档的记录
-		# 对象名
-		object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
-		collection = Creator.Collections[object_name]
+	record_id = collection.insert formData
 
-		collection.remove({'external_id':instance._id})
+	# 整理关联档案
+	#_minxiRelatedArchives(instance, record_id)
 
-		record_id = collection.insert formData
+	# 处理审计记录
+	# _minxiInstanceTraces(auditList, instance, record_id)
+	
+	# 整理文件
+	_minxiAttachmentInfo(instance, record_id)
 
-		# 整理关联档案
-		_minxiRelatedArchives(instance, record_id)
+	# 整理表单html
+	_minxiInstanceHtml(instance, record_id)
 
-		# 处理审计记录
-		_minxiInstanceTraces(auditList, instance, record_id)
-		
-		# 整理文件
-		_minxiAttachmentInfo(instance, record_id)
-
-		# 整理表单html
-		_minxiInstanceHtml(instance, record_id)
-
-
-		InstancesToArchive.success instance
-	else
-		InstancesToArchive.failed instance, "立档单位 不能为空"
+	InstancesToArchive.success instance
 
 
 #	获取申请单：正常结束的(不包括取消申请、被驳回的申请单)
@@ -412,7 +425,7 @@ InstancesToArchive::syncInstances = () ->
 
 # =================================================
 @Test = {}
-# Test.run('zuwJ7thtXn7ZxKcPZ')
+# Test.run('56c134dc527eca7e5a00b3fc')
 Test.run = (ins_id)->
 	instance = Creator.Collections["instances"].findOne({_id: ins_id})
 	if instance
