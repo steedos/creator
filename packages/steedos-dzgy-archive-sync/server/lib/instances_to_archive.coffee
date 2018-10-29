@@ -189,15 +189,16 @@ _minxiAttachmentInfo = (instance, record_id) ->
 _minxiInstanceHtml = (instance, record_id) ->
 	admin = RecordsSync?.settings_records_sync?.to_archive?.admin
 	apps_url = RecordsSync?.settings_records_sync?.to_archive?.apps_url
+	hide_traces = RecordsSync?.settings_records_sync?.to_archive?.hide_traces
 	
 	space_id = instance?.space
 	ins_id = instance?._id
 
 	user_id = admin?.userid
-	username = admin?.username
+	username = admin?.steedosId
 	password = admin?.password
 
-	instance_html_url = apps_url + '/workflow/space/' + space_id + '/view/readonly/' + ins_id + '?username=' + username + '&password=' + password + '&hide_traces=1'
+	instance_html_url = apps_url + '/workflow/space/' + space_id + '/view/readonly/' + ins_id + '?username=' + username + '&password=' + password + '&hide_traces=' + hide_traces
 	
 	result_html = HTTP.call('GET',instance_html_url)?.content
 

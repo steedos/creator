@@ -76,6 +76,7 @@
         "spaces": ["Af8eM6mAHo7wMDqD3"],    //需要同步的工作区Ids
         "-recurrenceRule": "* /10 * * * *",    //同步时间
         "instance_file_path":"D:\\Documents\\instances\\",    //同步过来的文件存储路径
+        "hide_traces":"0", //html表单是否显示历史，0 不显示，1 显示
         "to_archive": {
             "object_name":"archive_wenshu",    //同步到的对象
             "admin":{
