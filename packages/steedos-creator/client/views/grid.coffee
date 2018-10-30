@@ -344,20 +344,6 @@ Template.creator_grid.onRendered ->
 						$("<div>").append(htmlText).appendTo(container);
 			
 			unless creator_obj.enable_tree
-				showColumns.splice 0, 0,
-					dataField: "_index"
-					width: 60
-					allowExporting: true
-					allowSorting: false
-					allowReordering: false
-					caption: "序号"
-					cellTemplate: (container, options) ->
-						pageSize = self.dxDataGridInstance.pageSize();
-						pageIndex = self.dxDataGridInstance.pageIndex();
-						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
-						# Template.instance().dxDataGridInstance.pageIndex()
-						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
-						$("<div>").append(htmlText).appendTo(container);
 				
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
@@ -372,6 +358,21 @@ Template.creator_grid.onRendered ->
 						# console.log('[options]', options)
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 		
+				showColumns.splice 0, 0,
+					dataField: "_index"
+					width: 60
+					allowExporting: true
+					allowSorting: false
+					allowReordering: false
+					caption: ""
+					cellTemplate: (container, options) ->
+						pageSize = self.dxDataGridInstance.pageSize();
+						pageIndex = self.dxDataGridInstance.pageIndex();
+						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
+						# Template.instance().dxDataGridInstance.pageIndex()
+						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
+						$("<div>").append(htmlText).appendTo(container);
+						
 			# console.log "selectColumns", selectColumns
 			console.log "filter", filter
 			# console.log "expand_fields", expand_fields
