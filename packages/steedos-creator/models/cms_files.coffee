@@ -17,11 +17,13 @@ Creator.Objects.cms_files =
 		extention:
 			label: "文件后缀"
 			type: "text"
-			disabled: true
+			readonly: true
+			omit: true
 		size:
 			label: "文件大小"
 			type: "filesize"
-			disabled: true
+			omit: true
+			readonly: true
 		versions:
 			label: "历史版本"
 			type: "file"

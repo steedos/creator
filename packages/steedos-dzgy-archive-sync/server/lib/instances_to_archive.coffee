@@ -162,28 +162,29 @@ _minxiAttachmentInfo = (instance, record_id) ->
 				instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
 				if fs.existsSync(instance_file_key)
 					newFile = new FS.File()
-					newFile.attachData(
-						fs.createReadStream(instance_file_key),
-						{type: hf.original.type},
-						(err)->
-							if err
-								throw new Meteor.Error(err.error, err.reason)
-							newFile.name hf.name()
-							newFile.size hf.size()
-							metadata = {
-								owner: hf.metadata.owner,
-								owner_name: hf.metadata?.owner_name,
-								space: spaceId,
-								record_id: record_id,
-								object_name: object_name,
-								parent: cmsFileId,
-								current: hf.metadata?.current
-							}
-							newFile.metadata = metadata
-							fileObj = cfs.files.insert(newFile)
-							if fileObj
-								versions.push(fileObj._id)
-						)
+					if fs.createReadStream(instance_file_key)
+						newFile.attachData(
+							fs.createReadStream(instance_file_key),
+							{type: hf.original.type},
+							(err)->
+								if err
+									throw new Meteor.Error(err.error, err.reason)
+								newFile.name hf.name()
+								newFile.size hf.size()
+								metadata = {
+									owner: hf.metadata.owner,
+									owner_name: hf.metadata?.owner_name,
+									space: spaceId,
+									record_id: record_id,
+									object_name: object_name,
+									parent: cmsFileId,
+									current: hf.metadata?.current
+								}
+								newFile.metadata = metadata
+								fileObj = cfs.files.insert(newFile)
+								if fileObj
+									versions.push(fileObj._id)
+							)
 			# 把 cms_files 记录的 versions 更新
 			collection.update(cmsFileId, {$set: {versions: versions}})
 		catch e
