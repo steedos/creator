@@ -375,8 +375,9 @@ Template.creator_grid.onRendered ->
 			# console.log "selectColumns", selectColumns
 			console.log "filter", filter
 			# console.log "expand_fields", expand_fields
-			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
-				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
+			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
+			if !is_related and localPageSize
+				pageSize = localPageSize
 			else
 				pageSize = 10
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
@@ -487,13 +488,16 @@ Template.creator_grid.onRendered ->
 						recordsTotal = self.data.recordsTotal.get()
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
-					if creator_obj.enable_tree
-						current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
-						self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
-					else
-						current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
-						self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
-					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+					unless is_related
+						if creator_obj.enable_tree
+							current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
+							self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
+						else
+							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
+							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
+						localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+			if is_related
+				dxOptions.pager.showPageSizeSelector = false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent._id"
