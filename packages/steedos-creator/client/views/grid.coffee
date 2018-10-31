@@ -1,5 +1,3 @@
-dxDataGridInstance = null
-
 _standardQuery = (curObjectName)->
 	standard_query = Session.get("standard_query")
 	object_fields = Creator.getObject(curObjectName).fields
@@ -28,6 +26,7 @@ _standardQuery = (curObjectName)->
 		return Creator.formatFiltersToDev(query_arr)
 	
 _itemClick = (e, curObjectName, list_view_id)->
+	self = this
 	record = e.data
 	if !record
 		return
@@ -62,7 +61,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
 				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
-					dxDataGridInstance.refresh()
+					self.dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
@@ -483,7 +482,7 @@ Template.creator_grid.onRendered ->
 				onCellClick: (e)->
 					console.log "curObjectName", curObjectName
 					if e.column?.dataField ==  "_id_actions"
-						_itemClick(e, curObjectName)
+						_itemClick.call(self, e, curObjectName)
 
 				onContentReady: (e)->
 					if self.data.total
@@ -511,7 +510,6 @@ Template.creator_grid.onRendered ->
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 				self.dxDataGridInstance.pageSize(pageSize)
-			dxDataGridInstance = self.dxDataGridInstance
 			
 Template.creator_grid.helpers Creator.helpers
 
