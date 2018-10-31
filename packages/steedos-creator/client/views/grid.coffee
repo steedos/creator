@@ -512,6 +512,16 @@ Template.creator_grid.onRendered ->
 			
 Template.creator_grid.helpers Creator.helpers
 
+Template.creator_grid.helpers 
+	hideGridContent: ()->
+		is_related = Template.instance().data.is_related
+		if is_related
+			related_object_name = Template.instance().data.related_object_name
+			total = Template.instance().data.recordsTotal.get()?[related_object_name]
+			return !total and is_related
+		else
+			return false
+
 Template.creator_grid.events
 
 	'click .table-cell-edit': (event, template) ->
