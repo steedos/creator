@@ -12,6 +12,7 @@ if [ -d "$BUNDLE_PATH" ]; then
 	npm install --registry https://registry.npm.taobao.org -d
 
 	cd $BUNDLE_PATH
+	nvm use v8.11.3
 	pm2 restart vip.0
 else
 	echo "!!!=> Failed to create bundle path: $BUNDLE_PATH"
