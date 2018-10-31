@@ -449,6 +449,9 @@ Template.creator_grid.onRendered ->
 								if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 									error.message = t "creator_odata_unexpected_character"
 							toastr.error(error.message)
+						fieldTypes: {
+							'_id': 'String'
+						}
 					select: selectColumns
 					filter: filter
 					expand: expand_fields
