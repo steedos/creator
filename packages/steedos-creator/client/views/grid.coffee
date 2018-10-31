@@ -587,6 +587,11 @@ Template.creator_grid.onCreated ->
 			self.dxDataGridInstance.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
+	
+	AutoForm.hooks creatorAddRelatedForm:
+		onSuccess: (formType,result)->
+			self.dxDataGridInstance.refresh().done (result)->
+				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 
 # Template.creator_grid.onDestroyed ->
 # 	#离开界面时，清除hooks为空函数
