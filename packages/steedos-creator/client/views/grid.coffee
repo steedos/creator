@@ -518,7 +518,7 @@ Template.creator_grid.helpers
 		if is_related
 			related_object_name = Template.instance().data.related_object_name
 			total = Template.instance().data.recordsTotal.get()?[related_object_name]
-			return !total and is_related
+			return !total
 		else
 			return false
 
