@@ -260,6 +260,9 @@ Template.creator_list_wrapper.onDestroyed ->
 
 AutoForm.hooks addListView:
 	onSuccess: (formType,result)->
+		app_id = Session.get("app_id")
+		object_name = Session.get("object_name")
 		list_view_id = result._id
-		FlowRouter.go("/app/admin/objects/grid/#{list_view_id}");
+		url = Creator.getListViewUrl(object_name, app_id, list_view_id)
+		FlowRouter.go(url);
 			
