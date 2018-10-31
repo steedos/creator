@@ -52,7 +52,7 @@ Creator.Objects.space_users =
 			label:'排序号'
 			group:'-'
 		organization:
-			type: "master_detail"
+			type: "lookup"
 			reference_to: "organizations"
 			omit: true
 		organization_company: 
