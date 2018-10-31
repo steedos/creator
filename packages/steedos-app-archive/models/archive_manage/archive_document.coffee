@@ -37,7 +37,7 @@ Creator.Objects.archive_document =
 			hidden: true
 		flow_name:
 			type: "text"
-			label: "流程归档时候的名称"
+			label: "流程名称"
 		external_id:
 			type:"text"
 			label:'表单ID'
@@ -55,4 +55,20 @@ Creator.Objects.archive_document =
 			label: "全部"
 			filter_scope: "space"
 			columns:["name","submitter","submit_date","archive_date","outbox_users","flow_name","state","organization"]
+	
+	actions:
+		standard_view:
+			label: "查看表单"
+			visible:true
+			on: "record"
+			todo:(object_name, record_id)->
+				if record_id
+					Meteor.call "archive_view", record_id, (error,result) ->
+						if result 
+							if result == ""
+								toastr.error "未找到html！"							
+							
+							Steedos.openWindow(result)
+
+
 		
