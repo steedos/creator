@@ -246,7 +246,8 @@ Template.creator_list_wrapper.events
 
 	'click .btn-refresh': (event, template)->
 		$(".slds-icon-standard-refresh", event.currentTarget).animateCss("rotate")
-		Template["creator_#{FlowRouter.getParam('template')}"]?.refresh()
+		dxDataGridInstance = $(event.currentTarget).closest(".filter-list-wraper").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
+		Template["creator_#{FlowRouter.getParam('template')}"]?.refresh(dxDataGridInstance)
 
 
 Template.creator_list_wrapper.onCreated ->
