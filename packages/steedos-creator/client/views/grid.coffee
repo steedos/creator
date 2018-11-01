@@ -621,7 +621,6 @@ Template.creator_grid.onCreated ->
 # 	,true
 
 
-Template.creator_grid.refresh = ->
-	self = this
-	self.dxDataGridInstance.refresh().done (result)->
-		Creator.remainCheckboxState(self.dxDataGridInstance.$element())
+Template.creator_grid.refresh = (dxDataGridInstance)->
+	dxDataGridInstance.refresh().done (result)->
+		Creator.remainCheckboxState(dxDataGridInstance.$element())

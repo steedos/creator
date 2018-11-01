@@ -393,6 +393,7 @@ Template.creator_view.events
 				$(".btn.creator-edit").click()
 
 	'change .input-file-upload': (event, template)->
+		dxDataGridInstance = $(event.currentTarget).closest(".related-object-tabular").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
 		parent = event.currentTarget.dataset?.parent
 		files = event.currentTarget.files
 		i = 0
@@ -441,6 +442,7 @@ Template.creator_view.events
 							return
 						return
 					toastr.success TAPi18n.__('Attachment was added successfully')
+					Template.creator_grid.refresh dxDataGridInstance
 					return
 				error: (xhr, msg, ex) ->
 					$(document.body).removeClass 'loading'
