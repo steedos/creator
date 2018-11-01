@@ -14,11 +14,6 @@ Creator.Objects.flows =
 			type: "master_detail"
 			reference_to: "forms"
 			readonly: true
-		flowtype:
-			label:"流程分类"
-			type: "text"
-			omit: true
-			hidden: true
 		state:
 			label:"流程状态"
 			type: "select"
