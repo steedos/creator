@@ -51,17 +51,18 @@ Creator.Objects.organizations =
 			defaultValue: 100
 			sortable: true
 
-		users:
-			label: "成员"
-			type: "lookup"
-			reference_to: "users"
-			multiple: true
-
 		admins:
 			label: "组织管理员"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+
+		users:
+			label: "成员"
+			type: "lookup"
+			reference_to: "users"
+			multiple: true
+			is_wide: true
 
 		is_company:
 			label: "根组织"
