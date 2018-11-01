@@ -1,5 +1,3 @@
-dxDataGridInstance = null
-
 _standardQuery = (curObjectName)->
 	standard_query = Session.get("standard_query")
 	object_fields = Creator.getObject(curObjectName).fields
@@ -28,6 +26,7 @@ _standardQuery = (curObjectName)->
 		return Creator.formatFiltersToDev(query_arr)
 	
 _itemClick = (e, curObjectName, list_view_id)->
+	self = this
 	record = e.data
 	if !record
 		return
@@ -62,7 +61,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
 				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
-					dxDataGridInstance.refresh()
+					self.dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
@@ -344,20 +343,6 @@ Template.creator_grid.onRendered ->
 						$("<div>").append(htmlText).appendTo(container);
 			
 			unless creator_obj.enable_tree
-				showColumns.splice 0, 0,
-					dataField: "_index"
-					width: 60
-					allowExporting: true
-					allowSorting: false
-					allowReordering: false
-					caption: "序号"
-					cellTemplate: (container, options) ->
-						pageSize = self.dxDataGridInstance.pageSize();
-						pageIndex = self.dxDataGridInstance.pageIndex();
-						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
-						# Template.instance().dxDataGridInstance.pageIndex()
-						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
-						$("<div>").append(htmlText).appendTo(container);
 				
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
@@ -372,11 +357,27 @@ Template.creator_grid.onRendered ->
 						# console.log('[options]', options)
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 		
+				showColumns.splice 0, 0,
+					dataField: "_index"
+					width: 60
+					allowExporting: true
+					allowSorting: false
+					allowReordering: false
+					caption: ""
+					cellTemplate: (container, options) ->
+						pageSize = self.dxDataGridInstance.pageSize();
+						pageIndex = self.dxDataGridInstance.pageIndex();
+						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
+						# Template.instance().dxDataGridInstance.pageIndex()
+						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
+						$("<div>").append(htmlText).appendTo(container);
+						
 			# console.log "selectColumns", selectColumns
 			console.log "filter", filter
 			# console.log "expand_fields", expand_fields
-			if localStorage.getItem("creator_pageSize:"+Meteor.userId())
-				pageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
+			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
+			if !is_related and localPageSize
+				pageSize = localPageSize
 			else
 				pageSize = 10
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
@@ -447,6 +448,9 @@ Template.creator_grid.onRendered ->
 								if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 									error.message = t "creator_odata_unexpected_character"
 							toastr.error(error.message)
+						fieldTypes: {
+							'_id': 'String'
+						}
 					select: selectColumns
 					filter: filter
 					expand: expand_fields
@@ -478,7 +482,7 @@ Template.creator_grid.onRendered ->
 				onCellClick: (e)->
 					console.log "curObjectName", curObjectName
 					if e.column?.dataField ==  "_id_actions"
-						_itemClick(e, curObjectName)
+						_itemClick.call(self, e, curObjectName)
 
 				onContentReady: (e)->
 					if self.data.total
@@ -487,13 +491,16 @@ Template.creator_grid.onRendered ->
 						recordsTotal = self.data.recordsTotal.get()
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
-					if creator_obj.enable_tree
-						current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
-						self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
-					else
-						current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
-						self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
-					localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+					unless is_related
+						if creator_obj.enable_tree
+							current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
+							self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
+						else
+							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
+							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
+						localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+			if is_related
+				dxOptions.pager.showPageSizeSelector = false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent._id"
@@ -503,9 +510,19 @@ Template.creator_grid.onRendered ->
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 				self.dxDataGridInstance.pageSize(pageSize)
-			dxDataGridInstance = self.dxDataGridInstance
 			
 Template.creator_grid.helpers Creator.helpers
+
+Template.creator_grid.helpers 
+	hideGridContent: ()->
+		is_related = Template.instance().data.is_related
+		recordsTotal = Template.instance().data.recordsTotal
+		related_object_name = Template.instance().data.related_object_name
+		if is_related and recordsTotal
+			total = recordsTotal.get()?[related_object_name]
+			return !total
+		else
+			return false
 
 Template.creator_grid.events
 
@@ -571,6 +588,11 @@ Template.creator_grid.onCreated ->
 			self.dxDataGridInstance.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
+	
+	AutoForm.hooks creatorAddRelatedForm:
+		onSuccess: (formType,result)->
+			self.dxDataGridInstance.refresh().done (result)->
+				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 
 # Template.creator_grid.onDestroyed ->
 # 	#离开界面时，清除hooks为空函数
@@ -600,7 +622,6 @@ Template.creator_grid.onCreated ->
 # 	,true
 
 
-Template.creator_grid.refresh = ->
-	self = this
-	self.dxDataGridInstance.refresh().done (result)->
-		Creator.remainCheckboxState(self.dxDataGridInstance.$element())
+Template.creator_grid.refresh = (dxDataGridInstance)->
+	dxDataGridInstance.refresh().done (result)->
+		Creator.remainCheckboxState(dxDataGridInstance.$element())

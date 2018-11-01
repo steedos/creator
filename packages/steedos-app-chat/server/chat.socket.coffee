@@ -2,6 +2,10 @@ http = Npm.require 'http';
 socket_io = Npm.require 'socket.io';
 Fiber = Npm.require('fibers');
 
+if !process.env.SOCKET_IO_PORT
+	console.warn('The environment variable SOCKET_IO_PORT is not configured, failing to start socket.io');
+	return;
+
 PORT = process.env.SOCKET_IO_PORT || 8080;
 
 SOCKETS = {}
@@ -132,19 +136,24 @@ Meteor.startup ()->
 			object_name = msg.related_to.o;
 			record_id = msg.related_to.ids[0];
 			delete msg.related_to
+			msg.owner = Creator.getCollection("users").findOne({_id: msg.owner}, {
+				fields: {
+					_id: 1,
+					name: 1,
+					avatarUrl: 1
+				}
+			})
 			if object_name == 'chat_rooms'
 				room = Creator.getCollection(object_name).findOne({_id: record_id}, {fields: {members: 1}})
 				if room
-					msg.owner = Creator.getCollection("users").findOne({_id: msg.owner}, {
-						fields: {
-							_id: 1,
-							name: 1,
-							avatarUrl: 1
-						}
-					})
 					_.forEach room?.members, (m)->
 						key = getReceiveSocketKey(object_name, record_id, m)
 						socketEmit(receiveMessageSockets[key], SOCKETEVENTNAMES.NEWMESSAGE, msg)
+			else
+				participants = Creator.getCollection("chat_subscriptions").find({'related_to.o': object_name, 'related_to.ids': [record_id]}, {fields: {owner: 1}})
+				participants.forEach (p)->
+					key = getReceiveSocketKey(object_name, record_id, p.owner)
+					socketEmit(receiveMessageSockets[key], SOCKETEVENTNAMES.NEWMESSAGE, msg)
 
 
 	#订阅chat_messages

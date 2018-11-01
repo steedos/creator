@@ -15,7 +15,8 @@ Creator.Objects.permission_shares =
 			optionsFunction: ()->
 				_options = []
 				_.forEach Creator.objectsByName, (o, k)->
-					if o.enable_share and !o.hidden
+					enable_share = if o.enable_share == undefined then true else o.enable_share
+					if enable_share and !o.hidden
 						_options.push { label: o.label, value: k, icon: o.icon }
 				return _options
 			required: true
@@ -50,12 +51,9 @@ Creator.Objects.permission_shares =
 			defaultValue: []
 	list_views:
 		all:
-			label: "所有共享规则"
+			label: "全部"
 			filter_scope: "space"
 			columns: ["name"]
-		mine:
-			label: "我的共享规则"
-			filter_scope: "mine"
 	permission_set:
 		user:
 			allowCreate: true

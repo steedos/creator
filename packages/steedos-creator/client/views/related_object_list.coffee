@@ -45,7 +45,8 @@ Template.related_object_list.events
 			$(".creator-add").click()
 
 	'click .btn-refresh': (event, template)->
-		Template.creator_grid.refresh()
+		dxDataGridInstance = $(event.currentTarget).closest(".related_object_list").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
+		Template.creator_grid.refresh(dxDataGridInstance)
 
 
 Template.related_object_list.onCreated ->
