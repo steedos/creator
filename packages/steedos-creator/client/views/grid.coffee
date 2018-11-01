@@ -516,9 +516,10 @@ Template.creator_grid.helpers Creator.helpers
 Template.creator_grid.helpers 
 	hideGridContent: ()->
 		is_related = Template.instance().data.is_related
-		if is_related
-			related_object_name = Template.instance().data.related_object_name
-			total = Template.instance().data.recordsTotal.get()?[related_object_name]
+		recordsTotal = Template.instance().data.recordsTotal
+		related_object_name = Template.instance().data.related_object_name
+		if is_related and recordsTotal
+			total = recordsTotal.get()?[related_object_name]
 			return !total
 		else
 			return false
