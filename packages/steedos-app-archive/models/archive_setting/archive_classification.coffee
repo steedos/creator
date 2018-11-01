@@ -7,6 +7,7 @@ Creator.Objects.archive_classification =
 		_id:
 			type: "text"
 			label: "分类ID"
+			hidden: true
 		parent:
 			type: "lookup"
 			label: "上级"
@@ -15,3 +16,8 @@ Creator.Objects.archive_classification =
 		name:
 			type: "text"
 			label: "名称"
+	list_views:
+		all:
+			label: "全部"
+			filter_scope: "space"
+			columns:["name","parent"]

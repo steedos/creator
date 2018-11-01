@@ -22,7 +22,7 @@ Creator.baseObject =
 			readonly: true
 			sortable: true
 			omit: true
-			# group:"记录"
+			hidden: true
 		created_by:
 			label:"创建人"
 			type: "lookup"
@@ -31,7 +31,7 @@ Creator.baseObject =
 			disabled: true
 			index: true
 			omit: true
-			# group:"记录"
+			hidden: true
 		modified:
 			label:"修改时间"
 			type: "datetime"
@@ -40,7 +40,7 @@ Creator.baseObject =
 			searchable: true
 			index: true
 			omit: true
-			# group:"记录"
+			hidden: true
 		modified_by:
 			label:"修改人"
 			type: "lookup"
@@ -48,7 +48,7 @@ Creator.baseObject =
 			reference_to: "users"
 			disabled: true
 			omit: true
-			# group:"记录"
+			hidden: true
 		is_deleted:
 			type: "boolean"
 			label:"已删除"
