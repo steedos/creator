@@ -302,7 +302,7 @@ Creator.Objects.flows =
 			label: "设置步骤"
 			visible: (object_name, record_id, record_permissions)->
 				if FlowRouter.current().params?.record_id
-					return true && record_permissions["allowEdit"]
+					return true && record_permissions["allowEdit"] && false
 				return false
 			on: "record"
 			todo: (object_name, record_id, fields)->
