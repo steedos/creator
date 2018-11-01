@@ -2,8 +2,7 @@ Template.creatorLayout.helpers Creator.helpers
 
 Template.creatorLayout.helpers
 	hiddenHeader: ()->
-		hidden_header = Meteor?.settings?.public?.theme?.hidden_header
-		if hidden_header and hidden_header == true
+		if Session.get("hidden_header") and Session.get("hidden_header") == true
 			return true
 		else
 			return false
