@@ -3,6 +3,7 @@ Creator.Objects.archive_classification =
 	icon: "note"
 	label: "公文分类"
 	enable_search: true
+	enable_tree: true
 	fields:
 		_id:
 			type: "text"

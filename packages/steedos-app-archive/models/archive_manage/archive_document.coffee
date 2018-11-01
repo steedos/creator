@@ -6,11 +6,11 @@ Creator.Objects.archive_document =
 	enable_files: true
 	enable_api: true
 	fields:
-		classification_id:
-			type: "text"
-			label: "分类ID"
+		classification:
+			type: "lookup"
+			label: "流程分类"
 			reference_to: "archive_classification"
-			hidden: true
+			# hidden: true
 		name:
 			type: "text"
 			label: "标题"
@@ -54,7 +54,7 @@ Creator.Objects.archive_document =
 		all:
 			label: "全部"
 			filter_scope: "space"
-			columns:["name","submitter","submit_date","archive_date","outbox_users","flow_name","state","organization"]
+			columns:["name","classification","flow_name","state","submitter","submit_date","archive_date","outbox_users","organization"]
 	
 	actions:
 		standard_view:
