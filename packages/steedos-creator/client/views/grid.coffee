@@ -25,6 +25,8 @@ _standardQuery = (curObjectName)->
 					if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
 						query_arr.push([key, ">=", val])
 					else if ["text", "textarea", "html"].includes(object_fields[key].type)
+						# 特殊字符编码
+						val = encodeURIComponent(Creator.convertSpecialCharacter(val))
 						query_arr.push([key, "contains", val])
 					else if ["boolean"].includes(object_fields[key].type)
 						query_arr.push([key, "=", JSON.parse(val)])
