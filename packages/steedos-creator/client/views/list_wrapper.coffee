@@ -252,9 +252,7 @@ Template.creator_list_wrapper.events
 	'keydown input#grid-search': (event, template)->
 		if event.keyCode == "13" or event.key == "Enter"
 			searchKey = $(event.currentTarget).val().trim()
-			# 特殊字符编码
 			if searchKey
-				searchKey = encodeURIComponent(Creator.convertSpecialCharacter(searchKey))
 				object_name = Session.get("object_name")
 				obj = Creator.getObject(object_name)
 				obj_fields = obj.fields

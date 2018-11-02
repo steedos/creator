@@ -14,7 +14,11 @@ _standardQuery = (curObjectName)->
 					if ["currency", "number"].includes(object_fields[key].type)
 						query_arr.push([key, "=", val])
 					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
-						query_arr.push([key, "contains", val])
+						vals = val.trim().split(" ")
+						vals.forEach (val_item)->
+							# 特殊字符编码
+							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+							query_arr.push([key, "contains", val_item])
 		else
 			_.each query, (val, key)->
 				if object_fields[key]
