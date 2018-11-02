@@ -8,22 +8,32 @@ _standardQuery = (curObjectName)->
 		object_name = standard_query.object_name
 		query = standard_query.query
 		query_arr = []
-		_.each query, (val, key)->
-			if object_fields[key]
-				if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
-					query_arr.push([key, ">=", val])
-				else if ["text", "textarea", "html"].includes(object_fields[key].type)
-					query_arr.push([key, "contains", val])
-				else if ["boolean"].includes(object_fields[key].type)
-					query_arr.push([key, "=", JSON.parse(val)])
+		if standard_query.is_mini
+			_.each query, (val, key)->
+				if object_fields[key]
+					if ["currency", "number"].includes(object_fields[key].type)
+						query_arr.push([key, "=", val])
+					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
+						query_arr.push([key, "contains", val])
+		else
+			_.each query, (val, key)->
+				if object_fields[key]
+					if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						query_arr.push([key, ">=", val])
+					else if ["text", "textarea", "html"].includes(object_fields[key].type)
+						query_arr.push([key, "contains", val])
+					else if ["boolean"].includes(object_fields[key].type)
+						query_arr.push([key, "=", JSON.parse(val)])
+					else
+						query_arr.push([key, "=", val])
 				else
-					query_arr.push([key, "=", val])
-			else
-				key = key.replace(/(_endLine)$/, "")
-				if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
-					query_arr.push([key, "<=", val])
+					key = key.replace(/(_endLine)$/, "")
+					if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						query_arr.push([key, "<=", val])
 
-		return Creator.formatFiltersToDev(query_arr)
+		is_logic_or = if standard_query.is_mini then true else false
+		options = is_logic_or: is_logic_or
+		return Creator.formatFiltersToDev(query_arr, options)
 	
 _itemClick = (e, curObjectName, list_view_id)->
 	self = this
@@ -262,6 +272,7 @@ Template.creator_grid.onRendered ->
 					filter = Creator.getODataFilter(list_view_id, object_name)
 
 				standardQuery = _standardQuery(object_name)
+				console.log "standardQuery", standardQuery
 				if standardQuery and standardQuery.length
 					if filter
 						filter = [filter, "and", standardQuery]

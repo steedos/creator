@@ -251,13 +251,18 @@ Template.creator_list_wrapper.events
 
 	'keydown input#grid-search': (event, template)->
 		if event.keyCode == "13" or event.key == "Enter"
-			debugger
-			searchKey = $(event.currentTarget).val()
+			searchKey = $(event.currentTarget).val().trim()
+			# 特殊字符编码
 			if searchKey
+				searchKey = encodeURIComponent(Creator.convertSpecialCharacter(searchKey))
 				object_name = Session.get("object_name")
-				query = name: searchKey
-				standard_query = object_name: object_name, query: query
-				console.log 'keydown input#grid-search=====================================', standard_query
+				obj = Creator.getObject(object_name)
+				obj_fields = obj.fields
+				query = {}
+				_.each obj_fields, (field,field_name)->
+					if field.searchable || field_name == obj.NAME_FIELD_KEY
+						query[field_name] = searchKey
+				standard_query = object_name: object_name, query: query, is_mini: true
 				Session.set 'standard_query', standard_query
 			else
 				delete Session.keys["standard_query"]
