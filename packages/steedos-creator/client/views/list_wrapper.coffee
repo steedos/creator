@@ -249,6 +249,19 @@ Template.creator_list_wrapper.events
 		dxDataGridInstance = $(event.currentTarget).closest(".filter-list-wraper").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
 		Template["creator_#{FlowRouter.getParam('template')}"]?.refresh(dxDataGridInstance)
 
+	'keydown input#grid-search': (event, template)->
+		if event.keyCode == "13" or event.key == "Enter"
+			debugger
+			searchKey = $(event.currentTarget).val()
+			if searchKey
+				object_name = Session.get("object_name")
+				query = name: searchKey
+				standard_query = object_name: object_name, query: query
+				console.log 'keydown input#grid-search=====================================', standard_query
+				Session.set 'standard_query', standard_query
+			else
+				delete Session.keys["standard_query"]
+
 
 Template.creator_list_wrapper.onCreated ->
 	this.recordsTotal = new ReactiveVar(0)
