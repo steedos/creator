@@ -112,5 +112,6 @@ Template.standard_query_modal.events
 		object_name = Session.get("object_name")
 
 		Session.set 'standard_query', {object_name: object_name, query: query}
+		$(".filter-list-wraper #grid-search").val("")
 		Modal.hide(template)
 
