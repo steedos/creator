@@ -53,7 +53,10 @@ checkObjectPermission = (context, redirect)->
 				Session.set("object_name", null)
 				FlowRouter.go "/app"
 
-initLayout = ()->
+initLayout = (context)->
+	# 隐藏header部分
+	if context?.queryParams?.hidden_header == true || context?.queryParams?.hidden_header == "true"
+		Session.set("hidden_header", true)
 	if Steedos.isMobile() and (!$(".wrapper").length or !$("#home_menu").length)
 		BlazeLayout.render Creator.getLayout(),
 			main: "objectMenu"
@@ -228,8 +231,8 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
 
-		if queryParams?.hidden_header=="true"
-			Session.set("hidden_header", true)
+		# if queryParams?.hidden_header=="true"
+		# 	Session.set("hidden_header", true)
 		
 		if queryParams?.space_id
 			Session.set("spaceId", queryParams.space_id)

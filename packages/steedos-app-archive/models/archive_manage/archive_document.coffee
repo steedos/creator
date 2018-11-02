@@ -5,6 +5,7 @@ Creator.Objects.archive_document =
 	enable_search: true
 	enable_files: true
 	enable_api: true
+	open_window: true
 	fields:
 		classification:
 			type: "lookup"

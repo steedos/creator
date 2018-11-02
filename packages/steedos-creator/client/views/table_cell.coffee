@@ -68,7 +68,14 @@ Template.creator_table_cell.helpers
 		if this_object?.open_window == true
 			return true
 		else
-			return false 
+			return false
+	
+	hiddenHeader: ()->
+		hidden_header = Session.get("hidden_header")
+		if hidden_header and hidden_header == true
+			return true
+		else
+			return false
 
 
 	cellData: ()->
