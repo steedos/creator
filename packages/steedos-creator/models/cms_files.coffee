@@ -30,6 +30,7 @@ Creator.Objects.cms_files =
 			collection: "files"
 			multiple: true
 			omit: true
+			hidden: true
 		parent:
 			label: "起始版本"
 			type: "lookup"
