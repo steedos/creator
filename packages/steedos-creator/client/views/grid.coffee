@@ -390,7 +390,7 @@ Template.creator_grid.onRendered ->
 						htmlText = options.rowIndex + 1 + pageSize * pageIndex
 						if needToShowLinkForIndexColumn
 							href = Creator.getObjectUrl(curObjectName, options.data._id)
-							htmlText = "<a href=\"#{href}\">#{htmlText}</a>"
+							htmlText = "<a href=\"#{href}\" class=\"grid-index-link\">#{htmlText}</a>"
 							$("<div>").append(htmlText).appendTo(container)
 						else
 							$("<div>").append(htmlText).appendTo(container)
