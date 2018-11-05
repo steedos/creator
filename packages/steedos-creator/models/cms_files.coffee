@@ -1,6 +1,6 @@
 Creator.Objects.cms_files =
 	name: "cms_files"
-	label: "文件"
+	label: "附件"
 	icon: "drafts"
 	enable_search: true
 	enable_api: true
@@ -14,6 +14,7 @@ Creator.Objects.cms_files =
 		description:
 			label: "描述"
 			type: "textarea"
+			hidden: true
 		extention:
 			label: "文件后缀"
 			type: "text"

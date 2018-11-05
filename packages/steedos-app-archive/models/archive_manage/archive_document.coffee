@@ -1,20 +1,23 @@
 Creator.Objects.archive_document = 
 	name: "archive_document"
-	icon: "record"
+	icon: "drafts"
 	label: "文件归档"
 	enable_search: true
 	enable_files: true
 	enable_api: true
-	open_window: true
+	open_window: false
 	fields:
 		classification:
 			type: "lookup"
 			label: "流程分类"
 			reference_to: "archive_classification"
-			# hidden: true
+			hidden: true
 		name:
 			type: "text"
 			label: "标题"
+		flow_name:
+			type: "text"
+			label: "流程名称"
 		submitter:
 			type: "lookup"
 			label: "提交人"
@@ -36,9 +39,6 @@ Creator.Objects.archive_document =
 			label: "处理人"
 			omit: true
 			hidden: true
-		flow_name:
-			type: "text"
-			label: "流程名称"
 		external_id:
 			type:"text"
 			label:'表单ID'
@@ -55,7 +55,7 @@ Creator.Objects.archive_document =
 		all:
 			label: "全部"
 			filter_scope: "space"
-			columns:["name","classification","flow_name","state","submitter","submit_date","archive_date","outbox_users","organization"]
+			columns:["name","flow_name","submitter","submit_date","archive_date"]
 	
 	actions:
 		standard_view:

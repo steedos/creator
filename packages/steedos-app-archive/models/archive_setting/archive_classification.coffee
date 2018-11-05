@@ -1,6 +1,6 @@
 Creator.Objects.archive_classification = 
 	name: "archive_classification"
-	icon: "note"
+	icon: "drafts"
 	label: "公文分类"
 	enable_search: true
 	enable_tree: true

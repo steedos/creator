@@ -1,3 +1,5 @@
+# 手动执行
+npm use v8.11.3
 #!/bin/bash
 BUNDLE_PATH="/srv/app-dzgy-archive"
 
