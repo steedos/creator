@@ -360,7 +360,10 @@ Template.creator_grid.onRendered ->
 						$("<div>").append(htmlText).appendTo(container);
 			
 			unless creator_obj.enable_tree
-				
+				nameFieldKey = Creator.getObject(curObjectName).NAME_FIELD_KEY
+				needToShowLinkForIndexColumn = false
+				if selectColumns.indexOf(nameFieldKey) < 0
+					needToShowLinkForIndexColumn = true
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
 					width: 60
@@ -382,12 +385,15 @@ Template.creator_grid.onRendered ->
 					allowReordering: false
 					caption: ""
 					cellTemplate: (container, options) ->
-						pageSize = self.dxDataGridInstance.pageSize();
-						pageIndex = self.dxDataGridInstance.pageIndex();
-						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
-						# Template.instance().dxDataGridInstance.pageIndex()
-						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
-						$("<div>").append(htmlText).appendTo(container);
+						pageSize = self.dxDataGridInstance.pageSize()
+						pageIndex = self.dxDataGridInstance.pageIndex()
+						htmlText = options.rowIndex + 1 + pageSize * pageIndex
+						if needToShowLinkForIndexColumn
+							href = Creator.getObjectUrl(curObjectName, options.data._id)
+							htmlText = "<a href=\"#{href}\">#{htmlText}</a>"
+							$("<div>").append(htmlText).appendTo(container)
+						else
+							$("<div>").append(htmlText).appendTo(container)
 						
 			# console.log "selectColumns", selectColumns
 			console.log "filter", filter
