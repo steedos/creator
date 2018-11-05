@@ -1,5 +1,5 @@
-#!/bin/bash
 nvm use v8.11.3
+#!/bin/bash
 BUNDLE_PATH="/srv/vip"
 
 # Create BUNDLE_PATH directory if it does not exist
