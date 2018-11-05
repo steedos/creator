@@ -180,7 +180,7 @@ _columns = (object_name, columns, list_view_id, is_related)->
 				else
 					columnItem.width = defaultWidth
 			else
-				columnItem.width = defaultWidth
+				columnItem.width = field?.default_width || defaultWidth
 
 		list_view = Creator.getListView(object_name, list_view_id)
 

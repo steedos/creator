@@ -15,13 +15,16 @@ Creator.Objects.archive_document =
 		name:
 			type: "text"
 			label: "标题"
+			default_width: 600
 		flow_name:
 			type: "text"
 			label: "流程名称"
+			default_width: 300
 		submitter:
 			type: "lookup"
 			label: "提交人"
 			reference_to: "users"
+			default_width: 150
 		organization:
 			type: "text"
 			label: "部门"
@@ -30,10 +33,12 @@ Creator.Objects.archive_document =
 			type: "datetime"
 			label: "提交时间"
 			sortable: true
+			default_width: 180
 		archive_date:
 			type: "datetime"
 			label: "归档时间"
 			sortable: true
+			default_width: 180
 		outbox_users:
 			type: ["text"]
 			label: "处理人"
