@@ -767,9 +767,8 @@ Creator.Objects.archive_wenshu =
 			label: "全部"
 			filter_scope: "space"
 			filters: [["is_received", "=", true],["is_destroyed", "=", false]]
-			# columns:['item_number','archival_code',"author","title","electronic_record_code","total_number_of_pages","annotation",'archive_transfer_id']
 			columns:[
-				"year","retention_peroid","item_number",
+				"year","retention_peroid","organizational_structure","item_number",
 				"title","document_number","document_date",
 				"archive_dept","author"]
 # 		borrow:
@@ -781,6 +780,10 @@ Creator.Objects.archive_wenshu =
 			label:"待接收"
 			filter_scope: "space"
 			filters: [["is_received", "=", false]]
+			columns:[
+				"year","retention_peroid","organizational_structure","item_number",
+				"title","document_number","document_date",
+				"archive_dept","author"]
 		# 已移交功能去掉===============
 		# transfered:
 		# 	label:"已移交"
