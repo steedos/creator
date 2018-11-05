@@ -521,7 +521,7 @@ Template.creator_grid.onRendered ->
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent._id"
-				# dxOptions.autoExpandAll = true
+				dxOptions.autoExpandAll = true
 				delete dxOptions.paging # 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else

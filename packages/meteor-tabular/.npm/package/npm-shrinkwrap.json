@@ -2,16 +2,19 @@
   "lockfileVersion": 1,
   "dependencies": {
     "clone": {
-      "version": "https://registry.npmjs.org/clone/-/clone-2.1.1.tgz",
-      "integrity": "sha512-h5FLmEMFHeuzqmpVRcDayNlVZ+k4uK1niyKQN6oUMe7ieJihv44Vc3dY/kDnnWX4PDQSwes48s965PG/D4GntQ=="
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/clone/-/clone-2.1.1.tgz",
+      "integrity": "sha1-0hfR6WERjjrJpLi7oyhVU79kfNs="
     },
     "datatables": {
-      "version": "https://registry.npmjs.org/datatables/-/datatables-1.10.9.tgz",
-      "integrity": "sha512-UMxCH0rn/0xFeFGPJ0nXaq7KnqUzi0DMN4fT8kWpdvNVQTQN7yTyJ454KOYhGI1hKwwGxpAspsKYa/pFzhFXog=="
+      "version": "1.10.9",
+      "resolved": "https://registry.npmjs.org/datatables/-/datatables-1.10.9.tgz",
+      "integrity": "sha1-TxIkcnUHfhsCQ4NhEexcRgP6FPQ="
     },
     "jquery": {
-      "version": "https://registry.npmjs.org/jquery/-/jquery-3.2.1.tgz",
-      "integrity": "sha512-iQUctXqe/nSa7hshPkQnJaJEUfxM139//hg2nJj+wsqVvd/YgXALR3jTNGh7BylgsyfcC8r4i2cJrClGBkDu5Q=="
+      "version": "3.3.1",
+      "resolved": "https://registry.npmjs.org/jquery/-/jquery-3.3.1.tgz",
+      "integrity": "sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg=="
     }
   }
 }
