@@ -216,6 +216,7 @@ Creator.Objects.archive_wenshu =
 			type: "text"
 			label:"年度"
 			sortable:true
+			default_width: 80
 			group:"档号"
 		
 		retention_peroid:
@@ -223,12 +224,14 @@ Creator.Objects.archive_wenshu =
 			label:"保管期限"
 			reference_to:"archive_retention"
 			sortable:true
+			default_width: 85
 			group:"档号"
 		
 		organizational_structure:
 			type:"master_detail"
 			label:"机构"
 			reference_to: "archive_organization"
+			default_width: 115
 			group:"档号"
 		
 		category_code:
@@ -241,6 +244,7 @@ Creator.Objects.archive_wenshu =
 			type: "number"
 			label:"件号"
 			sortable:true
+			default_width: 70
 			group:"档号"
 		
 		document_sequence_number:
@@ -255,6 +259,7 @@ Creator.Objects.archive_wenshu =
 			is_name:true
 			required:true
 			searchable:true
+			default_width: 200
 			group:"内容描述"
 		
 		parallel_title:
@@ -302,11 +307,13 @@ Creator.Objects.archive_wenshu =
 		document_number:
 			type:"text"
 			label:"文件编号"
+			default_width: 135
 			group:"内容描述"
 		
 		author:
 			type:"text"
 			label:"责任者"
+			default_width: 115
 			group:"内容描述"
 		
 		document_date:
@@ -314,6 +321,7 @@ Creator.Objects.archive_wenshu =
 			label:"文件日期"
 			format:"YYYYMMDD"
 			sortable:true
+			default_width: 118
 			group:"内容描述"
 		
 		prinpipal_receiver:
@@ -462,6 +470,7 @@ Creator.Objects.archive_wenshu =
 		archive_dept:
 			type:"text"
 			label:"归档部门"
+			default_width: 115
 			group:"形式特征"   
 
 		archive_date:
