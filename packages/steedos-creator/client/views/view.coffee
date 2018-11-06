@@ -272,8 +272,9 @@ Template.creator_view.helpers
 
 	list_data: (obj) ->
 		console.log obj
+		object_name = Session.get "object_name"
 		related_object_name = obj.object_name
-		return {related_object_name: related_object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
+		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
 
 Template.creator_view.events
 

@@ -37,7 +37,8 @@ Template.creator_list_wrapper.helpers
 		return Template.instance().recordsTotal.get()
 	
 	list_data: ()->
-		return {total: Template.instance().recordsTotal}
+		object_name = Session.get "object_name"
+		return {object_name: object_name, total: Template.instance().recordsTotal}
 
 	list_views: ()->
 		Session.get("change_list_views")

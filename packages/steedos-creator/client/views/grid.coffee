@@ -132,6 +132,28 @@ _fields = (object_name, list_view_id)->
 	fieldsName = Creator.getObjectFieldsName(object_name)
 	return _.intersection(fieldsName, fields)
 
+_removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
+	# 移除主键字段，即columns中的reference_to等于object_name的字段
+	unless object_name
+		return columns
+	fields = Creator.getObject(curObjectName).fields
+	if is_related
+		columns = columns.filter (n)->
+			if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+				if fields[n].reference_to
+					ref = fields[n].reference_to
+					if _.isFunction(ref)
+						ref = ref()
+				else
+					ref = fields[n].optionsFunction({}).getProperty("value")
+				if _.isArray(ref)
+					return true
+				else
+					return ref != object_name
+			else
+				return true
+	return columns
+
 _expandFields = (object_name, columns)->
 	expand_fields = []
 	fields = Creator.getObject(object_name).fields
@@ -249,13 +271,13 @@ Template.creator_grid.onRendered ->
 			toastr.error t("creator_list_view_permissions_lost")
 			return
 
-		object_name = Session.get("object_name")
+		object_name = self.data.object_name
 		creator_obj = Creator.getObject(object_name)
 
 		if !creator_obj
 			return
 
-		related_object_name = self.data.related_object_name || Session.get("related_object_name")
+		related_object_name = self.data.related_object_name
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
 
@@ -325,6 +347,8 @@ Template.creator_grid.onRendered ->
 			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
 			if defaultExtraColumns
 				extra_columns = _.union extra_columns, defaultExtraColumns
+			
+			selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
