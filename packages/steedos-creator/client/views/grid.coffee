@@ -192,7 +192,21 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns, object.enable_tree)
 	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
-	return columns.map (n,i)->
+	if grid_settings and grid_settings.settings
+		column_width_settings = grid_settings.settings[list_view_id]?.column_width
+		column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
+	list_view = Creator.getListView(object_name, list_view_id)
+	list_view_sort = Creator.transformSortToDX(list_view?.sort)
+	if column_sort_settings and column_sort_settings.length > 0
+		list_view_sort = column_sort_settings
+	else if !_.isEmpty(list_view_sort)
+		list_view_sort = list_view_sort
+	else
+		console.log("default sort...")
+		#默认读取default view的sort配置
+		list_view_sort = column_default_sort
+	
+	result = columns.map (n,i)->
 		field = object.fields[n]
 		columnItem = 
 			cssClass: "slds-cell-edit"
@@ -209,10 +223,6 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		
-		if grid_settings and grid_settings.settings
-			column_width_settings = grid_settings.settings[list_view_id]?.column_width
-			column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
-
 		if !is_related
 			if column_width_settings
 				width = column_width_settings[n]
@@ -222,31 +232,19 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					columnItem.width = defaultWidth
 			else
 				columnItem.width = defaultWidth
-
-		list_view = Creator.getListView(object_name, list_view_id)
-
-		list_view_sort = Creator.transformSortToDX(list_view?.sort)
-
-		if column_sort_settings and column_sort_settings.length > 0
-			console.log("settings sort...")
-			_.each column_sort_settings, (sort)->
-				if sort[0] == n
-					columnItem.sortOrder = sort[1]
-		else if !_.isEmpty(list_view_sort)
-			console.log("view sort...")
-			_.each list_view_sort, (sort)->
-				if sort[0] == n
-					columnItem.sortOrder = sort[1]
-		else
-			console.log("default sort...")
-			#默认读取default view的sort配置
-			_.each column_default_sort, (sort)->
-				if sort[0] == n
-					columnItem.sortOrder = sort[1]
 		
 		unless field.sortable
 			columnItem.allowSorting = false
 		return columnItem
+	
+	
+	_.each list_view_sort, (sort,index)->
+		sortColumn = _.findWhere(result,{dataField:sort[0]})
+		if sortColumn
+			sortColumn.sortOrder = sort[1]
+			sortColumn.sortIndex = index
+	
+	return result
 
 _defaultWidth = (columns, isTree)->
 	column_counts = columns.length
@@ -457,6 +455,7 @@ Template.creator_grid.onRendered ->
 					customSave: (gridState)->
 						if self.data.is_related
 							return
+						debugger
 						columns = gridState.columns
 						column_width = {}
 						sort = []
@@ -465,9 +464,12 @@ Template.creator_grid.onRendered ->
 							_.each columns, (column_obj)->
 								if column_obj.width
 									column_width[column_obj.dataField] = column_obj.width
+							columns = _.sortBy(_.values(columns), "sortIndex")
+							_.each columns, (column_obj)->
 								if column_obj.sortOrder
 									sort.push {field_name: column_obj.dataField, order: column_obj.sortOrder}
-							
+							console.log "==========stateStoring====column_width======", column_width
+							console.log "==========stateStoring====sort======", sort
 							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
 								(error, result)->
 									if error
@@ -505,6 +507,8 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
+				sorting: 
+					mode: "multiple"
 				customizeExportData: (col, row)->
 					fields = creator_obj.fields
 					_.each row, (r)->
@@ -566,8 +570,10 @@ Template.creator_grid.onRendered ->
 				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
 				dxOptions.pager = null 
 				dxOptions.paging = null 
+				console.log "==========dxOptions=======x=========", dxOptions
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
+				console.log "==========dxOptions=======y=========", dxOptions
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 				self.dxDataGridInstance.pageSize(pageSize)
 			

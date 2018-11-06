@@ -87,7 +87,10 @@ Creator.Objects.organizations =
 			columns: ["name", "sort_no", "admins", "hidden"]
 			label: "所有"
 			filter_scope: "space"
-			sort : [ "field_name":"sort_no", "order":"asc"]
+			sort : [ 
+				{"field_name":"sort_no", "order":"desc"}
+				{"field_name":"name", "order":"asc"}
+			]
 
 	permission_set:
 		user:
