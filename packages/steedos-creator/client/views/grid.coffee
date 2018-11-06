@@ -547,12 +547,22 @@ Template.creator_grid.onRendered ->
 							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 							localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+				onNodesInitialized: (e)->
+					if creator_obj.enable_tree
+						# 默认展开第一个节点
+						rootNode = e.component.getRootNode()
+						firstNodeKey = rootNode?.children[0]?.key
+						if firstNodeKey
+							e.component.expandRow(firstNodeKey)
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent._id"
-				dxOptions.autoExpandAll = true
+				dxOptions.expandNodesOnFiltering = false
+				dxOptions.remoteOperations = false
+				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
+				# dxOptions.autoExpandAll = true
 				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
 				dxOptions.pager = null 
 				dxOptions.paging = null 
