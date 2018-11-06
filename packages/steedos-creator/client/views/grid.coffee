@@ -139,7 +139,10 @@ _removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)-
 	fields = Creator.getObject(curObjectName).fields
 	if is_related
 		columns = columns.filter (n)->
-			if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+			if fields[n]?.type == "master_detail"
+				if fields[n].multiple
+					# 多选字段不移除
+					return true
 				if fields[n].reference_to
 					ref = fields[n].reference_to
 					if _.isFunction(ref)
