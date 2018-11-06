@@ -542,20 +542,20 @@ Template.creator_grid.onRendered ->
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
 					unless is_related
-						if creator_obj.enable_tree
-							current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
-							self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
-						else
+						unless creator_obj.enable_tree
+							# 不支持tree格式的翻页
 							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
-						localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+							localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent._id"
 				dxOptions.autoExpandAll = true
-				delete dxOptions.paging # 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
+				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
+				dxOptions.pager = null 
+				dxOptions.paging = null 
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
