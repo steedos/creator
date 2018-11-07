@@ -17,32 +17,38 @@ _minxiInstanceData = (formData, instance) ->
 		return
 	dateFormat = "YYYY-MM-DD HH:mm:ss"
 
-	formData.outbox_users = instance.outbox_users
+	formData.outbox_users = instance?.outbox_users
 
-	formData.submitter = instance.submitter
+	formData.submitter = instance?.submitter
 
-	formData.created_by = instance.submitter
+	formData.created_by = instance?.submitter
 
-	formData.owner = instance.submitter
+	formData.owner = instance?.submitter
 
-	formData.space = instance.space
+	formData.space = instance?.space
 
-	formData.submit_date = instance.submit_date
+	formData.submit_date = instance?.submit_date
 
 	formData.archive_date = moment(new Date()).format(dateFormat)
 
-	formData.state = instance.state
+	formData.state = instance?.state
 
 	# 字段映射:表单字段对应到formData
 	# field_values = InstanceManager.handlerInstanceByFieldMap(instance)
 	
-	formData.name = instance.name
+	formData.name = instance?.name
 
 	# 获取当前归档流程的名称
 	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1}})
 	
-	if flow
-		formData.flow_name = flow.name
+	if flow?.name
+		formData.flow_name = flow?.name
+	
+	# 公文分类
+	gongwenfenlei = flow?.field_map["gongwenfenlei"]
+	if gongwenfenlei
+		classification = Creator.Collections["archive_classification"].findOne({name:gongwenfenlei},{fields:{_id:1}})
+		formData.classification = classification?._id
 
 	# 获取提交者主部门id
 	spaceUser = Creator.Collections["space_users"].findOne({space:instance.space, user:instance.submitter},{fields:{organization:1}})
