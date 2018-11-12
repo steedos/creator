@@ -8,22 +8,38 @@ _standardQuery = (curObjectName)->
 		object_name = standard_query.object_name
 		query = standard_query.query
 		query_arr = []
-		_.each query, (val, key)->
-			if object_fields[key]
-				if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
-					query_arr.push([key, ">=", val])
-				else if ["text", "textarea", "html"].includes(object_fields[key].type)
-					query_arr.push([key, "contains", val])
-				else if ["boolean"].includes(object_fields[key].type)
-					query_arr.push([key, "=", JSON.parse(val)])
+		if standard_query.is_mini
+			_.each query, (val, key)->
+				if object_fields[key]
+					if ["currency", "number"].includes(object_fields[key].type)
+						query_arr.push([key, "=", val])
+					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
+						vals = val.trim().split(" ")
+						vals.forEach (val_item)->
+							# 特殊字符编码
+							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+							query_arr.push([key, "contains", val_item])
+		else
+			_.each query, (val, key)->
+				if object_fields[key]
+					if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						query_arr.push([key, ">=", val])
+					else if ["text", "textarea", "html"].includes(object_fields[key].type)
+						# 特殊字符编码
+						val = encodeURIComponent(Creator.convertSpecialCharacter(val))
+						query_arr.push([key, "contains", val])
+					else if ["boolean"].includes(object_fields[key].type)
+						query_arr.push([key, "=", JSON.parse(val)])
+					else
+						query_arr.push([key, "=", val])
 				else
-					query_arr.push([key, "=", val])
-			else
-				key = key.replace(/(_endLine)$/, "")
-				if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
-					query_arr.push([key, "<=", val])
+					key = key.replace(/(_endLine)$/, "")
+					if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						query_arr.push([key, "<=", val])
 
-		return Creator.formatFiltersToDev(query_arr)
+		is_logic_or = if standard_query.is_mini then true else false
+		options = is_logic_or: is_logic_or
+		return Creator.formatFiltersToDev(query_arr, options)
 	
 _itemClick = (e, curObjectName, list_view_id)->
 	self = this
@@ -116,6 +132,31 @@ _fields = (object_name, list_view_id)->
 	fieldsName = Creator.getObjectFieldsName(object_name)
 	return _.intersection(fieldsName, fields)
 
+_removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
+	# 移除主键字段，即columns中的reference_to等于object_name的字段
+	unless object_name
+		return columns
+	fields = Creator.getObject(curObjectName).fields
+	if is_related
+		columns = columns.filter (n)->
+			if fields[n]?.type == "master_detail"
+				if fields[n].multiple
+					# 多选字段不移除
+					return true
+				if fields[n].reference_to
+					ref = fields[n].reference_to
+					if _.isFunction(ref)
+						ref = ref()
+				else
+					ref = fields[n].optionsFunction({}).getProperty("value")
+				if _.isArray(ref)
+					return true
+				else
+					return ref != object_name
+			else
+				return true
+	return columns
+
 _expandFields = (object_name, columns)->
 	expand_fields = []
 	fields = Creator.getObject(object_name).fields
@@ -151,7 +192,21 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns, object.enable_tree)
 	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
-	return columns.map (n,i)->
+	if grid_settings and grid_settings.settings
+		column_width_settings = grid_settings.settings[list_view_id]?.column_width
+		column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
+	list_view = Creator.getListView(object_name, list_view_id)
+	list_view_sort = Creator.transformSortToDX(list_view?.sort)
+	if column_sort_settings and column_sort_settings.length > 0
+		list_view_sort = column_sort_settings
+	else if !_.isEmpty(list_view_sort)
+		list_view_sort = list_view_sort
+	else
+		console.log("default sort...")
+		#默认读取default view的sort配置
+		list_view_sort = column_default_sort
+	
+	result = columns.map (n,i)->
 		field = object.fields[n]
 		columnItem = 
 			cssClass: "slds-cell-edit"
@@ -168,10 +223,6 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		
-		if grid_settings and grid_settings.settings
-			column_width_settings = grid_settings.settings[list_view_id]?.column_width
-			column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
-
 		if !is_related
 			if column_width_settings
 				width = column_width_settings[n]
@@ -206,6 +257,15 @@ _columns = (object_name, columns, list_view_id, is_related)->
 		unless field.sortable
 			columnItem.allowSorting = false
 		return columnItem
+	
+	if !_.isEmpty(list_view_sort)
+		_.each list_view_sort, (sort,index)->
+			sortColumn = _.findWhere(result,{dataField:sort[0]})
+			if sortColumn
+				sortColumn.sortOrder = sort[1]
+				sortColumn.sortIndex = index
+	
+	return result
 
 _defaultWidth = (columns, isTree)->
 	column_counts = columns.length
@@ -233,13 +293,13 @@ Template.creator_grid.onRendered ->
 			toastr.error t("creator_list_view_permissions_lost")
 			return
 
-		object_name = Session.get("object_name")
+		object_name = self.data.object_name
 		creator_obj = Creator.getObject(object_name)
 
 		if !creator_obj
 			return
 
-		related_object_name = self.data.related_object_name || Session.get("related_object_name")
+		related_object_name = self.data.related_object_name
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
 
@@ -262,6 +322,7 @@ Template.creator_grid.onRendered ->
 					filter = Creator.getODataFilter(list_view_id, object_name)
 
 				standardQuery = _standardQuery(object_name)
+				console.log "standardQuery", standardQuery
 				if standardQuery and standardQuery.length
 					if filter
 						filter = [filter, "and", standardQuery]
@@ -309,6 +370,8 @@ Template.creator_grid.onRendered ->
 			if defaultExtraColumns
 				extra_columns = _.union extra_columns, defaultExtraColumns
 			
+			selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
+			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
@@ -343,7 +406,10 @@ Template.creator_grid.onRendered ->
 						$("<div>").append(htmlText).appendTo(container);
 			
 			unless creator_obj.enable_tree
-				
+				nameFieldKey = Creator.getObject(curObjectName).NAME_FIELD_KEY
+				needToShowLinkForIndexColumn = false
+				if selectColumns.indexOf(nameFieldKey) < 0
+					needToShowLinkForIndexColumn = true
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
 					width: 60
@@ -365,13 +431,17 @@ Template.creator_grid.onRendered ->
 					allowReordering: false
 					caption: ""
 					cellTemplate: (container, options) ->
-						pageSize = self.dxDataGridInstance.pageSize();
-						pageIndex = self.dxDataGridInstance.pageIndex();
-						# console.log('[self.dxDataGridInstance]', self.dxDataGridInstance)
-						# Template.instance().dxDataGridInstance.pageIndex()
-						htmlText = options.rowIndex + 1 + pageSize * pageIndex;
-						$("<div>").append(htmlText).appendTo(container);
-						
+						pageSize = self.dxDataGridInstance.pageSize()
+						pageIndex = self.dxDataGridInstance.pageIndex()
+						htmlText = options.rowIndex + 1 + pageSize * pageIndex
+						if needToShowLinkForIndexColumn
+							href = Creator.getObjectUrl(curObjectName, options.data._id)
+							htmlText = "<a href=\"#{href}\" class=\"grid-index-link\">#{htmlText}</a>"
+							$("<div>").append(htmlText).appendTo(container)
+						else
+							$("<div>").append(htmlText).appendTo(container)
+			_.every showColumns, (n)->
+				n.sortingMethod = Creator.sortingMethod
 			# console.log "selectColumns", selectColumns
 			console.log "filter", filter
 			# console.log "expand_fields", expand_fields
@@ -415,9 +485,10 @@ Template.creator_grid.onRendered ->
 							_.each columns, (column_obj)->
 								if column_obj.width
 									column_width[column_obj.dataField] = column_obj.width
+							columns = _.sortBy(_.values(columns), "sortIndex")
+							_.each columns, (column_obj)->
 								if column_obj.sortOrder
 									sort.push {field_name: column_obj.dataField, order: column_obj.sortOrder}
-							
 							Meteor.call 'grid_settings', curObjectName, list_view_id, column_width, sort,
 								(error, result)->
 									if error
@@ -455,6 +526,8 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
+				sorting: 
+					mode: "multiple"
 				customizeExportData: (col, row)->
 					fields = creator_obj.fields
 					_.each row, (r)->
@@ -492,20 +565,30 @@ Template.creator_grid.onRendered ->
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
 					unless is_related
-						if creator_obj.enable_tree
-							current_pagesize = self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize()
-							self.$(".gridContainer").dxTreeList().dxTreeList('instance').pageSize(current_pagesize)
-						else
+						unless creator_obj.enable_tree
+							# 不支持tree格式的翻页
 							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
-						localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+							localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
+				onNodesInitialized: (e)->
+					if creator_obj.enable_tree
+						# 默认展开第一个节点
+						rootNode = e.component.getRootNode()
+						firstNodeKey = rootNode?.children[0]?.key
+						if firstNodeKey
+							e.component.expandRow(firstNodeKey)
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent._id"
-				dxOptions.autoExpandAll = true
-				delete dxOptions.paging # 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
+				dxOptions.expandNodesOnFiltering = false
+				dxOptions.remoteOperations = false
+				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
+				# dxOptions.autoExpandAll = true
+				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
+				dxOptions.pager = null 
+				dxOptions.paging = null 
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
