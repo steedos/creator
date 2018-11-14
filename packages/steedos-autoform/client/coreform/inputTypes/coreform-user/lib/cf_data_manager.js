@@ -322,7 +322,7 @@ CFDataManager.handerOrganizationModalValueLabel = function () {
 
 					var org_node = cf_org_jstree.get_node(el.dataset.value);
 					var org_node_self = cf_org_jstree_self.get_node(el.dataset.value);
-					
+
 					if(org_node || org_node_self){
 						if(org_node && org_node.state.selected){
 							Template.cf_organization.conditionalselect(org_node);
@@ -365,7 +365,7 @@ CFDataManager.handerOrganizationModalValueLabel = function () {
 
 CFDataManager.getRoot = function (spaceId) {
 
-	var query = {is_company: true}
+	var query = {is_company: true, parent: null}
 
 	if(spaceId){
 		query.space = spaceId
