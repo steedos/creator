@@ -57,11 +57,12 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			omit: true
 			hidden: true
-		organization_company: 
+		company_id:
+			label: "所属公司"
 			type: "lookup"
-			label: '所属公司'
 			reference_to: "organizations"
-			omit: true
+			sortable: true
+			index:true
 			hidden: true
 		user_accepted:
 			type: "boolean"

@@ -28,6 +28,7 @@ Creator.Objects.organizations =
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true
+			index:true
 
 		parents:
 			label: "上级组织"
@@ -64,15 +65,21 @@ Creator.Objects.organizations =
 			multiple: true
 			is_wide: true
 
-		is_company:
-			label: "根组织"
-			type: "boolean"
-			omit: true
+		company_id:
+			label: "所属公司"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
 			index:true
 			hidden: true
+
+		is_company:
+			label: "公司级"
+			type: "boolean"
+			index:true
 		
 		is_subcompany:
-			label: "公司级"
+			label: "公司级作废"
 			type: "boolean"
 			defaultValue: false
 			index:true
@@ -207,6 +214,7 @@ db.organizations.helpers
 if (Meteor.isServer) 
 
 	db.organizations.before.insert (userId, doc) ->
+		console.log "db.organizations.before.insert=============doc=====", doc
 		doc.created_by = userId;
 		doc.created = new Date();
 		doc.modified_by = userId;
@@ -231,8 +239,8 @@ if (Meteor.isServer)
 					parents = [doc.parent]
 				if db.organizations.findOne({_id:{$in:parents}, admins:userId})
 					isOrgAdmin = true
-			else if doc.is_company == true
-				# 注册用户的时候会触发"before.insert"，且其userId为underfined，所以这里需要通过is_company来判断是否是新注册用户时进该函数。
+			else
+				# 注册用户的时候会触发"before.insert"，且其userId为underfined，所以这里需要通过parent为空来判断是否是新注册用户时进该函数。
 				isOrgAdmin = true
 			unless isOrgAdmin
 				throw new Meteor.Error(400, "organizations_error_org_admins_only")
@@ -247,6 +255,12 @@ if (Meteor.isServer)
 				nameOrg = db.organizations.find({_id: {$in: parentOrg.children}, name: doc.name}).count()
 				if nameOrg>0
 					throw new Meteor.Error(400, "organizations_error_organizations_name_exists") 
+			
+			# 如果是新建组织不是根组织，则应该设置其company_id值为其最近一个父组织的company_id值，除非其is_company为true
+			if doc.is_company
+				doc.company_id = doc._id
+			else
+				doc.company_id = parentOrg.company_id
 		else
 			# 新增部门时不允许创建根部门
 			broexisted = db.organizations.find({space:doc.space}).count()
@@ -256,14 +270,23 @@ if (Meteor.isServer)
 			orgexisted = db.organizations.find({name: doc.name, space: doc.space,fullname:doc.name}).count()				
 			if orgexisted > 0
 				throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
+			
+			# 根组织的is_company值必须是true
+			doc.is_company = true
+			# 如果是新建根组织则应该设置其company_id值为根组织本身的_id值
+			doc.company_id = doc._id
+			
 
 		# only space admin can update organization.admins
 		if space.admins.indexOf(userId) < 0
 			if (doc.admins)
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
 		
+		console.log "db.organizations.before.insert=============doc==2===", doc
+
 
 	db.organizations.after.insert (userId, doc) ->
+		console.log "db.organizations.after.insert=============doc=====", doc
 		updateFields = {}
 		obj = db.organizations.findOne(doc._id)
 		
