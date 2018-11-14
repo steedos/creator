@@ -2,14 +2,14 @@ db.organizations = new Meteor.Collection('organizations')
 
 db.organizations._simpleSchema = new SimpleSchema
 
-Creator.Objects.organizations = 
+Creator.Objects.organizations =
 	name: "organizations"
 	label: "部门"
 	icon: "team_member"
 	enable_search: true
 	enable_tree: true
 	fields:
-		name: 
+		name:
 			label: "名称"
 			type: "text"
 			required: true
@@ -17,7 +17,7 @@ Creator.Objects.organizations =
 			index:true
 			sortable: true
 
-		fullname: 
+		fullname:
 			label: "全路径"
 			type: "text"
 			omit: true
@@ -65,29 +65,23 @@ Creator.Objects.organizations =
 			is_wide: true
 
 		is_company:
-			label: "根组织"
+			label: "公司级"
 			type: "boolean"
 			omit: true
 			index:true
 			hidden: true
-		
-		is_subcompany:
-			label: "公司级"
-			type: "boolean"
-			defaultValue: false
-			index:true
-		
+
 		hidden:
 			label: "隐藏"
 			type: "boolean"
 
 	list_views:
-	
+
 		all:
 			columns: ["name", "sort_no", "admins", "hidden"]
 			label: "所有"
 			filter_scope: "space"
-			sort : [ 
+			sort : [
 				{"field_name":"sort_no", "order":"desc"}
 				{"field_name":"name", "order":"asc"}
 			]
@@ -99,7 +93,7 @@ Creator.Objects.organizations =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true 
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -110,19 +104,19 @@ Creator.Objects.organizations =
 
 if Meteor.isServer
 	Meteor.publish "subCompany", (space_id)->
-		return Creator.Collections.organizations.find({space: space_id, $or: [{is_subcompany: true}, is_company: true]}, {fields: {_id: 1, name: 1, parent: 1, parents: 1, space: 1, is_subcompany: 1, is_company: 1}})
+		return Creator.Collections.organizations.find({space: space_id, is_company: true}, {fields: {_id: 1, name: 1, parent: 1, parents: 1, space: 1, is_company: 1}})
 
 if Meteor.isClient
 	db.organizations._simpleSchema.i18n("organizations")
 	db.organizations._sortFunction = (doc1, doc2) ->
 		if (doc1.sort_no == doc2.sort_no)
-			return doc1.name?.localeCompare(doc2.name); 
+			return doc1.name?.localeCompare(doc2.name);
 		else if (doc1.sort_no > doc2.sort_no)
 			return -1
 		else
 			return 1
 	db.organizations.getRoot = (fields)->
-		return SteedosDataManager.organizationRemote.findOne { is_company: true }, fields: fields
+		return SteedosDataManager.organizationRemote.findOne { is_company: true, parent: null }, fields: fields
 
 db.organizations.attachSchema db.organizations._simpleSchema;
 
@@ -183,7 +177,7 @@ db.organizations.helpers
 	users_count: ->
 		if this.users
 			return this.users.length
-		else 
+		else
 			return 0
 
 	calculateAllChildren: ->
@@ -204,7 +198,7 @@ db.organizations.helpers
 		return _.uniq users
 
 
-if (Meteor.isServer) 
+if (Meteor.isServer)
 
 	db.organizations.before.insert (userId, doc) ->
 		doc.created_by = userId;
@@ -231,7 +225,7 @@ if (Meteor.isServer)
 					parents = [doc.parent]
 				if db.organizations.findOne({_id:{$in:parents}, admins:userId})
 					isOrgAdmin = true
-			else if doc.is_company == true
+			else
 				# 注册用户的时候会触发"before.insert"，且其userId为underfined，所以这里需要通过is_company来判断是否是新注册用户时进该函数。
 				isOrgAdmin = true
 			unless isOrgAdmin
@@ -246,14 +240,14 @@ if (Meteor.isServer)
 			if parentOrg.children
 				nameOrg = db.organizations.find({_id: {$in: parentOrg.children}, name: doc.name}).count()
 				if nameOrg>0
-					throw new Meteor.Error(400, "organizations_error_organizations_name_exists") 
+					throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
 		else
 			# 新增部门时不允许创建根部门
 			broexisted = db.organizations.find({space:doc.space}).count()
 			if broexisted > 0
 				throw new Meteor.Error(400, "organizations_error_organizations_parent_required")
 
-			orgexisted = db.organizations.find({name: doc.name, space: doc.space,fullname:doc.name}).count()				
+			orgexisted = db.organizations.find({name: doc.name, space: doc.space,fullname:doc.name}).count()
 			if orgexisted > 0
 				throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
 
@@ -261,12 +255,12 @@ if (Meteor.isServer)
 		if space.admins.indexOf(userId) < 0
 			if (doc.admins)
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
-		
+
 
 	db.organizations.after.insert (userId, doc) ->
 		updateFields = {}
 		obj = db.organizations.findOne(doc._id)
-		
+
 		updateFields.parents = obj.calculateParents();
 		updateFields.fullname = obj.calculateFullname()
 
@@ -312,7 +306,7 @@ if (Meteor.isServer)
 			2.需要有改动后的父组织的权限
 		###
 		if space.admins.indexOf(userId) < 0
-			isOrgAdmin = Steedos.isOrgAdminByAllOrgIds [doc._id], userId 
+			isOrgAdmin = Steedos.isOrgAdminByAllOrgIds [doc._id], userId
 			unless isOrgAdmin
 				throw new Meteor.Error(400, "organizations_error_org_admins_only")
 
@@ -343,7 +337,7 @@ if (Meteor.isServer)
 
 		# if modifier.$set.users
 		# 	throw new Meteor.Error(400, "organizations_error_users_readonly");
-								
+
 		if (modifier.$set.parent)
 			# parent 不能等于自己或者 children
 			parentOrg = db.organizations.findOne({_id: modifier.$set.parent})
@@ -354,16 +348,16 @@ if (Meteor.isServer)
 				nameOrg = db.organizations.find({_id: {$in: parentOrg.children}, name: modifier.$set.name}).count()
 				if (nameOrg > 0 ) && (modifier.$set.name != doc.name)
 					throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
-				
-		# else if (modifier.$set.name != doc.name)					
-		# 	existed = db.organizations.find({name: modifier.$set.name, space: doc.space,fullname:modifier.$set.name}).count()				
+
+		# else if (modifier.$set.name != doc.name)
+		# 	existed = db.organizations.find({name: modifier.$set.name, space: doc.space,fullname:modifier.$set.name}).count()
 		# 	if existed > 0
 		# 		throw new Meteor.Error(400, "organizations_error.organizations_name_exists"))
 
 		# 根部门名字无法修改
-		if modifier.$set.name != doc.name && (doc.is_company == true)
+		if modifier.$set.name != doc.name && (doc.is_company == true) && !doc.parent
 			throw new Meteor.Error(400, "organizations_error_organization_is_company")
-		
+
 
 	db.organizations.after.update (userId, doc, fieldNames, modifier, options) ->
 		updateFields = {}
@@ -382,7 +376,7 @@ if (Meteor.isServer)
 					db.organizations.direct.update({_id:organization._id},{$pull:{children:doc._id}})
 
 
-		# 如果更改 parent 或 name, 需要更新 自己和孩子们的 fullname	
+		# 如果更改 parent 或 name, 需要更新 自己和孩子们的 fullname
 		if (modifier.$set.parent || modifier.$set.name)
 			updateFields.fullname = obj.calculateFullname()
 			children = db.organizations.find({parents: doc._id});
@@ -407,7 +401,7 @@ if (Meteor.isServer)
 					db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
 			if removed_users.length > 0
 				removed_space_users = db.space_users.find({space: doc.space, user: {$in: removed_users}}).fetch()
-				root_org = db.organizations.findOne({space: doc.space, is_company: true}, {fields: {_id: 1}})
+				root_org = db.organizations.findOne({space: doc.space, is_company: true, parent: null}, {fields: {_id: 1}})
 				_.each removed_space_users, (su)->
 					orgs = su.organizations
 					if orgs.length is 1
@@ -437,7 +431,7 @@ if (Meteor.isServer)
 				created_by_name: sUser.name,
 				created: new Date()
 
-	
+
 	db.organizations.before.remove (userId, doc) ->
 		# check space exists
 		space = db.spaces.findOne(doc.space)
@@ -464,7 +458,7 @@ if (Meteor.isServer)
 		if (doc.users && doc.users.length > 0)
 			throw new Meteor.Error(400, "organizations_error_organization_has_users");
 
-		if (doc.is_company)
+		if (doc.is_company && !doc.parent)
 			throw new Meteor.Error(400, "organizations_error_can_not_remove_root_organization");
 
 
@@ -491,52 +485,53 @@ if (Meteor.isServer)
 				created_by: userId,
 				created_by_name: sUser.name,
 				created: new Date()
-	
+
 	Meteor.publish 'organizations', (spaceId)->
-		
+
 		unless this.userId
 			return this.ready()
-		
+
 		unless spaceId
 			return this.ready()
 
-		selector = 
+		selector =
 			space: spaceId
 
 		return db.organizations.find(selector)
 
 	Meteor.publish 'organization', (orgId)->
-		
+
 		unless this.userId
 			return this.ready()
-		
+
 		unless orgId
 			return this.ready()
 
-		selector = 
+		selector =
 			_id: orgId
 
 		return db.organizations.find(selector)
 
 	Meteor.publish 'root_organization', (spaceId)->
-		
+
 		unless this.userId
 			return this.ready()
-		
+
 		unless spaceId
 			return this.ready()
 
-		selector = 
+		selector =
 			space: spaceId
 			is_company: true
+			parent: null
 
 		return db.organizations.find(selector)
 
 	Meteor.publish 'my_organizations', (spaceId)->
-		
+
 		unless this.userId
 			return this.ready()
-		
+
 		unless spaceId
 			return this.ready()
 
