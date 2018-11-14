@@ -14,20 +14,21 @@ body {
 .steedos.fixed {
 	.content-wrapper {
 		top: 90px;
-		background: #f8f9fb;
+		background: linear-gradient(#fef7f1, #fff);
 	}
 	.dx-widget {
 		font-size: 13px;
 	}
 	.slds-global-header_container {
 		z-index: 1000;
-		background: #f8f9fb;
+		background: linear-gradient(#f7f0ea, #efe8d8);
 		border-bottom: 0;
 		transition: all 1s ease-in-out 0.5s;
+		box-shadow: rgba(0, 0, 0, 0.3) 0 1px 5px, rgba(255, 255, 255, 0.2) 0 -1px 0 inset;
 
 		.slds-global-header {
-			background: #fff;
-			box-shadow: 0 1px 2px rgba(150,150,150,0.3);
+			background: transparent;
+			box-shadow: none;
 
 			.slds-global-header__logo {
 				width: 12.5rem;
@@ -46,8 +47,9 @@ body {
 			}
 		}
 		.slds-context-bar {
+			background: transparent;
 			padding: 0px 0px 0px 1rem;
-			border-bottom: 1px solid #e7e7eb;
+			border-bottom: 2px solid #ae1c20;
 			color: rgb(8, 7, 7);
 			a {
 				text-decoration: none !important;
@@ -62,15 +64,14 @@ body {
 				bottom: auto;
 				top: 0;
 			}
+			.slds-context-bar__item.slds-is-active:before {
+				background: #ae1c20;
+			}
 		}
 	}
 
 	.slds-page-header {
-		border-radius: 0;
-		box-shadow: none;
 		border-bottom: 0;
-		background: transparent;
-		padding-bottom: 0.5em
 	}
 
 	.slds-card.slds-card_boundary {
@@ -129,17 +130,14 @@ body {
 	.listViewManager {
 		.table-grid-content{
 			border: 1px solid #dddbda;
-			margin: 0 1em;
 		}
 	}
 
 	.objectViewManager {
 		.slds-tabs_default {
 			background: transparent;
-			margin: 0 1em;
 		}
 		.slds-tabs_default__content {
-			padding: 0.5em 0;
 		}
 		#viewRecordForm {
 			padding: 1em 0.5em;
@@ -154,6 +152,16 @@ body {
 	
 	.slds-modal__footer {
 		border-top: 1px solid #D5D5D5;
+	}
+
+	.forceEntityIcon.extraSmall {
+	    width: 1.5rem;
+	    height: 1.5rem;
+	}
+
+	.forceEntityIcon {
+	    display: block;
+	    border-radius: .125rem;
 	}
 }
 

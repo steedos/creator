@@ -1,9 +1,9 @@
 <template name="creator_view">
 
-	<div class="steedos-brand-band slds-brand-band_medium creator_view">
+	<div class="steedos-brand-band slds-brand-band_medium slds-template_bottom-magnet creator_view">
 		<div class="slds-template__container">
 			<div class="objectViewManager slds-grid slds-grid--vertical">
-				<div class="slds-page-header">
+				<div class="slds-page-header slds-page-header_bleed">
 					<div class="slds-grid">
 						<div class="slds-col slds-has-flexi-truncate">
 							<div class="slds-media slds-no-space slds-grow">
@@ -70,18 +70,9 @@
 					</div>
 				</div>
 
-				<div class="slds-grid table-grid-content">
-					<div class="slds-tabs_default creator-view-tabs_default">
-						<!-- <ul class="slds-tabs_default__nav" role="tablist">
-							<li class="slds-tabs_default__item" title="Item Two" role="presentation">
-								<a class="slds-tabs_default__link creator-view-tabs-link" role="tab" tabindex="-1" aria-selected="false" data-tab="creator-tabular">{{_ "creator_view_related_objects"}}</a>
-							</li>
-							<li class="slds-tabs_default__item slds-is-active" title="Item One" role="presentation">
-								<a class="slds-tabs_default__link creator-view-tabs-link" role="tab" tabindex="0" aria-selected="true" data-tab="creator-quick-form">{{_ "creator_view_details"}}</a>
-							</li>
-						</ul> -->
-						<!-- <div id="creator-quick-form" class="slds-tabs_default__content creator-view-tabs-content slds-show" role="tabpanel"> -->
-						<div id="creator-quick-form" class="slds-tabs_default__content" role="tabpanel">
+				<div class="slds-grid slds-gutters slds-m-top_medium">
+					<div class="slds-col slds-size_2-of-3">
+						<div id="creator-quick-form" class="" role="tabpanel">
 							<div class="slds-card slds-card_boundary ">
 							{{#if detail_info_visible}}
 								{{#if showForm}}
@@ -192,22 +183,23 @@
 							{{/if}}
 							</div>
 						</div>
-						<!-- <div id="creator-tabular" class="slds-tabs_default__content creator-view-tabs-content slds-show" role="tabpanel"> -->
-						<div id="creator-tabular" class="slds-tabs_default__content" role="tabpanel">
+					
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+
+						<div id="creator-tabular" class="" role="tabpanel">
 							{{#each related_list}}
 								<div class="slds-card slds-card_boundary forceRelatedListCardDesktop related-object-tabular">
 									<div class="slds-card__header slds-grid">
 										<header class="slds-media slds-media_center slds-has-flexi-truncate">
 											<div class="slds-media__figure">
-												<span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
-													{{> steedos_icon class="slds-icon slds-page-header__icon" source="standard-sprite" name=related_object.icon}}
-												</span>
+												{{> steedos_icon class="extraSmall forceEntityIcon slds-icon" source="standard-sprite" name=related_object.icon}}
 											</div>
 											<div class="slds-media__body">
 												<h2>
 													<a href="{{related_object_url}}" class="slds-card__header-link slds-truncate" title="{{_ related_object.name}}">
-														<span class="slds-text-heading_small">{{ related_object.label}}</span>
-														<span class="slds-text-heading--small slds-shrink-none slds-m-right--xx-small" title="{{related_list_count}}"> ({{related_list_count this}})</span>
+														<span class="">{{ related_object.label}}</span>
+														<span class=" slds-shrink-none slds-m-right--xx-small" title="{{related_list_count}}"> ({{related_list_count this}})</span>
 													</a>
 												</h2>
 											</div>
