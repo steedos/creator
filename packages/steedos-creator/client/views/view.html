@@ -2,7 +2,7 @@
 
 	<div class="steedos-brand-band slds-brand-band_medium slds-template_bottom-magnet creator_view">
 		<div class="slds-template__container">
-			<div class="objectViewManager slds-grid slds-grid--vertical">
+			<div class="objectViewManager slds-grid slds-grid--vertical flexipageBaseRecordHomeTemplateDesktop">
 				<div class="slds-page-header slds-page-header_bleed">
 					<div class="slds-grid">
 						<div class="slds-col slds-has-flexi-truncate">
@@ -70,8 +70,8 @@
 					</div>
 				</div>
 
-				<div class="slds-grid slds-gutters slds-m-top_medium">
-					<div class="slds-col slds-size_2-of-3">
+				<div class="row row-main">
+					<div class="column region-main">
 						<div id="creator-quick-form" class="" role="tabpanel">
 							<div class="slds-card slds-card_boundary ">
 							{{#if detail_info_visible}}
@@ -185,7 +185,7 @@
 						</div>
 					
 					</div>
-					<div class="slds-col slds-size_1-of-3">
+					<div class="column region-sidebar-right">
 
 						<div id="creator-tabular" class="" role="tabpanel">
 							{{#each related_list}}
