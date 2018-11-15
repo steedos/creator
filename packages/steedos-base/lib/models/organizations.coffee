@@ -361,7 +361,6 @@ if (Meteor.isServer)
 		if space.admins.indexOf(userId) < 0
 			if (typeof doc.admins != typeof modifier.$set.admins or doc.admins?.sort().join(",") != modifier.$set.admins?.sort().join(","))
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
-		debugger
 
 		if doc.parent
 			# 公司级的部门的父部门必须也是公司级的部门
@@ -379,8 +378,6 @@ if (Meteor.isServer)
 					childrenCompany = db.organizations.findOne({_id: {$in: doc.children},is_company: true})
 					if childrenCompany
 						throw new Meteor.Error(400, "organizations_error_children_is_company_true_for_current_company");
-
-			debugger
 
 			# 当变更parent或is_company属性时，重新计算其company_id值
 			if modifier.$set.parent or modifier.$set.is_company != undefined
@@ -431,6 +428,7 @@ if (Meteor.isServer)
 	db.organizations.after.update (userId, doc, fieldNames, modifier, options) ->
 		console.log "=======db.organizations.after.update=====doc===", doc
 		modifier.$set = modifier.$set || {};
+		modifier.$unset = modifier.$unset || {};
 		console.log "=======db.organizations.after.update=====modifier.$set===", modifier.$set
 		updateFields = {}
 		obj = db.organizations.findOne(doc._id)
@@ -462,7 +460,7 @@ if (Meteor.isServer)
 		new_users = modifier.$set.users || []
 
 		# 只修改单个字段时，modifier.$set.users可能是undefined
-		if modifier.$set.users
+		if modifier.$set.users or modifier.$unset.users != undefined
 			added_users = _.difference(new_users, old_users)
 			removed_users = _.difference(old_users, new_users)
 			if added_users.length > 0
@@ -475,6 +473,7 @@ if (Meteor.isServer)
 				removed_space_users = db.space_users.find({space: doc.space, user: {$in: removed_users}}).fetch()
 				root_org = db.organizations.findOne({space: doc.space, is_company: true, parent: null}, {fields: {_id: 1}})
 				_.each removed_space_users, (su)->
+					# 删除部门成员时，如果修改了其organization，则其company_id值应该同步改为其对应的organization.company_id值
 					orgs = su.organizations
 					if orgs.length is 1
 						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [root_org._id], organization: root_org._id, company_id: root_org._id}})
@@ -483,7 +482,6 @@ if (Meteor.isServer)
 							return org_id isnt doc._id
 						)
 						if su.organization is doc._id
-							# 删除部门成员时，如果修改了其organization，则其company_id值应该同步改为其对应的organization.company_id值
 							top_organization = db.organizations.findOne(new_orgs[0],fields:{company_id:1})
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs, organization: new_orgs[0], company_id: top_organization.company_id}})
 						else
@@ -491,7 +489,6 @@ if (Meteor.isServer)
 
 		old_company_id = this.previous.company_id
 		new_company_id = modifier.$set.company_id or doc.company_id
-		debugger
 		if new_company_id and (new_company_id != old_company_id)
 			# 当前部门的company_id值变化时，把其子部门全部设置为相同的company_id值
 			if doc.children and doc.children.length
