@@ -525,5 +525,6 @@
 	"organizations_error_parent_is_company_false_for_current_company": "The parent organization of the company-level organization must also be a company-level organization.",
 	"organizations_error_children_is_company_true_for_current_company": "There is a company-level department in the sub-department of the department, and the department cannot be directly set to non-company level.",
 	"organizations_error_parent_is_not_found": "Parent organization not found",
-	"organizations_error_root_parent_can_not_set": "Cannot modify the parent organization attribute of the root organization"
+	"organizations_error_root_parent_can_not_set": "Cannot modify the parent organization attribute of the root organization",
+	"organizations_is_company": "Is company"
 }

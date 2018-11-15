@@ -543,5 +543,6 @@
 	"organizations_error_parent_is_company_false_for_current_company": "公司级的部门的父部门必须也是公司级的部门",
 	"organizations_error_children_is_company_true_for_current_company": "部门的子部门中存在公司级的部门时，不能直接把该部门设置为非公司级",
 	"organizations_error_parent_is_not_found": "未找到父组织",
-	"organizations_error_root_parent_can_not_set": "不能修改根组织的父组织属性"
+	"organizations_error_root_parent_can_not_set": "不能修改根组织的父组织属性",
+	"organizations_is_company": "公司级"
 }
