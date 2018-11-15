@@ -477,13 +477,15 @@ if (Meteor.isServer)
 				_.each removed_space_users, (su)->
 					orgs = su.organizations
 					if orgs.length is 1
-						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [root_org._id], organization: root_org._id}})
+						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [root_org._id], organization: root_org._id, company_id: root_org._id}})
 					else if orgs.length > 1
 						new_orgs = _.filter(orgs, (org_id)->
 							return org_id isnt doc._id
 						)
 						if su.organization is doc._id
-							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs, organization: new_orgs[0]}})
+							# 删除部门成员时，如果修改了其organization，则其company_id值应该同步改为其对应的organization.company_id值
+							top_organization = db.organizations.findOne(new_orgs[0],fields:{company_id:1})
+							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs, organization: new_orgs[0], company_id: top_organization.company_id}})
 						else
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs}})
 
