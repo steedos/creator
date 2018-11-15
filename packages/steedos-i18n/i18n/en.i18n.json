@@ -519,5 +519,11 @@
 
 	"space_users_error_roles_used": "User has been used by roles：__names__",
 	"space_users_error_flows_used": "User has been used by flows：__names__",
-	"contact_need_phone_or_email": "You should fill in phone-number or email-address"
+	"contact_need_phone_or_email": "You should fill in phone-number or email-address",
+
+	"organizations_error_is_company_false_in_root": "IsCompany property can't be false in the root organization",
+	"organizations_error_parent_is_company_false_for_current_company": "The parent organization of the company-level organization must also be a company-level organization.",
+	"organizations_error_children_is_company_true_for_current_company": "There is a company-level department in the sub-department of the department, and the department cannot be directly set to non-company level.",
+	"organizations_error_parent_is_not_found": "Parent organization not found",
+	"organizations_error_root_parent_can_not_set": "Cannot modify the parent organization attribute of the root organization"
 }

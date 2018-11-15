@@ -269,7 +269,7 @@
 	"organizations_children": "下级部门",
 	"organizations_created": "创建时间",
 	"organizations_created_by": "创建者",
-	"organizations_is_company": "根部门",
+	"organizations_is_company": "公司级",
 	"organizations_modified": "修改时间",
 	"organizations_modified_by": "修改者",
 	"organizations_parents": "所有上级部门",
@@ -537,5 +537,11 @@
 
 	"space_users_error_roles_used": "已有角色指定该用户：__names__",
 	"space_users_error_flows_used": "已有流程指定该用户为处理人：__names__",
-	"contact_need_phone_or_email": "手机和邮箱不能同时为空"
+	"contact_need_phone_or_email": "手机和邮箱不能同时为空",
+
+	"organizations_error_is_company_false_in_root": "根部门“公司级”属性不能为否",
+	"organizations_error_parent_is_company_false_for_current_company": "公司级的部门的父部门必须也是公司级的部门",
+	"organizations_error_children_is_company_true_for_current_company": "部门的子部门中存在公司级的部门时，不能直接把该部门设置为非公司级",
+	"organizations_error_parent_is_not_found": "未找到父组织",
+	"organizations_error_root_parent_can_not_set": "不能修改根组织的父组织属性"
 }

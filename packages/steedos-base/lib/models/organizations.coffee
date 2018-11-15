@@ -71,13 +71,13 @@ Creator.Objects.organizations =
 			reference_to: "organizations"
 			sortable: true
 			index:true
+			omit: true
 			hidden: true
 
 		is_company:
 			label: "公司级"
 			type: "boolean"
 			index:true
-			hidden: true
 
 		hidden:
 			label: "隐藏"
@@ -227,6 +227,8 @@ if (Meteor.isServer)
 			isOrgAdmin = false
 			if doc.parent
 				parentOrg = db.organizations.findOne(doc.parent)
+				if !parentOrg
+					throw new Meteor.Error(400, "organizations_error_parent_is_not_found");
 				parents = parentOrg?.parents
 				if parents
 					parents.push(doc.parent)
@@ -246,6 +248,8 @@ if (Meteor.isServer)
 		# 同一个space中不能有同名的organization，parent 不能有同名的 child
 		if doc.parent
 			parentOrg = if parentOrg then parentOrg else db.organizations.findOne(doc.parent)
+			if !parentOrg
+				throw new Meteor.Error(400, "organizations_error_parent_is_not_found");
 			if parentOrg.children
 				nameOrg = db.organizations.find({_id: {$in: parentOrg.children}, name: doc.name}).count()
 				if nameOrg>0
@@ -318,7 +322,9 @@ if (Meteor.isServer)
 
 
 	db.organizations.before.update (userId, doc, fieldNames, modifier, options) ->
+		console.log "=======db.organizations.before.update=====doc===", doc
 		modifier.$set = modifier.$set || {};
+		console.log "=======db.organizations.before.update=====modifier.$set===", modifier.$set
 		# check space exists
 		space = db.spaces.findOne(doc.space)
 		if !space
@@ -355,7 +361,44 @@ if (Meteor.isServer)
 		if space.admins.indexOf(userId) < 0
 			if (typeof doc.admins != typeof modifier.$set.admins or doc.admins?.sort().join(",") != modifier.$set.admins?.sort().join(","))
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
+		debugger
 
+		if doc.parent
+			# 公司级的部门的父部门必须也是公司级的部门
+			parent = modifier.$set.parent or doc.parent
+			is_company = if modifier.$set.is_company == undefined then doc.is_company else modifier.$set.is_company
+			parentOrg = db.organizations.findOne(parent)
+			if !parentOrg
+				throw new Meteor.Error(400, "organizations_error_parent_is_not_found");
+			if is_company and !parentOrg.is_company
+				throw new Meteor.Error(400, "organizations_error_parent_is_company_false_for_current_company");
+			
+			# 部门的子部门中存在公司级的部门时，不能直接把该部门设置为非公司级
+			if modifier.$set.is_company != undefined
+				unless is_company
+					childrenCompany = db.organizations.findOne({_id: {$in: doc.children},is_company: true})
+					if childrenCompany
+						throw new Meteor.Error(400, "organizations_error_children_is_company_true_for_current_company");
+
+			debugger
+
+			# 当变更parent或is_company属性时，重新计算其company_id值
+			if modifier.$set.parent or modifier.$set.is_company != undefined
+				if is_company
+					company_id = doc._id
+				else
+					company_id = parentOrg.company_id
+				modifier.$set.company_id = company_id
+
+		else
+			# 根组织的is_company不能为false
+			if modifier.$set.is_company != undefined
+				if !modifier.$set.is_company
+					throw new Meteor.Error(400, "organizations_error_is_company_false_in_root");
+			# 不能修改根组织的父组织属性
+			if modifier.$set.parent
+				throw new Meteor.Error(400, "organizations_error_root_parent_can_not_set");
+		
 		modifier.$set.modified_by = userId;
 		modifier.$set.modified = new Date();
 
@@ -364,7 +407,9 @@ if (Meteor.isServer)
 
 		if (modifier.$set.parent)
 			# parent 不能等于自己或者 children
-			parentOrg = db.organizations.findOne({_id: modifier.$set.parent})
+			parentOrg = if parentOrg then parentOrg else db.organizations.findOne(modifier.$set.parent)
+			if !parentOrg
+				throw new Meteor.Error(400, "organizations_error_parent_is_not_found");
 			if (doc._id == parentOrg._id || parentOrg.parents.indexOf(doc._id)>=0)
 				throw new Meteor.Error(400, "organizations_error_parent_is_self")
 			# 同一个 parent 不能有同名的 child
@@ -384,6 +429,9 @@ if (Meteor.isServer)
 
 
 	db.organizations.after.update (userId, doc, fieldNames, modifier, options) ->
+		console.log "=======db.organizations.after.update=====doc===", doc
+		modifier.$set = modifier.$set || {};
+		console.log "=======db.organizations.after.update=====modifier.$set===", modifier.$set
 		updateFields = {}
 		obj = db.organizations.findOne(doc._id)
 		if obj.parent
@@ -413,7 +461,7 @@ if (Meteor.isServer)
 		old_users = this.previous.users || []
 		new_users = modifier.$set.users || []
 
-		#只修改单个字段时，users可能是undefined
+		# 只修改单个字段时，modifier.$set.users可能是undefined
 		if modifier.$set.users
 			added_users = _.difference(new_users, old_users)
 			removed_users = _.difference(old_users, new_users)
@@ -439,6 +487,17 @@ if (Meteor.isServer)
 						else
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs}})
 
+		old_company_id = this.previous.company_id
+		new_company_id = modifier.$set.company_id or doc.company_id
+		debugger
+		if new_company_id and (new_company_id != old_company_id)
+			# 当前部门的company_id值变化时，把其子部门全部设置为相同的company_id值
+			if doc.children and doc.children.length
+				# 这里不能用direct.update，因为要触发级联操作
+				db.organizations.update({_id: {$in: doc.children}}, {$set: {company_id: new_company_id}},{multi: true})
+			# 当前部门的company_id值变化时，同步当前组织的users对应的space_users的company_id值
+			users = if modifier.$set.users then modifier.$set.users else doc.users
+			db.space_users.direct.update({space: doc.space, user: {$in: users}}, {$set: {company_id: new_company_id}},{multi: true})
 
 		# 更新部门后在audit_logs表中添加一条记录
 		updatedDoc = db.organizations.findOne({_id: doc._id})
