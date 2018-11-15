@@ -209,7 +209,6 @@ db.organizations.helpers
 if (Meteor.isServer)
 
 	db.organizations.before.insert (userId, doc) ->
-		console.log "db.organizations.before.insert=============doc=====", doc
 		doc.created_by = userId;
 		doc.created = new Date();
 		doc.modified_by = userId;
@@ -221,9 +220,14 @@ if (Meteor.isServer)
 		space = db.spaces.findOne(doc.space)
 		if !space
 			throw new Meteor.Error(400, "organizations_error_space_not_found");
+		
+		isSpaceAdmin = space.admins.indexOf(userId) >= 0
+
+		if doc.is_company and !isSpaceAdmin
+			throw new Meteor.Error(400, "organizations_error_space_admins_only_for_is_company")
 
 		# only space admin or org admin can insert organizations
-		if space.admins.indexOf(userId) < 0
+		unless isSpaceAdmin
 			isOrgAdmin = false
 			if doc.parent
 				parentOrg = db.organizations.findOne(doc.parent)
@@ -277,15 +281,12 @@ if (Meteor.isServer)
 			
 
 		# only space admin can update organization.admins
-		if space.admins.indexOf(userId) < 0
+		unless isSpaceAdmin
 			if (doc.admins)
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
 		
-		console.log "db.organizations.before.insert=============doc==2===", doc
-
 
 	db.organizations.after.insert (userId, doc) ->
-		console.log "db.organizations.after.insert=============doc=====", doc
 		updateFields = {}
 		obj = db.organizations.findOne(doc._id)
 
@@ -322,20 +323,22 @@ if (Meteor.isServer)
 
 
 	db.organizations.before.update (userId, doc, fieldNames, modifier, options) ->
-		console.log "=======db.organizations.before.update=====doc===", doc
 		modifier.$set = modifier.$set || {};
-		console.log "=======db.organizations.before.update=====modifier.$set===", modifier.$set
 		# check space exists
 		space = db.spaces.findOne(doc.space)
 		if !space
 			throw new Meteor.Error(400, "organizations_error_space_not_found");
+		
+		isSpaceAdmin = space.admins.indexOf(userId) >= 0
+		if modifier.$set.is_company != undefined and modifier.$set.is_company != doc.is_company and !isSpaceAdmin
+			throw new Meteor.Error(400, "organizations_error_space_admins_only_for_is_company")
 
 		###
 			非工作区管理员修改部门，需要以下权限：
 			1.需要有原组织或原组织的父组织的管理员权限
 			2.需要有改动后的父组织的权限
 		###
-		if space.admins.indexOf(userId) < 0
+		unless isSpaceAdmin
 			isOrgAdmin = Steedos.isOrgAdminByAllOrgIds [doc._id], userId
 			unless isOrgAdmin
 				throw new Meteor.Error(400, "organizations_error_org_admins_only")
@@ -358,7 +361,7 @@ if (Meteor.isServer)
 			throw new Meteor.Error(400, "organizations_error_fullname_readonly");
 
 		# only space admin can update organization.admins
-		if space.admins.indexOf(userId) < 0
+		unless isSpaceAdmin
 			if (typeof doc.admins != typeof modifier.$set.admins or doc.admins?.sort().join(",") != modifier.$set.admins?.sort().join(","))
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
 
@@ -426,10 +429,8 @@ if (Meteor.isServer)
 
 
 	db.organizations.after.update (userId, doc, fieldNames, modifier, options) ->
-		console.log "=======db.organizations.after.update=====doc===", doc
 		modifier.$set = modifier.$set || {};
 		modifier.$unset = modifier.$unset || {};
-		console.log "=======db.organizations.after.update=====modifier.$set===", modifier.$set
 		updateFields = {}
 		obj = db.organizations.findOne(doc._id)
 		if obj.parent
@@ -519,9 +520,14 @@ if (Meteor.isServer)
 		space = db.spaces.findOne(doc.space)
 		if !space
 			throw new Meteor.Error(400, "organizations_error_space_not_found");
+		
+		isSpaceAdmin = space.admins.indexOf(userId) >= 0
+
+		if doc.is_company and !isSpaceAdmin
+			throw new Meteor.Error(400, "organizations_error_space_admins_only_for_is_company")
 
 		# only space admin or org admin can remove organizations
-		if space.admins.indexOf(userId) < 0
+		unless isSpaceAdmin
 			isOrgAdmin = false
 			if doc.admins?.includes userId
 				isOrgAdmin = true
