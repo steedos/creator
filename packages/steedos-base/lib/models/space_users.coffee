@@ -23,6 +23,7 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			multiple: true
 			defaultValue: []
+			required: true
 		position:
 			type: "text"
 			label:'职务'
@@ -365,6 +366,11 @@ Meteor.startup ()->
 				# 如果主组织未设置或设置的值不在doc.organizations内，则自动设置为第一个组织
 				unless doc.organizations.includes doc.organization
 					doc.organization = doc.organizations[0]
+			
+			if doc.organization
+				organization = db.organizations.findOne(doc.organization,fields:{company_id:1})
+				if organization
+					doc.company_id = organization.company_id
 
 		db.space_users.after.insert (userId, doc) ->
 			if doc.organizations
@@ -410,6 +416,11 @@ Meteor.startup ()->
 				# 修改所有组织且修改后的组织不包含原主组织，则把主组织自动设置为第一个组织
 				unless modifier.$set.organizations.includes doc.organization
 					modifier.$set.organization = modifier.$set.organizations[0]
+			
+			if modifier.$set.organization
+				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1})
+				if organization
+					doc.company_id = organization.company_id
 
 			newMobile = modifier.$set.mobile
 			# 当把手机号设置为空值时，newMobile为undefined，modifier.$unset.mobile为空字符串
