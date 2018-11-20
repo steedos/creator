@@ -30,6 +30,9 @@ Package.onUse(function(api) {
 	api.use('steedos:cfs-s3@0.1.4');
 	api.use('steedos:cfs-aliyun@0.1.0');
 
+	api.use('aldeed:simple-schema@1.3.3');
+	api.use('steedos:base');
+
 	api.addFiles('core.coffee', 'client');
 	api.addFiles('client/new_flow_modal.less', 'client');
 	api.addFiles('client/new_flow_modal.html', 'client');
@@ -41,6 +44,9 @@ Package.onUse(function(api) {
 	api.addFiles('models/flows.coffee');
 	api.addFiles('models/statistic_instance.coffee');
 	api.addFiles('models/categories.coffee');
+	api.addFiles('models/flow_roles.coffee');
+	api.addFiles('models/flow_positions.coffee');
+	api.addFiles('models/space_user_signs.coffee');
 
 	api.addFiles('cfs/instances.coffee', 'server');
 })

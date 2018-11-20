@@ -220,7 +220,7 @@ if (Meteor.isServer)
 		space = db.spaces.findOne(doc.space)
 		if !space
 			throw new Meteor.Error(400, "organizations_error_space_not_found");
-		
+
 		isSpaceAdmin = space.admins.indexOf(userId) >= 0
 
 		if doc.is_company and !isSpaceAdmin
@@ -257,8 +257,8 @@ if (Meteor.isServer)
 			if parentOrg.children
 				nameOrg = db.organizations.find({_id: {$in: parentOrg.children}, name: doc.name}).count()
 				if nameOrg>0
-					throw new Meteor.Error(400, "organizations_error_organizations_name_exists") 
-			
+					throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
+
 			# 如果是新建组织不是根组织，则应该设置其company_id值为其最近一个父组织的company_id值，除非其is_company为true
 			if doc.is_company
 				doc.company_id = doc._id
@@ -273,18 +273,18 @@ if (Meteor.isServer)
 			orgexisted = db.organizations.find({name: doc.name, space: doc.space,fullname:doc.name}).count()
 			if orgexisted > 0
 				throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
-			
+
 			# 根组织的is_company值必须是true
 			doc.is_company = true
 			# 如果是新建根组织则应该设置其company_id值为根组织本身的_id值
 			doc.company_id = doc._id
-			
+
 
 		# only space admin can update organization.admins
 		unless isSpaceAdmin
 			if (doc.admins)
 				throw new Meteor.Error(400, "organizations_error_space_admins_only_for_org_admins");
-		
+
 
 	db.organizations.after.insert (userId, doc) ->
 		updateFields = {}
@@ -328,7 +328,7 @@ if (Meteor.isServer)
 		space = db.spaces.findOne(doc.space)
 		if !space
 			throw new Meteor.Error(400, "organizations_error_space_not_found");
-		
+
 		isSpaceAdmin = space.admins.indexOf(userId) >= 0
 		if modifier.$set.is_company != undefined and modifier.$set.is_company != doc.is_company and !isSpaceAdmin
 			throw new Meteor.Error(400, "organizations_error_space_admins_only_for_is_company")
@@ -374,7 +374,7 @@ if (Meteor.isServer)
 				throw new Meteor.Error(400, "organizations_error_parent_is_not_found");
 			if is_company and !parentOrg.is_company
 				throw new Meteor.Error(400, "organizations_error_parent_is_company_false_for_current_company");
-			
+
 			# 部门的子部门中存在公司级的部门时，不能直接把该部门设置为非公司级
 			if modifier.$set.is_company != undefined
 				unless is_company
@@ -398,7 +398,7 @@ if (Meteor.isServer)
 			# 不能修改根组织的父组织属性
 			if modifier.$set.parent
 				throw new Meteor.Error(400, "organizations_error_root_parent_can_not_set");
-		
+
 		modifier.$set.modified_by = userId;
 		modifier.$set.modified = new Date();
 
@@ -520,7 +520,7 @@ if (Meteor.isServer)
 		space = db.spaces.findOne(doc.space)
 		if !space
 			throw new Meteor.Error(400, "organizations_error_space_not_found");
-		
+
 		isSpaceAdmin = space.admins.indexOf(userId) >= 0
 
 		if doc.is_company and !isSpaceAdmin

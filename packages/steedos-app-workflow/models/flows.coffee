@@ -1,3 +1,7 @@
+db.flows = new Meteor.Collection('flows')
+
+db.flows._simpleSchema = new SimpleSchema
+
 Creator.Objects.flows =
 	name: "flows"
 	icon: "timesheet"
@@ -380,3 +384,21 @@ Creator.Objects.flows =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+
+if Meteor.isClient
+	db.flows._simpleSchema.i18n("flows")
+
+db.flows.attachSchema(db.flows._simpleSchema)
+
+if Meteor.isServer
+
+	db.flows.before.insert (userId, doc) ->
+		if not userId
+			return
+
+		doc.created_by = userId
+		doc.created = new Date()
+
+		su = db.space_users.findOne({space: doc.space, user: userId}, {fields: {company_id: 1}})
+		if su && su.company_id
+			doc.company_id = su.company_id
