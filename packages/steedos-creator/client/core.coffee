@@ -43,7 +43,7 @@ if Meteor.isClient
 		object_name = Session.get("object_name")
 		if object_name
 			Creator.TabularSelectedIds[object_name] = []
-	
+
 	Creator.remainCheckboxState = (container)->
 		# 当Creator.TabularSelectedIds值，把container内的勾选框状态保持住
 		checkboxAll = container.find(".select-all")
@@ -70,7 +70,12 @@ if Meteor.isClient
 				checkboxAll.prop("checked",false)
 			else if selectedLength == checkboxs.length
 				checkboxAll.prop("checked",true)
-	
+
+	Creator.getUserCompanyId = (userId)->
+		userId = userId || Meteor.userId()
+		su = Creator.getCollection('space_users').findOne({space: Session.get('spaceId'), user: userId}, {fields: {company_id:1}})
+		return su.company_id
+
 	### TO DO LIST
 		1.支持$in操作符，实现recent视图
 		$eq, $ne, $lt, $gt, $lte, $gte
@@ -102,7 +107,7 @@ if Meteor.isClient
 							if _.isString(obj?._value)
 								return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
 						return [obj.field, obj.operation, obj.value]
-					
+
 					filters = Creator.formatFiltersToDev(filters)
 					_.each filters, (filter)->
 						selector.push filter
@@ -111,6 +116,8 @@ if Meteor.isClient
 				list_view = Creator.getListView(object_name, list_view_id)
 				unless list_view
 					return ["_id", "=", -1]
+
+				filter_scope = list_view.filter_scope
 
 				if object_name == "users"
 					selector.push ["_id", "=", userId]
@@ -145,6 +152,11 @@ if Meteor.isClient
 							selector.push "and"
 						selector.push ["owner", "=", userId]
 
+		if filter_scope == "company"
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
+
 		if selector.length == 0
 			return undefined
 		return selector
@@ -158,7 +170,7 @@ if Meteor.isClient
 		_.each related_lists, (obj)->
 			if obj.object_name == related_object_name
 				related_field_name = obj.related_field_name
-		
+
 		related_field_name = related_field_name.replace(/\./g, "/")
 
 		if related_object_name == "cfs.files.filerecord"
@@ -174,7 +186,7 @@ if Meteor.isClient
 			selector.push("and", [related_field_name, "=", record_object_name])
 		else
 			selector.push("and", [related_field_name, "=", record_id])
-		
+
 		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
 		if !permissions.viewAllRecords and permissions.allowRead
 			selector.push("and", ["owner", "=", userId])

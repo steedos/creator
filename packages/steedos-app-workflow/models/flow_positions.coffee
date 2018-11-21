@@ -42,6 +42,11 @@ Creator.Objects.flow_positions =
 			columns: ["org","users"]
 			label: "所有"
 
+		company:
+			filter_scope: "company"
+			columns: ["org","users"]
+			label: "公司级"
+
 	permission_set:
 		user:
 			allowCreate: false
@@ -64,6 +69,37 @@ if Meteor.isClient
 db.flow_positions.attachSchema db.flow_positions._simpleSchema
 
 if Meteor.isServer
+
+	db.flow_positions.allow
+		insert: (userId, event) ->
+			if (!Steedos.isSpaceAdmin(event.space, userId))
+				return false
+			else
+				return true
+
+		update: (userId, event) ->
+			if (!Steedos.isSpaceAdmin(event.space, userId))
+				return false
+			else
+				return true
+
+		remove: (userId, event) ->
+			if (!Steedos.isSpaceAdmin(event.space, userId))
+				return false
+			else
+				return true
+
+	db.flow_positions.before.insert (userId, doc) ->
+
+		doc.created_by = userId;
+		doc.created = new Date();
+
+	db.flow_positions.before.update (userId, doc, fieldNames, modifier, options) ->
+
+		modifier.$set = modifier.$set || {};
+
+		modifier.$set.modified_by = userId;
+		modifier.$set.modified = new Date();
 
 	db.flow_positions.before.insert (userId, doc) ->
 		if not userId

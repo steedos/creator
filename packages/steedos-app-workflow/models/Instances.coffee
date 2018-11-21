@@ -127,7 +127,7 @@ Creator.Objects.instances =
 			reference_to: "instances"
 			label:"相关申请单"
 			is_wide: true
-			
+
 		record_ids:
 			label:"记录ID"
 			type: "grid"
@@ -154,7 +154,10 @@ Creator.Objects.instances =
 			label: "已办文件"
 			filter_scope: "space"
 			filters: [["outbox_users", "=", "{userId}"]]
-
+		company:
+			filter_scope: "company"
+			columns: ["name", "applicant", "applicant_organization", "modified"]
+			label: "公司级"
 	permission_set:
 		user:
 			allowCreate: false

@@ -33,6 +33,10 @@ Package.onUse(function(api) {
 	api.use('aldeed:simple-schema@1.3.3');
 	api.use('steedos:base');
 
+	api.use('tap:i18n', ['client', 'server']);
+	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
+	api.addFiles(tapi18nFiles, ['client', 'server']);
+
 	api.addFiles('core.coffee', 'client');
 	api.addFiles('client/new_flow_modal.less', 'client');
 	api.addFiles('client/new_flow_modal.html', 'client');

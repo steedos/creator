@@ -60,6 +60,10 @@ Creator.Objects.forms =
 			filter_scope: "space"
 			filters: [["is_deleted", "=", false]]
 			columns: ["name", "category", "modified", "modified_by", "auto_remind", "state"]
+		company:
+			filter_scope: "company"
+			columns: ["name"]
+			label: "公司级"
 
 	permission_set:
 		user:

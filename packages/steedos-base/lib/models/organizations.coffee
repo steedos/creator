@@ -75,7 +75,7 @@ Creator.Objects.organizations =
 			hidden: true
 
 		is_company:
-			label: "公司级"
+			label: "公司"
 			type: "boolean"
 			index:true
 

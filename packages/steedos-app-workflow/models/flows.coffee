@@ -258,6 +258,10 @@ Creator.Objects.flows =
 			columns: ["name", "modified", "modified_by"]
 			filter_scope: "space"
 			filters: [["is_deleted", "=", true]]
+		company:
+			filter_scope: "company"
+			columns: ["name"]
+			label: "公司级"
 
 	actions:
 		standard_new:
