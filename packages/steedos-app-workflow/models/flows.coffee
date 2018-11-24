@@ -356,7 +356,7 @@ Creator.Objects.flows =
 				return true;
 			on: "record"
 			todo: (object_name, record_id, fields)->
-				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id)
+				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id, Creator.getUserCompanyId())
 
 #		edit_steps:
 #			label: "设置步骤"
