@@ -67,7 +67,7 @@ Package.onUse(function(api) {
 	api.use('simple:json-routes@2.1.0');
 
 	api.use('steedos:ionicons@0.1.7');
-	api.use('steedos:i18n@0.0.10');
+	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:ui@0.0.1');
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:e164-phones-countries@1.0.3');
