@@ -18,12 +18,11 @@ Creator.Objects.flow_roles =
 			sortable: true
 			index:true
 			omit: true
-			hidden: true
 
 	list_views:
 		all:
 			filter_scope: "space"
-			columns: ["name"]
+			columns: ["name", "company_id"]
 			label: "所有"
 
 		company:
