@@ -4,6 +4,8 @@ CFDataManager = {};
 // DataManager.spaceUserRemote = new AjaxCollection("space_users");
 // DataManager.flowRoleRemote = new AjaxCollection("flow_roles");
 CFDataManager.getNode = function (spaceId, node, isSelf, isNeedtoSelDefault) {
+	//isSelf:是否是用户所属组织的树，现在选人控件有两棵树第一棵树是自己所属组织的树，另一树是完整的树
+	//isNeedtoSelDefault:是否默认选中已展开的节点
 	var orgs,
 		myContactsLimit = Steedos.my_contacts_limit;
 	if (node.id == '#') {
