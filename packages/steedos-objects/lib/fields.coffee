@@ -91,6 +91,9 @@ Creator.getObjectSchema = (obj) ->
 
 			fs.autoform.dependOn = field.depend_on
 
+			if field.beforeOpenFunction
+				fs.beforeOpenFunction = field.beforeOpenFunction
+
 			fs.filtersFunction = Creator.evaluateFilters
 
 			if field.optionsFunction
