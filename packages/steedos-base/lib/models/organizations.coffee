@@ -495,9 +495,8 @@ if (Meteor.isServer)
 			if doc.children and doc.children.length
 				# 这里不能用direct.update，因为要触发级联操作
 				db.organizations.update({_id: {$in: doc.children}}, {$set: {company_id: new_company_id}},{multi: true})
-			# 当前部门的company_id值变化时，同步当前组织的users对应的space_users的company_id值
-			users = if modifier.$set.users then modifier.$set.users else doc.users
-			db.space_users.direct.update({space: doc.space, user: {$in: users}}, {$set: {company_id: new_company_id}},{multi: true})
+			# 当前部门的company_id值变化时，同步主部门为当前部门的space_users的company_id值
+			db.space_users.direct.update({space: doc.space, organization: doc._id }, {$set: {company_id: new_company_id}},{multi: true})
 
 		# 更新部门后在audit_logs表中添加一条记录
 		updatedDoc = db.organizations.findOne({_id: doc._id})
