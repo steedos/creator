@@ -68,7 +68,7 @@ Template.new_flow_modal.events
 
 				newFlow = _.find flows, (f)->
 							return f.form == newFormId
-				Workflow.openFlowDesign(Steedos.locale(), newFlow.space, newFlow._id)
+				Workflow.openFlowDesign(Steedos.locale(), newFlow.space, newFlow._id, Creator.getUserCompanyId())
 				Modal.hide(template)
 
 			error: (jqXHR, textStatus, errorThrown) ->

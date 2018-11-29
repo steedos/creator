@@ -153,33 +153,57 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		"perms.orgs_can_add":
 			label:"授权部门: 新建申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		"perms.users_can_monitor":
 			label:"授权用户: 查看所有申请单"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		"perms.orgs_can_monitor":
 			label:"授权部门: 查看所有申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		"perms.users_can_admin":
 			label:"授权用户: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		"perms.orgs_can_admin":
 			label:"授权部门: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		app:
 			label:"所属应用"
@@ -238,6 +262,14 @@ Creator.Objects.flows =
 			label:"分发给自己"
 			type: "boolean"
 			group: "高级"
+		company_id:
+			label: "所属公司"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			omit: true
+			hidden: true
 
 	list_views:
 		enabled:
@@ -273,13 +305,13 @@ Creator.Objects.flows =
 			on: "list"
 			todo: (object_name, record_id, fields)->
 				Modal.show('new_flow_modal')
-		flowDesign:
+		design:
 			label: "流程设计器"
 			visible: ()->
 				return true;
 			on: "list"
 			todo: (object_name, record_id, fields)->
-				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId())
+				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), null, Creator.getUserCompanyId())
 		standard_edit:
 			visible: false
 			on: "record"
