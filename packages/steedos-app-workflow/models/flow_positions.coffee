@@ -30,6 +30,10 @@ Creator.Objects.flow_positions =
 			reference_to: "organizations"
 			required: true
 			is_name: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flow_roles", AutoForm.getFormValues().insertDoc.role, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		company_id:
 			label: "所属公司"
