@@ -56,7 +56,12 @@ if Meteor.isClient
 								$(".btn.creator-edit").click()
 
 		"standard_delete": (object_name, record_id, record_title, list_view_id, call_back)->
+			console.log("standard_delete", object_name, record_id, record_title, list_view_id)
 			object = Creator.getObject(object_name)
+
+			if(!_.isString(record_title) && record_title?.name)
+				record_title = record_title?.name
+
 			if record_title
 				text = "是否确定要删除此#{object.label}\"#{record_title}\""
 			else
