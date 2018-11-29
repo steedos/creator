@@ -10,6 +10,7 @@ CFDataManager = {};
 * rootOrg: 允许支持组织树上的根节点, 值为organization _id
 * }
 * */
+//TODO: 选人,选组控件中应该去掉 通讯录的权限限制功能
 CFDataManager.getNode = function (spaceId, node, options) {
 	console.log('getNode', options);
 	var orgs,

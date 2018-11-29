@@ -50,6 +50,12 @@ AutoForm.addInputType("selectorg", {
 
 Template.afSelectOrg.events({
 	'click .selectOrg': function (event, template) {
+		var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+
+		if(_.isFunction(fieldSchema.beforeOpenFunction)){
+			fieldSchema.beforeOpenFunction(event, template)
+		}
+
 		if (Modal.allowMultiple) {
 			return;
 		}
