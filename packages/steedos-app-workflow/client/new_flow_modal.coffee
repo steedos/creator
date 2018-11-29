@@ -12,7 +12,7 @@ Template.new_flow_modal.helpers
 		return new SimpleSchema(schema)
 
 	fields: ()->
-		return ['name', 'category']
+		return ['category', 'name']
 
 
 Template.new_flow_modal.events
