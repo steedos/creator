@@ -296,6 +296,12 @@ Creator.Objects.flows =
 			label: "公司级"
 
 	actions:
+		standard_query:
+			label: "查找"
+			visible: false
+			on: "list"
+			todo: "standard_query"
+
 		standard_new:
 			label: "新建"
 			visible: ()->
