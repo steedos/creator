@@ -161,7 +161,8 @@ if Meteor.isClient
 			return undefined
 		return selector
 
-	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id)->
+	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id, list_view_id)->
+		console.log("getODataRelatedFilter", object_name, related_object_name, record_id, list_view_id)
 		spaceId = Steedos.spaceId()
 		userId = Meteor.userId()
 		related_lists = Creator.getRelatedList(object_name, record_id)
@@ -172,6 +173,45 @@ if Meteor.isClient
 				related_field_name = obj.related_field_name
 
 		related_field_name = related_field_name.replace(/\./g, "/")
+		if list_view_id
+			custom_list_view = Creator.getListView(related_object_name, list_view_id)
+			console.log("custom_list_view", custom_list_view, selector)
+			if custom_list_view
+				filter_logic = custom_list_view.filter_logic
+				filter_scope = custom_list_view.filter_scope
+				filters = custom_list_view.filters
+				if filter_scope == "mine"
+					selector.push ["owner", "=", Meteor.userId()]
+				else if filter_scope == "company"
+					if selector.length > 0
+						selector.push "and"
+					selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
+
+				if filter_logic
+					format_logic = Creator.formatLogicFiltersToDev(filters, filter_logic)
+					if selector.length
+						selector.push("and", format_logic)
+					else
+						selector.push(format_logic)
+				else
+					if filters and filters.length > 0
+						if selector.length > 0
+							selector.push "and"
+						filters = _.map filters, (obj)->
+							if _.isObject(obj) && !_.isArray(obj)
+								if Meteor.isClient
+									if _.isString(obj?._value)
+										return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
+								return [obj.field, obj.operation, obj.value]
+							else
+								return obj
+						console.log('filters', filters)
+						filters = Creator.formatFiltersToDev(filters)
+						_.each filters, (filter)->
+							selector.push filter
+		console.log("custom_list_view selector1`1111", selector)
+		if selector.length > 0
+			selector.push "and"
 
 		if related_object_name == "cfs.files.filerecord"
 			selector.push(["metadata/space", "=", spaceId])
@@ -190,7 +230,6 @@ if Meteor.isClient
 		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
 		if !permissions.viewAllRecords and permissions.allowRead
 			selector.push("and", ["owner", "=", userId])
-
 		return selector
 
 # 切换工作区时，重置下拉框的选项

@@ -265,7 +265,7 @@ Template.creator_grid.onRendered ->
 	self.autorun (c)->
 		is_related = self.data.is_related
 		if is_related
-			list_view_id = Creator.getListView(self.data.related_object_name) || "all"
+			list_view_id = Creator.getListView(self.data.related_object_name, "all")._id
 		else
 			list_view_id = Session.get("list_view_id")
 		unless list_view_id
@@ -291,7 +291,7 @@ Template.creator_grid.onRendered ->
 					filter = undefined
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
-					filter = Creator.getODataFilter(list_view_id, related_object_name)
+					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
