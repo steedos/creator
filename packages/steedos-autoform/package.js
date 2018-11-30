@@ -3,7 +3,7 @@
  */
 Package.describe({
 	name: 'steedos:autoform',
-	version: '0.0.15',
+	version: '0.0.16',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/apps/tree/master/packages/steedos-autoform',
 	documentation: null
