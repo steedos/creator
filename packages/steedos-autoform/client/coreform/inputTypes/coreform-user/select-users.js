@@ -130,11 +130,15 @@ Template.afSelectUser.events({
 
     'click .selectUser': function(event, template) {
 
-		var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+		try{
+			var fieldSchema = AutoForm.getSchemaForField(template.data.name);
 
-		if(fieldSchema && _.isFunction(fieldSchema.beforeOpenFunction)){
-			fieldSchema.beforeOpenFunction(event, template)
-        }
+			if(fieldSchema && _.isFunction(fieldSchema.beforeOpenFunction)){
+				fieldSchema.beforeOpenFunction(event, template)
+			}
+		}catch(e){
+			console.log('click .selectUser e', e);
+		}
 
         if (Modal.allowMultiple) {
             return;
