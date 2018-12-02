@@ -75,8 +75,10 @@ getRoomPermission = (room) ->
 	return result?.enable_open
 
 getTooltipTemplate = (data) ->
-	color = getAppointmentColor(data.room)
-	if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId()
+	room = Creator.odata.get('meetingroom', data.room,'color,admins')
+	color = room.color
+	roomAdmins = room.admins
+	if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId() || roomAdmins.indexOf(Meteor.userId())>-1
 		action = """
 			<div class="action" style='background-color:" + color + ";'>
 				<div class="dx-scheduler-appointment-tooltip-buttons">
@@ -245,15 +247,28 @@ Template.creator_calendar.onRendered ->
 						else
 							Session.set("cmDoc", doc)
 				onAppointmentUpdating: (e)->
-					e.cancel = true
-					doc = {}
-					_.keys(e.newData).forEach (key)->
-						if _.indexOf(key, '@') < 0
-							doc[key] = e.newData[key]
-					doc['modified'] = new Date()
-					Creator.odata.update("meeting", e.newData['_id'], doc, () -> 
-						dxSchedulerInstance.option("dataSource", _dataSource())
-					)
+					roomAdmins = getRoomAdmin(e.oldData.room)
+					if Steedos.isSpaceAdmin() || e.oldData.owner._id == Meteor.userId() || roomAdmins.indexOf(Meteor.userId())>-1
+						newRoom = Creator.odata.get('meetingroom',e.newData.room,'admins,enable_open')
+						if newRoom.admins.indexOf(Meteor.userId())>-1 or newRoom.enable_open
+							e.cancel = true
+							doc = {}
+							_.keys(e.newData).forEach (key)->
+								if _.indexOf(key, '@') < 0
+									if key == 'owner'
+										doc[key] = e.newData[key]?._id
+									else
+										doc[key] = e.newData[key]
+							doc['modified'] = new Date()
+							Creator.odata.update("meeting", e.newData['_id'], doc, () ->
+								dxSchedulerInstance.option("dataSource", _dataSource())
+							)
+						else
+							e.cancel = true
+							toastr.error("此会议室为特约会议室，您暂无权限。")
+					else
+						e.cancel = true;
+						toastr.error("您无权限调整此记录");
 
 				onAppointmentUpdated: (e)->
 					dxSchedulerInstance.option("dataSource", _dataSource())
