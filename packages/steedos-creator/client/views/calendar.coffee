@@ -76,7 +76,7 @@ getRoomPermission = (room) ->
 
 getTooltipTemplate = (data) ->
 	color = getAppointmentColor(data.room)
-	if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+	if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId()
 		action = """
 			<div class="action" style='background-color:" + color + ";'>
 				<div class="dx-scheduler-appointment-tooltip-buttons">
@@ -198,8 +198,7 @@ Template.creator_calendar.onRendered ->
 					e.cancel = true	
 
 				dropDownAppointmentTemplate: (data, index, container) ->
-					container.addClass('appointment-border')
-					if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+					if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId()
 						$("body").off("click", ".appointment-border")
 						$("body").on("click", ".appointment-border", ()->
 							_editData(data)
