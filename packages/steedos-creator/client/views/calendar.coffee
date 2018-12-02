@@ -58,6 +58,7 @@ _dataSource = () ->
 					if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 						error.message = t "creator_odata_unexpected_character"
 				toastr.error(error.message)
+		expand: ["owner($select=name)"]
 	}
 	return dataSource
 
@@ -177,6 +178,18 @@ Template.creator_calendar.onRendered ->
 						#orderby:'name'
 					}
 				}],
+				appointmentTemplate: (data)->
+					return $("""
+						<div style='height: 100%;' title='会议标题: #{data.name}&#10;创建人: #{data.owner.name}&#10;联系方式: #{data.phone || ''}'>
+							<div class='dx-scheduler-appointment-title'>#{data.name}</div>
+							<div class='dx-scheduler-appointment-content-details' style='white-space: nowrap;'>
+								<div class='dx-scheduler-appointment-content-date'>#{DevExpress.localization.formatDate(new Date(data.start), 'hh:mm a')}</div>
+								<div class='dx-scheduler-appointment-content-date'> - </div>
+								<div class='dx-scheduler-appointment-content-date'>#{DevExpress.localization.formatDate(new Date(data.end), 'hh:mm a')}</div>
+							</div>
+						</div>
+					""");
+				,
 				onAppointmentClick: (e) ->
 					if e.event.currentTarget.className.includes("dx-list-item")
 						e.cancel = true
@@ -301,5 +314,3 @@ Template.creator_calendar.helpers
 Template.creator_calendar.events 
 	"click .list-action-custom": (event, template) ->
 		_insertData()
-
-		
