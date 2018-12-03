@@ -129,6 +129,17 @@ Template.afSelectUser.events({
     },
 
     'click .selectUser': function(event, template) {
+
+		try{
+			var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+
+			if(fieldSchema && _.isFunction(fieldSchema.beforeOpenFunction)){
+				fieldSchema.beforeOpenFunction(event, template)
+			}
+		}catch(e){
+			console.log('click .selectUser e', e);
+		}
+
         if (Modal.allowMultiple) {
             return;
         }
@@ -172,6 +183,15 @@ Template.afSelectUser.events({
 
         if (dataset.showOrg && dataset.showOrg == 'false') {
             showOrg = false;
+        }
+
+        if(showOrg){
+
+			// dataset.rootOrg = 'YrZJ35kLyvq5RNHfd'
+
+            if(dataset.rootOrg && _.isString(dataset.rootOrg)){
+				options.rootOrg = dataset.rootOrg
+            }
         }
 
         var values = $("input[name='" + template.data.name + "']")[0].dataset.values;

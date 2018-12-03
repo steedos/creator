@@ -3,74 +3,99 @@ CFDataManager = {};
 // DataManager.organizationRemote = new AjaxCollection("organizations");
 // DataManager.spaceUserRemote = new AjaxCollection("space_users");
 // DataManager.flowRoleRemote = new AjaxCollection("flow_roles");
-CFDataManager.getNode = function (spaceId, node, isSelf, isNeedtoSelDefault) {
-	//isSelf:是否是用户所属组织的树，现在选人控件有两棵树第一棵树是自己所属组织的树，另一树是完整的树
-	//isNeedtoSelDefault:是否默认选中已展开的节点
+/*
+* options: {
+* isSelf: 用于生成另外一个树, 用户主部门
+* isNeedtoSelDefault:
+* rootOrg: 允许支持组织树上的根节点, 值为organization _id
+* }
+* */
+//TODO: 选人,选组控件中应该去掉 通讯录的权限限制功能
+CFDataManager.getNode = function (spaceId, node, options) {
 	var orgs,
 		myContactsLimit = Steedos.my_contacts_limit;
 	if (node.id == '#') {
 		selfOrganization = Steedos.selfOrganization();
-		if(isSelf){
+		//第一棵树: 只显示本部
+		if(options.isSelf){
 			if(selfOrganization){
 				orgs = [selfOrganization];
 				orgs[0].open = true;
 				orgs[0].select = true;
 			}
-		}
-		else if (myContactsLimit && myContactsLimit.isLimit) {
-			var query = {space: spaceId, users: Meteor.userId()};
-			if(!Steedos.isSpaceAdmin()){
-				query.hidden = {$ne: true}
-			}
-			var uOrgs = db.organizations.find(query).fetch();
-			var _ids = uOrgs.getProperty("_id");
-			var outsideOrganizations = myContactsLimit.outside_organizations;
-			//当前用户所属组织自身存在的父子包含关系，及其与额外外部组织之间父子包含关系都要过滤掉
-			//当前用户所属组织自身的排序在前端是可信的，因为后台相关发布publish做了排序
-			_ids = _.union(_ids, outsideOrganizations);
-			orgs = _.filter(uOrgs, function (org) {
-				var parents = org.parents || [];
-				return _.intersection(parents, _ids).length < 1;
-			});
-			_ids = orgs.getProperty("_id");
-			if(outsideOrganizations.length){
-				_ids = _.union(outsideOrganizations, _ids);
-			}
-			//主部门在第一个jstree(即selfOrganization)中已有显示，第二个jstree就应该过滤掉不显示
-			var selfIndex = selfOrganization ? _ids.indexOf(selfOrganization._id) : -1;
-			if(selfIndex > -1){
-				_ids.splice(selfIndex, 1);
-			}
-			// 这里故意重新抓取后台数据，因为前台无法正确排序
-			orgs = CFDataManager.getOrganizationsByIds(_ids);
-			if (orgs.length > 0) {
-				orgs[0].open = true;
-				orgs[0].select = true;
-				// 有主要部门的时候不应该再选中根节点
-				if (selfOrganization){
-					orgs[0].select = false;
+		}else{  //第二棵树: 组织机构
+
+			if(options.rootOrg){
+				if(selfOrganization && selfOrganization._id == options.rootOrg){
+					orgs = []
+				}else{
+					orgs = CFDataManager.getOrganizationsByIds([options.rootOrg])
+
+					if(orgs.length > 0 ){
+						orgs[0].open = true;
+						orgs[0].select = true;
+						if (selfOrganization) {
+							orgs[0].select = false;
+						}
+					}
+
+				}
+			}else if (myContactsLimit && myContactsLimit.isLimit) {
+				var query = {space: spaceId, users: Meteor.userId()};
+				if(!Steedos.isSpaceAdmin()){
+					query.hidden = {$ne: true}
+				}
+				var uOrgs = db.organizations.find(query).fetch();
+				var _ids = uOrgs.getProperty("_id");
+				var outsideOrganizations = myContactsLimit.outside_organizations;
+				//当前用户所属组织自身存在的父子包含关系，及其与额外外部组织之间父子包含关系都要过滤掉
+				//当前用户所属组织自身的排序在前端是可信的，因为后台相关发布publish做了排序
+				_ids = _.union(_ids, outsideOrganizations);
+				orgs = _.filter(uOrgs, function (org) {
+					var parents = org.parents || [];
+					return _.intersection(parents, _ids).length < 1;
+				});
+				_ids = orgs.getProperty("_id");
+				if(outsideOrganizations.length){
+					_ids = _.union(outsideOrganizations, _ids);
+				}
+				//主部门在第一个jstree(即selfOrganization)中已有显示，第二个jstree就应该过滤掉不显示
+				var selfIndex = selfOrganization ? _ids.indexOf(selfOrganization._id) : -1;
+				if(selfIndex > -1){
+					_ids.splice(selfIndex, 1);
+				}
+				// 这里故意重新抓取后台数据，因为前台无法正确排序
+				orgs = CFDataManager.getOrganizationsByIds(_ids);
+				if (orgs.length > 0) {
+					orgs[0].open = true;
+					orgs[0].select = true;
+					// 有主要部门的时候不应该再选中根节点
+					if (selfOrganization){
+						orgs[0].select = false;
+					}
+				}
+			} else {
+				orgs = CFDataManager.getRoot(spaceId);
+				// 当没有限制查看本部门的时候，主部门与根节点相同时只显示主部门而不显示根组织
+				if(selfOrganization && selfOrganization._id == orgs[0]._id){
+					orgs = []
+				}
+				else{
+					orgs[0].open = true;
+					orgs[0].select = true;
+					// 有主要部门的时候不应该再选中根节点
+					if (selfOrganization) {
+						orgs[0].select = false;
+					}
 				}
 			}
-		} else {
-			orgs = CFDataManager.getRoot(spaceId);
-			// 当没有限制查看本部门的时候，主部门与根节点相同时只显示主部门而不显示根组织
-			if(selfOrganization && selfOrganization._id == orgs[0]._id){
-				orgs = []
-			}
-			else{
-				orgs[0].open = true;
-				orgs[0].select = true;
-				// 有主要部门的时候不应该再选中根节点
-				if (selfOrganization) {
-					orgs[0].select = false;
-				}
-			}
 		}
+
 	}
 	else{
 		orgs = CFDataManager.getChild(spaceId || node.data.spaceId, node.id);
 	}
-	return handerOrg(orgs, node.id, isNeedtoSelDefault);
+	return handerOrg(orgs, node.id, options.isNeedtoSelDefault);
 }
 
 

@@ -50,6 +50,12 @@ AutoForm.addInputType("selectorg", {
 
 Template.afSelectOrg.events({
 	'click .selectOrg': function (event, template) {
+		var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+
+		if(_.isFunction(fieldSchema.beforeOpenFunction)){
+			fieldSchema.beforeOpenFunction(event, template)
+		}
+
 		if (Modal.allowMultiple) {
 			return;
 		}
@@ -81,6 +87,12 @@ Template.afSelectOrg.events({
 		}
 
 		options.title = this.atts.title?  this.atts.title: t('coreform_select_org_title'); //t('coreform_select') +
+
+		// dataset.rootOrg = 'YrZJ35kLyvq5RNHfd'
+
+		if(dataset.rootOrg && _.isString(dataset.rootOrg)){
+			options.rootOrg = dataset.rootOrg
+		}
 
 		Modal.allowMultiple = true;
 		Modal.show("cf_organization_modal", options);

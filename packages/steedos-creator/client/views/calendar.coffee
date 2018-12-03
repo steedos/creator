@@ -58,6 +58,7 @@ _dataSource = () ->
 					if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 						error.message = t "creator_odata_unexpected_character"
 				toastr.error(error.message)
+		expand: ["owner($select=name)"]
 	}
 	return dataSource
 
@@ -74,8 +75,10 @@ getRoomPermission = (room) ->
 	return result?.enable_open
 
 getTooltipTemplate = (data) ->
-	color = getAppointmentColor(data.room)
-	if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+	room = Creator.odata.get('meetingroom', data.room,'color,admins')
+	color = room.color
+	roomAdmins = room.admins
+	if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId() || roomAdmins.indexOf(Meteor.userId())>-1
 		action = """
 			<div class="action" style='background-color:" + color + ";'>
 				<div class="dx-scheduler-appointment-tooltip-buttons">
@@ -177,6 +180,18 @@ Template.creator_calendar.onRendered ->
 						#orderby:'name'
 					}
 				}],
+				appointmentTemplate: (data)->
+					return $("""
+						<div style='height: 100%;' title='会议标题: #{data.name}&#10;创建人: #{data.owner.name}&#10;联系方式: #{data.phone || ''}'>
+							<div class='dx-scheduler-appointment-title'>#{data.name}</div>
+							<div class='dx-scheduler-appointment-content-details' style='white-space: nowrap;'>
+								<div class='dx-scheduler-appointment-content-date'>#{DevExpress.localization.formatDate(new Date(data.start), 'hh:mm a')}</div>
+								<div class='dx-scheduler-appointment-content-date'> - </div>
+								<div class='dx-scheduler-appointment-content-date'>#{DevExpress.localization.formatDate(new Date(data.end), 'hh:mm a')}</div>
+							</div>
+						</div>
+					""");
+				,
 				onAppointmentClick: (e) ->
 					if e.event.currentTarget.className.includes("dx-list-item")
 						e.cancel = true
@@ -185,8 +200,7 @@ Template.creator_calendar.onRendered ->
 					e.cancel = true	
 
 				dropDownAppointmentTemplate: (data, index, container) ->
-					container.addClass('appointment-border')
-					if Steedos.isSpaceAdmin() || data.owner == Meteor.userId()
+					if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId()
 						$("body").off("click", ".appointment-border")
 						$("body").on("click", ".appointment-border", ()->
 							_editData(data)
@@ -233,15 +247,28 @@ Template.creator_calendar.onRendered ->
 						else
 							Session.set("cmDoc", doc)
 				onAppointmentUpdating: (e)->
-					e.cancel = true
-					doc = {}
-					_.keys(e.newData).forEach (key)->
-						if _.indexOf(key, '@') < 0
-							doc[key] = e.newData[key]
-					doc['modified'] = new Date()
-					Creator.odata.update("meeting", e.newData['_id'], doc, () -> 
-						dxSchedulerInstance.option("dataSource", _dataSource())
-					)
+					roomAdmins = getRoomAdmin(e.oldData.room)
+					if Steedos.isSpaceAdmin() || e.oldData.owner._id == Meteor.userId() || roomAdmins.indexOf(Meteor.userId())>-1
+						newRoom = Creator.odata.get('meetingroom',e.newData.room,'admins,enable_open')
+						if newRoom.admins.indexOf(Meteor.userId())>-1 or newRoom.enable_open
+							e.cancel = true
+							doc = {}
+							_.keys(e.newData).forEach (key)->
+								if _.indexOf(key, '@') < 0
+									if key == 'owner'
+										doc[key] = e.newData[key]?._id
+									else
+										doc[key] = e.newData[key]
+							doc['modified'] = new Date()
+							Creator.odata.update("meeting", e.newData['_id'], doc, () ->
+								dxSchedulerInstance.option("dataSource", _dataSource())
+							)
+						else
+							e.cancel = true
+							toastr.error("此会议室为特约会议室，您暂无权限。")
+					else
+						e.cancel = true;
+						toastr.error("您无权限调整此记录");
 
 				onAppointmentUpdated: (e)->
 					dxSchedulerInstance.option("dataSource", _dataSource())
@@ -301,5 +328,3 @@ Template.creator_calendar.helpers
 Template.creator_calendar.events 
 	"click .list-action-custom": (event, template) ->
 		_insertData()
-
-		

@@ -107,7 +107,7 @@ Template.creator_view.helpers
 
 	full_screen: (key) ->
 		fields = Creator.getObject().fields
-		if fields[key].type is "markdown"
+		if fields[key]?.type is "markdown"
 			return true
 		else
 			return false

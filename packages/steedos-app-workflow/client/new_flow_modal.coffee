@@ -12,7 +12,7 @@ Template.new_flow_modal.helpers
 		return new SimpleSchema(schema)
 
 	fields: ()->
-		return ['name', 'category']
+		return ['category', 'name']
 
 
 Template.new_flow_modal.events
@@ -40,6 +40,10 @@ Template.new_flow_modal.events
 		if doc.category
 			form.category = doc.category
 
+		companyId = Creator.getUserCompanyId()
+		if companyId
+			form.company_id = companyId
+
 		data = {
 			"Forms": [form]
 		}
@@ -64,7 +68,7 @@ Template.new_flow_modal.events
 
 				newFlow = _.find flows, (f)->
 							return f.form == newFormId
-				Workflow.openFlowDesign(Steedos.locale(), newFlow.space, newFlow._id)
+				Workflow.openFlowDesign(Steedos.locale(), newFlow.space, newFlow._id, Creator.getUserCompanyId())
 				Modal.hide(template)
 
 			error: (jqXHR, textStatus, errorThrown) ->

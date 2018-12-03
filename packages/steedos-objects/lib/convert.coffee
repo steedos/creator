@@ -131,6 +131,7 @@ Meteor.startup ()->
 				optionsFunction = field.optionsFunction
 				reference_to = field.reference_to
 				createFunction = field.createFunction
+				beforeOpenFunction = field.beforeOpenFunction
 
 				if optionsFunction && _.isFunction(optionsFunction)
 					field._optionsFunction = optionsFunction.toString()
@@ -140,11 +141,14 @@ Meteor.startup ()->
 
 				if createFunction && _.isFunction(createFunction)
 					field._createFunction = createFunction.toString()
+				if beforeOpenFunction && _.isFunction(beforeOpenFunction)
+					field._beforeOpenFunction = beforeOpenFunction.toString()
 			else
 
 				optionsFunction = field._optionsFunction
 				reference_to = field._reference_to
 				createFunction = field._createFunction
+				beforeOpenFunction = field._beforeOpenFunction
 
 				if optionsFunction && _.isString(optionsFunction)
 					field.optionsFunction = Creator.eval("(#{optionsFunction})")
@@ -154,6 +158,9 @@ Meteor.startup ()->
 
 				if createFunction && _.isString(createFunction)
 					field.createFunction = Creator.eval("(#{createFunction})")
+
+				if beforeOpenFunction && _.isString(beforeOpenFunction)
+					field.beforeOpenFunction = Creator.eval("(#{beforeOpenFunction})")
 
 			if Meteor.isServer
 				defaultValue = field.defaultValue

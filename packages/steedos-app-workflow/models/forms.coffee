@@ -1,3 +1,5 @@
+db.forms = new Meteor.Collection('forms')
+
 Creator.Objects.forms =
 	name: "forms"
 	icon: "timesheet"
@@ -12,12 +14,12 @@ Creator.Objects.forms =
 			type: "select"
 			label:"表单状态"
 			options: [{label: "启用",value: "enabled"},{label: "停用",value: "disabled"}]
-		
+
 		description:
 			type: "textarea"
 			label:"表单描述"
 			is_wide: true
-			
+
 		category:
 			type: "master_detail"
 			label: "流程分类"
@@ -31,7 +33,7 @@ Creator.Objects.forms =
 			omit: true
 			hidden: true
 		historys:
-			label:"签核历程"	
+			label:"签核历程"
 			blackbox: true
 			omit: true
 			hidden: true
@@ -58,6 +60,10 @@ Creator.Objects.forms =
 			filter_scope: "space"
 			filters: [["is_deleted", "=", false]]
 			columns: ["name", "category", "modified", "modified_by", "auto_remind", "state"]
+		company:
+			filter_scope: "company"
+			columns: ["name"]
+			label: "公司级"
 
 	permission_set:
 		user:
@@ -74,3 +80,16 @@ Creator.Objects.forms =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+
+if Meteor.isServer
+
+	db.forms.before.insert (userId, doc) ->
+		if not userId
+			return
+
+		doc.created_by = userId
+		doc.created = new Date()
+
+		su = db.space_users.findOne({space: doc.space, user: userId}, {fields: {company_id: 1}})
+		if su && su.company_id
+			doc.company_id = su.company_id

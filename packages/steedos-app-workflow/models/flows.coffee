@@ -1,3 +1,7 @@
+db.flows = new Meteor.Collection('flows')
+
+db.flows._simpleSchema = new SimpleSchema
+
 Creator.Objects.flows =
 	name: "flows"
 	icon: "timesheet"
@@ -149,33 +153,57 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		"perms.orgs_can_add":
 			label:"授权部门: 新建申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		"perms.users_can_monitor":
 			label:"授权用户: 查看所有申请单"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		"perms.orgs_can_monitor":
 			label:"授权部门: 查看所有申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		"perms.users_can_admin":
 			label:"授权用户: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		"perms.orgs_can_admin":
 			label:"授权部门: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 
 		app:
 			label:"所属应用"
@@ -234,6 +262,14 @@ Creator.Objects.flows =
 			label:"分发给自己"
 			type: "boolean"
 			group: "高级"
+		company_id:
+			label: "所属公司"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			omit: true
+			hidden: true
 
 	list_views:
 		enabled:
@@ -254,8 +290,18 @@ Creator.Objects.flows =
 			columns: ["name", "modified", "modified_by"]
 			filter_scope: "space"
 			filters: [["is_deleted", "=", true]]
+		company:
+			filter_scope: "company"
+			columns: ["name"]
+			label: "公司级"
 
 	actions:
+		standard_query:
+			label: "查找"
+			visible: false
+			on: "list"
+			todo: "standard_query"
+
 		standard_new:
 			label: "新建"
 			visible: ()->
@@ -265,13 +311,13 @@ Creator.Objects.flows =
 			on: "list"
 			todo: (object_name, record_id, fields)->
 				Modal.show('new_flow_modal')
-		flowDesign:
+		design:
 			label: "流程设计器"
 			visible: ()->
 				return true;
 			on: "list"
 			todo: (object_name, record_id, fields)->
-				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId())
+				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), null, Creator.getUserCompanyId())
 		standard_edit:
 			visible: false
 			on: "record"
@@ -348,7 +394,7 @@ Creator.Objects.flows =
 				return true;
 			on: "record"
 			todo: (object_name, record_id, fields)->
-				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id)
+				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id, Creator.getUserCompanyId())
 
 #		edit_steps:
 #			label: "设置步骤"
@@ -380,3 +426,21 @@ Creator.Objects.flows =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+
+if Meteor.isClient
+	db.flows._simpleSchema.i18n("flows")
+
+db.flows.attachSchema(db.flows._simpleSchema)
+
+if Meteor.isServer
+
+	db.flows.before.insert (userId, doc) ->
+		if not userId
+			return
+
+		doc.created_by = userId
+		doc.created = new Date()
+
+		su = db.space_users.findOne({space: doc.space, user: userId}, {fields: {company_id: 1}})
+		if su && su.company_id
+			doc.company_id = su.company_id
