@@ -15,7 +15,7 @@ Creator.Objects.instances =
 			#index:true
 		flow:
 			label:"流程"
-			type: "master_detail"
+			type: "lookup"
 			reference_to: "flows"
 			readonly: true
 		flow_version:
