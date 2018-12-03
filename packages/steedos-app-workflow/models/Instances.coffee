@@ -157,7 +157,7 @@ Creator.Objects.instances =
 		company:
 			filter_scope: "company"
 			columns: ["name", "applicant", "applicant_organization", "modified"]
-			label: "公司级"
+			label: "本单位"
 	permission_set:
 		user:
 			allowCreate: false

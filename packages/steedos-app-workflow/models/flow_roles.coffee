@@ -28,7 +28,7 @@ Creator.Objects.flow_roles =
 		company:
 			filter_scope: "company"
 			columns: ["name"]
-			label: "公司级"
+			label: "本单位"
 
 	permission_set:
 		user:

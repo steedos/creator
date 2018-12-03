@@ -43,7 +43,7 @@ Creator.Objects.space_user_signs =
 		company:
 			filter_scope: "company"
 			columns: ["user", "sign"]
-			label: "公司级"
+			label: "本单位"
 
 	permission_set:
 		user:

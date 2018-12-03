@@ -52,7 +52,7 @@ Creator.Objects.flow_positions =
 		company:
 			filter_scope: "company"
 			columns: ["org","users","company_id"]
-			label: "公司级"
+			label: "本单位"
 
 	permission_set:
 		user:
