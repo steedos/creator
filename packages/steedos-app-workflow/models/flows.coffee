@@ -26,9 +26,11 @@ Creator.Objects.flows =
 			label:"流程状态"
 			type: "select"
 			options: [{label: "启用",value: "enabled"},{label: "停用",value: "disabled"}]
+			readonly: true
 		is_valid:
 			label:"流程是否有效"
 			type: "boolean"
+			readonly: true
 		description:
 			label:"流程介绍"
 			type: "textarea"
@@ -38,6 +40,7 @@ Creator.Objects.flows =
 		current_no:
 			label:"流程编号"
 			type: "number"
+			readonly: true
 
 		current:
 #			blackbox: true
