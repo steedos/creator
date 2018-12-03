@@ -42,17 +42,16 @@ Creator.Objects.flow_positions =
 			sortable: true
 			index:true
 			omit: true
-			hidden: true
 
 	list_views:
 		all:
 			filter_scope: "space"
-			columns: ["org","users"]
+			columns: ["org","users","company_id"]
 			label: "所有"
 
 		company:
 			filter_scope: "company"
-			columns: ["org","users"]
+			columns: ["org","users","company_id"]
 			label: "公司级"
 
 	permission_set:
