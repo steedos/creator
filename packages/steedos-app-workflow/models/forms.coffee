@@ -21,7 +21,7 @@ Creator.Objects.forms =
 			is_wide: true
 
 		category:
-			type: "master_detail"
+			type: "lookup"
 			label: "流程分类"
 			reference_to: "categories"
 		is_valid:
