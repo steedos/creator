@@ -14,7 +14,7 @@ body {
 .steedos.fixed {
 	.content-wrapper {
 		top: 90px;
-		background: linear-gradient(#faf6f3, #fff);
+		background: #fafafa;
 	}
 	.dx-widget {
 		font-size: 13px;
@@ -160,6 +160,13 @@ body {
 	    border-radius: .125rem;
 	}
 
+	.slds-context-bar__item:not(.slds-no-hover):hover, .slds-context-bar__item.slds-is-active {
+		background-color: rgba(254, 241, 225, 0.5);
+    }
+
+	.creator_view #creator-tabular {
+		padding-top: 15px;
+	}
 }
 
 
@@ -197,7 +204,8 @@ body {
     padding-left:0;
     padding-right:.75rem
 }
-@media only screen and (max-width:47.9375em){
+/* 暂时停用右侧栏，原始 (max-width:47.9375em) */
+@media only screen and (max-width:1047.9375em){
     .flexipageBaseRecordHomeTemplateDesktop{
         min-width:auto
     }
