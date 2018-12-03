@@ -447,3 +447,10 @@ if Meteor.isServer
 		su = db.space_users.findOne({space: doc.space, user: userId}, {fields: {company_id: 1}})
 		if su && su.company_id
 			doc.company_id = su.company_id
+
+	db.flows.after.update (userId, doc, fieldNames, modifier, options) ->
+		if doc.category != this.previous.category
+			if doc.category
+				db.forms.update(doc.form, { $set: { category: doc.category } })
+			else
+				db.forms.update(doc.form, { $unset: { category: 1 } })
