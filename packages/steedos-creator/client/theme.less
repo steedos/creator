@@ -1,8 +1,6 @@
 body {
 
 	background-size: cover;
-	background-color: #158bc6 !important;
-    background-image: none !important;
 	
 	button {
 		margin-right: 0px;
@@ -14,17 +12,17 @@ body {
 .steedos.fixed {
 	.content-wrapper {
 		top: 90px;
-		background: #fafafa;
+		background: transparent;
 	}
 	.dx-widget {
 		font-size: 13px;
 	}
 	.slds-global-header_container {
 		z-index: 1000;
-		background: linear-gradient(#f7f0ea, #efe8d8);
+		background: rgba(255, 255, 255, 0.9);
 		border-bottom: 0;
 		transition: all 1s ease-in-out 0.5s;
-		box-shadow: rgba(0, 0, 0, 0.3) 0 1px 5px, rgba(255, 255, 255, 0.2) 0 -1px 0 inset;
+		x-box-shadow: rgba(0, 0, 0, 0.3) 0 1px 5px, rgba(255, 255, 255, 0.2) 0 -1px 0 inset;
 
 		.slds-global-header {
 			background: transparent;
@@ -38,18 +36,11 @@ body {
 				background-position: left center;
 			}
 
-			.slds-lookup__search-input {
-				background: #fcf8ef;
-				border: 1px solid #e0ded8;
-			}
-			.slds-lookup__search-input:focus, .slds-lookup__search-input:active {
-				background: #fff;
-			}
 		}
 		.slds-context-bar {
 			background: transparent;
 			padding: 0px 0px 0px 1rem;
-			border-bottom: 2px solid #ae1c20;
+			border-bottom: 2px solid rgb(21, 137, 238);
 			color: rgb(8, 7, 7);
 			a {
 				text-decoration: none !important;
@@ -65,7 +56,7 @@ body {
 				top: 0;
 			}
 			.slds-context-bar__item.slds-is-active:before {
-				background: #ae1c20;
+				background: rgb(21, 137, 238);
 			}
 		}
 	}
@@ -159,10 +150,6 @@ body {
 	    display: block;
 	    border-radius: .125rem;
 	}
-
-	.slds-context-bar__item:not(.slds-no-hover):hover, .slds-context-bar__item.slds-is-active {
-		background-color: rgba(254, 241, 225, 0.5);
-    }
 
 	.creator_view #creator-tabular {
 		padding-top: 15px;
