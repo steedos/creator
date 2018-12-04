@@ -26,7 +26,7 @@ Creator.Objects.space_user_signs =
 			label: "签名"
 
 		company_id:
-			label: "所属公司"
+			label: "所属单位"
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true

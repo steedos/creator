@@ -701,6 +701,8 @@
 	"process_delegation_rules_from_name": "委托人",
 	"process_delegation_rules_to_name": "被委托人",
 	"process_delegation_rules_start_must_lt_end": "开始时间应小于结束时间",
-	"process_delegation_rules_description": "__userName__委托"
+	"process_delegation_rules_description": "__userName__委托",
+
+	"categories_in_use": "分类在使用中，不能删除"
 
 }

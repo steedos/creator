@@ -50,7 +50,7 @@ Creator.Objects.instances_statistic =
 			multiple: true
 			defaultValue: []
 		company_id:
-			label: "所属公司"
+			label: "所属单位"
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true

@@ -36,7 +36,7 @@ Creator.Objects.flow_positions =
 					event.currentTarget.dataset.rootOrg = company_id
 
 		company_id:
-			label: "所属公司"
+			label: "所属单位"
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true
