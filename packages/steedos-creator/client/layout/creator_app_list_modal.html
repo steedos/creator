@@ -55,7 +55,7 @@
             <ul class="slds-grid slds-grid_pull-padded slds-wrap">
 			{{#each apps}}
               <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3">
-                <div draggable="true" class="slds-app-launcher__tile slds-text-link_reset slds-is-draggable">
+                <a href="{{app_url}}" draggable="true" class="app-launcher-link slds-app-launcher__tile slds-text-link_reset slds-is-draggable">
                   <div class="slds-app-launcher__tile-figure">
                     <span class="slds-avatar slds-avatar_large">
                       <span class="slds-icon_container" title="">
@@ -70,14 +70,14 @@
                     </div>
                   </div>
                   <div class="slds-app-launcher__tile-body">
-                    <a href="{{app_url}}" class="app-launcher-link appTileTitle">{{_ name}}</a>
+                    <span class="appTileTitle">{{_ name}}</span>
                     <p>{{description}}
                     </p>
                     <div class="slds-popover slds-popover_tooltip slds-nubbin_top slds-hide" role="tooltip" id="help-0" style="position:absolute;top:100px;left:165px">
                       <div class="slds-popover__body"></div>
                     </div>
                   </div>
-                </div>
+                </a>
               </li>
             {{/each}}
             </ul>
