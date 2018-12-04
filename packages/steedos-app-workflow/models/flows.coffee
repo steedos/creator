@@ -293,11 +293,11 @@ Creator.Objects.flows =
 			label: "本单位"
 
 	actions:
-		standard_query:
-			label: "查找"
-			visible: false
-			on: "list"
-			todo: "standard_query"
+		# standard_query:
+		# 	label: "查找"
+		# 	visible: false
+		# 	on: "list"
+		# 	todo: "standard_query"
 
 		standard_new:
 			label: "新建"
