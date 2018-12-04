@@ -32,17 +32,16 @@ Creator.Objects.space_user_signs =
 			sortable: true
 			index: true
 			omit: true
-			hidden: true
 
 	list_views:
 		all:
 			filter_scope: "space"
-			columns: ["user", "sign"]
+			columns: ["user", "sign", "company_id"]
 			label: "所有"
 
 		company:
 			filter_scope: "company"
-			columns: ["user", "sign"]
+			columns: ["user", "sign", "company_id"]
 			label: "本单位"
 
 	permission_set:

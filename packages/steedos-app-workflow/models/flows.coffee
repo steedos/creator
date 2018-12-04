@@ -41,6 +41,13 @@ Creator.Objects.flows =
 			label:"流程编号"
 			type: "number"
 			readonly: true
+		company_id:
+			label: "所属公司"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			omit: true
 
 		current:
 #			blackbox: true
@@ -235,44 +242,36 @@ Creator.Objects.flows =
 			type: "textarea"
 			is_wide: true
 			rows: 6
-			group: "高级"
+			group: "设置模板"
 		print_template:
 			label:"打印模板"
 			type: "textarea"
 			rows: 6
 			is_wide: true
-			group: "高级"
+			group: "设置模板"
 		field_map:
 			label:"映射关系"
 			type: "textarea"
 			rows: 6
 			is_wide: true
-			group: "高级"
+			group: "设置归档关系"
 		events:
 			label:"相关事件"
 			type: "textarea"
 			rows: 6
 			is_wide: true
-			group: "高级"
+			group: "设置脚本"
 		distribute_optional_users:
 			type: "lookup"
 			label: "分发者"
 			reference_to: "users"
 			multiple: true
 			is_wide: true
-			group: "高级"
+			group: "设置分发"
 		distribute_to_self:
 			label:"分发给自己"
 			type: "boolean"
-			group: "高级"
-		company_id:
-			label: "所属公司"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			omit: true
-			hidden: true
+			group: "设置分发"
 
 	list_views:
 		enabled:
@@ -288,14 +287,9 @@ Creator.Objects.flows =
 			filter_scope: "space"
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
 			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted"]
-		is_deleted:
-			label: "已删除"
-			columns: ["name", "modified", "modified_by"]
-			filter_scope: "space"
-			filters: [["is_deleted", "=", true]]
 		company:
 			filter_scope: "company"
-			columns: ["name"]
+			columns: ["name", "company_id"]
 			label: "本单位"
 
 	actions:
@@ -327,69 +321,69 @@ Creator.Objects.flows =
 		standard_delete:
 			visible: false
 			on: "record_more"
-		edit_template:
-			label: "设置模板"
-			visible: (object_name, record_id, record_permissions)->
-				if FlowRouter.current().params?.record_id
-					return true && record_permissions["allowEdit"]
-				return false
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
-				Session.set 'action_fields', 'instance_template,print_template'
-				Meteor.defer ()->
-					$(".creator-edit").click()
-		edit_perms:
-			label: "设置权限"
-			visible: (object_name, record_id, record_permissions)->
-				if FlowRouter.current().params?.record_id
-					return true && record_permissions["allowEdit"]
-				return false
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				console.log('edit_perms', object_name, record_id)
-				Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
-				Session.set 'action_fields', 'perms, perms.orgs_can_add, perms.users_can_add, perms.orgs_can_monitor, perms.users_can_monitor, perms.orgs_can_admin, perms.users_can_admin'
-				Meteor.defer ()->
-					$(".creator-edit").click()
+		# edit_template:
+		# 	label: "设置模板"
+		# 	visible: (object_name, record_id, record_permissions)->
+		# 		if FlowRouter.current().params?.record_id
+		# 			return true && record_permissions["allowEdit"]
+		# 		return false
+		# 	on: "record"
+		# 	todo: (object_name, record_id, fields)->
+		# 		Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
+		# 		Session.set 'action_fields', 'instance_template,print_template'
+		# 		Meteor.defer ()->
+		# 			$(".creator-edit").click()
+		# edit_perms:
+		# 	label: "设置权限"
+		# 	visible: (object_name, record_id, record_permissions)->
+		# 		if FlowRouter.current().params?.record_id
+		# 			return true && record_permissions["allowEdit"]
+		# 		return false
+		# 	on: "record"
+		# 	todo: (object_name, record_id, fields)->
+		# 		console.log('edit_perms', object_name, record_id)
+		# 		Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
+		# 		Session.set 'action_fields', 'perms, perms.orgs_can_add, perms.users_can_add, perms.orgs_can_monitor, perms.users_can_monitor, perms.orgs_can_admin, perms.users_can_admin'
+		# 		Meteor.defer ()->
+		# 			$(".creator-edit").click()
 
-		edit_events:
-			label: "设置脚本"
-			visible: (object_name, record_id, record_permissions)->
-				if FlowRouter.current().params?.record_id
-					return true && record_permissions["allowEdit"]
-				return false
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
-				Session.set 'action_fields', 'events'
-				Meteor.defer ()->
-					$(".creator-edit").click()
+		# edit_events:
+		# 	label: "设置脚本"
+		# 	visible: (object_name, record_id, record_permissions)->
+		# 		if FlowRouter.current().params?.record_id
+		# 			return true && record_permissions["allowEdit"]
+		# 		return false
+		# 	on: "record"
+		# 	todo: (object_name, record_id, fields)->
+		# 		Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
+		# 		Session.set 'action_fields', 'events'
+		# 		Meteor.defer ()->
+		# 			$(".creator-edit").click()
 
-		edit_field_map:
-			label: "设置归档关系"
-			visible: (object_name, record_id, record_permissions)->
-				if FlowRouter.current().params?.record_id
-					return true && record_permissions["allowEdit"]
-				return false
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
-				Session.set 'action_fields', 'field_map'
-				Meteor.defer ()->
-					$(".creator-edit").click()
-		edit_distribute:
-			label: "设置分发"
-			visible: (object_name, record_id, record_permissions)->
-				if FlowRouter.current().params?.record_id
-					return true && record_permissions["allowEdit"]
-				return false
-			on: "record"
-			todo: (object_name, record_id, fields)->
-				Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
-				Session.set 'action_fields', 'distribute_optional_users,distribute_to_self'
-				Meteor.defer ()->
-					$(".creator-edit").click()
+		# edit_field_map:
+		# 	label: "设置归档关系"
+		# 	visible: (object_name, record_id, record_permissions)->
+		# 		if FlowRouter.current().params?.record_id
+		# 			return true && record_permissions["allowEdit"]
+		# 		return false
+		# 	on: "record"
+		# 	todo: (object_name, record_id, fields)->
+		# 		Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
+		# 		Session.set 'action_fields', 'field_map'
+		# 		Meteor.defer ()->
+		# 			$(".creator-edit").click()
+		# edit_distribute:
+		# 	label: "设置分发"
+		# 	visible: (object_name, record_id, record_permissions)->
+		# 		if FlowRouter.current().params?.record_id
+		# 			return true && record_permissions["allowEdit"]
+		# 		return false
+		# 	on: "record"
+		# 	todo: (object_name, record_id, fields)->
+		# 		Session.set 'cmDoc', Creator.getCollection(object_name).findOne(record_id)
+		# 		Session.set 'action_fields', 'distribute_optional_users,distribute_to_self'
+		# 		Meteor.defer ()->
+		# 			$(".creator-edit").click()
 
 		designFlow:
 			label: "流程设计器"
