@@ -65,10 +65,9 @@ Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
 	openWindow: ()->
-		return true # 所有的相关链接 改为弹出新窗口 #735
 		object_name = this.object_name
 		this_object = Creator.getObject(object_name)
-		if this_object?.open_window == true
+		if this_object?.open_window == true || this.reference_to # 所有的相关链接 改为弹出新窗口 #735
 			return true
 		else
 			return false
