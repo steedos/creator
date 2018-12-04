@@ -56,7 +56,7 @@ Creator.Objects.forms =
 
 	list_views:
 		all:
-			label: "全部"
+			label: "所有"
 			filter_scope: "space"
 			filters: [["is_deleted", "=", false]]
 			columns: ["name", "category", "modified", "modified_by", "auto_remind", "state"]
