@@ -51,7 +51,7 @@ Template.creator_table_cell.onRendered ->
 							cellOption = {_id: options.data._id, val: options.data[column], record_val: record, doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true}
 							Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 					return columnItem
-				
+
 				columns = _.compact(columns)
 
 				self.$(".cellGridContainer").dxDataGrid
@@ -65,12 +65,13 @@ Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
 	openWindow: ()->
+		return true # 所有的相关链接 改为弹出新窗口 #735
 		object_name = this.object_name
 		this_object = Creator.getObject(object_name)
 		if this_object?.open_window == true
 			return true
 		else
-			return false 
+			return false
 
 
 	cellData: ()->
@@ -185,7 +186,7 @@ Template.creator_table_cell.helpers
 				data.push {value: val, id: this._id, isImage: true}
 			else
 				data.push {value: val, id: this._id, isImages: true}
-				 
+
 		else
 			if (val instanceof Date)
 				if this.agreement == "odata"
