@@ -59,7 +59,7 @@ Creator.Objects.instances_statistic =
 
 	list_views:
 		all:
-			label: "全部"
+			label: "所有"
 			filter_scope: "space"
 			columns: ["user","year","month",
 			"month_finished_count","inbox_count",
