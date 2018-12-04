@@ -46,12 +46,12 @@ Creator.Objects.flow_positions =
 	list_views:
 		all:
 			filter_scope: "space"
-			columns: ["org","users","company_id"]
+			columns: ["role", "org","users","company_id"]
 			label: "所有"
 
 		company:
 			filter_scope: "company"
-			columns: ["org","users","company_id"]
+			columns: ["role", "org","users","company_id"]
 			label: "本单位"
 
 	permission_set:
