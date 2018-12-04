@@ -22,7 +22,7 @@ Creator.Objects.forms =
 
 		category:
 			type: "lookup"
-			label: "流程分类"
+			label: "表单分类"
 			reference_to: "categories"
 		is_valid:
 			type: "boolean"
