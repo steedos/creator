@@ -13,7 +13,7 @@ Creator.Apps.admin =
 Creator.Menus =  [
     { _id: 'profile', name: 'Profile' },
     { _id: 'profile_password', name: 'Password', template_name: "profile_password", parent: 'profile' },
-    { _id: 'profile_background', name: 'Background', template_name: "profile_background", parent: '2' }
+    { _id: 'profile_background', name: 'Background', template_name: "profile_background", parent: 'profile' }
     { _id: 'users', name: 'Users' },
     { _id: 'users_organizations', name: 'Organizations', object_name: "organizations", parent: 'users' },
     { _id: 'users_users', name: 'Users', object_name: "users", parent: 'users' },
