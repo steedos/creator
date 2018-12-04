@@ -68,12 +68,9 @@
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<div class="row row-main">
-					<div class="column region-main">
-						<div id="creator-quick-form" class="" role="tabpanel">
-							<div class="slds-card slds-card_boundary ">
+						<div id="creator-quick-form" class="slds-show slds-form slds-form_stacked slds-grid slds-page-header__detail-row" role="tabpanel">
+							<div class="">
 							{{#if detail_info_visible}}
 								{{#if showForm}}
 									{{#autoForm collection=collection type="disabled" id="viewRecordForm" schema=schema doc=record}}
@@ -183,6 +180,10 @@
 							{{/if}}
 							</div>
 						</div>
+				</div>
+
+				<div class="row row-main">
+					<div class="column region-main">
 					
 						<div id="creator-tabular" class="">
 							{{#each related_list}}
