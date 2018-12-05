@@ -57,6 +57,13 @@ Template.creatorNavigation.helpers
 
 	isNode: ()->
 		return Steedos.isNode()
+	
+	hideObjects: ()->
+		app = Creator.getApp()
+		if app and app._id == "admin"
+			return true
+		else
+			return false
 
 Template.creatorNavigation.events
 
