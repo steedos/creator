@@ -13,13 +13,7 @@ Creator.Objects.space_user_signs =
 			reference_to: "users"
 			required: true
 			is_name: true
-			beforeOpenFunction: (event, template)->
-				if Session.get("cmDoc")?._id
-					company_id = Creator.odata.get("space_user_signs", Session.get("cmDoc")._id, "company_id")?.company_id
-				else
-					company_id = Creator.getUserCompanyId()
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 
 		sign:
 			type: "avatar"

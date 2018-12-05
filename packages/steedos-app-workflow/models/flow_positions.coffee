@@ -19,10 +19,7 @@ Creator.Objects.flow_positions =
 			reference_to: "users"
 			multiple: true
 			required: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flow_roles", AutoForm.getFormValues().insertDoc.role, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 
 		org:
 			type: "lookup"
@@ -30,10 +27,7 @@ Creator.Objects.flow_positions =
 			reference_to: "organizations"
 			required: true
 			is_name: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flow_roles", AutoForm.getFormValues().insertDoc.role, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 
 		company_id:
 			label: "所属单位"

@@ -163,57 +163,39 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 		"perms.orgs_can_add":
 			label:"授权部门: 新建申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 
 		"perms.users_can_monitor":
 			label:"授权用户: 查看所有申请单"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 		"perms.orgs_can_monitor":
 			label:"授权部门: 查看所有申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 
 		"perms.users_can_admin":
 			label:"授权用户: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 		"perms.orgs_can_admin":
 			label:"授权部门: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 
 		app:
 			label:"所属应用"
@@ -256,10 +238,7 @@ Creator.Objects.flows =
 			multiple: true
 			is_wide: true
 			group: "分发"
-			beforeOpenFunction: (event, template)->
-				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
-				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+			filter_by_company: true
 		distribute_to_self:
 			label:"分发给自己"
 			type: "boolean"
