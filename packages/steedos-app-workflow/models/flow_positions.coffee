@@ -12,6 +12,13 @@ Creator.Objects.flow_positions =
 			label: "岗位"
 			reference_to: "flow_roles"
 			required: true
+			# filtersFunction: (filters, context)->
+			# 	selector = {}
+			# 	companyId = Creator.getUserCompanyId()
+			# 	if companyId
+			# 		selector['company_id'] = companyId
+			# 	return selector
+			filter_by_company: true
 
 		users:
 			type: "lookup"

@@ -96,7 +96,7 @@ Creator.getObjectSchema = (obj) ->
 			if field.beforeOpenFunction
 				fs.beforeOpenFunction = field.beforeOpenFunction
 
-			fs.filtersFunction = Creator.evaluateFilters
+			fs.filtersFunction = if field.filtersFunction then field.filtersFunction else Creator.evaluateFilters
 
 			if field.optionsFunction
 				fs.optionsFunction = field.optionsFunction
@@ -162,7 +162,7 @@ Creator.getObjectSchema = (obj) ->
 
 					else
 						_reference_to = [_reference_to]
-					
+
 					_object = Creator.Objects[_reference_to[0]]
 					if _object and _object.enable_tree
 						fs.autoform.type = "selectTree"
@@ -318,7 +318,7 @@ Creator.getObjectSchema = (obj) ->
 
 		if !field.required
 			fs.optional = true
-		
+
 		if field.unique
 			fs.unique = true
 
