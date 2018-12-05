@@ -25,6 +25,13 @@ Template.creatorLayout.helpers
 	saveAndInsert: ()->
 		return Session.get("action_save_and_insert")
 
+	split: ()->
+		app = Creator.getApp()
+		if app and app._id == "admin"
+			return true
+		else
+			return false
+
 AutoForm.hooks creatorAddForm:
 	onSuccess: (formType, result)->
 		$('#afModal').modal 'hide'

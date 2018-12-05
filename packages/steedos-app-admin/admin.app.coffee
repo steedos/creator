@@ -12,7 +12,7 @@ Creator.Apps.admin =
 
 # Menu 支持两种类型的参数
 # - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
-# - object_name 指向对象, url=/app/admin/{object_name}/
+# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/
 Creator.Menus =  [
 
     { _id: 'account', name: 'Account' },
