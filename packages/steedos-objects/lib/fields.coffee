@@ -89,6 +89,8 @@ Creator.getObjectSchema = (obj) ->
 
 			fs.autoform.filters = field.filters
 
+			fs.autoform.filter_by_company = field.filter_by_company
+
 			fs.autoform.dependOn = field.depend_on
 
 			if field.beforeOpenFunction

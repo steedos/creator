@@ -50,17 +50,29 @@ AutoForm.addInputType("selectorg", {
 
 Template.afSelectOrg.events({
 	'click .selectOrg': function (event, template) {
-		var fieldSchema = AutoForm.getSchemaForField(template.data.name);
-
-		if(_.isFunction(fieldSchema.beforeOpenFunction)){
-			fieldSchema.beforeOpenFunction(event, template)
-		}
-
 		if (Modal.allowMultiple) {
 			return;
 		}
 		if ("disabled" in template.data.atts)
 			return;
+
+		if(template.data.atts.filter_by_company){
+			company_id = db.space_users.findOne({space: Session.get('spaceId'), user: Meteor.userId()}, {fields: {company_id:1}}).company_id
+			event.currentTarget.dataset.rootOrg = company_id
+		}
+
+		try{
+			if (AutoForm.getCurrentDataForForm()){
+				var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+
+				if(_.isFunction(fieldSchema.beforeOpenFunction)){
+					fieldSchema.beforeOpenFunction(event, template)
+				}
+			}
+		}catch(e){
+			console.log('click .selectUser e', e);
+		}
+
 		var dataset = $("input[name='" + template.data.name + "']")[0].dataset;
 
 		//var data = {orgs:WorkflowManager.getSpaceOrganizations()};

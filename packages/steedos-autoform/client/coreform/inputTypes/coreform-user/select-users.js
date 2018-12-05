@@ -129,22 +129,28 @@ Template.afSelectUser.events({
     },
 
     'click .selectUser': function(event, template) {
+		if (Modal.allowMultiple) {
+			return;
+		}
+		if ("disabled" in template.data.atts)
+			return;
+
+		if(template.data.atts.filter_by_company){
+			company_id = db.space_users.findOne({space: Session.get('spaceId'), user: Meteor.userId()}, {fields: {company_id:1}}).company_id
+			event.currentTarget.dataset.rootOrg = company_id
+        }
 
 		try{
-			var fieldSchema = AutoForm.getSchemaForField(template.data.name);
-
-			if(fieldSchema && _.isFunction(fieldSchema.beforeOpenFunction)){
-				fieldSchema.beforeOpenFunction(event, template)
+			if (AutoForm.getCurrentDataForForm()){
+				var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+				if(fieldSchema && _.isFunction(fieldSchema.beforeOpenFunction)){
+					fieldSchema.beforeOpenFunction(event, template)
+				}
 			}
 		}catch(e){
 			console.log('click .selectUser e', e);
 		}
 
-        if (Modal.allowMultiple) {
-            return;
-        }
-        if ("disabled" in template.data.atts)
-            return;
 
         var options = {};
 
