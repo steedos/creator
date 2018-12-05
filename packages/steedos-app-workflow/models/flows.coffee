@@ -256,6 +256,10 @@ Creator.Objects.flows =
 			multiple: true
 			is_wide: true
 			group: "分发"
+			beforeOpenFunction: (event, template)->
+				company_id = Creator.odata.get("flows", Session.get("cmDoc")._id, "company_id")?.company_id
+				if company_id
+					event.currentTarget.dataset.rootOrg = company_id
 		distribute_to_self:
 			label:"分发给自己"
 			type: "boolean"
