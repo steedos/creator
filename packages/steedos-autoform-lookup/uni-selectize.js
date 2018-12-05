@@ -550,6 +550,12 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 	}
 
 	// self.loading.set(true);
+	if (this.template.data.filter_by_company){
+		var companyId = Creator.getUserCompanyId();
+		if (companyId) {
+			searchVal.filterQuery.company_id = companyId;
+		}
+	}
 
 	Meteor.call(methodName, searchVal, function (err, options) {
 		// self.loading.set(false);
