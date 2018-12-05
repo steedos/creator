@@ -1,3 +1,22 @@
-#sidebar-menu{
+#sidebar-menu {
     background: #fff;
+    padding: 16px;
+    .dx-treeview-item {
+        &.dx-selected {
+            // background: #337ab7;
+            background: #1589ee;
+            color: #fff;
+        }
+        &.dx-state-hover {
+            cursor: pointer;
+            animation: bkAnim 0.135s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+        }
+    }
+    .dx-state-focused {
+        &>.dx-treeview-item {
+            // background: #337ab7;
+            background: #1589ee;
+            color: #fff;
+        }
+    }
 }

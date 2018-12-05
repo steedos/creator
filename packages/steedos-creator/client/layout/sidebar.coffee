@@ -9,8 +9,11 @@ Template.creatorSidebar.onRendered ->
 		parentIdExpr: 'parent'
 		keyExpr: '_id'
 		displayExpr: 'name'
-		# width: 300
+		searchEnabled: true
 		onItemClick: (e) ->
+			debugger
+			$('#sidebar-menu .dx-selected').removeClass("dx-selected");
+			e.itemElement.addClass("dx-selected");
 			# - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
 			# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/
 			object_name = e.itemData?.object_name
