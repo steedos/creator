@@ -18,20 +18,20 @@ Creator.Objects.organizations =
 			sortable: true
 
 		fullname:
-			label: "全路径"
+			label: "部门全称"
 			type: "text"
 			omit: true
 			hidden: true
 
 		parent:
-			label: "上级组织"
+			label: "上级部门"
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true
 			index:true
 
 		parents:
-			label: "上级组织"
+			label: "上级部门"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
@@ -39,7 +39,7 @@ Creator.Objects.organizations =
 			hidden: true
 
 		children:
-			label: "下级组织"
+			label: "下级部门"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
@@ -53,7 +53,7 @@ Creator.Objects.organizations =
 			sortable: true
 
 		admins:
-			label: "组织管理员"
+			label: "部门管理员"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
@@ -75,7 +75,7 @@ Creator.Objects.organizations =
 			hidden: true
 
 		is_company:
-			label: "公司"
+			label: "公司级"
 			type: "boolean"
 			index:true
 
