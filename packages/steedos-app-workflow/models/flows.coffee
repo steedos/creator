@@ -257,22 +257,23 @@ Creator.Objects.flows =
 			type: "boolean"
 			group: "高级"
 	list_views:
-		enabled:
-			label: "已启用"
-			filter_scope: "space"
-			filters: [["is_deleted", "=", false], ["state", "=", "enabled"]]
-		disabled:
-			label: "已停用"
-			filter_scope: "space"
-			filters: [["is_deleted", "=", false], ["state", "=", "disabled"]]
+		# enabled:
+		# 	label: "已启用"
+		# 	filter_scope: "space"
+		# 	filters: [["is_deleted", "=", false], ["state", "=", "enabled"]]
+		# disabled:
+		# 	label: "已停用"
+		# 	filter_scope: "space"
+		# 	filters: [["is_deleted", "=", false], ["state", "=", "disabled"]]
 		all:
 			label: "所有"
 			filter_scope: "space"
+			permission_sets: ["admin"]
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
 			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id"]
 		company:
 			filter_scope: "company"
-			columns: ["name", "company_id"]
+			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id"]
 			label: "本单位"
 
 	actions:
