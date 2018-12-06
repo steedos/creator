@@ -10,6 +10,7 @@ Template.creatorSidebar.onRendered ->
 		keyExpr: '_id'
 		displayExpr: 'name'
 		searchEnabled: true
+		expandEvent: "click"
 		onItemClick: (e) ->
 			# - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
 			# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/
