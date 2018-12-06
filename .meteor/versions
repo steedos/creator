@@ -137,7 +137,6 @@ steedos:accounts-phone@0.0.4
 steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.1
-steedos:app-chat@0.0.1
 steedos:app-crm@0.0.1
 steedos:app-workflow@0.0.1
 steedos:application-package@0.0.1
@@ -193,7 +192,6 @@ steedos:oauth2-server@0.0.6
 steedos:object-database@0.0.1
 steedos:objects@0.0.1
 steedos:odata@0.0.1
-steedos:pay@0.0.1
 steedos:qcloud-smsqueue@0.0.2
 steedos:smsqueue@0.0.1
 steedos:sso@0.0.4
@@ -203,7 +201,6 @@ steedos:ui@0.0.1
 steedos:useraccounts-bootstrap@1.14.2_8
 steedos:useraccounts-core@1.14.2_6
 steedos:useraccounts-flow-routing@1.14.2_4
-steedos:vip-card@0.0.1
 steedos:weixin@0.0.1
 steedos:weixin-aes@0.0.1
 steedos:weixin-template-message-queue@0.0.1
