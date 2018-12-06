@@ -30,7 +30,7 @@ Template.creatorLayout.helpers
 		if app and app._id == "admin"
 			return true
 		else
-			return false
+			return Session.get("show_creator_sidebar")
 
 AutoForm.hooks creatorAddForm:
 	onSuccess: (formType, result)->

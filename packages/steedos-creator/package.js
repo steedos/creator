@@ -320,7 +320,9 @@ Package.onUse(function (api) {
 	
 	api.addFiles('client/views/account_password.html', 'client');
 	api.addFiles('client/views/account_password.coffee', 'client');
-	api.addFiles('client/views/account_password.less', 'client');
+	api.addFiles('client/views/account_background.html', 'client');
+	api.addFiles('client/views/account_background.coffee', 'client');
+	api.addFiles('client/views/account_profile.less', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
