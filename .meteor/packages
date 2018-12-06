@@ -146,7 +146,7 @@ steedos:instances-statistics
 steedos:meeting
 
 steedos:weixin
-steedos:pay
+# steedos:pay
 
 steedos:weixin-template-message-queue
 # steedos:mini-web
@@ -156,4 +156,4 @@ steedos:markdown@0.0.1
 
 steedos:application-template
 # steedos:love
-steedos:app-chat
+# steedos:app-chat
