@@ -8,9 +8,10 @@ if Meteor.isServer
 		psetsUser = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1, assigned_apps:1}})
 		psetsMember = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1, assigned_apps:1}})
 		psetsGuest = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1, assigned_apps:1}})
-		psetsCurrent = Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1}}).fetch()
+		psetsCurrent = Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1, name:1}}).fetch()
 		psets = { psetsAdmin, psetsUser, psetsCurrent, psetsMember, psetsGuest }
 		permissions.assigned_apps = Creator.getAssignedApps.bind(psets)(spaceId, userId)
+		permissions.assigned_menus = Creator.getAssignedMenus.bind(psets)(spaceId, userId)
 		_.each Creator.objectsByName, (object, object_name)->
 			if !_.has(object, 'space') || !object.space || object.space == spaceId
 				permissions.objects[object_name] = _.clone Creator.Objects[object_name]
@@ -46,6 +47,23 @@ if Meteor.isServer
 					return
 				apps = _.union apps, pset.assigned_apps
 			return _.without(_.uniq(apps),undefined,null)
+
+	Creator.getAssignedMenus = (spaceId, userId)->
+		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, name:1}}).fetch()
+		if Creator.isSpaceAdmin(spaceId, userId)
+			# 工作区管理员返回空值，表示有全部权限，因为用户至少会有一个菜单，所以可以这么处理
+			return []
+		else
+			currentPsetNames = psets.map (n) ->
+				return n.name
+			menus = Creator.Menus.filter (menu)->
+				psetsMenu = menu.permission_sets
+				# 如果普通用户有权限，则直接返回true
+				if psetsMenu.indexOf("user") > -1
+					return true
+				# 否则取当前用户的权限集与menu菜单要求的权限集对比，如果交集大于1个则返回true
+				return _.intersection(currentPsetNames, psetsMenu).length
+			return menus
 
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
 		permissions = {}
