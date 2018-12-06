@@ -259,6 +259,8 @@ Meteor.startup ->
 
 	$(document).keydown (e) ->
 		if e.keyCode == "13" or e.key == "Enter"
+			if $(".modal").length > 1
+				return;
 			if e.target.tagName != "TEXTAREA" or $(e.target).closest("div").hasClass("bootstrap-tagsinput")
 				if Session.get("cmOperation") == "update"
 					$(".creator-auotform-modals .btn-update").click()
