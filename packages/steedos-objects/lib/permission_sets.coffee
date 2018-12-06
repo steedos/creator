@@ -51,8 +51,8 @@ if Meteor.isServer
 	Creator.getAssignedMenus = (spaceId, userId)->
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, name:1}}).fetch()
 		if Creator.isSpaceAdmin(spaceId, userId)
-			# 工作区管理员返回空值，表示有全部权限，因为用户至少会有一个菜单，所以可以这么处理
-			return []
+			# 工作区管理员有全部菜单功能
+			return Creator.Menus
 		else
 			currentPsetNames = psets.map (n) ->
 				return n.name
