@@ -8,11 +8,6 @@ Creator.Objects.permission_set =
 			type: "text",
 			searchable:true
 			index:true
-		users:
-			label: "用户"
-			type: "lookup"
-			reference_to: "users"
-			multiple: true
 		assigned_apps:
 			label: "授权应用"
 			type: "lookup"
@@ -23,6 +18,13 @@ Creator.Objects.permission_set =
 				_.forEach Creator.Apps, (o, k)->
 					_options.push {label: o.name, value: k, icon: o.icon_slds}
 				return _options
+
+		users:
+			label: "成员"
+			type: "lookup"
+			reference_to: "users"
+			multiple: true
+			is_wide: true
 
 	list_views:
 		all:
