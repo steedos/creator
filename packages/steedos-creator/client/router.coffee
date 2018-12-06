@@ -83,6 +83,7 @@ FlowRouter.route '/app/:app_id',
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		Session.set("app_id", app_id)
+		Session.set("admin_template_name", null)
 		if Steedos.isMobile()
 			Tracker.autorun (c)->
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
