@@ -9,18 +9,3 @@ Creator.Apps.admin =
 		"objects", "permission_set", "permission_shares",
 		"application_package",
 		"queue_import", "OAuth2Clients","OAuth2AccessTokens","categories"]
-
-# Menu 支持两种类型的参数
-# - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
-# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/
-Creator.Menus =  [
-
-    { _id: 'account', name: 'Account', expanded: true },
-    { _id: 'account_password', name: 'Password', template_name: "account_password", parent: 'account' },
-    { _id: 'account_background', name: 'Background', template_name: "account_background", parent: 'account' }
-
-    { _id: 'users', name: 'Users', expanded: true },
-    { _id: 'users_organizations', name: 'Organizations', object_name: "organizations", parent: 'users' },
-    { _id: 'users_users', name: 'Users', object_name: "users", parent: 'users' },
-
-];
