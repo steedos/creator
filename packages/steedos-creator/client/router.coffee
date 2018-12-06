@@ -257,3 +257,12 @@ FlowRouter.route '/app/:app_id/:object_name/calendar/',
 		
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_calendar"
+
+FlowRouter.route '/app/admin/_template/:template_name', 
+	triggersEnter: [ checkUserSigned ],
+	action: (params, queryParams)->
+		if Meteor.userId()
+			template_name = params?.template_name
+			BlazeLayout.render Creator.getLayout(),
+				main: template_name
+

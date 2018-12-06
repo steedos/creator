@@ -317,6 +317,10 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/calendar.html', 'client');
 	api.addFiles('client/views/calendar.coffee', 'client');
 	api.addFiles('client/views/calendar.less', 'client');
+	
+	api.addFiles('client/views/account_password.html', 'client');
+	api.addFiles('client/views/account_password.coffee', 'client');
+	api.addFiles('client/views/account_password.less', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
