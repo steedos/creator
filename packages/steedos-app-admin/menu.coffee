@@ -10,7 +10,7 @@ Creator.Menus =  [
 
     { _id: 'menu_users', name: '用户管理', expanded: true },
     { _id: 'organizations', name: '部门', object_name: "organizations", parent: 'menu_users' },
-    { _id: 'space_users', name: '成员', object_name: "space_users", parent: 'menu_users' },
+    { _id: 'space_users', name: '用户', object_name: "space_users", parent: 'menu_users' },
     { _id: 'permission_set', name: '权限组', object_name: "permission_set", parent: 'menu_users' },
 
     { _id: 'menu_workflow', name: '流程管理', expanded: true },
