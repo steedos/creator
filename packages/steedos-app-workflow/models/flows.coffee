@@ -268,7 +268,6 @@ Creator.Objects.flows =
 		all:
 			label: "所有"
 			filter_scope: "space"
-			permission_sets: ["admin"]
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
 			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id"]
 		company:
@@ -401,6 +400,13 @@ Creator.Objects.flows =
 			modifyAllRecords: false
 			viewAllRecords: true
 		admin:
+			allowCreate: true
+			allowDelete: false
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true
+		workflow_admin:
 			allowCreate: true
 			allowDelete: false
 			allowEdit: true
