@@ -262,8 +262,9 @@ FlowRouter.route '/app/admin/_template/:template_name',
 	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		if Meteor.userId()
-			Session.set("app_id", "admin")
 			template_name = params?.template_name
+			Session.set("app_id", "admin")
+			Session.set("admin_template_name", template_name)
 			BlazeLayout.render Creator.getLayout(),
 				main: template_name
 
