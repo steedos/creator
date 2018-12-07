@@ -28,7 +28,9 @@ Template.creatorLayout.helpers
 	split: ()->
 		app = Creator.getApp()
 		if app and app._id == "admin"
-			return true
+			reg = /\/app\/\w+\/search\//
+			currentPath = Session.get("router-path")
+			return !reg.test(currentPath)
 		else
 			return false
 
