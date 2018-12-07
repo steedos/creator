@@ -6,6 +6,7 @@ Creator.Menus =  [
 
     { _id: 'account', name: '我的账户', permission_sets: ["user"], expanded: false },
     { _id: 'account_avatar', name: '头像', permission_sets: ["user"], template_name: "account_avatar", parent: 'account' },
+    { _id: 'account_setting', name: '账户', permission_sets: ["user"], template_name: "account_setting", parent: 'account' },
     { _id: 'account_password', name: '密码', permission_sets: ["user"], template_name: "account_password", parent: 'account' },
     { _id: 'account_background', name: '背景图', permission_sets: ["user"], template_name: "account_background", parent: 'account' }
 
