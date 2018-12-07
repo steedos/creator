@@ -248,10 +248,10 @@ Creator.getApp = (app_id)->
 	Creator.deps?.app?.depend()
 	return app
 
-Creator.getVisibleApps = ()->
+Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
-		if v.visible != false
+		if v.visible != false or (includeAdmin and v._id == "admin")
 			apps.push v
 	return apps;
 
