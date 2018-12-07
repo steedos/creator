@@ -93,3 +93,15 @@ Creator.Objects.instances_statistic =
 			allowRead: false
 			modifyAllRecords: false
 			viewAllRecords: true
+		workflow_admin:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: false
+			modifyAllRecords: false
+			viewAllRecords: true
+			disabled_list_views: ['all']
+			disabled_actions: []
+			unreadable_fields: []
+			uneditable_fields: []
+			unrelated_objects: []

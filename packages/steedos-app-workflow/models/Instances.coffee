@@ -173,6 +173,18 @@ Creator.Objects.instances =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+		workflow_admin:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+			disabled_list_views: ['all','inbox','outbox']
+			disabled_actions: []
+			unreadable_fields: []
+			uneditable_fields: []
+			unrelated_objects: []
 
 	actions:
 		view_instance:

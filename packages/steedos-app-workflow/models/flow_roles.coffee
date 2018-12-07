@@ -45,6 +45,18 @@ Creator.Objects.flow_roles =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		workflow_admin:
+			allowCreate: true
+			allowDelete: false
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true
+			disabled_list_views: ['all']
+			disabled_actions: []
+			unreadable_fields: []
+			uneditable_fields: []
+			unrelated_objects: []
 
 if Meteor.isClient
 	db.flow_roles._simpleSchema.i18n("flow_roles")

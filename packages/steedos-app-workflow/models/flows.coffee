@@ -413,6 +413,11 @@ Creator.Objects.flows =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+			disabled_list_views: ['all']
+			disabled_actions: []
+			unreadable_fields: []
+			uneditable_fields: []
+			unrelated_objects: []
 
 if Meteor.isClient
 	db.flows._simpleSchema.i18n("flows")
