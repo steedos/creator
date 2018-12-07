@@ -326,6 +326,10 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/account_background.coffee', 'client');
 	api.addFiles('client/views/account_avatar.html', 'client');
 	api.addFiles('client/views/account_avatar.coffee', 'client');
+	api.addFiles('client/views/account_setting.html', 'client');
+	api.addFiles('client/views/account_setting.coffee', 'client');
+	api.addFiles('client/views/account_personal.html', 'client');
+	api.addFiles('client/views/account_personal.coffee', 'client');
 	api.addFiles('client/views/account_profile.less', 'client');
 
 	api.addFiles('client/theme.less', 'client');
