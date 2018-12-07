@@ -62,6 +62,7 @@
 						</div>
 						
 					</div>
+					{{#unless isCalendarView}}
 					<div class="slds-grid">
 						<div class="slds-col slds-align-middle">
 							<p class="slds-text-body_small tabular_info">{{#if recordsTotalCount}}{{_ "creator_list_item_counts" recordsTotalCount}}{{else}}{{_ "creator_list_item_counts" 0}}{{/if}}</p>
@@ -154,13 +155,18 @@
 							</div>
 						</div>
 					</div>
+					{{/unless}}
 				</div>
 				<div class="weui-flex" style="height: 100%;">
 					<div style="width: calc(100% - 30px);" class="slds-grid table-grid-content weui-flex__item">
 						<div class="slds-col slds-no-space">
 							<div class="slds-table tale-content list-table-container td-cell-wrap">
 								{{#if list_view_visible}}
-									{{> Template.dynamic template=list_template data=list_data}}
+									{{#if isCalendarView}}
+										{{> Template.dynamic template='creator_calendarNew' data=list_data}}
+									{{else}}
+										{{> Template.dynamic template=list_template data=list_data}}
+									{{/if}}
 								{{/if}}
 							</div>
 						</div>

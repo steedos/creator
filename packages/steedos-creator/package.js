@@ -213,7 +213,9 @@ Package.onUse(function (api) {
 	api.addFiles('client/mobile/object_list.coffee', 'client');
 	api.addFiles('client/mobile/object_list.less', 'client');
 
-
+	api.addFiles('client/views/calendarNew.less', 'client');
+	api.addFiles('client/views/calendarNew.html', 'client');
+	api.addFiles('client/views/calendarNew.coffee', 'client');
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
