@@ -10,10 +10,12 @@ Creator.Objects.forms =
 			label:"表单"
 			required: true
 			searchable: true
+			readonly: true
 		state:
 			type: "select"
 			label:"表单状态"
 			options: [{label: "启用",value: "enabled"},{label: "停用",value: "disabled"}]
+			readonly: true
 
 		description:
 			type: "textarea"
@@ -24,16 +26,14 @@ Creator.Objects.forms =
 			type: "lookup"
 			label: "表单分类"
 			reference_to: "categories"
+			readonly: true
 		is_valid:
 			type: "boolean"
 			label:"是否有效"
-		current:
-			label:"当前步骤"
-			blackbox: true
-			omit: true
-			hidden: true
+			readonly: true
+
 		historys:
-			label:"签核历程"
+			label:"历史版本"
 			blackbox: true
 			omit: true
 			hidden: true
@@ -53,6 +53,18 @@ Creator.Objects.forms =
 		enable_view_others:
 			type: "boolean"
 			label:"是否查看其它表单"
+
+		current:
+			label:"当前版本"
+			type: 'Object'
+			is_wide: true
+
+		'current.form_script':
+			label: "表单脚本"
+			type: 'textarea'
+		'current.name_forumla':
+			label: "标题公式"
+			type: 'textarea'
 
 	list_views:
 		all:
@@ -78,7 +90,7 @@ Creator.Objects.forms =
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: false
+			modifyAllRecords: true
 			viewAllRecords: true
 		workflow_admin:
 			allowCreate: false
