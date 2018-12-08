@@ -24,7 +24,7 @@ Creator.Objects.instances =
 			hidden: true
 		form:
 			label:"表单"
-			type: "master_detail"
+			type: "lookup"
 			reference_to: "forms"
 			readonly: true
 		form_version:

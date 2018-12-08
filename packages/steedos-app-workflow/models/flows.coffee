@@ -15,7 +15,7 @@ Creator.Objects.flows =
 			readonly: true
 		form:
 			label:"流程表单"
-			type: "master_detail"
+			type: "lookup"
 			reference_to: "forms"
 			readonly: true
 		category:
