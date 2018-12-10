@@ -218,10 +218,8 @@ Template.creator_calendar.onRendered ->
 							_deleteData(data)
 					})
 					return markup;
-					console.log('[dropDownAppointmentTemplate]', data)
 
 				onCellClick: (e) ->
-					console.log('[onCellClick]', e)
 					cellData = e.cellData
 					doc = {
 								start: cellData.startDate
@@ -274,7 +272,6 @@ Template.creator_calendar.onRendered ->
 					dxSchedulerInstance.option("dataSource", _dataSource())
 
 				appointmentTooltipTemplate: (data, container) ->
-					console.log('[appointmentTooltipTemplate]', data, container)
 					markup = getTooltipTemplate(data);
 					markup.find(".edit").dxButton({
 						text: "Edit details",

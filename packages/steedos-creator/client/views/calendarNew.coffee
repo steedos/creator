@@ -28,7 +28,6 @@ _dataSource = (options) ->
 			deserializeDates: false
 			withCredentials: false
 			onLoaded: (a,b,c)->
-				console.log('onLoaded');
 			onLoading: (loadOptions)->
 				startDate = loadOptions.dxScheduler.startDate
 				endDate = loadOptions.dxScheduler.endDate

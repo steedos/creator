@@ -231,9 +231,7 @@ Template.search_result_list.events
 		collection_name = Creator.getObject(objectName).label
 
 		Meteor.call "object_record", Session.get("spaceId"), objectName, this._id, (error, result)->
-			console.log "method: object_record", error, result
 			if result
-				console.log result, "result"
 				Session.set 'cmDoc', result
 				Session.set("action_fields", field)
 				Session.set("action_collection", "Creator.Collections.#{objectName}")
@@ -255,7 +253,6 @@ Template.search_result_list.events
 				search_Keywords.forEach (keyword)->
 					# 特殊字符编码
 					keyword = encodeURIComponent(Creator.convertSpecialCharacter(keyword))
-					console.log "keyword", keyword
 					if filter.length > 0
 						filter.push "or"
 					filter.push [field_name, "contains", keyword]
