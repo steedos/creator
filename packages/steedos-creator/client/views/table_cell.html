@@ -22,6 +22,9 @@
 					{{/if}}
 				{{/if}}
 			{{/each}}
+			{{#if field.extra_field}}
+				<div class="cell-extra-field-container"></div>
+			{{/if}}
 		</div>
 		{{#if showEditIcon}}
 			<button class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small {{#if editable}}table-cell-edit{{/if}}" tabindex="-1" title="Edit">

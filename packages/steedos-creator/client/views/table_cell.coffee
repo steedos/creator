@@ -60,6 +60,13 @@ Template.creator_table_cell.onRendered ->
 					showColumnLines: false
 					showRowLines: true
 					height: "auto"
+		
+		# 显示额外的其他字段
+		extra_field = _field.extra_field
+		if extra_field
+			currentDoc = self.data.doc
+			cellOption = {_id: currentDoc._id, val: currentDoc[extra_field], doc: currentDoc, field: this_object.fields[extra_field], field_name: extra_field, object_name:object_name, hideIcon: true}
+			Blaze.renderWithData Template.creator_table_cell, cellOption, self.$(".cell-extra-field-container")[0]
 
 Template.creator_table_cell.helpers Creator.helpers
 
