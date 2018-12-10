@@ -79,11 +79,15 @@ Creator.Objects.flows =
 			label: "修改时间"
 			type: 'datetime'
 			readonly: true
+			omit: true
+			hidden: true
 		'current.modified_by':
 			label: "修改人"
 			type: "lookup"
 			reference_to: "users"
 			readonly: true
+			omit: true
+			extra_field: 'current.modified'
 		'current.created':
 			label: "创建时间"
 			type: 'datetime'
@@ -96,7 +100,7 @@ Creator.Objects.flows =
 			reference_to: "users"
 			readonly: true
 			omit: true
-			hidden: true
+			extra_field: 'current.created'
 		'current.steps':
 			label: "步骤"
 			type: "grid"

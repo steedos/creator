@@ -48,11 +48,22 @@ Template.creator_view.helpers
 
 	objectField: (fieldKey)->
 		schema = Creator.getObject(Session.get("object_name")).schema
+		name = schema._schema[fieldKey].label
+		schemaFieldKeys = _.map(schema._objectKeys[fieldKey + '.'], (k)->
+			return fieldKey + '.' + k
+		)
+		schemaFieldKeys = schemaFieldKeys.filter (key)->
+			# 子表字段不应该显示hidden字段
+			schemaFieldItem = schema._schema[key]
+			if schemaFieldItem
+				return !(schemaFieldItem.autoform?.type == "hidden")
+			else
+				return false
+
+		fields = Creator.getFieldsForReorder(schema, schemaFieldKeys)
 		return {
-			name: schema._schema[fieldKey].label
-			fields: Creator.getFieldsForReorder(schema, _.map(schema._objectKeys[fieldKey + '.'], (k)->
-				return fieldKey + '.' + k
-			))
+			name: name
+			fields: fields
 		}
 
 	collection: ()->
