@@ -75,7 +75,6 @@ Template.filter_option.helpers
 	filter_item: ()->
 		# filter_item = Template.instance().data?.filter_item
 		filter_item = Template.instance().filter_item?.get()
-		 filter_item
 		return filter_item
 
 	is_show_form: ()->
