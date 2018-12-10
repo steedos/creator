@@ -22,6 +22,9 @@ formatFileSize = (filesize)->
 
 Template.creator_table_cell.onRendered ->
 	self = this
+	if !self.data.is_detail_view
+		# 只有详细界面才需要下面的gird及extra_field逻辑
+		return
 	self.autorun ->
 		_field = self.data.field
 		object_name = self.data.object_name
@@ -48,7 +51,7 @@ Template.creator_table_cell.onRendered ->
 						cellTemplate: (container, options) ->
 							field_name = _field.name + ".$." + column
 							field_name = field_name.replace(/\$\./,"")
-							cellOption = {_id: options.data._id, val: options.data[column], record_val: record, doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true}
+							cellOption = {_id: options.data._id, val: options.data[column], record_val: record, doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true, is_detail_view: true}
 							Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 					return columnItem
 
@@ -65,7 +68,7 @@ Template.creator_table_cell.onRendered ->
 		extra_field = _field.extra_field
 		if extra_field
 			currentDoc = self.data.doc
-			cellOption = {_id: currentDoc._id, val: currentDoc[extra_field], doc: currentDoc, field: this_object.fields[extra_field], field_name: extra_field, object_name:object_name, hideIcon: true}
+			cellOption = {_id: currentDoc._id, val: currentDoc[extra_field], doc: currentDoc, field: this_object.fields[extra_field], field_name: extra_field, object_name:object_name, hideIcon: true, is_detail_view: true}
 			Blaze.renderWithData Template.creator_table_cell, cellOption, self.$(".cell-extra-field-container")[0]
 
 Template.creator_table_cell.helpers Creator.helpers

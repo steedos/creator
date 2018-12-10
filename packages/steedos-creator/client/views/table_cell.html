@@ -22,8 +22,10 @@
 					{{/if}}
 				{{/if}}
 			{{/each}}
-			{{#if field.extra_field}}
-				<div class="cell-extra-field-container"></div>
+			{{#if is_detail_view}}
+				{{#if field.extra_field}}
+					<div class="cell-extra-field-container"></div>
+				{{/if}}
 			{{/if}}
 		</div>
 		{{#if showEditIcon}}
