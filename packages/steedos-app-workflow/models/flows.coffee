@@ -48,7 +48,10 @@ Creator.Objects.flows =
 			sortable: true
 			index:true
 			omit: true
-
+		created_by:
+			label:"创建人"
+		modified_by:
+			label:"修改人"
 		current:
 #			blackbox: true
 #			omit: true
