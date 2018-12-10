@@ -113,7 +113,6 @@ Steedos.Helpers =
 				reason: reason
 
 	handleOpenURL: (url)->
-		console.log("steedos received url: " + url)
 		search = url.split('?')[1]
 		if search
 			urlQuery = (name)->
