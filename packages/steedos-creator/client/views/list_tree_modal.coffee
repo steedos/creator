@@ -54,7 +54,6 @@ Template.list_tree_modal.onRendered ->
 			Session.set('listTreeCompany', data.node.data.filter);
 		else
 			Session.set('listTreeCompany', "-1");
-		console.log("=== set === listTreeCompany ===", Session.get('listTreeCompany'));
 	).jstree
 		core:
 			multiple:false,

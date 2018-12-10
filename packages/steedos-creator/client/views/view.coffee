@@ -278,11 +278,9 @@ Template.creator_view.helpers
 		data.object_name = Session.get("object_name")
 		data.disabled = true
 		data.parent_view = "record_details"
-		console.log data
 		return data
 
 	list_data: (obj) ->
-		console.log obj
 		object_name = Session.get "object_name"
 		related_object_name = obj.object_name
 		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
@@ -290,7 +288,6 @@ Template.creator_view.helpers
 Template.creator_view.events
 
 	'click .record-action-custom': (event, template) ->
-		console.log('click record-action-custom')
 		record = Creator.getObjectRecord()
 		recordId = record._id
 		objectName = Session.get("object_name")

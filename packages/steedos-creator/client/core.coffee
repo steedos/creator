@@ -162,7 +162,6 @@ if Meteor.isClient
 		return selector
 
 	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id, list_view_id)->
-		console.log("getODataRelatedFilter", object_name, related_object_name, record_id, list_view_id)
 		spaceId = Steedos.spaceId()
 		userId = Meteor.userId()
 		related_lists = Creator.getRelatedList(object_name, record_id)
@@ -175,7 +174,6 @@ if Meteor.isClient
 		related_field_name = related_field_name.replace(/\./g, "/")
 		if list_view_id
 			custom_list_view = Creator.getListView(related_object_name, list_view_id)
-			console.log("custom_list_view", custom_list_view, selector)
 			if custom_list_view
 				filter_logic = custom_list_view.filter_logic
 				filter_scope = custom_list_view.filter_scope
@@ -205,11 +203,9 @@ if Meteor.isClient
 								return [obj.field, obj.operation, obj.value]
 							else
 								return obj
-						console.log('filters', filters)
 						filters = Creator.formatFiltersToDev(filters)
 						_.each filters, (filter)->
 							selector.push filter
-		console.log("custom_list_view selector1`1111", selector)
 		if selector.length > 0
 			selector.push "and"
 

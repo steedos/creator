@@ -43,7 +43,6 @@ Template.filter_option.helpers
 					firstOption: ""
 					options: ()->
 						if object_fields[schema_key]
-							console.log "schema_key is:", schema_key
 							return Creator.getFieldOperation(object_fields[schema_key].type)
 						else
 							return Creator.getFieldOperation("text")
@@ -76,13 +75,12 @@ Template.filter_option.helpers
 	filter_item: ()->
 		# filter_item = Template.instance().data?.filter_item
 		filter_item = Template.instance().filter_item?.get()
-		console.log filter_item
+		 filter_item
 		return filter_item
 
 	is_show_form: ()->
 		filter_item = Template.instance().filter_item?.get()
 		schema_key = Template.instance().schema_key?.get()
-		# console.log "filter_item", filter_item
 		if !filter_item.field
 			return true
 		else
@@ -107,7 +105,6 @@ Template.filter_option.helpers
 Template.filter_option.events 
 	'click .save-filter': (event, template) ->
 		filter = AutoForm.getFormValues("filter-option").insertDoc
-		# console.log filter
 		index = this.index
 		filter_items = Session.get("filter_items")
 		filter_items[index] = filter

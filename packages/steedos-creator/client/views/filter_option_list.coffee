@@ -114,7 +114,6 @@ Template.filter_option_list.events
 			i++
 
 		val = arr.join(" AND ")
-		console.log "val", val
 		Session.set("filter_logic", val)
 		
 

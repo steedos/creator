@@ -97,7 +97,6 @@ _actionItems = (object_name, record_id, record_permissions)->
 			if action.only_detail
 				return false
 			if typeof action.visible == "function"
-				console.log "action.visible,function:", object_name, record_id, record_permissions
 				return action.visible(object_name, record_id, record_permissions)
 			else
 				return action.visible
@@ -202,7 +201,6 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	else if !_.isEmpty(list_view_sort)
 		list_view_sort = list_view_sort
 	else
-		console.log("default sort...")
 		#默认读取default view的sort配置
 		list_view_sort = column_default_sort
 	
@@ -301,7 +299,6 @@ Template.creator_grid.onRendered ->
 					filter = Creator.getODataFilter(list_view_id, object_name)
 
 				standardQuery = _standardQuery(object_name)
-				console.log "standardQuery", standardQuery
 				if standardQuery and standardQuery.length
 					if filter
 						filter = [filter, "and", standardQuery]
@@ -398,8 +395,6 @@ Template.creator_grid.onRendered ->
 					headerCellTemplate: (container) ->
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
 					cellTemplate: (container, options) ->
-						# console.log('[container]', container)
-						# console.log('[options]', options)
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 		
 				showColumns.splice 0, 0,
@@ -421,9 +416,6 @@ Template.creator_grid.onRendered ->
 							$("<div>").append(htmlText).appendTo(container)
 			_.every showColumns, (n)->
 				n.sortingMethod = Creator.sortingMethod
-			# console.log "selectColumns", selectColumns
-			console.log "filter", filter
-			# console.log "expand_fields", expand_fields
 			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			if !is_related and localPageSize
 				pageSize = localPageSize
@@ -532,7 +524,6 @@ Template.creator_grid.onRendered ->
 										val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
 										r.values[index] = val
 				onCellClick: (e)->
-					console.log "curObjectName", curObjectName
 					if e.column?.dataField ==  "_id_actions"
 						_itemClick.call(self, e, curObjectName)
 
