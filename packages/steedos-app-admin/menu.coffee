@@ -16,6 +16,7 @@ Creator.Menus =  [
     { _id: 'space_users', name: '用户', permission_sets: ["admin"], object_name: "space_users", parent: 'menu_users' },
     { _id: 'permission_set', name: '权限组', permission_sets: ["admin"], object_name: "permission_set", parent: 'menu_users' },
 
+    # 单位管理员可以创建和设置流程及相关参数。
     { _id: 'menu_workflow', name: '流程管理', permission_sets: ["admin", "workflow_admin"], expanded: false },
     { _id: 'flows', name: '流程', permission_sets: ["admin", "workflow_admin"], object_name: "flows", parent: 'menu_workflow' },
     { _id: 'flow_roles', name: '审批岗位', permission_sets: ["admin", "workflow_admin"], object_name: "flow_roles", parent: 'menu_workflow' },
