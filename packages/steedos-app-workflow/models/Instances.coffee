@@ -24,7 +24,7 @@ Creator.Objects.instances =
 			hidden: true
 		form:
 			label:"表单"
-			type: "master_detail"
+			type: "lookup"
 			reference_to: "forms"
 			readonly: true
 		form_version:
@@ -173,6 +173,18 @@ Creator.Objects.instances =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
+		workflow_admin:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+			disabled_list_views: ['all','inbox','outbox']
+			disabled_actions: []
+			unreadable_fields: []
+			uneditable_fields: []
+			unrelated_objects: []
 
 	actions:
 		view_instance:

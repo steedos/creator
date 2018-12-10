@@ -38,6 +38,8 @@ checkAppPermission = (context, redirect)->
 		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
 			c.stop()
 			app_id = context.params.app_id
+			if app_id == "admin"
+				return
 			apps = _.pluck(Creator.getVisibleApps(),"_id")
 			if apps.indexOf(app_id) < 0
 				Session.set("app_id", null)

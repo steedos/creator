@@ -248,21 +248,21 @@ Creator.getApp = (app_id)->
 	Creator.deps?.app?.depend()
 	return app
 
-Creator.getVisibleApps = ()->
+Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
-		if v.visible != false
+		if v.visible != false or (includeAdmin and v._id == "admin")
 			apps.push v
 	return apps;
 
 Creator.getVisibleAppsObjects = ()->
 	apps = Creator.getVisibleApps()
-	objects = []
-	tempObjects = []
-	#_.forEach apps, (app)->
-	tempObjects = _.filter Creator.Objects, (obj)->
-		return !obj.hidden
-	objects = objects.concat(tempObjects)
+	visibleObjectNames = _.flatten(_.pluck(apps,'objects'))
+	objects = _.filter Creator.Objects, (obj)->
+		if visibleObjectNames.indexOf(obj.name) < 0
+			return false
+		else
+			return !obj.hidden
 	objects = objects.sort(Creator.sortingMethod.bind({key:"label"}))
 	objects = _.pluck(objects,'name')
 	return _.uniq objects

@@ -158,7 +158,10 @@ Creator.odata.delete = (object_name,record_id,callback)->
 				error = jqXHR.responseJSON.error
 				console.error error
 				if error.reason
-		 			toastr?.error?(TAPi18n.__(error.reason))
+					if error.details
+						toastr?.error?(TAPi18n.__(error.reason, error.details))
+					else
+		 				toastr?.error?(TAPi18n.__(error.reason))
 				else if error.message
 					toastr?.error?(TAPi18n.__(error.message))
 				else

@@ -115,6 +115,7 @@
 														{{/with}}
 													{{/if}}
 												{{/each}}
+												{{#if hasUnObjectField this}}
 												<div class="slds-grid view-page-section-row">
 													{{#each this}}
 														{{#unless isObjectField this}}
@@ -135,6 +136,7 @@
 														{{/unless}}
 													{{/each}}
 												</div>
+												{{/if}}
 											{{/each}}
 										{{/if}}
 

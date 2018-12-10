@@ -29,6 +29,17 @@ Template.creator_view.onRendered ->
 Template.creator_view.helpers Creator.helpers
 
 Template.creator_view.helpers
+	hasUnObjectField: (t)->
+		r = false;
+
+		if t && t.length > 0
+			_.find t, (fieldKey)->
+				if !fieldKey
+					return
+				if Creator.getObject(Session.get("object_name")).schema._schema[fieldKey]?.type.name != 'Object'
+					r = true;
+				return true;
+		return r;
 
 	isObjectField: (fieldKey)->
 		if !fieldKey

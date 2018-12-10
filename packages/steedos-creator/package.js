@@ -213,7 +213,9 @@ Package.onUse(function (api) {
 	api.addFiles('client/mobile/object_list.coffee', 'client');
 	api.addFiles('client/mobile/object_list.less', 'client');
 
-
+	api.addFiles('client/views/calendarNew.less', 'client');
+	api.addFiles('client/views/calendarNew.html', 'client');
+	api.addFiles('client/views/calendarNew.coffee', 'client');
 
 	api.addFiles('client/core.coffee', 'client');
 	api.addFiles('client/router.coffee', 'client');
@@ -322,6 +324,12 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/account_password.coffee', 'client');
 	api.addFiles('client/views/account_background.html', 'client');
 	api.addFiles('client/views/account_background.coffee', 'client');
+	api.addFiles('client/views/account_avatar.html', 'client');
+	api.addFiles('client/views/account_avatar.coffee', 'client');
+	api.addFiles('client/views/account_setting.html', 'client');
+	api.addFiles('client/views/account_setting.coffee', 'client');
+	api.addFiles('client/views/account_personal.html', 'client');
+	api.addFiles('client/views/account_personal.coffee', 'client');
 	api.addFiles('client/views/account_profile.less', 'client');
 
 	api.addFiles('client/theme.less', 'client');

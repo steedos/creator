@@ -19,6 +19,10 @@ Template.creator_list_wrapper.helpers Creator.helpers
 
 Template.creator_list_wrapper.helpers
 
+	isCalendarView: ()->
+		view = Creator.getListView(Session.get "object_name", Session.get("list_view_id"))
+		return view.type == 'calendar'
+
 	object_listviews_fields: ()->
 		listview_fields = Creator.getObject("object_listviews").fields
 		field_keys = _.keys(listview_fields)
