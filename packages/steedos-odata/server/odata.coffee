@@ -1,7 +1,192 @@
+#import { Promise } from "meteor/promise";
+
 Meteor.startup ->
 
 	odataV4Mongodb = Npm.require 'odata-v4-mongodb'
 	querystring = Npm.require 'querystring'
+
+	isReferenceField = (object, fk)->
+		fields = object.fields
+		field = fields[fk]
+		rev = false
+		if !["_id", "space"].includes(key) && field?.reference_to && ["lookup", "master_detail"].includes(field?.type)
+			rev = true
+		return rev
+
+	isSearchReferenceFields = (object, queryKeys)->
+		fields = object.fields
+		rev = false
+		_.find queryKeys, (key)->
+			console.log('key', key);
+			field = fields[key]
+			if !["_id", "space"].includes(key) && field?.reference_to && ["lookup", "master_detail"].includes(field?.type)
+				rev = true
+				return true
+			return false
+		return rev
+
+	transformFilters = (filters, rev)->
+		if !rev
+			rev = {}
+
+		if filters.$or
+			_.each filters.$or, (f)->
+				if !_.keys(f).includes('$and') && !_.keys(f).includes('$or')
+					_.extend(rev, f);
+					console.log("transformFilters", f);
+				else
+					transformFilters(f, rev)
+		else if filters.$and
+			_.each filters.$and, (f)->
+				if !_.keys(f).includes('$and') && !_.keys(f).includes('$or')
+					_.extend(rev, f);
+					console.log("transformFilters", f);
+				else
+					transformFilters(f, rev)
+		else
+			rev = filters
+		return rev
+
+	getPipelineMatch = (object, query, spaceId, rev)->
+		if !rev
+			rev = {}
+#		_.each query, (v, k)->
+#			if _.isArray(v)
+##				console.log('v------array--------', v)
+#				getPipelineMatch(object, v, spaceId, match, k)
+#			else
+#				if !_.keys(v).includes('$and') && !_.keys(v).includes('$or')
+#					keys = _.keys(v)
+#					if keys.length ==0
+#						key = keys[0]
+#						if isReferenceField(object, key) && !_.isRegExp(v[key])
+#							match["#{key}._id"] = v
+#
+#					console.log('getPipelineMatch-------', v, k)
+#				else
+#					console.log('v--------------', v,  k)
+#					getPipelineMatch(object, v, spaceId, match[logic], k)
+
+		if query.$or
+			rev["$or"] = []
+			_.each query.$or, (f)->
+				if !_.keys(f).includes('$and') && !_.keys(f).includes('$or')
+					rev["$or"].push f
+					console.log("transformFilters", f);
+				else
+					getPipelineMatch(object, f, spaceId, rev["$or"])
+		else if query.$and
+			rev["$and"] = []
+			_.each query.$and, (f)->
+				if !_.keys(f).includes('$and') && !_.keys(f).includes('$or')
+					rev["$and"].push f
+					console.log("transformFilters", f);
+				else
+					getPipelineMatch(object, f, spaceId, rev["$and"])
+		else
+			rev = query
+		return rev
+
+
+
+
+	superSearch = (object, createQuery, superSearchFilters, options, spaceId)->
+
+		query = createQuery.query
+
+#		console.log('superSearch', createQuery);
+#
+#		console.log('createQuery.includes', createQuery.includes);
+
+		console.log('createQuery.projection', createQuery.projection);
+
+		fields = object.fields
+
+		pipeline = []
+
+		pipelineProject = {}
+
+		pipelineMatchOr = []
+
+		lookup_localFields = []
+
+		console.log('getPipelineMatch', JSON.stringify(getPipelineMatch(object, query, spaceId)));
+
+		console.log("query2", JSON.stringify(query))
+
+		_.each createQuery.includes, (include)->
+			navigationProperty = include.navigationProperty
+			field = fields[navigationProperty]
+#			console.log('include.navigationProperty', navigationProperty)
+#			console.log('include.query', include.query)
+			projection = include.projection
+			console.log('projection', projection);
+			if field?.reference_to && _.isString(field.reference_to) && ["lookup", "master_detail"].includes(field?.type)
+				pipeline.push {
+					$lookup: {
+						from: field.reference_to,
+						localField: navigationProperty,
+						foreignField: "_id",
+						as: navigationProperty
+					}
+				}
+
+				lookup_localFields.push navigationProperty
+
+				pipelineProject["#{navigationProperty}._id"] = 1
+				_.each _.keys(projection), (k)->
+					pipelineProject["#{navigationProperty}.#{k}"] = 1
+
+
+		_.each superSearchFilters, (item, key)->
+			console.log('query item', item, key);
+			if key != 'space'
+				field = fields[key]
+				if field?.reference_to && _.isString(field.reference_to) && ["lookup", "master_detail"].includes(field?.type)
+					reference_to = Creator.getObject(field.reference_to, spaceId)
+					if !_.contains(lookup_localFields, key)
+						pipeline.push {
+							$lookup: {
+								from: field.reference_to,
+								localField: key,
+								foreignField: "_id",
+								as: key
+							}
+						}
+
+						lookup_localFields.push key
+
+						pipelineProject["#{key}._id"] = 1
+						pipelineProject["#{key}.#{reference_to.NAME_FIELD_KEY}"] = 1
+
+					if _.isRegExp(item)
+						pipelineMatchOr.push {"#{key}.#{reference_to.NAME_FIELD_KEY}": item}
+					else
+						pipelineMatchOr.push {"#{key}._id": item}
+
+
+					console.log('pipelineMatchOr', pipelineMatchOr);
+
+		console.log('pipeline', pipeline);
+		console.log('pipelineProject', pipelineProject);
+		console.log('pipelineMatchOr', pipelineMatchOr);
+
+		pipeline.push {$project: pipelineProject}
+
+		pipeline.push {$match: {$or: pipelineMatchOr}}
+
+		console.log('object._collection_name', object._collection_name)
+
+		rawCollection = Creator.Collections[object._collection_name].rawCollection()
+
+		console.log('pipeline', JSON.stringify(pipeline))
+
+		records = Promise.await(rawCollection.aggregate(pipeline).toArray());
+		console.log('records', records?.length);
+
+		return records;
+
+
 
 	visitorParser = (visitor)->
 		parsedOpt = {}
@@ -148,7 +333,13 @@ Meteor.startup ->
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				if permissions.viewAllRecords or (permissions.allowRead and @userId)
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
+					console.log("qs", qs)
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
+					superSearchFilters = transformFilters(createQuery.query)
+					console.log("createQuery", createQuery)
+					console.log("createQuery.query", JSON.stringify(createQuery.query))
+					console.log('odataV4Mongodb.createFilter', superSearchFilters)
+					console.log("key", key)
 					if key is 'cfs.files.filerecord'
 						createQuery.query['metadata.space'] = spaceId
 					else if key is 'spaces'
@@ -221,27 +412,41 @@ Meteor.startup ->
 						else
 							createQuery.query.owner = @userId
 					entities = []
-					if @queryParams.$top isnt '0'
-						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
-					scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
-					if entities
-						dealWithExpand(createQuery, entities, key, spaceId)
-						#scannedCount = entities.length
+					console.log('createQuery.query keys', _.keys(superSearchFilters));
+					if isSearchReferenceFields object, _.keys(superSearchFilters)
+						entities = superSearch(object, createQuery, superSearchFilters, visitorParser(createQuery))
+						console.log('isSearchReferenceFields', true)
 						body = {}
 						headers = {}
 						body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key)
-					#	body['@odata.nextLink'] = SteedosOData.getODataNextLinkPath(spaceId,key)+"?%24skip="+ 10
-						body['@odata.count'] = scannedCount
-						entities_OdataProperties = setOdataProperty(entities,spaceId, key)
+						body['@odata.count'] = 7
+						entities_OdataProperties = setOdataProperty(entities, spaceId, key)
 						body['value'] = entities_OdataProperties
 						headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
 						headers['OData-Version'] = SteedosOData.VERSION
-						{body: body, headers: headers}
+						return {body: body, headers: headers}
 					else
-						return{
-							statusCode: 404
-							body: setErrorMessage(404,collection,key)
-						}
+						if @queryParams.$top isnt '0'
+							entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
+						scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
+						if entities
+							dealWithExpand(createQuery, entities, key, spaceId)
+							#scannedCount = entities.length
+							body = {}
+							headers = {}
+							body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key)
+						#	body['@odata.nextLink'] = SteedosOData.getODataNextLinkPath(spaceId,key)+"?%24skip="+ 10
+							body['@odata.count'] = scannedCount
+							entities_OdataProperties = setOdataProperty(entities,spaceId, key)
+							body['value'] = entities_OdataProperties
+							headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
+							headers['OData-Version'] = SteedosOData.VERSION
+							{body: body, headers: headers}
+						else
+							return{
+								statusCode: 404
+								body: setErrorMessage(404,collection,key)
+							}
 				else
 					return{
 						statusCode: 403

@@ -1,4 +1,5 @@
 _standardQuery = (curObjectName)->
+	console.log('_standardQuery', curObjectName);
 	standard_query = Session.get("standard_query")
 	object_fields = Creator.getObject(curObjectName).fields
 	if !standard_query or !standard_query.query or !_.size(standard_query.query) or standard_query.object_name != curObjectName
@@ -10,13 +11,20 @@ _standardQuery = (curObjectName)->
 		query_arr = []
 		if standard_query.is_mini
 			_.each query, (val, key)->
-				if object_fields[key]
-					if ["currency", "number"].includes(object_fields[key].type)
+				_field = object_fields[key]
+				if _field
+					if ["currency", "number"].includes(_field.type)
 						query_arr.push([key, "=", val])
-					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
+					else if ["text", "textarea", "html", "select"].includes(_field.type)
 						vals = val.trim().split(" ")
 						vals.forEach (val_item)->
 							# 特殊字符编码
+							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+							query_arr.push([key, "contains", val_item])
+					else if ["lookup", "master_detail"].includes(_field.type)
+						if _field.reference_to && _.isString(_field.reference_to)
+							vals = val.trim().split(" ")
+						vals.forEach (val_item)->
 							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
 							query_arr.push([key, "contains", val_item])
 		else

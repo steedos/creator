@@ -19,6 +19,7 @@ Creator.Objects.flow_positions =
 			# 		selector['company_id'] = companyId
 			# 	return selector
 			filter_by_company: true
+			searchable:true
 
 		users:
 			type: "lookup"
@@ -27,6 +28,7 @@ Creator.Objects.flow_positions =
 			multiple: true
 			required: true
 			filter_by_company: true
+			searchable:true
 
 		org:
 			type: "lookup"
@@ -35,6 +37,7 @@ Creator.Objects.flow_positions =
 			required: true
 			is_name: true
 			filter_by_company: true
+			searchable:true
 
 		company_id:
 			label: "所属单位"
@@ -43,6 +46,7 @@ Creator.Objects.flow_positions =
 			sortable: true
 			index:true
 			omit: true
+			searchable:true
 
 	list_views:
 		all:
