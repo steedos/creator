@@ -20,7 +20,7 @@ Creator.Objects.flows =
 			readonly: true
 		category:
 			label: '流程分类'
-			type: "master_detail",
+			type: "lookup"
 			reference_to: "categories"
 		state:
 			label:"流程状态"
