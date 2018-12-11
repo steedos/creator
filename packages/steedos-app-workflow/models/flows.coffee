@@ -47,7 +47,7 @@ Creator.Objects.flows =
 			reference_to: "organizations"
 			sortable: true
 			index:true
-			omit: true
+			is_company_only: true
 		created_by:
 			label:"创建人"
 		modified_by:

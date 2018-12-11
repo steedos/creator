@@ -2,6 +2,7 @@ renderTree = (container, isSelf)->
 	templateData = Template.instance().data
 	spaceId = templateData.spaceId
 	rootOrg = templateData.rootOrg
+	showCompanyOnly = templateData.showCompanyOnly
 	CFDataManager.setOrganizationModalValue(CFDataManager.getFormulaOrganizations(templateData.defaultValues, spaceId));
 	$.jstree.defaults.checkbox.three_state = false;
 	plugins = ["wholerow", "conditionalselect"];
@@ -9,7 +10,7 @@ renderTree = (container, isSelf)->
 	if templateData.multiple
 		plugins.push("checkbox");
 	$(container).on('select_node.jstree', (e, data) ->
-# 选中组织时把另一个组织的同一节点也选中
+		# 选中组织时把另一个组织的同一节点也选中
 		if(container == "#cf_organizations_tree_self")
 			targetTree = $("#cf_organizations_tree").jstree()
 		else
@@ -18,7 +19,7 @@ renderTree = (container, isSelf)->
 		if currentNode
 			targetTree.select_node? currentNode
 	).on('deselect_node.jstree', (e, data) ->
-# 删除选中组织时把另一个组织的同一节点也删除
+		# 删除选中组织时把另一个组织的同一节点也删除
 		if(container == "#cf_organizations_tree_self")
 			targetTree = $("#cf_organizations_tree").jstree()
 		else
@@ -37,8 +38,8 @@ renderTree = (container, isSelf)->
 		core:
 			themes: {"stripes": true},
 			data: (node, cb) ->
-# Session.set("cf_selectOrgId", node.id);
-				cb(CFDataManager.getNode(spaceId, node, {isSelf: isSelf, rootOrg: rootOrg}));
+				# Session.set("cf_selectOrgId", node.id);
+				cb(CFDataManager.getNode(spaceId, node, {isSelf: isSelf, rootOrg: rootOrg, showCompanyOnly: showCompanyOnly}));
 			three_state: false
 		conditionalselect: (node) ->
 			return Template.cf_organization.conditionalselect(node);
@@ -68,7 +69,10 @@ Template.cf_organization.conditionalselect = (node)->
 
 
 Template.cf_organization.onRendered ->
-	renderTree "#cf_organizations_tree_self", true
+	templateData = Template.instance().data
+	showCompanyOnly = templateData.showCompanyOnly
+	unless showCompanyOnly
+		renderTree "#cf_organizations_tree_self", true
 	renderTree "#cf_organizations_tree", false
 
 Template.cf_organization.events

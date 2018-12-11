@@ -139,6 +139,7 @@ Creator.getObjectSchema = (obj) ->
 					fs.autoform.type = "selectuser"
 				else if field.reference_to == "organizations"
 					fs.autoform.type = "selectorg"
+					fs.autoform.is_company_only = field.is_company_only
 				else
 					if typeof(field.reference_to) == "function"
 						_reference_to = field.reference_to()

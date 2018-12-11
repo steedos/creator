@@ -17,7 +17,7 @@ Creator.Objects.flow_roles =
 			reference_to: "organizations"
 			sortable: true
 			index:true
-			omit: true
+			is_company_only: true
 
 	list_views:
 		all:

@@ -6,8 +6,9 @@ CFDataManager = {};
 /*
 * options: {
 * isSelf: 用于生成另外一个树, 用户主部门
-* isNeedtoSelDefault:
+* isNeedtoSelDefault: 是否默认选中展开的节点， 因为有两棵树， 用户主部门那棵树不应该默认选中
 * rootOrg: 允许支持组织树上的根节点, 值为organization _id
+* showCompanyOnly: 是否只显示公司级别的部门
 * }
 * */
 //TODO: 选人,选组控件中应该去掉 通讯录的权限限制功能
@@ -18,6 +19,9 @@ CFDataManager.getNode = function (spaceId, node, options) {
 		selfOrganization = Steedos.selfOrganization();
 		//第一棵树: 只显示本部
 		if(options.isSelf){
+			if (options.showCompanyOnly) {
+				console.error("选组控件showCompanyOnly为true时，不应该加载本部组织")
+			}
 			if(selfOrganization){
 				orgs = [selfOrganization];
 				orgs[0].open = true;
@@ -93,13 +97,14 @@ CFDataManager.getNode = function (spaceId, node, options) {
 
 	}
 	else{
-		orgs = CFDataManager.getChild(spaceId || node.data.spaceId, node.id);
+		orgs = CFDataManager.getChild(spaceId || node.data.spaceId, node.id, options);
 	}
-	return handerOrg(orgs, node.id, options.isNeedtoSelDefault);
+	return handerOrg(orgs, node.id, options);
 }
 
 
-function handerOrg(orgs, parentId, isNeedtoSelDefault) {
+function handerOrg(orgs, parentId, options) {
+	var isNeedtoSelDefault = options.isNeedtoSelDefault;
 	var selfOrganization = Steedos.selfOrganization();
 	var nodes = new Array();
 	orgs.forEach(function (org) {
@@ -443,12 +448,15 @@ CFDataManager.getOrganizationsByIds = function(ids) {
 	return childs;
 }
 
-CFDataManager.getChild = function (spaceId, parentId) {
+CFDataManager.getChild = function (spaceId, parentId, options) {
 
 	var query = {
 		parent: parentId,
 		space: spaceId
 	};
+	if (options && options.showCompanyOnly) {
+		query.is_company = true
+	}
 
 	if(!Steedos.isSpaceAdmin()){
 		query.hidden = {$ne: true}

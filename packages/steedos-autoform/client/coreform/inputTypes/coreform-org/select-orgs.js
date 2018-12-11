@@ -106,6 +106,10 @@ Template.afSelectOrg.events({
 			options.rootOrg = dataset.rootOrg
 		}
 
+		if(template.data.atts.is_company_only){
+			options.showCompanyOnly = true
+		}
+		
 		Modal.allowMultiple = true;
 		Modal.show("cf_organization_modal", options);
 		
