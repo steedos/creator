@@ -80,7 +80,7 @@ Creator.Objects.flow_positions =
 			disabled_list_views: ['all']
 			disabled_actions: []
 			unreadable_fields: []
-			uneditable_fields: []
+			uneditable_fields: ['company_id']
 			unrelated_objects: []
 
 if Meteor.isClient

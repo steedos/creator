@@ -63,7 +63,7 @@ Creator.Objects.space_user_signs =
 			disabled_list_views: ['all']
 			disabled_actions: []
 			unreadable_fields: []
-			uneditable_fields: []
+			uneditable_fields: ['company_id']
 			unrelated_objects: []
 
 if Meteor.isClient
