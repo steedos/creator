@@ -76,6 +76,16 @@ Creator.Objects.forms =
 			filter_scope: "company"
 			columns: ["name"]
 			label: "本单位"
+	actions:
+		standard_new:
+			visible: false
+			on: "list"
+		standard_edit:
+			visible: false
+			on: "record"
+		standard_delete:
+			visible: false
+			on: "record_more"
 
 	permission_set:
 		user:
