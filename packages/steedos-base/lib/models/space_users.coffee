@@ -59,12 +59,11 @@ Creator.Objects.space_users =
 			omit: true
 			hidden: true
 		company_id:
-			label: "所属公司"
+			label: "所属单位"
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true
 			index:true
-			hidden: true
 		user_accepted:
 			type: "boolean"
 			label:'有效'
@@ -91,7 +90,7 @@ Creator.Objects.space_users =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "organization","position", "mobile", "email", "sort_no"]
+			columns: ["name", "position", "mobile", "email", "sort_no", "company_id"]
 			filter_scope: "space"	
 	
 	permission_set:
