@@ -58,13 +58,16 @@ Creator.Objects.forms =
 			label:"当前版本"
 			type: 'Object'
 			is_wide: true
+			readonly: true
 
 		'current.form_script':
 			label: "表单脚本"
 			type: 'textarea'
+			readonly: true
 		'current.name_forumla':
 			label: "标题公式"
 			type: 'textarea'
+			readonly: true
 
 	list_views:
 		all:
