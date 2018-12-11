@@ -29,6 +29,12 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "[text]" or field.type == "[phone]"
 			fs.type = [String]
 			fs.autoform.type = "tags"
+		else if field.type == 'code'
+			fs.type = String
+			fs.autoform.type = "textarea"
+			fs.autoform.rows = field.rows || 3
+			if field.language
+				fs.autoform.language = field.language
 		else if field.type == "textarea"
 			fs.type = String
 			fs.autoform.type = "textarea"

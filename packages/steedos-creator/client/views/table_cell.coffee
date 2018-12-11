@@ -200,7 +200,12 @@ Template.creator_table_cell.helpers
 				data.push {value: val, id: this._id, isImage: true}
 			else
 				data.push {value: val, id: this._id, isImages: true}
-
+		else if _field.type == "code"
+			if val
+				val = '...'
+			else
+				val = ''
+			data.push {value: val, id: this._id}
 		else
 			if (val instanceof Date)
 				if this.agreement == "odata"

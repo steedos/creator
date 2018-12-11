@@ -216,13 +216,15 @@ Creator.Objects.flows =
 			hidden: true
 		instance_template:
 			label:"表单模板"
-			type: "textarea"
+			type: "code",
+			language: "handlebars",
 			is_wide: true
 			rows: 6
 			group: "模板"
 		print_template:
 			label:"打印模板"
-			type: "textarea"
+			type: "code",
+			language: "handlebars",
 			rows: 6
 			is_wide: true
 			group: "模板"
