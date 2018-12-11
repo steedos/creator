@@ -59,6 +59,7 @@ _dataSource = () ->
 						error.message = t "creator_odata_unexpected_character"
 				toastr.error(error.message)
 		expand: ["owner($select=name)"]
+
 	}
 	return dataSource
 
@@ -130,7 +131,7 @@ Template.creator_calendar.onRendered ->
 				}, {
 					type:"week",
 					maxAppointmentsPerCell:"unlimited"
-				}, "month"]
+				}, "month", "agenda"]
 				currentView: "day"
 				currentDate: new Date()
 				firstDayOfWeek: 1
