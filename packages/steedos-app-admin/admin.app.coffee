@@ -6,6 +6,4 @@ Creator.Apps.admin =
 	icon_slds: "custom"
 	is_creator:true
 	objects: ["organizations", "space_users", "apps",
-		"objects", "permission_set", "permission_shares",
-		"application_package",
-		"queue_import", "OAuth2Clients","OAuth2AccessTokens","categories"]
+		"objects", "permission_set"]

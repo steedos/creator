@@ -13,6 +13,10 @@
 	height: 34px;
 }
 
+.dx-treeview {
+	font-size: 13px;
+}
+
 .dx-datagrid .dx-row > td {
 	font-size: 13px;
 }
