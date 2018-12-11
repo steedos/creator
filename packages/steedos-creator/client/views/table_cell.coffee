@@ -53,7 +53,6 @@ Template.creator_table_cell.onRendered ->
 					return columnItem
 
 				columns = _.compact(columns)
-
 				self.$(".cellGridContainer").dxDataGrid
 					dataSource: val,
 					columns: columns
@@ -64,16 +63,18 @@ Template.creator_table_cell.onRendered ->
 		# 显示额外的其他字段
 		extra_field = _field.extra_field
 		if extra_field and self.data.is_detail_view
-			currentDoc = self.data.doc
-			if extra_field.indexOf(".") > 0
-				# 子表字段取值
-				extraKeys = extra_field.split(".")
-				extraFirstLevelValue = currentDoc[extraKeys[0]]
-				extraVal = extraFirstLevelValue[extraKeys[1]]
-			else
-				extraVal = currentDoc[extra_field]
-			cellOption = {_id: currentDoc._id, val: extraVal, doc: currentDoc, field: this_object.fields[extra_field], field_name: extra_field, object_name:object_name, hideIcon: true, is_detail_view: true}
-			Blaze.renderWithData Template.creator_table_cell, cellOption, self.$(".cell-extra-field-container")[0]
+			extraContainer = self.$(".cell-extra-field-container")
+			unless extraContainer.find(".creator_table_cell").length
+				currentDoc = self.data.doc
+				if extra_field.indexOf(".") > 0
+					# 子表字段取值
+					extraKeys = extra_field.split(".")
+					extraFirstLevelValue = currentDoc[extraKeys[0]]
+					extraVal = extraFirstLevelValue[extraKeys[1]]
+				else
+					extraVal = currentDoc[extra_field]
+				cellOption = {_id: currentDoc._id, val: extraVal, doc: currentDoc, field: this_object.fields[extra_field], field_name: extra_field, object_name:object_name, hideIcon: true, is_detail_view: true}
+				Blaze.renderWithData Template.creator_table_cell, cellOption, extraContainer[0]
 
 Template.creator_table_cell.helpers Creator.helpers
 
