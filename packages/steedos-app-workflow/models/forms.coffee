@@ -58,13 +58,16 @@ Creator.Objects.forms =
 			label:"当前版本"
 			type: 'Object'
 			is_wide: true
+			readonly: true
 
 		'current.form_script':
 			label: "表单脚本"
 			type: 'textarea'
+			readonly: true
 		'current.name_forumla':
 			label: "标题公式"
 			type: 'textarea'
+			readonly: true
 
 	list_views:
 		all:
@@ -76,6 +79,16 @@ Creator.Objects.forms =
 			filter_scope: "company"
 			columns: ["name"]
 			label: "本单位"
+	actions:
+		standard_new:
+			visible: false
+			on: "list"
+		standard_edit:
+			visible: false
+			on: "record"
+		standard_delete:
+			visible: false
+			on: "record_more"
 
 	permission_set:
 		user:
