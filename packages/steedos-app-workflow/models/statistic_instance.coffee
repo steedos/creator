@@ -56,6 +56,8 @@ Creator.Objects.instances_statistic =
 			sortable: true
 			index:true
 			is_company_only: true
+			defaultValue: ()->
+				return Session.get("user_company_id")
 
 	list_views:
 		all:
@@ -103,5 +105,5 @@ Creator.Objects.instances_statistic =
 			disabled_list_views: ['all']
 			disabled_actions: []
 			unreadable_fields: []
-			uneditable_fields: ['company_id']
+			uneditable_fields: []
 			unrelated_objects: []

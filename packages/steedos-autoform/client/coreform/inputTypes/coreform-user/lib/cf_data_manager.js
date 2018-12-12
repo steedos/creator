@@ -14,13 +14,20 @@ CFDataManager = {};
 //TODO: 选人,选组控件中应该去掉 通讯录的权限限制功能
 CFDataManager.getNode = function (spaceId, node, options) {
 	var orgs,
-		myContactsLimit = Steedos.my_contacts_limit;
+		myContactsLimit = Steedos.my_contacts_limit,
+		isCompanyOnly = options && options.showCompanyOnly;
+	
+	if (isCompanyOnly) {
+		// 只显示单位时，不考虑通讯录的权限限制功能逻辑
+		myContactsLimit = null;
+	}
 	if (node.id == '#') {
-		selfOrganization = Steedos.selfOrganization();
+		var selfOrganization = Steedos.selfOrganization();
 		//第一棵树: 只显示本部
 		if(options.isSelf){
-			if (options.showCompanyOnly) {
+			if (isCompanyOnly) {
 				console.error("选组控件showCompanyOnly为true时，不应该加载本部组织")
+				return
 			}
 			if(selfOrganization){
 				orgs = [selfOrganization];
@@ -79,17 +86,20 @@ CFDataManager.getNode = function (spaceId, node, options) {
 					}
 				}
 			} else {
-				orgs = CFDataManager.getRoot(spaceId);
-				// 当没有限制查看本部门的时候，主部门与根节点相同时只显示主部门而不显示根组织
-				if(selfOrganization && selfOrganization._id == orgs[0]._id){
-					orgs = []
-				}
-				else{
-					orgs[0].open = true;
-					orgs[0].select = true;
-					// 有主要部门的时候不应该再选中根节点
-					if (selfOrganization) {
-						orgs[0].select = false;
+				orgs = CFDataManager.getRoot(spaceId, options);
+				if(orgs.length){
+					// 当没有限制查看本部门的时候，主部门与根节点相同时只显示主部门而不显示根组织
+					// showCompanyOnly为true时，不加载selfOrganization
+					if(!isCompanyOnly && selfOrganization && selfOrganization._id == orgs[0]._id){
+						orgs = []
+					}
+					else{
+						orgs[0].open = true;
+						orgs[0].select = true;
+						// 有主要部门的时候不应该再选中根节点
+						if (selfOrganization) {
+							orgs[0].select = false;
+						}
 					}
 				}
 			}
@@ -395,7 +405,7 @@ CFDataManager.handerOrganizationModalValueLabel = function () {
 }
 
 
-CFDataManager.getRoot = function (spaceId) {
+CFDataManager.getRoot = function (spaceId, options) {
 
 	var query = {is_company: true, parent: null}
 
@@ -405,6 +415,12 @@ CFDataManager.getRoot = function (spaceId) {
 		user_spaces = db.spaces.find().fetch().getProperty("_id")
 
 		query.space = {$in: user_spaces}
+	}
+
+	var isCompanyOnly = options && options.showCompanyOnly
+	if(isCompanyOnly){
+		query._id = Session.get("user_company_id");
+		delete query.parent
 	}
 
 	return SteedosDataManager.organizationRemote.find(query, {
@@ -454,12 +470,18 @@ CFDataManager.getChild = function (spaceId, parentId, options) {
 		parent: parentId,
 		space: spaceId
 	};
-	if (options && options.showCompanyOnly) {
-		query.is_company = true
+	var isCompanyOnly = options && options.showCompanyOnly
+	if (isCompanyOnly) {
+		query.is_company = true;
 	}
 
-	if(!Steedos.isSpaceAdmin()){
-		query.hidden = {$ne: true}
+	if (!Steedos.isSpaceAdmin()) {
+		query.hidden = {
+			$ne: true
+		};
+		if (isCompanyOnly) {
+			query._id = Session.get("user_company_id");
+		}
 	}
 
 	var childs = SteedosDataManager.organizationRemote.find(query, {

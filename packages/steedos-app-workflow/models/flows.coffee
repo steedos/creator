@@ -50,6 +50,8 @@ Creator.Objects.flows =
 			sortable: true
 			index:true
 			is_company_only: true
+			defaultValue: ()->
+				return Session.get("user_company_id")
 		created_by:
 			label:"创建人"
 		modified_by:
@@ -433,7 +435,7 @@ Creator.Objects.flows =
 			disabled_list_views: ['all']
 			disabled_actions: []
 			unreadable_fields: []
-			uneditable_fields: ['company_id']
+			uneditable_fields: []
 			unrelated_objects: []
 
 if Meteor.isClient
@@ -449,10 +451,6 @@ if Meteor.isServer
 
 		doc.created_by = userId
 		doc.created = new Date()
-
-		su = db.space_users.findOne({space: doc.space, user: userId}, {fields: {company_id: 1}})
-		if su && su.company_id
-			doc.company_id = su.company_id
 
 	db.flows.after.update (userId, doc, fieldNames, modifier, options) ->
 		if doc.category != this.previous.category
