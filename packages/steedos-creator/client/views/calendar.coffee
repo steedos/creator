@@ -24,7 +24,7 @@ _insertData = () ->
 
 _deleteData = (data) ->
 	action = {
-		name: "standard_delete", 
+		name: "standard_delete",
 		todo: "standard_delete"
 	}
 	action_record_title = data.name
@@ -37,12 +37,23 @@ _deleteData = (data) ->
 _dataSource = () ->
 	url = "/api/odata/v4/#{Steedos.spaceId()}/#{Session.get('object_name')}"
 	dataSource = {
-		store: 
+		store:
 			type: "odata"
 			version: 4
 			url: Steedos.absoluteUrl(url)
 			deserializeDates: false
 			withCredentials: false
+			onLoading: (loadOptions)->
+				startDate = loadOptions.dxScheduler.startDate
+				endDate = loadOptions.dxScheduler.endDate
+				_f = [
+					[[ 'end', ">=", startDate], 'and', [ 'start', "<=", endDate]]
+				]
+
+				if loadOptions.filter && _.isArray(loadOptions.filter)
+					loadOptions.filter = [loadOptions.filter, 'and', _f]
+				else
+					loadOptions.filter = _f
 			beforeSend: (request) ->
 				request.headers['X-User-Id'] = Meteor.userId()
 				request.headers['X-Space-Id'] = Steedos.spaceId()
@@ -66,7 +77,7 @@ _dataSource = () ->
 getAppointmentColor = (room) ->
 	result = Creator.odata.get('meetingroom',room,'color')
 	return result.color
-	
+
 getRoomAdmin = (room) ->
 	result = Creator.odata.get('meetingroom',room,'admins')
 	return result?.admins || []
@@ -146,7 +157,7 @@ Template.creator_calendar.onRendered ->
 				# groups: ["room"]
 				crossScrollingEnabled: true
 				cellDuration: 30
-				editing: { 
+				editing: {
 					allowAdding: false,
 					allowDragging: true,
 					allowResizing: true,
@@ -158,7 +169,7 @@ Template.creator_calendar.onRendered ->
 					displayExpr: "name"
 					label: "会议室"
 					dataSource: {
-						store: 
+						store:
 							type: "odata"
 							version: 4
 							url: Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/meetingroom?$orderby=name"
@@ -198,7 +209,7 @@ Template.creator_calendar.onRendered ->
 						e.cancel = true
 
 				onAppointmentDblClick: (e) ->
-					e.cancel = true	
+					e.cancel = true
 
 				dropDownAppointmentTemplate: (data, index, container) ->
 					if Steedos.isSpaceAdmin() || data.owner._id == Meteor.userId()
@@ -213,7 +224,7 @@ Template.creator_calendar.onRendered ->
 						onClick: () ->
 							_editData(data)
 					});
-					
+
 					markup.find(".delete").dxButton({
 						onClick: () ->
 							_deleteData(data)
@@ -306,10 +317,10 @@ Template.creator_calendar.helpers
 	list_views: ()->
 		Session.get("change_list_views")
 		return Creator.getListViews()
-	
+
 	list_view_label: (item)->
 		if item
-			return item.label || item.name 
+			return item.label || item.name
 		else
 			return ""
 
@@ -318,11 +329,11 @@ Template.creator_calendar.helpers
 			list_view_id = String(list_view._id)
 		else
 			list_view_id = String(list_view.name)
-		
+
 		app_id = Session.get("app_id")
 		object_name = Session.get("object_name")
 		return Creator.getListViewUrl(object_name, app_id, list_view_id)
 
-Template.creator_calendar.events 
+Template.creator_calendar.events
 	"click .list-action-custom": (event, template) ->
 		_insertData()
