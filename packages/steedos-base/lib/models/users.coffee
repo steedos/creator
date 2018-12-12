@@ -6,8 +6,6 @@ db.users.allow
 		if userId == doc._id
 			return true
 
-db.users._simpleSchema = new SimpleSchema
-
 Creator.Objects.users =
 	name: "users"
 	label: "用户"
@@ -30,7 +28,6 @@ Creator.Objects.users =
 			required: true
 			searchable:true
 			index:true
-			group:'-'
 
 		company:
 			type: "text"
@@ -189,9 +186,9 @@ Creator.Objects.users =
 			unique: true
 			readonly: true
 			omit: true
-			hidden:true
 
 		locale:
+			label: "语言"
 			type: "select"
 			allowedValues: [
 				"en-us",
@@ -206,9 +203,8 @@ Creator.Objects.users =
 			}]
 
 		email_notification:
+			label: "接收邮件通知"
 			type: "boolean"
-			omit: true
-			hidden:true
 
 		primary_email_verified:
 			type: "boolean"
@@ -260,9 +256,6 @@ Creator.Objects.users =
 			modifyAllRecords: false
 			viewAllRecords: true
 
-
-if Meteor.isClient
-	db.users._simpleSchema.i18n("users")
 
 db.users.helpers
 	spaces: ->

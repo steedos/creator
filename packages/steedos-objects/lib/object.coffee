@@ -149,7 +149,8 @@ Creator.Object = (options)->
 			_db.attachSchema(self.schema, {replace: true})
 		else
 			_db.attachSchema(self.schema, {replace: true})
-#	console.log('Creator.objectsByName---------->', self._collection_name, self.name)
+	if self.name == "users"
+		_db._simpleSchema = self.schema
 	Creator.objectsByName[self._collection_name] = self
 
 	return self
