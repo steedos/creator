@@ -76,10 +76,10 @@ _itemClick = (e, curObjectName, list_view_id)->
 			Session.set("action_save_and_insert", true)
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
-				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
+				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, value.itemData.record, ()->
 					self.dxDataGridInstance.refresh()
 			else
-				Creator.executeAction objectName, action, recordId, value.itemElement
+				Creator.executeAction objectName, action, recordId, value.itemElement, value.itemData.record
 	unless actions.length
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"

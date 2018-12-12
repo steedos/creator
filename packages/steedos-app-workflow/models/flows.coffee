@@ -2,6 +2,31 @@ db.flows = new Meteor.Collection('flows')
 
 db.flows._simpleSchema = new SimpleSchema
 
+if Meteor.isServer
+	db.flows.copy = (userId, spaceId, flowId, newFlowName, enabled)->
+
+		flow = db.flows.findOne({_id: flowId, space: spaceId}, {fields: {_id: 1, name: 1, form: 1}})
+
+		if !flow
+			throw Meteor.Error("[flow.copy]未找到flow, space: #{spaceId}, flowId: #{flowId}");
+
+		if newFlowName
+			newName = newFlowName
+		else
+			newName = "复制:" + flow.name
+
+		form = steedosExport.form(flow.form, flow._id, true)
+
+		if _.isEmpty(form)
+			throw Meteor.Error("[flow.copy]未找到form, formId: #{flow.form}");
+
+		form.name = newName
+
+		form.flows?.forEach (f)->
+			f.name = newName
+
+		steedosImport.workflow(userId, spaceId, form, enabled)
+
 Creator.Objects.flows =
 	name: "flows"
 	icon: "timesheet"
@@ -50,8 +75,8 @@ Creator.Objects.flows =
 			sortable: true
 			index:true
 			is_company_only: true
-			defaultValue: ()->
-				return Session.get("user_company_id")
+#			defaultValue: ()->
+#				return Session.get("user_company_id")
 		created_by:
 			label:"创建人"
 		modified_by:
@@ -288,10 +313,10 @@ Creator.Objects.flows =
 			label: "所有"
 			filter_scope: "space"
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
-			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id"]
+			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form"]
 		company:
 			filter_scope: "company"
-			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id"]
+			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form"]
 			label: "本单位"
 
 	actions:
@@ -408,7 +433,57 @@ Creator.Objects.flows =
 #				Session.set 'action_fields', 'current,current._rev,current.steps'
 #				Meteor.defer ()->
 #					$(".creator-edit").click()
+		exportFlow:
+			label: "导出流程"
+			visible: true
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				console.log("exportFlow", object_name, record_id, fields);
+				if this.record?.form?._id
+					window.open("/api/workflow/export/form?form=#{this.record.form._id}", '_blank')
+				else
+					flow = Creator.getCollection(object_name).findOne(record_id)
+					if flow
+						window.open("/api/workflow/export/form?form=#{flow.form}", '_blank')
+		importFlow:
+			label: "导入流程"
+			visible: true
+			on: "list"
+			todo: ()->
+				Modal.show "admin_import_flow_modal", {
+					onSuccess: (flows)->
+						if flows.length > 0
+							FlowRouter.go("/app/admin/flows/view/#{flows[0]}")
+				}
+		copyFlow:
+			label: "复制流程"
+			visible: true
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				swal {
+					title: t("workflow_copy_flow"),
+					text: t("workflow_copy_flow_text"),
+					type: "input",
+					confirmButtonText: t('OK'),
+					cancelButtonText: t('Cancel'),
+					showCancelButton: true,
+					closeOnConfirm: false
+				}, (reason) ->
+					if (reason == false)
+						return false;
 
+					if (reason == "")
+						swal.showInputError(t("workflow_copy_flow_error_reason_required"));
+						return false;
+
+					Meteor.call "flow_copy", Steedos.spaceId(), record_id, reason, (error, result)->
+						if error
+							toastr.error 'error'
+						else
+							toastr.success t('workflow_copy_flow_success')
+							sweetAlert.close();
+							if result.length > 0
+								FlowRouter.go("/app/admin/flows/view/#{result[0]}")
 
 	permission_set:
 		user:
