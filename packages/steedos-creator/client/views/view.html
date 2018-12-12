@@ -69,7 +69,7 @@
 						</div>
 					</div>
 
-						<div id="creator-quick-form" class="slds-show slds-form slds-grid slds-page-header__detail-row" role="tabpanel">
+						<div id="creator-quick-form" class="slds-show {{#if form_horizontal}} slds-form_horizontal{{else}}  slds-form_stacked{{/if}} slds-form slds-grid slds-page-header__detail-row" role="tabpanel">
 							<div class="">
 							{{#if detail_info_visible}}
 								{{#if showForm}}
@@ -89,17 +89,15 @@
 																</h3>
 																<div aria-hidden="false" class="slds-section__content" id="expando-unique-id">
 																	{{#each this.fields}}
-																		<div class="slds-grid view-page-section-row">
+																		<div class="slds-grid slds-grid slds-gutters_small">
 																			{{#each this}}
 																				{{#if this}}
-																					<div class="slds-has-flexi-truncate slds-p-horizontal_x-small full view-page-block-item">
-																						<div class="slds-form-element slds-form-element_edit slds-grow slds-hint-parent slds-p-vertical_xx-small override--slds-form-element uiInput ">
+																					<div class="slds-col slds-has-flexi-truncate slds-grid">
+																						<div class="slds-form-element slds-form-element_readonly  {{#if is_wide this}} slds-form-element_stacked {{/if}} slds-hint-parent">
 
-																								<div class="test-id__field-label-container">
-																									<span class="test-id__field-label slds-form-element__label">{{label this}}</span>
-																								</div>
-																								<div class="slds-form-element__control slds-grid itemBody">
-																						<span class="test-id__field-value slds-form-element__static slds-grow slds-has-divider_bottom">
+																								<span class="slds-form-element__label">{{label this}}</span>
+																								<div class="slds-form-element__control">
+																						<span class="test-id__field-value slds-form-element__static slds-grow">
 																							{{> creator_table_cell _id=record._id val=(keyValue this) doc=record field=(keyField this) field_name=this object_name=object_name disabled=true is_detail_view=true}}
 																						</span>
 																								</div>
@@ -116,22 +114,20 @@
 													{{/if}}
 												{{/each}}
 												{{#if hasUnObjectField this}}
-												<div class="slds-grid view-page-section-row">
+												<div class="slds-grid slds-gutters_small">
 													{{#each this}}
 														{{#unless isObjectField this}}
-															<div class="slds-has-flexi-truncate slds-p-horizontal_x-small full view-page-block-item">
-																<div class="slds-form-element slds-form-element_edit slds-grow slds-hint-parent slds-p-vertical_xx-small override--slds-form-element uiInput">
-																	{{#if this}}
-																		<div class="test-id__field-label-container">
-																			<span class="test-id__field-label slds-form-element__label">{{label this}}</span>
-																		</div>
-																		<div class="slds-form-element__control slds-grid itemBody">
-																		<span class="test-id__field-value slds-form-element__static slds-grow slds-has-divider_bottom">
+															<div class="slds-col slds-has-flexi-truncate slds-grid">
+																{{#if this}}
+																<div class="slds-form-element {{#if is_wide this}} slds-form-element_stacked {{/if}} slds-form-element_readonly slds-hint-parent">
+																		<span class="test-id__field-label slds-form-element__label">{{label this}}</span>
+																		<div class="slds-form-element__control">
+																		<span class="test-id__field-value slds-form-element__static slds-grow">
 																			{{> creator_table_cell _id=record._id val=(keyValue this) doc=record field=(keyField this) field_name=this object_name=object_name disabled=true parent_view='record_details' full_screen=(full_screen this) is_detail_view=true}}
 																		</span>
 																		</div>
-																	{{/if}}
 																</div>
+																{{/if}}
 															</div>
 														{{/unless}}
 													{{/each}}
@@ -155,18 +151,18 @@
 																<div class="slds-grid view-page-section-row">
 																	{{#each this}}
 																		<div class="slds-has-flexi-truncate slds-p-horizontal_x-small full view-page-block-item">
-																			<div class="slds-form-element slds-form-element_edit slds-grow slds-hint-parent slds-p-vertical_xx-small override--slds-form-element uiInput ">
-																				{{#if this}}
+																			{{#if this}}
+																			<div class="slds-form-element slds-form-element_readonly slds-grow slds-hint-parent slds-p-vertical_xx-small override--slds-form-element uiInput ">
 																					<div class="test-id__field-label-container">
 																						<span class="test-id__field-label slds-form-element__label">{{label this}}</span>
 																					</div>
 																					<div class="slds-form-element__control slds-grid itemBody">
-																						<span class="test-id__field-value slds-form-element__static slds-grow slds-has-divider_bottom">
+																						<span class="test-id__field-value slds-form-element__static slds-grow ">
 																							{{> creator_table_cell _id=record._id val=(keyValue this) doc=record field=(keyField this) field_name=this object_name=object_name disabled=true is_detail_view=true}}
 																						</span>
 																					</div>
-																				{{/if}}
 																			</div>
+																			{{/if}}
 																		</div>
 																	{{/each}}
 																</div>

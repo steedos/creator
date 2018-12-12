@@ -29,6 +29,12 @@ Template.creator_view.onRendered ->
 Template.creator_view.helpers Creator.helpers
 
 Template.creator_view.helpers
+	form_horizontal: ()->
+		if Session.get("app_id") == "admin"
+			return window.innerWidth > (767 + 250)
+		else
+			return window.innerWidth > 767
+
 	hasUnObjectField: (t)->
 		r = false;
 
@@ -126,6 +132,10 @@ Template.creator_view.helpers
 	keyField: (key) ->
 		fields = Creator.getObject().fields
 		return fields[key]
+
+	is_wide: (key) ->
+		fields = Creator.getObject().fields
+		return fields[key]?.is_wide
 
 	full_screen: (key) ->
 		fields = Creator.getObject().fields
