@@ -4,11 +4,6 @@ Creator.subs = {}
 
 
 Meteor.startup ->
-
-	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Match.OneOf(Function, String))})
-	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
-	SimpleSchema.extendOptions({createFunction: Match.Optional(Match.OneOf(Function, String))})
-
 	if Meteor.isServer
 		_.each Creator.Objects, (obj, object_name)->
 			Creator.loadObjects obj, object_name
@@ -47,15 +42,6 @@ Creator.loadObjects = (obj, object_name)->
 	Creator.initListViews(object_name)
 	# if Meteor.isServer
 	# 	Creator.initPermissions(object_name)
-
-Creator.getRelativeUrl = (url)->
-	if url
-		# url开头没有"/"，需要添加"/"
-		if !/^\//.test(url)
-			url = "/" + url
-		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX + url
-	else
-		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
 
 Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 	if Meteor.isClient
@@ -163,40 +149,6 @@ Creator.getObjectRecord = (object_name, record_id)->
 	collection = Creator.getCollection(object_name)
 	if collection
 		return collection.findOne(record_id)
-
-# 该函数只在初始化Object时，把相关对象的计算结果保存到Object的related_objects属性中，后续可以直接从related_objects属性中取得计算结果而不用再次调用该函数来计算
-Creator.getObjectRelateds = (object_name)->
-	if Meteor.isClient
-		if !object_name
-			object_name = Session.get("object_name")
-
-	related_objects = []
-	# _object = Creator.getObject(object_name)
-	# 因Creator.getObject函数内部要调用该函数，所以这里不可以调用Creator.getObject取对象，只能调用Creator.Objects来取对象
-	_object = Creator.Objects[object_name]
-	if !_object
-		return related_objects
-
-	if _object.enable_files
-		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
-		
-	_.each Creator.Objects, (related_object, related_object_name)->
-		_.each related_object.fields, (related_field, related_field_name)->
-			if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
-				if related_object_name == "object_fields"
-					#TODO 待相关列表支持排序后，删除此判断
-					related_objects.splice(0, 0, {object_name:related_object_name, foreign_key: related_field_name})
-				else
-					related_objects.push {object_name:related_object_name, foreign_key: related_field_name}
-
-	if _object.enable_tasks
-		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
-	if _object.enable_notes
-		related_objects.push {object_name:"notes", foreign_key: "related_to"}
-	if _object.enable_instances
-		related_objects.push {object_name:"instances", foreign_key: "instances"}
-
-	return related_objects
 
 Creator.getPermissions = (object_name, spaceId, userId)->
 	if Meteor.isClient

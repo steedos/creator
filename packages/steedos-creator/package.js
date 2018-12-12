@@ -60,7 +60,6 @@ Package.onUse(function (api) {
 	api.use('es5-shim@4.6.15');
 	api.use('simple:json-routes@2.1.0');
 	api.use('steedos:fullcalendar@3.4.0_3');
-	api.use('steedos:autoform-lookup@0.3.10');
 	api.use('steedos:filesize@0.0.1');
 	api.use('steedos:location@0.0.1');
 
@@ -102,7 +101,7 @@ Package.onUse(function (api) {
 	api.addFiles('core.coffee');
 
 	api.addFiles('lib/actions.coffee');
-	api.addFiles('lib/listviews.coffee');
+
 	api.addFiles('lib/apps.coffee');
 	api.addFiles('lib/user_object_view.coffee', 'server');
 	// api.addFiles('lib/eval.js');
@@ -135,7 +134,6 @@ Package.onUse(function (api) {
 
 	api.addFiles('models/object_workflows.coffee');
 
-	api.addFiles('server/methods/object_options.coffee', 'server');
 	api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
 	api.addFiles('server/methods/object_recent_record.coffee', 'server');
 	api.addFiles('server/methods/object_listviews_options.coffee', 'server');

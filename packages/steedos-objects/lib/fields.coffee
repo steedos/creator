@@ -31,7 +31,7 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "tags"
 		else if field.type == 'code'
 			fs.type = String
-			fs.autoform.type = "textarea"
+			fs.autoform.type = "widearea"
 			fs.autoform.rows = field.rows || 3
 			if field.language
 				fs.autoform.language = field.language
@@ -87,7 +87,7 @@ Creator.getObjectSchema = (obj) ->
 					]
 					fontNames: ['Arial', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', '宋体','黑体','微软雅黑','仿宋','楷体','隶书','幼圆']
 
-		else if field.type == "lookup" or field.type == "master_detail"
+		else if !field.hidden && (field.type == "lookup" or field.type == "master_detail")
 			fs.type = String
 
 			if field.multiple
@@ -347,7 +347,7 @@ Creator.getObjectSchema = (obj) ->
 		if field.defaultValue
 			if Meteor.isClient and Creator.Formular.checkFormula(field.defaultValue)
 				fs.autoform.defaultValue = ()->
-					return Creator.Formular.run(field.defaultValue)
+					return Creator.Formular.run(field.defaultValue, {userId: Meteor.userId(), spaceId: Session.get("spaceId")})
 			else
 				fs.autoform.defaultValue = field.defaultValue
 				fs.defaultValue = field.defaultValue

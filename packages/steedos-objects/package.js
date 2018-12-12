@@ -1,7 +1,7 @@
 Package.describe({
 
 	name: 'steedos:objects',
-	version: '0.0.1',
+	version: '0.0.2',
 	summary: 'Steedos Creator',
 	git: ''
 });
@@ -30,6 +30,7 @@ Package.onUse(function(api) {
 	api.use('aldeed:collection2@2.5.0');
 	api.use('aldeed:tabular@1.6.1');
 	api.use('matb33:collection-hooks@0.8.4');
+	api.use('steedos:autoform-lookup@0.3.10');
 
 
 	api.use(['webapp@1.3.11'], 'server');
@@ -43,8 +44,14 @@ Package.onUse(function(api) {
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
+	api.addFiles('client/helpers.coffee', 'client');
+	api.addFiles('client/steedos_icon.html','client');
+	api.addFiles('client/steedos_icon.coffee','client');
 
+	api.addFiles('server/methods/object_options.coffee', 'server');
+	
 	api.addFiles('core.coffee');
+	api.addFiles('lib/listviews.coffee');
 
 	api.addFiles('lib/add_simple_schema_validation_error.coffee');
 	api.addFiles('lib/field_simple_schema_validation_error.coffee')

@@ -10,12 +10,16 @@ Creator.baseObject =
 			omit: true
 			hidden: true
 		space:
-			type: "lookup"
+			type: "text"
 			label:"所属工作区"
 			reference_to: "spaces"
-			omit: true
+#			omit: true
 			index: true
 			hidden: true
+			defaultValue: "{spaceId}"
+#			defaultValue: ()->
+#				if Meteor.isClient
+#					return Session.get("spaceId")
 		created:
 			type: "datetime"
 			label:"创建日期"
