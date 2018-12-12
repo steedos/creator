@@ -140,6 +140,18 @@ Creator.Objects.instances =
 		"record_ids.$.ids":
 			type: "[text]"
 			hidden:true
+		
+		company_id:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			is_company_only: true
+			required: true
+			defaultValue: ()->
+				if Meteor.isClient
+					return Session.get("user_company_id")
 
 	list_views:
 		all:

@@ -18,6 +18,7 @@ Creator.Objects.flow_roles =
 			sortable: true
 			index:true
 			is_company_only: true
+			required: true
 			defaultValue: ()->
 				if Meteor.isClient
 					return Session.get("user_company_id")
