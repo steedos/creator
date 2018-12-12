@@ -28,19 +28,21 @@ Creator.Objects.flows =
 			options: [{label: "启用",value: "enabled"},{label: "停用",value: "disabled"}]
 			readonly: true
 		is_valid:
-			label:"流程是否有效"
+			label:"流程有效"
 			type: "boolean"
 			readonly: true
-		description:
-			label:"流程介绍"
-			type: "textarea"
-		help_text:
-			label:"流程帮助"
-			type: "text"
 		current_no:
-			label:"流程编号"
+			label:"当前序号"
 			type: "number"
 			readonly: true
+		description:
+			label:"备注"
+			type: "textarea"
+			is_wide: true
+		help_text:
+			label:"帮助文本"
+			type: "textarea"
+			is_wide: true
 		company_id:
 			label: "所属单位"
 			type: "lookup"
@@ -171,12 +173,14 @@ Creator.Objects.flows =
 			reference_to: "users"
 			multiple: true
 			filter_by_company: true
+			is_wide: true
 		"perms.orgs_can_add":
 			label:"授权部门: 新建申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
 			filter_by_company: true
+			is_wide: true
 
 		"perms.users_can_monitor":
 			label:"授权用户: 查看所有申请单"
@@ -184,12 +188,14 @@ Creator.Objects.flows =
 			reference_to: "users"
 			multiple: true
 			filter_by_company: true
+			is_wide: true
 		"perms.orgs_can_monitor":
 			label:"授权部门: 查看所有申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
 			filter_by_company: true
+			is_wide: true
 
 		"perms.users_can_admin":
 			label:"授权用户: 查看所有申请单，并能执行重定位、转签核、删除操作"
@@ -197,12 +203,14 @@ Creator.Objects.flows =
 			reference_to: "users"
 			multiple: true
 			filter_by_company: true
+			is_wide: true
 		"perms.orgs_can_admin":
 			label:"授权部门: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
 			filter_by_company: true
+			is_wide: true
 
 		app:
 			label:"所属应用"
