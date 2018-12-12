@@ -40,7 +40,7 @@ Template.new_flow_modal.events
 		if doc.category
 			form.category = doc.category
 
-		companyId = Creator.getUserCompanyId()
+		companyId = doc.company_id
 		if companyId
 			form.company_id = companyId
 
