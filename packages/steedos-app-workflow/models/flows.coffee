@@ -75,8 +75,9 @@ Creator.Objects.flows =
 			sortable: true
 			index:true
 			is_company_only: true
-#			defaultValue: ()->
-#				return Session.get("user_company_id")
+			defaultValue: ()->
+				if Meteor.isClient
+					return Session.get("user_company_id")
 		created_by:
 			label:"创建人"
 		modified_by:

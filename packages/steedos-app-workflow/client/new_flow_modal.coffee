@@ -4,7 +4,7 @@ Template.new_flow_modal.helpers
 		object = Creator.getObject('flows')
 		new_schema = new SimpleSchema(Creator.getObjectSchema(object))
 		obj_schema = new_schema._schema
-		_.each ['name', 'category'], (field)->
+		_.each ['name', 'category', 'company_id'], (field)->
 			schema[field] = obj_schema[field]
 			if schema[field].autoform
 				schema[field].autoform.readonly = false
@@ -12,7 +12,7 @@ Template.new_flow_modal.helpers
 		return new SimpleSchema(schema)
 
 	fields: ()->
-		return ['category', 'name']
+		return ['category', 'name', 'company_id']
 
 
 Template.new_flow_modal.events

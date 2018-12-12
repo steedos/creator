@@ -19,7 +19,8 @@ Creator.Objects.flow_roles =
 			index:true
 			is_company_only: true
 			defaultValue: ()->
-				return Session.get("user_company_id")
+				if Meteor.isClient
+					return Session.get("user_company_id")
 
 	list_views:
 		all:

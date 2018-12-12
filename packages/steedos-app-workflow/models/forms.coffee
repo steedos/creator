@@ -76,6 +76,9 @@ Creator.Objects.forms =
 			sortable: true
 			index:true
 			is_company_only: true
+			defaultValue: ()->
+				if Meteor.isClient
+					return Session.get("user_company_id")
 
 	list_views:
 		all:
@@ -134,7 +137,3 @@ if Meteor.isServer
 
 		doc.created_by = userId
 		doc.created = new Date()
-
-		su = db.space_users.findOne({space: doc.space, user: userId}, {fields: {company_id: 1}})
-		if su && su.company_id
-			doc.company_id = su.company_id
