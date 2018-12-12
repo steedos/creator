@@ -143,7 +143,6 @@ Creator.Object = (options)->
 	self._collection_name = _db._name
 
 	schema = Creator.getObjectSchema(self)
-	console.log('schema', schema)
 	self.schema = new SimpleSchema(schema)
 	if self.name != "users" and self.name != "cfs.files.filerecord" && !self.is_view
 		if Meteor.isClient
