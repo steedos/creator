@@ -157,7 +157,8 @@
 													<div class="info-popover" id="info_popover_{{this}}" style="display: none">{{hasInlineHelpText this}}</div>
 												{{/if}}
 												{{#if isDisabled this}}
-													<div class="form-group">
+													<!-- 不显示只读字段，而且发现只读字段值未能正确显示出来 -->
+													<!-- <div class="form-group">
 														<label class="control-label" for="{{this}}">{{getLabel this}}</label>
 														<span class="test-id__field-value slds-form-element__static slds-grow">
 															<span class="slds-grid slds-grid_align-spread creator_table_cell">
@@ -166,7 +167,7 @@
 																</div>
 															</span>
 														</span>
-													</div>
+													</div> -->
 												{{else}}
 													{{> afQuickField name=this}}
 												{{/if}}
