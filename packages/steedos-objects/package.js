@@ -30,8 +30,6 @@ Package.onUse(function(api) {
 	api.use('aldeed:collection2@2.5.0');
 	api.use('aldeed:tabular@1.6.1');
 	api.use('matb33:collection-hooks@0.8.4');
-	api.use('steedos:autoform-lookup@0.3.10');
-
 
 	api.use(['webapp@1.3.11'], 'server');
 
