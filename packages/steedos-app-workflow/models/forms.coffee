@@ -68,6 +68,14 @@ Creator.Objects.forms =
 			label: "标题公式"
 			type: 'textarea'
 			readonly: true
+		
+		company_id:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			is_company_only: true
 
 	list_views:
 		all:
