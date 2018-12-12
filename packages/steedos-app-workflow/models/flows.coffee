@@ -535,3 +535,9 @@ if Meteor.isServer
 				db.forms.update(doc.form, { $set: { category: doc.category } })
 			else
 				db.forms.update(doc.form, { $unset: { category: 1 } })
+		
+		if doc.company_id != this.previous.company_id
+			if doc.company_id
+				db.forms.update(doc.form, { $set: { company_id: doc.company_id } })
+			else
+				db.forms.update(doc.form, { $unset: { company_id: 1 } })
