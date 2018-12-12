@@ -157,3 +157,5 @@ steedos:markdown@0.0.1
 steedos:application-template
 # steedos:love
 # steedos:app-chat
+
+steedos:autoform-lookup

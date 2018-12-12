@@ -64,7 +64,8 @@ Package.onUse(function (api) {
 	api.use('steedos:location@0.0.1');
 
 	api.use('natestrauser:select2@4.0.3');
-	api.use('aldeed:autoform-select2@1.0.5')
+	api.use('aldeed:autoform-select2@1.0.5');
+	api.use('steedos:autoform-lookup');
 
 	api.use('steedos:cfs-standard-packages@0.5.10');
 	api.use('steedos:cfs-s3@0.1.4');
