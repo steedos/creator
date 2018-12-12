@@ -20,3 +20,9 @@ if (Meteor.isServer) {
 
 
 Meteor.autorun = Tracker.autorun
+
+if (Meteor.isServer) {
+	Meteor.startup(function(){
+		Accounts._bcryptRounds = function () {		return Accounts._options.bcryptRounds || 10; }
+	})
+}
