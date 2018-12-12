@@ -2,21 +2,3 @@
 .dx-searchbox .dx-texteditor-input, .dx-searchbox .dx-placeholder:before {
     padding-left: 34px;
 }
-
-.dx-treeview-item {
-	padding: 8px 8px;
-    min-height: 32px;
-    line-height: inherit;
-}
-
-.dx-treeview-toggle-item-visibility {
-	height: 34px;
-}
-
-.dx-treeview {
-	font-size: 13px;
-}
-
-.dx-datagrid .dx-row > td {
-	font-size: 13px;
-}
