@@ -119,7 +119,7 @@ _fields = (object_name, list_view_id)->
 				fields = defaultColumns
 
 	fields = fields.map (n)->
-		if object.fields[n]?.type and !object.fields[n].hidden
+		if object.fields[n]?.type # and !object.fields[n].hidden
 			return n.split(".")[0]
 		else
 			return undefined
