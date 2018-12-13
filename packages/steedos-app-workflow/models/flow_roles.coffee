@@ -1,7 +1,5 @@
 db.flow_roles = new Meteor.Collection('flow_roles')
 
-db.flow_roles._simpleSchema = new SimpleSchema
-
 Creator.Objects.flow_roles =
 	name: "flow_roles"
 	icon: "metrics"
@@ -61,11 +59,6 @@ Creator.Objects.flow_roles =
 			unreadable_fields: []
 			uneditable_fields: []
 			unrelated_objects: []
-
-if Meteor.isClient
-	db.flow_roles._simpleSchema.i18n("flow_roles")
-
-db.flow_roles.attachSchema db.flow_roles._simpleSchema
 
 if Meteor.isServer
 

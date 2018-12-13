@@ -1,7 +1,5 @@
 db.categories = new Meteor.Collection('categories')
 
-db.categories._simpleSchema = new SimpleSchema
-
 Creator.Objects.categories =
 	name: "categories"
 	icon: "metrics"
@@ -46,11 +44,6 @@ Creator.Objects.categories =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
-
-if Meteor.isClient
-	db.categories._simpleSchema.i18n("categories")
-
-db.categories.attachSchema db.categories._simpleSchema
 
 if Meteor.isServer
 

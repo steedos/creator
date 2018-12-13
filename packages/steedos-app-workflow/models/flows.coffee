@@ -1,7 +1,5 @@
 db.flows = new Meteor.Collection('flows')
 
-db.flows._simpleSchema = new SimpleSchema
-
 if Meteor.isServer
 	db.flows.copy = (userId, spaceId, flowId, newFlowName, enabled)->
 
@@ -515,11 +513,6 @@ Creator.Objects.flows =
 			uneditable_fields: []
 			unrelated_objects: []
 
-if Meteor.isClient
-	db.flows._simpleSchema.i18n("flows")
-
-db.flows.attachSchema(db.flows._simpleSchema)
-
 if Meteor.isServer
 
 	db.flows.before.insert (userId, doc) ->
@@ -535,7 +528,7 @@ if Meteor.isServer
 				db.forms.update(doc.form, { $set: { category: doc.category } })
 			else
 				db.forms.update(doc.form, { $unset: { category: 1 } })
-		
+
 		if doc.company_id != this.previous.company_id
 			if doc.company_id
 				db.forms.update(doc.form, { $set: { company_id: doc.company_id } })

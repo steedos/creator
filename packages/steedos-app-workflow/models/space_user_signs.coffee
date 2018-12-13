@@ -1,7 +1,5 @@
 db.space_user_signs = new Meteor.Collection('space_user_signs')
 
-db.space_user_signs._simpleSchema = new SimpleSchema
-
 Creator.Objects.space_user_signs =
 	name: "space_user_signs"
 	icon: "metrics"
@@ -69,11 +67,6 @@ Creator.Objects.space_user_signs =
 			unreadable_fields: []
 			uneditable_fields: []
 			unrelated_objects: []
-
-if Meteor.isClient
-	db.space_user_signs._simpleSchema.i18n("space_user_signs")
-
-db.space_user_signs.attachSchema db.space_user_signs._simpleSchema
 
 if Meteor.isServer
 

@@ -1,7 +1,5 @@
 db.webhooks = new Meteor.Collection('webhooks')
 
-db.webhooks._simpleSchema = new SimpleSchema
-
 Creator.Objects.webhooks =
 	name: "webhooks"
 	icon: "metrics"
@@ -56,11 +54,6 @@ Creator.Objects.webhooks =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
-
-if Meteor.isClient
-	db.webhooks._simpleSchema.i18n("webhooks")
-
-db.webhooks.attachSchema db.webhooks._simpleSchema
 
 if Meteor.isServer
 	db.webhooks._ensureIndex({

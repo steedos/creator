@@ -1,7 +1,5 @@
 db.flow_positions = new Meteor.Collection('flow_positions')
 
-db.flow_positions._simpleSchema = new SimpleSchema
-
 Creator.Objects.flow_positions =
 	name: "flow_positions"
 	icon: "metrics"
@@ -86,11 +84,6 @@ Creator.Objects.flow_positions =
 			unreadable_fields: []
 			uneditable_fields: []
 			unrelated_objects: []
-
-if Meteor.isClient
-	db.flow_positions._simpleSchema.i18n("flow_positions")
-
-db.flow_positions.attachSchema db.flow_positions._simpleSchema
 
 if Meteor.isServer
 
