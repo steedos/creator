@@ -35,7 +35,6 @@ Package.onUse(function(api) {
 	api.use('steedos:cfs-aliyun@0.1.0');
 
 	api.use('steedos:base');
-	api.use('steedos:app-admin');
 
 	api.use('tap:i18n', ['client', 'server']);
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
