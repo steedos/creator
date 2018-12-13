@@ -646,6 +646,8 @@ Meteor.startup ->
 						if _.indexOf(permissions.uneditable_fields, key) > -1
 							fields_editable = false
 					if fields_editable
+						if key is 'spaces'
+							delete selector.space
 						entityIsUpdated = collection.update selector, @bodyParams
 						if entityIsUpdated
 							#statusCode: 201
