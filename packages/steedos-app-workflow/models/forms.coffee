@@ -59,6 +59,7 @@ Creator.Objects.forms =
 			type: 'Object'
 			is_wide: true
 			readonly: true
+			blackbox: true
 
 		'current.form_script':
 			label: "表单脚本"

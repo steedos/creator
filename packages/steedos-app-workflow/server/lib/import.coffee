@@ -100,8 +100,6 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 
 			flow.form = form_id
 
-			flow.space = spaceId
-
 			if enabled
 				flow.state = 'enabled'
 				flow.is_valid = true #直接启用的流程设置is valid值为true
@@ -118,21 +116,17 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 			delete flow.company_id
 			if company_id
 				flow.company_id = company_id
-
 			#跨工作区导入时，重置流程权限perms
 			if !flow.perms || flow.space !=  spaceId || company_id
-
 				orgs_can_add = []
-
 				if company_id
 					orgs_can_add = [company_id]
 				else
-					db.organizations.find({
+					orgs_can_add = db.organizations.find({
 						space: spaceId,
 						is_company: true,
 						parent: null
 					}, {fields: {_id: 1}}).fetch().getProperty("_id")
-
 				#设置提交部门为：全公司
 				perms = {
 					_id: new Mongo.ObjectID()._str
@@ -145,6 +139,8 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 				}
 
 				flow.perms = perms
+
+			flow.space = spaceId
 
 			flow.current._id = new Mongo.ObjectID()._str
 
