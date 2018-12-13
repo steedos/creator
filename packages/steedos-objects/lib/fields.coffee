@@ -31,7 +31,7 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "tags"
 		else if field.type == 'code'
 			fs.type = String
-			fs.autoform.type = "widearea"
+			fs.autoform.type = "textarea"
 			fs.autoform.rows = field.rows || 3
 			if field.language
 				fs.autoform.language = field.language
@@ -350,7 +350,8 @@ Creator.getObjectSchema = (obj) ->
 					return Creator.Formular.run(field.defaultValue, {userId: Meteor.userId(), spaceId: Session.get("spaceId")})
 			else
 				fs.autoform.defaultValue = field.defaultValue
-				fs.defaultValue = field.defaultValue
+				if !_.isFunction(field.defaultValue)
+					fs.defaultValue = field.defaultValue
 
 		if field.readonly
 			fs.autoform.readonly = true
