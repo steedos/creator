@@ -60,6 +60,16 @@ Creator.Objects.flow_roles =
 			uneditable_fields: []
 			unrelated_objects: []
 
+if Meteor.isClient
+
+	db.flow_roles._sortFunction = (doc1, doc2) ->
+		return doc1.name?.localeCompare(doc2.name);
+
+	db.flow_roles.before.find (userId, selector, options) ->
+		if !options
+			options = {}
+		options.sort = db.flow_roles._sortFunction
+
 if Meteor.isServer
 
 	db.flow_roles.allow
@@ -118,3 +128,24 @@ if Meteor.isServer
 		"modified": 1
 	},{background: true})
 
+
+new Tabular.Table
+	name: "flow_roles",
+	collection: db.flow_roles,
+	columns: [
+		{
+			data: "name"
+		}
+	]
+	dom: "tp"
+	lengthChange: false
+	ordering: false
+	pageLength: 10
+	info: false
+	extraFields: ["space","_id"]
+	searching: true
+	autoWidth: false
+	changeSelector: (selector, userId) ->
+		unless userId
+			return {_id: -1}
+		return selector

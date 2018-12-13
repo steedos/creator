@@ -73,3 +73,20 @@ if Meteor.isServer
 
 		if db.forms.find({space: doc.space, category: doc._id}).count()>0
 			throw new Meteor.Error(400, "categories_in_use")
+
+new Tabular.Table
+	name: "Categories",
+	collection: db.categories,
+	columns: [
+		{data: "name", title: "name", orderable: false},
+		{data: "sort_no", title: "sort_no",orderable: false},
+		{data: "sort_no", title: "sort_no", visible: false}
+	]
+	dom: "tp"
+	order: [2, "desc"]
+	extraFields: []
+	lengthChange: false
+	pageLength: 10
+	info: false
+	searching: true
+	autoWidth: false

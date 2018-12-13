@@ -78,3 +78,42 @@ if Meteor.isServer
 				return false
 			else
 				return true
+
+
+db.webhooks.helpers
+	flow_name: ()->
+		f = db.flows.findOne({_id: this.flow}, {fields: {name: 1}})
+		return f && f.name
+
+new Tabular.Table
+	name: "Webhooks",
+	collection: db.webhooks,
+	columns: [
+		{
+			data: "flow"
+			render: (val, type, doc) ->
+				f = db.flows.findOne({_id: doc.flow}, {fields: {name: 1}})
+				return f && f.name
+		}
+		{
+			data: "payload_url"
+		}
+		{
+			data: "active"
+		}
+		{
+			data: "description"
+		}
+	]
+	dom: "tp"
+	lengthChange: false
+	ordering: false
+	pageLength: 10
+	info: false
+	extraFields: ["space", "content_type"]
+	searching: true
+	autoWidth: false
+	changeSelector: (selector, userId) ->
+		unless userId
+			return {_id: -1}
+		return selector

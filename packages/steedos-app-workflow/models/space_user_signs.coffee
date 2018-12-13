@@ -124,3 +124,54 @@ if Meteor.isServer
 		"user": 1
 	},{background: true})
 
+
+db.space_user_signs.helpers
+	signImage: ()->
+		return "<img style='max-width: 120px;max-height: 80px;' src='" + Steedos.absoluteUrl("api/files/avatars/" + this.sign) + "' />"
+
+	userName:()->
+		user =  SteedosDataManager.spaceUserRemote.findOne({
+					space: this.space,
+					user: this.user
+				}, {
+					fields: {
+						name: 1
+					}
+				})
+		return user?.name
+
+new Tabular.Table
+	name: "SpaceUserSigns",
+	collection: db.space_user_signs,
+	columns: [
+		{
+			data: "user"
+			render: (val, type, doc) ->
+				user =  SteedosDataManager.spaceUserRemote.findOne({
+					space: doc.space,
+					user: doc.user
+				}, {
+					fields: {
+						name: 1
+					}
+				})
+				return user?.name
+		}
+		{
+			data: "sign"
+			render: (val, type, doc) ->
+				return "<img style='max-width: 120px;max-height: 80px;' src='" + Steedos.absoluteUrl("api/files/avatars/" + doc.sign) + "' />"
+		}
+	]
+	dom: "tp"
+	lengthChange: false
+	ordering: false
+	pageLength: 10
+	info: false
+	extraFields: ["space", "user", 'sign']
+	searching: true
+	autoWidth: false
+	changeSelector: (selector, userId) ->
+		unless userId
+			return {_id: -1}
+		return selector

@@ -29,6 +29,7 @@ Package.onUse(function(api) {
 	api.use('aldeed:simple-schema@1.3.3');
 	api.use('aldeed:collection2@2.5.0');
 	api.use('kadira:flow-router@2.10.1');
+	api.use('aldeed:tabular@1.6.1');
 
 	api.use('steedos:cfs-standard-packages@0.5.10');
 	api.use('steedos:cfs-s3@0.1.4');

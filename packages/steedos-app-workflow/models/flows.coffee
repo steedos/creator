@@ -611,3 +611,191 @@ if Meteor.isServer
 		"form": 1,
 		"state:": 1
 	},{background: true})
+
+
+db.flows.helpers
+	modified_by_name: () ->
+		spaceUser = db.space_users.findOne({user: this.current?.modified_by}, {fields: {name: 1}});
+		return spaceUser?.name;
+
+	category_name: ()->
+		form = db.forms.findOne({_id: this.form, space: this.space});
+
+		if form && form.category
+			category = db.categories.findOne({_id: form.category})
+			return category?.name
+
+new Tabular.Table
+	name: "Flows",
+	collection: db.flows,
+	pub :"flows_tabular",
+	columns: [
+		{
+			data: "name",
+			orderable: false
+		},
+		{
+			data: "category_name()",
+			width: "150px",
+			orderable: false
+		},
+		{
+			data: "current.modified",
+			width: "150px",
+			render: (val, type, doc)->
+				return moment(doc.current?.modified).format('YYYY-MM-DD HH:mm')
+		},
+		{
+			data: "modified_by_name()",
+			width: "150px",
+			orderable: false
+		},
+		{
+#			title: ()->
+#				"""
+#					<span class="filter-span">#{t('flows_state')}</span>
+#					<div class="tabular-filter col-state">
+#						<div class="btn-group">
+#						  <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+#							<span class="ion ion-funnel"></span></a>
+#						  <ul class="dropdown-menu">
+#							<li><a href="#">
+#									<label>
+#										<input type="checkbox" name='filter_state' value='enabled' data-col='col-state'>启用
+#									</label>
+#								</a>
+#							</li>
+#							<li><a href="#">
+#									<label>
+#										<input type="checkbox" name='filter_state' value='disabled' data-col='col-state'>停用
+#									</label>
+#								</a>
+#							</li>
+#						  </ul>
+#						</div>
+#					</div>
+#				"""
+#			,
+			data: "state",
+			width: "150px",
+			orderable: false,
+			render: (val, type, doc)->
+
+				checked = "";
+
+				if doc.state == 'enabled'
+					checked = "checked"
+
+				return """
+							<div class="flow-list-switch">
+								<label for="switch_#{doc._id}" class="weui-switch-cp">
+									<input id="switch_#{doc._id}" data-id="#{doc._id}" class="weui-switch-cp__input flow-switch-input" type="checkbox" #{checked}>
+									<div class="weui-switch-cp__box"></div>
+								</label>
+							</div>
+						"""
+		},
+		{
+			data: "auto_remind",
+			width: "150px",
+			orderable: false,
+			render: (val, type, doc)->
+
+				checked = "";
+
+				if doc.auto_remind is true
+					checked = "checked"
+
+				return """
+							<div class="flow-list-switch">
+								<label for="switch_auto_remind_#{doc._id}" class="weui-switch-cp">
+									<input id="switch_auto_remind_#{doc._id}" data-id="#{doc._id}" class="weui-switch-cp__input flow-switch-input-enable-auto-remind" type="checkbox" #{checked}>
+									<div class="weui-switch-cp__box"></div>
+								</label>
+							</div>
+						"""
+		},
+		{
+			data: "upload_after_being_distributed",
+			width: "150px",
+			orderable: false,
+			render: (val, type, doc)->
+
+				checked = "";
+
+				if doc.upload_after_being_distributed is true
+					checked = "checked"
+
+				return """
+							<div class="flow-list-switch">
+								<label for="switch_upload_after_being_distributed_#{doc._id}" class="weui-switch-cp">
+									<input id="switch_upload_after_being_distributed_#{doc._id}" data-id="#{doc._id}" class="weui-switch-cp__input flow-switch-input-upload-after-being-distributed" type="checkbox" #{checked}>
+									<div class="weui-switch-cp__box"></div>
+								</label>
+							</div>
+						"""
+		},
+		{
+			data: "",
+			title: "",
+			orderable: false,
+			width: '1px',
+			render: (val, type, doc) ->
+
+				return """
+						<div class="flow-edit">
+							<div class="btn-group">
+							  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+								<span class="ion ion-android-more-vertical"></span>
+							  </button>
+							  <ul class="dropdown-menu dropdown-menu-right" role="menu">
+								<li><a href="#" id="editFlow" data-id="#{doc._id}">#{t("Edit")}</a></li>
+								<li class="divider"></li>
+								<li><a target="_blank" id="exportFlow" href="/api/workflow/export/form?form=#{doc.form}">#{t("flows_btn_export_title")}</a></li>
+								<li><a href="#" id="copyFlow" data-id="#{doc._id}">#{t("workflow_copy_flow")}</a></li>
+								<li><a href="#" id="designFlow" data-id="#{doc._id}">#{t("workflow_design_flow")}</a></li>
+								<li class="divider"></li>
+								<li><a href="#" id="editFlow_template" data-id="#{doc._id}">#{t('flow_list_title_set_template')}</a></li>
+								<li><a href="#" id="editFlow_events" data-id="#{doc._id}">#{t('flow_list_title_set_script')}</a></li>
+								<li><a href="#" id="editFlow_fieldsMap" data-id="#{doc._id}">#{t('flow_list_title_set_fieldsMap')}</a></li>
+								<li><a href="#" id="editFlow_distribute" data-id="#{doc._id}">#{t('flow_list_title_set_distribute')}</a></li>
+							  </ul>
+							</div>
+						</div>
+					"""
+		}
+	]
+	order: [[2, "desc"]]
+	dom: "tp"
+	extraFields: ["form","print_template","instance_template",
+				"events","field_map","space", "description",
+				"current", "state", "distribute_optional_users",
+				"distribute_to_self","distribute_end_notification"]
+	lengthChange: false
+	pageLength: 10
+	info: false
+	searching: true
+	autoWidth: false
+
+new Tabular.Table
+	name: "ImportOrExportFlows",
+	collection: db.flows,
+	columns: [
+		{data: "name", title: "name"},
+#		{data: "state", title: "state"},
+		{
+			data: "",
+			title: "",
+			orderable: false,
+			width: '1px',
+			render: (val, type, doc) ->
+				return '<a target="_blank" class="btn btn-xs btn-default" id="exportFlow" href="/api/workflow/export/form?form=' + doc.form + '">' + t("flows_btn_export_title") + '</a>'
+		}
+	]
+	dom: "tp"
+	extraFields: ["form","print_template","instance_template","events","field_map","space", "current"]
+	lengthChange: false
+	pageLength: 10
+	info: false
+	searching: true
+	autoWidth: false
