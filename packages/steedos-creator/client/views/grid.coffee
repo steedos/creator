@@ -388,7 +388,7 @@ Template.creator_grid.onRendered ->
 					needToShowLinkForIndexColumn = true
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
-					width: 40
+					width: 30
 					allowExporting: false
 					allowSorting: false
 					allowReordering: false
@@ -399,7 +399,8 @@ Template.creator_grid.onRendered ->
 		
 				showColumns.splice 0, 0,
 					dataField: "_index"
-					width: 40
+					width: 50
+					alignment: "right"
 					allowExporting: true
 					allowSorting: false
 					allowReordering: false
