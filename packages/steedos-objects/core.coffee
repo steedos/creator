@@ -255,3 +255,18 @@ Creator.getUserCompanyId = (userId, spaceId)->
 			throw new Meteor.Error(400, 'miss spaceId')
 	su = Creator.getCollection('space_users').findOne({space: spaceId, user: userId}, {fields: {company_id:1}})
 	return su.company_id
+
+Creator.processPermissions = (po)->
+	if po.allowCreate
+		po.allowRead = true
+	if po.allowEdit
+		po.allowRead = true
+	if po.allowDelete
+		po.allowEdit = true
+		po.allowRead = true
+	if po.viewAllRecords
+		po.allowRead = true
+	if po.modifyAllRecords
+		po.allowRead = true
+		po.allowEdit = true
+		po.viewAllRecords = true
