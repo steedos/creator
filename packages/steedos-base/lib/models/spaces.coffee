@@ -1,10 +1,5 @@
 db.spaces = new Meteor.Collection('spaces')
 
-db.spaces.allow
-	update: (userId, doc, fields, modifier) ->
-		return doc.owner == userId;
-
-db.spaces._simpleSchema = new SimpleSchema
 
 Creator.Objects.spaces =
 	name: "spaces"
@@ -20,23 +15,26 @@ Creator.Objects.spaces =
 			required: true
 			searchable:true
 			index:true
-		industry:
-            label: "行业"
-            type: "select"
-            options:[
-                {label:'餐饮',value:'food'},
-                {label:'酒店住宿',value:'accommodation'},
-                {label:'出行',value:'travel'},
-                {label:'休闲娱乐',value:'entertainment'},
-                {label:'丽人',value:'beauty'},
-                {label:'教育',value:'education'},
-                {label:'母婴亲子',value:'parent-child'},
-                {label:'运动健身',value:'sport'},
-                {label:'家具装修',value:'decoration'},
-                {label:'生活服务',value:'life'},
-                {label:'宠物',value:'pets'},
-                {label:'汽车服务',value:'car'}
-            ]
+		# industry:
+  #           label: "行业"
+  #           type: "select"
+  #           options:[
+  #               {label:'餐饮',value:'food'},
+  #               {label:'酒店住宿',value:'accommodation'},
+  #               {label:'出行',value:'travel'},
+  #               {label:'休闲娱乐',value:'entertainment'},
+  #               {label:'丽人',value:'beauty'},
+  #               {label:'教育',value:'education'},
+  #               {label:'母婴亲子',value:'parent-child'},
+  #               {label:'运动健身',value:'sport'},
+  #               {label:'家具装修',value:'decoration'},
+  #               {label:'生活服务',value:'life'},
+  #               {label:'宠物',value:'pets'},
+  #               {label:'汽车服务',value:'car'}
+  #           ]
+		phone:
+			label:'联系电话'
+			type:'text'
 		owner:
 			label: "所有者"
 			type: "lookup"
@@ -49,13 +47,8 @@ Creator.Objects.spaces =
 			reference_to: "users"
 			index:true
 			multiple: true
-		apps:
-			label: "应用"
-			type: "lookup"
-			reference_to: "apps"
-			multiple: true
 		avatar:
-			label:'头像'
+			label:'公司Logo'
 			type:'avatar'
 		cover:
 			label:'封面照片'
@@ -64,21 +57,26 @@ Creator.Objects.spaces =
 			label:'地址'
 			type:'location'
 			system: 'gcj02'
-		phone:
-			label:'联系电话'
-			type:'text'
+			omit: true
+			hidden: true
+		apps:
+			label: "启用应用"
+			type: "lookup"
+			reference_to: "apps"
+			multiple: true
 		apps_paid:
 			label:'已付费应用'
 			type: "[text]"
 			omit: true
 		hostname:
-			label:'域名'
+			label:'绑定域名'
 			type: "[text]"
 		balance:
-			label:'余额'
+			label:'账户余额'
 			type:"number"
 			scale:2
 			omit: true
+			readonly: true
 		is_paid:
 			label: t("Spaces_isPaid")
 			type: "boolean"
@@ -88,6 +86,7 @@ Creator.Objects.spaces =
 			type: "object"
 			blackbox: true
 			omit: true
+			hidden: true
 		is_deleted:
 			type: "boolean"
 			omit: true
@@ -95,22 +94,24 @@ Creator.Objects.spaces =
 		"billing.remaining_months":
 			type:"number"
 			omit: true
+			hidden: true
 		user_limit:
-			label:'用户数限制'
+			label:'已购买用户数'
 			type:"number"
 			omit: true
 		start_date:
-			label:'开始时间'
+			label:'付费开始时间'
 			type: "datetime"
 			omit: true
 		end_date:
-			label:'结束时间'
+			label:'付费截止时间'
 			type: "datetime"
 			omit: true
 		modules:
 			label:'模块'
 			type: "[text]"
 			omit: true
+			hidden: true
 		enable_register:
 			label:'允许新用户注册'
 			type: "boolean"
@@ -132,14 +133,7 @@ Creator.Objects.spaces =
 		admin:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: false
-			allowRead: true
-			modifyAllRecords: false
-			viewAllRecords: true
-		member:
-			allowCreate: true
-			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
@@ -151,11 +145,6 @@ Creator.Objects.spaces =
 			modifyAllRecords: false
 			viewAllRecords: true
 
-
-if Meteor.isClient
-	db.spaces._simpleSchema.i18n("spaces")
-
-db.spaces.attachSchema(db.spaces._simpleSchema)
 
 
 db.spaces.helpers
