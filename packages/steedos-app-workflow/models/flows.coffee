@@ -1,12 +1,15 @@
 db.flows = new Meteor.Collection('flows')
 
 if Meteor.isServer
-	db.flows.copy = (userId, spaceId, flowId, newFlowName, enabled)->
+	db.flows.copy = (userId, spaceId, flowId, options, enabled)->
 
 		flow = db.flows.findOne({_id: flowId, space: spaceId}, {fields: {_id: 1, name: 1, form: 1}})
 
 		if !flow
 			throw Meteor.Error("[flow.copy]未找到flow, space: #{spaceId}, flowId: #{flowId}");
+
+		newFlowName = options?.name
+		company_id = options?.company_id
 
 		if newFlowName
 			newName = newFlowName
@@ -23,7 +26,7 @@ if Meteor.isServer
 		form.flows?.forEach (f)->
 			f.name = newName
 
-		steedosImport.workflow(userId, spaceId, form, enabled)
+		steedosImport.workflow(userId, spaceId, form, enabled, company_id)
 
 Creator.Objects.flows =
 	name: "flows"
@@ -460,30 +463,12 @@ Creator.Objects.flows =
 			visible: true
 			on: "record"
 			todo: (object_name, record_id, fields)->
-				swal {
-					title: t("workflow_copy_flow"),
-					text: t("workflow_copy_flow_text"),
-					type: "input",
-					confirmButtonText: t('OK'),
-					cancelButtonText: t('Cancel'),
-					showCancelButton: true,
-					closeOnConfirm: false
-				}, (reason) ->
-					if (reason == false)
-						return false;
-
-					if (reason == "")
-						swal.showInputError(t("workflow_copy_flow_error_reason_required"));
-						return false;
-
-					Meteor.call "flow_copy", Steedos.spaceId(), record_id, reason, (error, result)->
-						if error
-							toastr.error 'error'
-						else
-							toastr.success t('workflow_copy_flow_success')
-							sweetAlert.close();
-							if result.length > 0
-								FlowRouter.go("/app/admin/flows/view/#{result[0]}")
+				Modal.show "copy_flow_modal", {
+					record_id: record_id,
+					onSuccess: (flows)->
+						if flows.length > 0
+							FlowRouter.go("/app/admin/flows/view/#{flows[0]}")
+				}
 
 	permission_set:
 		user:

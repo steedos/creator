@@ -245,3 +245,13 @@ Creator.getRelativeUrl = (url)->
 		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX + url
 	else
 		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
+
+Creator.getUserCompanyId = (userId, spaceId)->
+	userId = userId || Meteor.userId()
+	if Meteor.isClient
+		spaceId = spaceId || Session.get('spaceId')
+	else
+		if !spaceId
+			throw new Meteor.Error(400, 'miss spaceId')
+	su = Creator.getCollection('space_users').findOne({space: spaceId, user: userId}, {fields: {company_id:1}})
+	return su.company_id

@@ -1,9 +1,9 @@
 Meteor.methods
-	flow_copy: (spaceId, flowId, newName)->
+	flow_copy: (spaceId, flowId, options)->
 		if (!this.userId)
 			return;
 
-		if !Steedos.isSpaceAdmin(spaceId, this.userId)
+		if !Workflow.checkCreatePermissions(spaceId, this.userId, options?.company_id)
 			throw  Meteor.Error("No permission");
 
-		db.flows.copy(this.userId, spaceId, flowId, newName, false)
+		db.flows.copy(this.userId, spaceId, flowId, options, false)

@@ -41,7 +41,7 @@ Package.onUse(function(api) {
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
-	api.addFiles('core.coffee', 'client');
+	api.addFiles('core.coffee');
 	api.addFiles('client/new_flow_modal.less', 'client');
 	api.addFiles('client/new_flow_modal.html', 'client');
 	api.addFiles('client/new_flow_modal.coffee', 'client');
@@ -64,6 +64,9 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/admin_import_flow_modal.html', 'client');
 	api.addFiles('client/admin_import_flow_modal.coffee', 'client');
+
+	api.addFiles('client/copy_flow_modal.html', 'client');
+	api.addFiles('client/copy_flow_modal.coffee', 'client');
 
 	api.addFiles('server/lib/export.coffee', 'server');
 	api.addFiles('routes/export.coffee', 'server');

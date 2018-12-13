@@ -24,6 +24,8 @@ JsonRoutes.add "post", "/api/workflow/import/form", (req, res, next) ->
 
 	spaceId = req.query?.space;
 
+	company_id = req.query?.company_id;
+
 	space = db.spaces.findOne(spaceId, { fields: { is_paid: 1 } })
 
 	if !space?.is_paid
@@ -34,14 +36,12 @@ JsonRoutes.add "post", "/api/workflow/import/form", (req, res, next) ->
 				"success": false
 		return;
 
-#	是否工作区管理员
-	if !Steedos.isSpaceAdmin(spaceId, uid)
+	if !Workflow.checkCreatePermissions(spaceId, uid, company_id)
 		res.writeHead(401);
 		res.end JSON.stringify({
 			"error": "Validate Request -- No permission",
 			"success": false
 		})
-
 		return
 
 	try
@@ -52,7 +52,7 @@ JsonRoutes.add "post", "/api/workflow/import/form", (req, res, next) ->
 					jsonData = req.files[0].data.toString("utf-8")
 					try
 						form = JSON.parse(jsonData)
-						new_flowIds = steedosImport.workflow(uid, spaceId, form, false);
+						new_flowIds = steedosImport.workflow(uid, spaceId, form, false, company_id);
 						msg = JSON.stringify({new_flows: new_flowIds})
 						res.statusCode = 200;
 					catch e

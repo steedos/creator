@@ -71,11 +71,6 @@ if Meteor.isClient
 			else if selectedLength == checkboxs.length
 				checkboxAll.prop("checked",true)
 
-	Creator.getUserCompanyId = (userId)->
-		userId = userId || Meteor.userId()
-		su = Creator.getCollection('space_users').findOne({space: Session.get('spaceId'), user: userId}, {fields: {company_id:1}})
-		return su.company_id
-
 	### TO DO LIST
 		1.支持$in操作符，实现recent视图
 		$eq, $ne, $lt, $gt, $lte, $gte

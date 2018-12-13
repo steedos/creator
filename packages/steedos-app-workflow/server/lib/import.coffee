@@ -1,11 +1,10 @@
 steedosImport = {}
 
-steedosImport.workflow = (uid, spaceId, form, enabled)->
+steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 
 	if _.isEmpty(form)
 		throw new Meteor.Error('error', "无效的json data")
 
-	company_id = form.company_id
 	if company_id
 		if db.organizations.find({ _id: company_id, space: spaceId }).count() == 0
 			throw new Meteor.Error('error', "无效的字段: company_id")
@@ -84,13 +83,13 @@ steedosImport.workflow = (uid, spaceId, form, enabled)->
 
 		form.current.modified_by = uid
 
-		form.company_id = company_id
+		delete form.company_id
+		if company_id
+			form.company_id = company_id
 
 		form.import = true
 
 		db.forms.direct.insert(form)
-
-
 
 		new_form_ids.push(form_id)
 
@@ -116,19 +115,29 @@ steedosImport.workflow = (uid, spaceId, form, enabled)->
 
 			flow.created_by = uid
 
-			flow.company_id = company_id
+			delete flow.company_id
+			if company_id
+				flow.company_id = company_id
 
 			#跨工作区导入时，重置流程权限perms
-			if !flow.perms || flow.space !=  spaceId
-				#设置提交部门为：全公司
-				perms = {
-					_id: new Mongo.ObjectID()._str
-					users_can_add: []
-					orgs_can_add: db.organizations.find({
+			if !flow.perms || flow.space !=  spaceId || company_id
+
+				orgs_can_add = []
+
+				if company_id
+					orgs_can_add = [company_id]
+				else
+					db.organizations.find({
 						space: spaceId,
 						is_company: true,
 						parent: null
 					}, {fields: {_id: 1}}).fetch().getProperty("_id")
+
+				#设置提交部门为：全公司
+				perms = {
+					_id: new Mongo.ObjectID()._str
+					users_can_add: []
+					orgs_can_add: orgs_can_add
 					users_can_monitor: []
 					orgs_can_monitor: []
 					users_can_admin: []
@@ -161,7 +170,13 @@ steedosImport.workflow = (uid, spaceId, form, enabled)->
 				else
 					approve_roles = new Array()
 					step.approver_roles_name.forEach (role_name) ->
-						role = db.flow_roles.findOne({space: spaceId, name: role_name}, {fields: {_id: 1}})
+
+						flow_role_query = {space: spaceId, name: role_name}
+
+						if company_id
+							flow_role_query.company_id = company_id
+
+						role = db.flow_roles.findOne(flow_role_query, {fields: {_id: 1}})
 						if _.isEmpty(role)
 							role_id = db.flow_roles._makeNewID()
 							role = {
@@ -171,6 +186,9 @@ steedosImport.workflow = (uid, spaceId, form, enabled)->
 								create: new Date
 								create_by: uid
 							}
+
+							if company_id
+								role.company_id = company_id
 
 							db.flow_roles.direct.insert(role)
 
