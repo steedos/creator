@@ -2,6 +2,12 @@ if !Creator?
 	@Creator = {}
 Creator.Objects = {}
 Creator.Collections = {}
+Creator.Menus = []
+Creator.Apps = {}
+Creator.Reports = {}
+Creator.subs = {}
+
+
 Creator.deps = {
 	app: new Tracker.Dependency
 	object: new Tracker.Dependency
