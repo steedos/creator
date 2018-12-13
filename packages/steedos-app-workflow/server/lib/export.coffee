@@ -1,6 +1,6 @@
 steedosExport = {}
 
-_getFlowByForm = (form, flowId, is_copy)->
+_getFlowByForm = (form, flowId, is_copy, company_id)->
 
 	query = {form: form}
 
@@ -9,15 +9,11 @@ _getFlowByForm = (form, flowId, is_copy)->
 
 	fields = {history: 0}
 
-	if !is_copy
-		fields.perms = 0
-
 	flows = db.flows.find(query, fields).fetch();
 
 	flows.forEach (flow) ->
 		flow.historys = []
-
-		if !is_copy
+		if !is_copy || (!company_id && flow.company_id) || (company_id && !flow.company_id) || (company_id != flow.company_id)
 			flow.current.steps?.forEach (step) ->
 				roles_name = []
 				if !_.isEmpty(step.approver_roles)
@@ -28,6 +24,9 @@ _getFlowByForm = (form, flowId, is_copy)->
 				step.approver_users = []
 
 				step.approver_orgs = []
+
+		if !is_copy || (!company_id && flow.company_id) || (company_id && !flow.company_id) || (company_id != flow.company_id)
+			delete flow.perms
 
 	return flows;
 
@@ -42,7 +41,7 @@ _getFlowByForm = (form, flowId, is_copy)->
 
     flows: 引用此表单的所有流程，不包含历史版本
 ###
-steedosExport.form = (formId, flowId, is_copy) ->
+steedosExport.form = (formId, flowId, is_copy, company_id) ->
 	form = db.forms.findOne({_id: formId}, {fields: {historys: 0}});
 
 	if !form
@@ -103,6 +102,6 @@ steedosExport.form = (formId, flowId, is_copy) ->
 
 	form.instance_number_rules = instance_number_rules
 
-	form.flows = _getFlowByForm(formId, flowId, is_copy)
+	form.flows = _getFlowByForm(formId, flowId, is_copy, company_id)
 
 	return form

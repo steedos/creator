@@ -16,7 +16,7 @@ if Meteor.isServer
 		else
 			newName = "复制:" + flow.name
 
-		form = steedosExport.form(flow.form, flow._id, true)
+		form = steedosExport.form(flow.form, flow._id, true, company_id)
 
 		if _.isEmpty(form)
 			throw Meteor.Error("[flow.copy]未找到form, formId: #{flow.form}");
@@ -85,12 +85,12 @@ Creator.Objects.flows =
 		modified_by:
 			label:"修改人"
 		current:
-#			blackbox: true
 #			omit: true
 #			hidden: true
 			label:"步骤"
 			type: 'Object'
 			is_wide: true
+			blackbox: true
 #		'current._id':
 #			type: 'text'
 #			readonly: true
@@ -196,6 +196,7 @@ Creator.Objects.flows =
 			label:"权限"
 			type: 'Object'
 			is_wide: true
+			blackbox: true
 
 		"perms.users_can_add":
 			label:"授权用户: 新建申请单"
@@ -286,6 +287,7 @@ Creator.Objects.flows =
 			is_wide: true
 			group: "分发"
 			filter_by_company: true
+			blackbox: true
 		distribute_to_self:
 			label:"分发给自己"
 			type: "boolean"
