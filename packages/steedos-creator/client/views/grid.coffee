@@ -221,15 +221,15 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 		
-		if !is_related
-			if column_width_settings
-				width = column_width_settings[n]
-				if width
-					columnItem.width = width
-				else
-					columnItem.width = defaultWidth
-			else
-				columnItem.width = defaultWidth
+		# if !is_related
+		# 	if column_width_settings
+		# 		width = column_width_settings[n]
+		# 		if width
+		# 			columnItem.width = width
+		# 		else
+		# 			columnItem.width = defaultWidth
+		# 	else
+		# 		columnItem.width = defaultWidth
 		
 		unless field.sortable
 			columnItem.allowSorting = false
@@ -388,7 +388,7 @@ Template.creator_grid.onRendered ->
 					needToShowLinkForIndexColumn = true
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
-					width: 60
+					width: 40
 					allowExporting: false
 					allowSorting: false
 					allowReordering: false
@@ -399,7 +399,7 @@ Template.creator_grid.onRendered ->
 		
 				showColumns.splice 0, 0,
 					dataField: "_index"
-					width: 60
+					width: 40
 					allowExporting: true
 					allowSorting: false
 					allowReordering: false
@@ -497,6 +497,7 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
+				columnAutoWidth: true
 				sorting: 
 					mode: "multiple"
 				customizeExportData: (col, row)->
