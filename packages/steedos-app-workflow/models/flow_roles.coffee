@@ -76,13 +76,8 @@ if Meteor.isServer
 				return true
 
 	db.flow_roles.before.insert (userId, doc) ->
-		if not userId
-			return
-
-		doc.created_by = userId
-		doc.created = new Date()
-		doc.modified_by = userId
-		doc.modified = new Date()
+		doc.created_by = userId;
+		doc.created = new Date();
 
 
 	db.flow_roles.before.update (userId, doc, fieldNames, modifier, options) ->
@@ -107,4 +102,19 @@ if Meteor.isServer
 
 		if not _.isEmpty(flowNames)
 			throw new Meteor.Error 400, "flow_roles_error_flows_used", {names: _.uniq(flowNames).join(',')}
+
+	db.flow_roles._ensureIndex({
+		"space": 1
+	},{background: true})
+
+	db.flow_roles._ensureIndex({
+		"space": 1,
+		"created": 1
+	},{background: true})
+
+	db.flow_roles._ensureIndex({
+		"space": 1,
+		"created": 1,
+		"modified": 1
+	},{background: true})
 

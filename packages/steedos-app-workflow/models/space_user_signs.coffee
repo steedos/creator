@@ -90,16 +90,12 @@ if Meteor.isServer
 				return true
 
 	db.space_user_signs.before.insert (userId, doc) ->
-		if not userId
-			return
-
 		if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
 			throw new Meteor.Error(400, "space_paid_info_title");
-
-		doc.created_by = userId
-		doc.created = new Date()
-		doc.modified_by = userId
-		doc.modified = new Date()
+		doc.created_by = userId;
+		doc.created = new Date();
+		doc.modified_by = userId;
+		doc.modified = new Date();
 
 		userSign = db.space_user_signs.findOne({space: doc.space, user: doc.user});
 
@@ -118,4 +114,13 @@ if Meteor.isServer
 
 			if userSign
 				throw new Meteor.Error(400, "spaceUserSigns_error_user_sign_exists");
+
+	db.space_user_signs._ensureIndex({
+		"space": 1
+	},{background: true})
+
+	db.space_user_signs._ensureIndex({
+		"space": 1,
+		"user": 1
+	},{background: true})
 

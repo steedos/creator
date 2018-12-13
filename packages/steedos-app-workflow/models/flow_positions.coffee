@@ -118,11 +118,33 @@ if Meteor.isServer
 		modifier.$set.modified_by = userId;
 		modifier.$set.modified = new Date();
 
-	db.flow_positions.before.insert (userId, doc) ->
-		if not userId
-			return
+	db.flow_positions._ensureIndex({
+			"space": 1
+	},{background: true})
 
-		doc.created_by = userId
-		doc.created = new Date()
-		doc.modified_by = userId
-		doc.modified = new Date()
+	db.flow_positions._ensureIndex({
+		"space": 1,
+		"created": 1
+	},{background: true})
+
+	db.flow_positions._ensureIndex({
+		"space": 1,
+		"created": 1,
+		"modified": 1
+	},{background: true})
+
+	db.flow_positions._ensureIndex({
+		"role": 1,
+		"org": 1,
+		"space": 1
+	},{background: true})
+
+	db.flow_positions._ensureIndex({
+		"space": 1,
+		"users": 1
+	},{background: true})
+
+	db.flow_positions._ensureIndex({
+		"space": 1,
+		"role": 1
+	},{background: true})

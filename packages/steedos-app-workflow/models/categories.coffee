@@ -9,25 +9,15 @@ Creator.Objects.categories =
 			type: "text"
 			label: "名称"
 
+		sort_no:
+			label: "排序号"
+			type: "number"
+
 	list_views:
 		all:
 			label: "所有"
 			filter_scope: "space"
 			columns: ["name"]
-
-		calendarView:
-			type: 'calendar'
-			label: '日历视图'
-			filter_scope: "space"
-#			filters: [["is_deleted", "=", false], ["state", "=", "enabled"]]
-			options: {
-				startDateExpr: 'created', # 开始时间 必填
-				endDateExpr: 'created', # 结束时间 必填
-#				textExpr: 'name', #显示的字段
-#				title: ['name', 'form', 'state'] #鼠标悬浮提示
-#				currentView: 'month'
-			}
-
 
 	permission_set:
 		user:
@@ -47,6 +37,39 @@ Creator.Objects.categories =
 
 if Meteor.isServer
 
+	db.categories.allow
+		insert: (userId, event) ->
+			return false
+
+		update: (userId, event) ->
+			if (!Steedos.isSpaceAdmin(event.space, userId))
+				return false
+			else
+				return true
+
+		remove: (userId, event) ->
+			return false
+
+	db.categories.before.insert (userId, doc) ->
+		doc.created_by = userId;
+		doc.created = new Date();
+
+		if (!Steedos.isSpaceAdmin(doc.space, userId))
+			throw new Meteor.Error(400, "error_space_admins_only");
+
+	db.categories.before.update (userId, doc, fieldNames, modifier, options) ->
+
+		modifier.$set = modifier.$set || {};
+
+		modifier.$set.modified_by = userId;
+		modifier.$set.modified = new Date();
+
+		if (!Steedos.isSpaceAdmin(doc.space, userId))
+			throw new Meteor.Error(400, "error_space_admins_only");
+
 	db.categories.before.remove (userId, doc) ->
+		if (!Steedos.isSpaceAdmin(doc.space, userId))
+			throw new Meteor.Error(400, "error_space_admins_only");
+
 		if db.forms.find({space: doc.space, category: doc._id}).count()>0
 			throw new Meteor.Error(400, "categories_in_use")

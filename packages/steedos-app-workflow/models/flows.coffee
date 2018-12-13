@@ -499,15 +499,39 @@ Creator.Objects.flows =
 			unrelated_objects: []
 
 if Meteor.isServer
+	db.flows.allow
+		insert: (userId, event) ->
+			return false
+
+		update: (userId, event) ->
+			if (!Steedos.isSpaceAdmin(event.space, userId))
+				return false
+			else
+				return true
+
+		remove: (userId, event) ->
+			return false
 
 	db.flows.before.insert (userId, doc) ->
-		if not userId
-			return
-
-		doc.created_by = userId
-		doc.created = new Date()
+		doc.created_by = userId;
+		doc.created = new Date();
+		if doc.current
+			doc.current.created_by = userId;
+			doc.current.created = new Date();
+			doc.current.modified_by = userId;
+			doc.current.modified = new Date();
 
 	db.flows.after.update (userId, doc, fieldNames, modifier, options) ->
+		modifier.$set = modifier.$set || {};
+
+		if !modifier.$set.current
+			if _.keys(modifier.$set).toString() isnt 'auto_remind' and _.keys(modifier.$set).toString() isnt 'upload_after_being_distributed' # 为了启用自动催办的时候流程在列表位置不变
+				modifier.$set['current.modified_by'] = userId;
+				modifier.$set['current.modified'] = new Date();
+
+		if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
+			throw new Meteor.Error(400, "space_paid_info_title");
+
 		if doc.category != this.previous.category
 			if doc.category
 				db.forms.update(doc.form, { $set: { category: doc.category } })
@@ -519,3 +543,71 @@ if Meteor.isServer
 				db.forms.update(doc.form, { $set: { company_id: doc.company_id } })
 			else
 				db.forms.update(doc.form, { $unset: { company_id: 1 } })
+
+	db.flows._ensureIndex({
+		"is_deleted": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"space": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"space": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"role": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"space": 1,
+		"app": 1,
+		"created": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"space": 1,
+		"app": 1,
+		"created": 1,
+		"current.modified": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"name": 1,
+		"space": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"form": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"current.steps.approver_roles": 1,
+		"space": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"_id": 1,
+		"space": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"space": 1,
+		"form": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"form": 1
+	},{background: true})
+
+	db.flows._ensureIndex({
+		"space": 1,
+		"form": 1,
+		"state:": 1
+	},{background: true})

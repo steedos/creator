@@ -1,3 +1,5 @@
+db.instances = new Meteor.Collection('instances')
+
 Creator.Objects.instances =
 	name: "instances"
 	icon: "task"
@@ -140,7 +142,7 @@ Creator.Objects.instances =
 		"record_ids.$.ids":
 			type: "[text]"
 			hidden:true
-		
+
 		company_id:
 			label: "所属单位"
 			type: "lookup"
@@ -210,3 +212,214 @@ Creator.Objects.instances =
 				uobj["X-Auth-Token"] = Accounts._storedLoginToken()
 				workflowUrl = window.location.protocol + '//' + window.location.hostname + '/'
 				Steedos.openWindow(workflowUrl + "workflow/space/" + Session.get("spaceId") + "/print/" + record_id + "?" + $.param(uobj), "",'width=900,height=750,scrollbars=yes,EnableViewPortScale=yes,toolbarposition=top,transitionstyle=fliphorizontal,menubar=yes,closebuttoncaption=  x  ')
+
+if Meteor.isServer
+	db.instances.allow
+
+		insert: (userId, event) ->
+			return false
+
+		update: (userId, event) ->
+			if event.state == "draft" && (event.applicant == userId || event.submitter == userId)
+				return true
+			else
+				return false
+
+		remove: (userId, event) ->
+			return false
+
+
+	db.instances._ensureIndex({
+		"space": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"submitter": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"applicant": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"outbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"inbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"space": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"state": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_archived": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"created": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"_id": 1,
+		"submit_date": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"space": 1,
+		"flow": 1,
+		"state": 1,
+		"submit_date": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"created": 1,
+		"modified": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"final_decision": 1,
+		"submitter": 1,
+		"applicant": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"space": 1,
+		"modified": 1,
+		"outbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"modified": 1,
+		"final_decision": 1,
+		"submitter": 1,
+		"applicant": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"space": 1,
+		"outbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"space": 1,
+		"modified": 1,
+		"submit_date": 1,
+		"outbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"space": 1,
+		"submit_date": 1,
+		"outbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"flow": 1,
+		"modified": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"flow": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"flow": 1,
+		"submit_date": 1,
+		"modified": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"flow": 1,
+		"submit_date": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"submitter": 1,
+		"applicant": 1,
+		"inbox_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"is_deleted": 1,
+		"state": 1,
+		"space": 1,
+		"is_archive": 1,
+		"submitter": 1,
+		"applicant": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"modified": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"modified": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"cc_users": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"space": 1,
+		"state": 1,
+		"is_deleted": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"keywords": "hashed",
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"space": 1,
+		"submit_date": 1,
+		"is_deleted": 1,
+		"final_decision": 1,
+		"state": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"traces.approves.type": 1,
+		"traces.approves.handler": 1
+	},{background: true})
+
+	# 全文检索同步字段
+	db.instances._ensureIndex({
+		"is_recorded": 1
+	},{background: true})
