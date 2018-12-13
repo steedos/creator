@@ -218,8 +218,8 @@ if Meteor.isServer
 				modifier.$set.admins.push(modifier.$set.owner)
 
 		# 管理员不能为空
-		if (!modifier.$set.admins)
-			throw new Meteor.Error(400, "spaces_error_space_admins_required");
+		# if (!modifier.$set.admins)
+		# 	throw new Meteor.Error(400, "spaces_error_space_admins_required");
 
 		# 必须启用 admin app
 		# if modifier.$set.apps_enabled

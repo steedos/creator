@@ -54,6 +54,7 @@ Creator.Objects.space_users =
 			label:'排序号'
 			group:'-'
 		organization:
+			label:'主部门'
 			type: "lookup"
 			reference_to: "organizations"
 			omit: true
@@ -90,7 +91,7 @@ Creator.Objects.space_users =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "position", "mobile", "email", "sort_no", "company_id"]
+			columns: ["name", "organization", "position", "mobile", "email", "sort_no", "company_id"]
 			filter_scope: "space"	
 	
 	permission_set:
