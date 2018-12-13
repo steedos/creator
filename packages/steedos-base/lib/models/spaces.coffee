@@ -47,6 +47,7 @@ Creator.Objects.spaces =
 			reference_to: "users"
 			index:true
 			multiple: true
+			is_wide: true
 		avatar:
 			label:'公司Logo'
 			type:'avatar'
@@ -71,15 +72,17 @@ Creator.Objects.spaces =
 		hostname:
 			label:'绑定域名'
 			type: "[text]"
-		balance:
-			label:'账户余额'
-			type:"number"
-			scale:2
-			omit: true
-			readonly: true
 		is_paid:
 			label: t("Spaces_isPaid")
 			type: "boolean"
+			group: "账务"
+			omit: true
+			readonly: true
+		balance:
+			label:'账户余额'
+			type:"number"
+			group: "账务"
+			scale:2
 			omit: true
 			readonly: true
 		services:
@@ -99,14 +102,17 @@ Creator.Objects.spaces =
 			label:'已购买用户数'
 			type:"number"
 			omit: true
+			group: "账务"
 		start_date:
 			label:'付费开始时间'
 			type: "datetime"
 			omit: true
+			group: "账务"
 		end_date:
 			label:'付费截止时间'
 			type: "datetime"
 			omit: true
+			group: "账务"
 		modules:
 			label:'模块'
 			type: "[text]"
