@@ -258,25 +258,21 @@ Creator.Objects.flows =
 			type: "code",
 			language: "handlebars",
 			is_wide: true
-			rows: 6
 			group: "模板"
 		print_template:
 			label:"打印模板"
 			type: "code",
 			language: "handlebars",
-			rows: 6
 			is_wide: true
 			group: "模板"
 		field_map:
 			label:"映射关系"
 			type: "textarea"
-			rows: 6
 			is_wide: true
 			group: "归档"
 		events:
 			label:"相关事件"
 			type: "textarea"
-			rows: 6
 			is_wide: true
 			group: "脚本"
 		distribute_optional_users:

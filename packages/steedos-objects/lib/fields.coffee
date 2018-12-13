@@ -32,13 +32,13 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == 'code'
 			fs.type = String
 			fs.autoform.type = "textarea"
-			fs.autoform.rows = field.rows || 3
+			fs.autoform.rows = field.rows || 12
 			if field.language
 				fs.autoform.language = field.language
 		else if field.type == "textarea"
 			fs.type = String
 			fs.autoform.type = "textarea"
-			fs.autoform.rows = field.rows || 3
+			fs.autoform.rows = field.rows || 6
 		else if field.type == "date"
 			fs.type = Date
 			if Meteor.isClient
