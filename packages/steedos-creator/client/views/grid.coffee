@@ -389,6 +389,7 @@ Template.creator_grid.onRendered ->
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
 					width: 30
+					allowResizing: false
 					allowExporting: false
 					allowSorting: false
 					allowReordering: false
@@ -400,6 +401,7 @@ Template.creator_grid.onRendered ->
 				showColumns.splice 0, 0,
 					dataField: "_index"
 					width: 50
+					allowResizing: false
 					alignment: "right"
 					allowExporting: true
 					allowSorting: false
@@ -443,6 +445,8 @@ Template.creator_grid.onRendered ->
 				columnResizingMode: "widget"
 				showRowLines: true
 				savingTimeout: 1000
+				#selection: 
+				#	mode: "multiple"
 				stateStoring:{
 		   			type: "custom"
 					enabled: true
