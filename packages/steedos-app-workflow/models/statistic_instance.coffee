@@ -56,7 +56,7 @@ Creator.Objects.instances_statistic =
 			sortable: true
 			index:true
 			is_company_only: true
-			required: true
+			required: Meteor.settings.public.is_group_company
 			defaultValue: ()->
 				if Meteor.isClient
 					return Session.get("user_company_id")
