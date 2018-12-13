@@ -1,5 +1,5 @@
 Package.describe({
-	name: 'steedos:meeting',
+	name: 'steedos:app-meeting',
 	version: '0.0.1',
 	summary: 'meeting',
 	git: '',

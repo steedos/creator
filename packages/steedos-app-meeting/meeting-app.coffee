@@ -7,7 +7,7 @@ Creator.Apps.meeting =
 	visible:true 
 	is_creator:true
 	objects: [
-		"meeting"
+		"meeting", "tasks", "notes"
 		]
 
 
