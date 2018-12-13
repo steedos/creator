@@ -1,6 +1,6 @@
 <template name="creator_table_cell">
-	<span class="slds-grid slds-grid_align-spread creator_table_cell field-{{field.type}}">
-		<div class="{{#unless isMarkdown field.type}}cell-container{{else}}editor-preview-side{{/unless}}">
+	<span class="slds-grid slds-grid_align-spread field-{{field.type}}">
+		<div class="slds-truncate {{#unless isMarkdown field.type}}cell-container{{else}}editor-preview-side{{/unless}}">
 			{{#each cellData}}
 				{{#if isTable}}
 					<div class="cellGridContainer slds-table_edit slds-hint-parent"></div>
@@ -13,12 +13,12 @@
 				{{else}}
 					{{#if href}}
 						{{#if openWindow}}
-							<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=800, left=300, top=20,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false" title="{{value}}" class="slds-truncate link-detail fulltex list-item-link-{{id}}">{{value}}</a>
+							<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=800, left=300, top=20,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false" title="{{value}}" class="slds-truncate link-detail list-item-link-{{id}}">{{value}}</a>
 						{{else}}
-							<a href="{{href}}" title="{{value}}" class="slds-truncate link-detail fulltex list-item-link-{{id}}">{{value}}</a>
+							<a href="{{href}}" title="{{value}}" class="slds-truncate link-detail list-item-link-{{id}}">{{value}}</a>
 						{{/if}}
 					{{else}}
-						<span class="fulltex">{{{value}}}&nbsp;</span>
+						<span class="">{{{value}}}&nbsp;</span>
 					{{/if}}
 				{{/if}}
 			{{/each}}
