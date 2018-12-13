@@ -6,10 +6,10 @@
 					<div class="cellGridContainer slds-table_edit slds-hint-parent"></div>
 				{{else if isImages}}
 					{{#each value}}
-						<img class="creator-table-cell-image" src="/api/files/images/{{this}}" alt="{{this}}" />
+						<img class="creator-table-cell-image" src="{{baseUrl}}/{{this}}"/>
 					{{/each}}
 				{{else if isImage}}
-					<img class="creator-table-cell-image" src="/api/files/images/{{value}}" alt="{{value}}" />
+					<img class="creator-table-cell-image" src="{{baseUrl}}/{{value}}"/>
 				{{else}}
 					{{#if href}}
 						{{#if openWindow}}

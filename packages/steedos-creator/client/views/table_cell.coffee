@@ -197,9 +197,14 @@ Template.creator_table_cell.helpers
 						return
 		else if _field.type == "image"
 			if typeof val is "string"
-				data.push {value: val, id: this._id, isImage: true}
+				data.push {value: val, id: this._id, isImage: true, baseUrl: Creator.getRelativeUrl("/api/files/images")}
 			else
-				data.push {value: val, id: this._id, isImages: true}
+				data.push {value: val, id: this._id, isImages: true, baseUrl: Creator.getRelativeUrl("/api/files/images")}
+		else if _field.type == "avatar"
+			if typeof val is "string"
+				data.push {value: val, id: this._id, isImage: true, baseUrl: Creator.getRelativeUrl("/api/files/avatars")}
+			else
+				data.push {value: val, id: this._id, isImages: true, baseUrl: Creator.getRelativeUrl("/api/files/avatars")}
 		else if _field.type == "code"
 			if val
 				val = '...'
