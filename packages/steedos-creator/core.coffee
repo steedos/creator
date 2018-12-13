@@ -1,8 +1,3 @@
-Creator.Apps = {}
-Creator.Reports = {}
-Creator.subs = {}
-
-
 Meteor.startup ->
 	if Meteor.isServer
 		_.each Creator.Objects, (obj, object_name)->

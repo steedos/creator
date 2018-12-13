@@ -7,7 +7,12 @@ Creator.Apps.meeting =
 	visible:true 
 	is_creator:true
 	objects: [
-		"meeting",
-		"meetingroom",
-		"reports"
+		"meeting"
 		]
+
+
+Creator.Menus.push( 
+    # 单位管理员可以创建和设置流程及相关参数。
+    { _id: 'menu_meeting', name: '会议', permission_sets: ["admin"], expanded: false },
+    { _id: 'meetingroom', name: '会议室', permission_sets: ["admin"], object_name: "meetingroom", parent: 'menu_meeting' },
+);
