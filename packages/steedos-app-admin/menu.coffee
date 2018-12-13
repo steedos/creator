@@ -31,7 +31,7 @@ Creator.Menus =  [
     { _id: 'permission_objects', name: '对象权限', permission_sets: ["admin"], object_name: "permission_objects", parent: 'menu_objects' },
 
     { _id: 'menu_company', name: '公司', permission_sets: ["admin"], expanded: false },
-    { _id: 'spaces', name: '工作区', permission_sets: ["admin"], object_name: "spaces", parent: 'menu_company' },
+    { _id: 'spaces', name: '公司信息', permission_sets: ["admin"], object_name: "spaces", parent: 'menu_company' },
 
     { _id: 'menu_development', name: '开发', permission_sets: ["admin"], expanded: false },
     { _id: 'application_package', name: '软件包', permission_sets: ["admin"], object_name: "application_package", parent: 'menu_development' },
