@@ -37,7 +37,7 @@ Creator.Objects.organizations =
 			reference_to: "organizations"
 			multiple: true
 			omit: true
-			hidden: true
+			group: "系统"
 			blackbox: true
 
 		children:
@@ -46,7 +46,7 @@ Creator.Objects.organizations =
 			reference_to: "organizations"
 			multiple: true
 			omit: true
-			hidden: true
+			group: "系统"
 
 		sort_no:
 			label: "排序号"
@@ -74,7 +74,7 @@ Creator.Objects.organizations =
 			sortable: true
 			index:true
 			omit: true
-			hidden: true
+			group: "系统"
 
 		is_company:
 			label: "公司级"
