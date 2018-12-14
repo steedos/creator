@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:app-workflow',
-	version: '0.0.1',
+	version: '0.0.2',
 	summary: 'Creator workflow',
 	git: '',
 	documentation: null
@@ -12,6 +12,8 @@ Npm.depends({
 });
 
 Package.onUse(function(api) {
+	api.versionsFrom('METEOR@1.3');
+
 	api.use('reactive-var');
 	api.use('reactive-dict');
 	api.use('random');
@@ -35,9 +37,9 @@ Package.onUse(function(api) {
 	api.use('steedos:cfs-s3@0.1.4');
 	api.use('steedos:cfs-aliyun@0.1.0');
 
-	api.use('steedos:base');
+	api.use('steedos:base@0.0.88');
 
-	api.use('tap:i18n', ['client', 'server']);
+	api.use('tap:i18n@1.8.2', ['client', 'server']);
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
