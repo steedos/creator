@@ -49,7 +49,7 @@ Creator.Objects.flow_roles =
 			viewAllRecords: true
 		workflow_admin:
 			allowCreate: true
-			allowDelete: false
+			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
