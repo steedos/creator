@@ -1,6 +1,6 @@
 db.organizations = new Meteor.Collection('organizations')
 
-db.organizations._simpleSchema = new SimpleSchema
+#db.organizations._simpleSchema = new SimpleSchema
 
 Creator.Objects.organizations =
 	name: "organizations"
@@ -29,6 +29,7 @@ Creator.Objects.organizations =
 			reference_to: "organizations"
 			sortable: true
 			index:true
+			blackbox: true
 
 		parents:
 			label: "上级部门"
@@ -37,6 +38,7 @@ Creator.Objects.organizations =
 			multiple: true
 			omit: true
 			hidden: true
+			blackbox: true
 
 		children:
 			label: "下级部门"
@@ -115,7 +117,7 @@ if Meteor.isServer
 		return Creator.Collections.organizations.find({space: space_id, is_company: true}, {fields: {_id: 1, name: 1, parent: 1, parents: 1, space: 1, is_company: 1}})
 
 if Meteor.isClient
-	db.organizations._simpleSchema.i18n("organizations")
+#	db.organizations._simpleSchema.i18n("organizations")
 	db.organizations._sortFunction = (doc1, doc2) ->
 		if (doc1.sort_no == doc2.sort_no)
 			return doc1.name?.localeCompare(doc2.name);
@@ -126,7 +128,7 @@ if Meteor.isClient
 	db.organizations.getRoot = (fields)->
 		return SteedosDataManager.organizationRemote.findOne { is_company: true, parent: null }, fields: fields
 
-db.organizations.attachSchema db.organizations._simpleSchema;
+#db.organizations.attachSchema db.organizations._simpleSchema;
 
 
 db.organizations.helpers
@@ -453,7 +455,6 @@ if (Meteor.isServer)
 			children = db.organizations.find({parents: doc._id});
 			children.forEach (child) ->
 				db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
-
 		if !_.isEmpty(updateFields)
 			db.organizations.direct.update(obj._id, {$set: updateFields})
 

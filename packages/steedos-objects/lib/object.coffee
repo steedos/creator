@@ -144,7 +144,7 @@ Creator.Object = (options)->
 
 	schema = Creator.getObjectSchema(self)
 	self.schema = new SimpleSchema(schema)
-	if self.name != "users" and self.name != "cfs.files.filerecord" && !self.is_view && !_.contains(["flows", "forms", "instances"], self.name)
+	if self.name != "users" and self.name != "cfs.files.filerecord" && !self.is_view && !_.contains(["flows", "forms", "instances", "organizations"], self.name)
 		if Meteor.isClient
 			_db.attachSchema(self.schema, {replace: true})
 		else
@@ -152,7 +152,7 @@ Creator.Object = (options)->
 	if self.name == "users"
 		_db._simpleSchema = self.schema
 
-	if _.contains(["flows", "forms", "instances"], self.name)
+	if _.contains(["flows", "forms", "instances", "organizations"], self.name)
 		if Meteor.isClient
 			_db.attachSchema(self.schema, {replace: true})
 
