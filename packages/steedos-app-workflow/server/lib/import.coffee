@@ -61,7 +61,7 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 			form.is_valid = true #直接启用的表单设置is valid值为true
 		else
 			form.state = 'disabled' #设置状态为 未启用
-			form.is_valid = false #设置已验证为 false
+			form.is_valid = true #设置已验证为 false
 
 		form.created = new Date()
 
@@ -105,7 +105,7 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 				flow.is_valid = true #直接启用的流程设置is valid值为true
 			else
 				flow.state = 'disabled' #设置状态为 未启用
-				flow.is_valid = false
+				flow.is_valid = true
 
 			flow.current_no = 0 #重置编号起始为0
 
