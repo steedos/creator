@@ -13,11 +13,11 @@ body {
     #sidebar-menu {
     	background: rgba(255, 255, 255, 0.9);
 		position: fixed;
-		overflow: auto;
 		top: 90px;
 		width: 250px;
 		height: calc(~"100% - 90px");
-		padding: 10px 10px 0px 10px;
+		padding: 0;
+		box-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
     }
 	.content-wrapper {
 		top: 90px;
@@ -288,3 +288,43 @@ body {
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     border: 0.1px solid transparent;
 }
+
+.dx-treeview [role="treeitem"][aria-selected="true"] > .dx-treeview-item {
+    background: rgba(21, 137, 238, 0.1);
+    -webkit-box-shadow: #1589ee 4px 0 0 inset;
+    box-shadow: #1589ee 4px 0 0 inset;
+}
+
+.dx-treeview-node {
+    padding-left: 0;
+}
+
+.dx-treeview-search {
+	margin: 12px 6px;
+}
+
+.dx-treeview-item.dx-state-hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.dx-treeview [aria-level="1"] > .dx-treeview-item {
+padding-left: 24px; }
+.dx-treeview [aria-level="2"] > .dx-treeview-item {
+padding-left: 48px; }
+.dx-treeview [aria-level="3"] > .dx-treeview-item {
+padding-left: 54px; }
+.dx-treeview [aria-level="4"] > .dx-treeview-item {
+padding-left: 96px; }
+.dx-treeview [aria-level="5"] > .dx-treeview-item {
+padding-left: 120px; }
+.dx-treeview [aria-level="6"] > .dx-treeview-item {
+padding-left: 144px; }
+.dx-treeview [aria-level="7"] > .dx-treeview-item {
+padding-left: 168px; }
+.dx-treeview [aria-level="8"] > .dx-treeview-item {
+padding-left: 192px; }
+.dx-treeview [aria-level="9"] > .dx-treeview-item {
+padding-left: 216px; }
+.dx-treeview [aria-level="10"] > .dx-treeview-item {
+padding-left: 240px; }

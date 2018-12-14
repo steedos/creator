@@ -1,35 +1,4 @@
 #sidebar-menu {
     background: rgba(255, 255, 255, 0.8);
-    padding: 16px;
-    .dx-treeview-item {
-        &.dx-state-hover {
-            cursor: pointer !important;
-            animation: bkAnim 0.135s cubic-bezier(0.39, 0.575, 0.565, 1) both;
-        }
-    }
-    .dx-state-focused {
-        &>.dx-treeview-item {
-            background: initial;
-            * {
-                color: initial !important;
-            }
-        }
-    }
-    .dx-state-selected {
-        &>.dx-treeview-item {
-            background: #1589ee !important;
-            color: #fff !important;
-            &.dx-state-hover {
-                cursor: pointer !important;
-                background: #1589ee !important;
-                color: #fff !important;
-                animation: none;
-            }
-            .dx-state-focused& {
-                * {
-                    color: #fff !important;
-                }
-            }
-        }
-    }
+    padding: 10px;
 }
