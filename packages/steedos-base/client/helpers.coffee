@@ -2,9 +2,6 @@ import {moment} from 'meteor/momentjs:moment';
 
 Steedos.Helpers =
 
-	isMobile: ()->
-		return $(window).width() < 767
-
 	isPad: ()->
 		return /iP(ad)/.test(navigator.userAgent)
 
@@ -206,7 +203,11 @@ TemplateHelpers =
 		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
 
 	isMobile: ->
-		return $(window).width()<767
+
+		if DevExpress
+			return DevExpress.devices._currentDevice.phone
+		else
+			return $(window).width()<767
 
 	isAndroidOrIOS: ->
 		return Steedos.isAndroidApp() || Steedos.isiOS()
