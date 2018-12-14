@@ -21,16 +21,16 @@ if Meteor.isClient
 
 if Meteor.isServer
 	WorkflowCore.checkCreatePermissions = (spaceId, uid, company_id)->
-		permissions = Creator.getObjectPermissions(spaceId, uid, 'flows')
-
-		if !permissions.allowCreate
-			return false
-
-		# 如果不是工作区管理员, 则必须要指定company_id
-		if !Steedos.isSpaceAdmin(spaceId, uid)
-			userCompanyId = Creator.getUserCompanyId(uid, spaceId)
-			if !company_id || !userCompanyId || company_id != userCompanyId
-				return false
+#		permissions = Creator.getObjectPermissions(spaceId, uid, 'flows')
+#
+#		if !permissions.allowCreate
+#			return false
+#
+#		# 如果不是工作区管理员, 则必须要指定company_id
+#		if !Steedos.isSpaceAdmin(spaceId, uid)
+#			userCompanyId = Creator.getUserCompanyId(uid, spaceId)
+#			if !company_id || !userCompanyId || company_id != userCompanyId
+#				return false
 
 		if company_id
 			if db.organizations.find({ _id: company_id, space: spaceId }).count() == 0
