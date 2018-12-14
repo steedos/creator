@@ -33,13 +33,13 @@ Meteor.startup ->
 			})
 			return ;
 		else
-			if !Steedos.isSpaceAdmin(form.space, userId)
-				res.writeHead(401);
-				res.end JSON.stringify({
-					"error": "Validate Request -- No permission",
-					"success": false
-				})
-				return;
+#			if !Steedos.isSpaceAdmin(form.space, userId)
+#				res.writeHead(401);
+#				res.end JSON.stringify({
+#					"error": "Validate Request -- No permission",
+#					"success": false
+#				})
+#				return;
 
 			space = db.spaces.findOne(form.space, { fields: { is_paid: 1 } })
 			if !space?.is_paid
