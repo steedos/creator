@@ -87,121 +87,123 @@ Creator.getObjectSchema = (obj) ->
 					]
 					fontNames: ['Arial', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', '宋体','黑体','微软雅黑','仿宋','楷体','隶书','幼圆']
 
-		else if !field.hidden && (field.type == "lookup" or field.type == "master_detail")
+		else if (field.type == "lookup" or field.type == "master_detail")
 			fs.type = String
 
 			if field.multiple
 				fs.type = [String]
 
-			fs.autoform.filters = field.filters
+			if !field.hidden
 
-			fs.autoform.filter_by_company = field.filter_by_company
+				fs.autoform.filters = field.filters
 
-			fs.autoform.dependOn = field.depend_on
+				fs.autoform.filter_by_company = field.filter_by_company
 
-			if field.beforeOpenFunction
-				fs.beforeOpenFunction = field.beforeOpenFunction
+				fs.autoform.dependOn = field.depend_on
 
-			fs.filtersFunction = if field.filtersFunction then field.filtersFunction else Creator.evaluateFilters
+				if field.beforeOpenFunction
+					fs.beforeOpenFunction = field.beforeOpenFunction
 
-			if field.optionsFunction
-				fs.optionsFunction = field.optionsFunction
+				fs.filtersFunction = if field.filtersFunction then field.filtersFunction else Creator.evaluateFilters
 
-			if field.reference_to
+				if field.optionsFunction
+					fs.optionsFunction = field.optionsFunction
 
-				if Meteor.isClient
-					if field.createFunction && _.isFunction(field.createFunction)
-						fs.createFunction = field.createFunction
-					else
-						if _.isString(field.reference_to)
-							_ref_obj = Creator.Objects[field.reference_to]
-							if _ref_obj?.permissions?.allowCreate
-								fs.autoform.create = true
-								fs.createFunction = (lookup_field)->
-									Modal.show("CreatorObjectModal", {
-										collection: "Creator.Collections.#{Creator.getCollection(field.reference_to)._name}",
-										formId: "new#{field.reference_to}",
-										object_name: "#{field.reference_to}",
-										operation: "insert",
-										onSuccess: (operation, result)->
-											object = Creator.getObject(result.object_name)
-											if result.object_name == "objects"
-												lookup_field.addItems([{label: result.value.label, value: result.value.name, icon: result.value.icon}], result.value.name)
-											else
-												lookup_field.addItems([{label: result.value[object.NAME_FIELD_KEY] || result.value.label || result.value.name, value: result._id}], result._id)
-									})
-							else
-								fs.autoform.create = false
+				if field.reference_to
 
-				if _.isBoolean(field.create)
-					fs.autoform.create = field.create
-
-				if field.reference_sort
-					fs.autoform.optionsSort = field.reference_sort
-
-				if field.reference_limit
-					fs.autoform.optionsLimit = field.reference_limit
-
-				if field.reference_to == "users"
-					fs.autoform.type = "selectuser"
-				else if field.reference_to == "organizations"
-					fs.autoform.type = "selectorg"
-					fs.autoform.is_company_only = field.is_company_only
-				else
-					if typeof(field.reference_to) == "function"
-						_reference_to = field.reference_to()
-					else
-						_reference_to = field.reference_to
-
-					if _.isArray(_reference_to)
-						fs.type = Object
-						fs.blackbox = true
-						fs.autoform.objectSwitche = true
-
-						schema[field_name + ".o"] = {
-							type: String
-							autoform: {omit: true}
-						}
-
-						schema[field_name + ".ids"] = {
-							type: [String]
-							autoform: {omit: true}
-						}
-
-					else
-						_reference_to = [_reference_to]
-
-					_object = Creator.Objects[_reference_to[0]]
-					if _object and _object.enable_tree
-						fs.autoform.type = "selectTree"
-					else
-						fs.autoform.type = "steedosLookups"
-						fs.autoform.optionsMethod = field.optionsMethod || "creator.object_options"
-
-						if Meteor.isClient
-							fs.autoform.optionsMethodParams = ()->
-								return {space: Session.get("spaceId")}
-							fs.autoform.references = []
-							_reference_to.forEach (_reference)->
-								_object = Creator.Objects[_reference]
-								if _object
-									fs.autoform.references.push {
-										object: _reference
-										label: _object?.label
-										icon: _object?.icon
-										link: ()->
-											return "/app/#{Session.get('app_id')}/#{_reference}/view/"
-									}
+					if Meteor.isClient
+						if field.createFunction && _.isFunction(field.createFunction)
+							fs.createFunction = field.createFunction
+						else
+							if _.isString(field.reference_to)
+								_ref_obj = Creator.Objects[field.reference_to]
+								if _ref_obj?.permissions?.allowCreate
+									fs.autoform.create = true
+									fs.createFunction = (lookup_field)->
+										Modal.show("CreatorObjectModal", {
+											collection: "Creator.Collections.#{Creator.getCollection(field.reference_to)._name}",
+											formId: "new#{field.reference_to}",
+											object_name: "#{field.reference_to}",
+											operation: "insert",
+											onSuccess: (operation, result)->
+												object = Creator.getObject(result.object_name)
+												if result.object_name == "objects"
+													lookup_field.addItems([{label: result.value.label, value: result.value.name, icon: result.value.icon}], result.value.name)
+												else
+													lookup_field.addItems([{label: result.value[object.NAME_FIELD_KEY] || result.value.label || result.value.name, value: result._id}], result._id)
+										})
 								else
-									fs.autoform.references.push {
-										object: _reference
-										link: ()->
-											return "/app/#{Session.get('app_id')}/#{_reference}/view/"
-									}
+									fs.autoform.create = false
 
-			else
-				fs.autoform.type = "steedosLookups"
-				fs.autoform.defaultIcon = field.defaultIcon
+					if _.isBoolean(field.create)
+						fs.autoform.create = field.create
+
+					if field.reference_sort
+						fs.autoform.optionsSort = field.reference_sort
+
+					if field.reference_limit
+						fs.autoform.optionsLimit = field.reference_limit
+
+					if field.reference_to == "users"
+						fs.autoform.type = "selectuser"
+					else if field.reference_to == "organizations"
+						fs.autoform.type = "selectorg"
+						fs.autoform.is_company_only = field.is_company_only
+					else
+						if typeof(field.reference_to) == "function"
+							_reference_to = field.reference_to()
+						else
+							_reference_to = field.reference_to
+
+						if _.isArray(_reference_to)
+							fs.type = Object
+							fs.blackbox = true
+							fs.autoform.objectSwitche = true
+
+							schema[field_name + ".o"] = {
+								type: String
+								autoform: {omit: true}
+							}
+
+							schema[field_name + ".ids"] = {
+								type: [String]
+								autoform: {omit: true}
+							}
+
+						else
+							_reference_to = [_reference_to]
+
+						_object = Creator.Objects[_reference_to[0]]
+						if _object and _object.enable_tree
+							fs.autoform.type = "selectTree"
+						else
+							fs.autoform.type = "steedosLookups"
+							fs.autoform.optionsMethod = field.optionsMethod || "creator.object_options"
+
+							if Meteor.isClient
+								fs.autoform.optionsMethodParams = ()->
+									return {space: Session.get("spaceId")}
+								fs.autoform.references = []
+								_reference_to.forEach (_reference)->
+									_object = Creator.Objects[_reference]
+									if _object
+										fs.autoform.references.push {
+											object: _reference
+											label: _object?.label
+											icon: _object?.icon
+											link: ()->
+												return "/app/#{Session.get('app_id')}/#{_reference}/view/"
+										}
+									else
+										fs.autoform.references.push {
+											object: _reference
+											link: ()->
+												return "/app/#{Session.get('app_id')}/#{_reference}/view/"
+										}
+
+				else
+					fs.autoform.type = "steedosLookups"
+					fs.autoform.defaultIcon = field.defaultIcon
 
 		else if field.type == "select"
 			fs.type = String
