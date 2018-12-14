@@ -60,7 +60,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/space_user_signs.coffee');
 	api.addFiles('models/webhooks.coffee');
 
-	api.addFiles('cfs/instances.coffee', 'server');
+	api.addFiles('cfs/instances.coffee');
 
 	api.addFiles('client/admin_import_flow_modal.html', 'client');
 	api.addFiles('client/admin_import_flow_modal.coffee', 'client');
