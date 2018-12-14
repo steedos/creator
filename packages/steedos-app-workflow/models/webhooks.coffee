@@ -11,6 +11,7 @@ Creator.Objects.webhooks =
 			reference_to: "flows"
 			is_name: true
 			required:true
+			create: false
 
 		payload_url:
 			label: "URL"

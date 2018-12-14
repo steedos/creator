@@ -109,8 +109,6 @@ Creator.getObjectSchema = (obj) ->
 
 			if field.reference_to
 
-				if _.isBoolean(field.create)
-					fs.autoform.create = field.create
 				if Meteor.isClient
 					if field.createFunction && _.isFunction(field.createFunction)
 						fs.createFunction = field.createFunction
@@ -134,6 +132,9 @@ Creator.getObjectSchema = (obj) ->
 									})
 							else
 								fs.autoform.create = false
+
+				if _.isBoolean(field.create)
+					fs.autoform.create = field.create
 
 				if field.reference_sort
 					fs.autoform.optionsSort = field.reference_sort
