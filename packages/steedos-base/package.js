@@ -72,7 +72,7 @@ Package.onUse(function(api) {
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:e164-phones-countries@1.0.3');
 	api.use('steedos:i18n-iso-countries@3.3.0');
-	api.use('steedos:objects@0.0.5');
+	api.use('steedos:objects@0.0.6');
 
 	api.addFiles('lib/meteor_fix.js', ['client', 'server']);
 	api.addFiles('lib/steedos_util.js', ['client', 'server']);

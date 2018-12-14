@@ -151,6 +151,11 @@ Creator.Object = (options)->
 			_db.attachSchema(self.schema, {replace: true})
 	if self.name == "users"
 		_db._simpleSchema = self.schema
+
+	if _.contains(["flows", "forms", "instances"], self.name)
+		if Meteor.isClient
+			_db.attachSchema(self.schema, {replace: true})
+
 	Creator.objectsByName[self._collection_name] = self
 
 	return self
