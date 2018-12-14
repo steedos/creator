@@ -342,7 +342,7 @@ Creator.Objects.flows =
 				return true;
 			on: "list"
 			todo: (object_name, record_id, fields)->
-				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), null, Creator.getUserCompanyId())
+				WorkflowCore.openFlowDesign(Steedos.locale(), Steedos.spaceId(), null, Creator.getUserCompanyId())
 		standard_edit:
 			visible: false
 			on: "record"
@@ -419,7 +419,7 @@ Creator.Objects.flows =
 				return true;
 			on: "record"
 			todo: (object_name, record_id, fields)->
-				Workflow.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id, Creator.getUserCompanyId())
+				WorkflowCore.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id, Creator.getUserCompanyId())
 
 #		edit_steps:
 #			label: "设置步骤"

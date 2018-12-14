@@ -1,7 +1,7 @@
-@Workflow = {}
+@WorkflowCore = {}
 
 if Meteor.isClient
-	Workflow.openFlowDesign = (locale, space, flow, companyId)->
+	WorkflowCore.openFlowDesign = (locale, space, flow, companyId)->
 		url = "/packages/steedos_admin/assets/designer/index.html?locale=#{locale}&space=#{space}"
 		if flow
 			url = url + "&flow=#{flow}"
@@ -20,7 +20,7 @@ if Meteor.isClient
 						$(".flow-modal .btn-confirm").click()
 
 if Meteor.isServer
-	Workflow.checkCreatePermissions = (spaceId, uid, company_id)->
+	WorkflowCore.checkCreatePermissions = (spaceId, uid, company_id)->
 		permissions = Creator.getObjectPermissions(spaceId, uid, 'flows')
 
 		if !permissions.allowCreate

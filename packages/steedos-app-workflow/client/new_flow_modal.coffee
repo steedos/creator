@@ -69,7 +69,7 @@ Template.new_flow_modal.events
 
 				newFlow = _.find flows, (f)->
 							return f.form == newFormId
-				Workflow.openFlowDesign(Steedos.locale(), newFlow.space, newFlow._id, Creator.getUserCompanyId())
+				WorkflowCore.openFlowDesign(Steedos.locale(), newFlow.space, newFlow._id, Creator.getUserCompanyId())
 				FlowRouter.go("/app/admin/flows/view/#{newFlow._id}")
 				Modal.hide(template)
 

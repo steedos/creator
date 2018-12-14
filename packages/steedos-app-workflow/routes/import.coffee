@@ -36,7 +36,7 @@ JsonRoutes.add "post", "/api/workflow/import/form", (req, res, next) ->
 				"success": false
 		return;
 
-	if !Workflow.checkCreatePermissions(spaceId, uid, company_id)
+	if !WorkflowCore.checkCreatePermissions(spaceId, uid, company_id)
 		res.writeHead(401);
 		res.end JSON.stringify({
 			"error": "Validate Request -- No permission",

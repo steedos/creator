@@ -3,7 +3,7 @@ Meteor.methods
 		if (!this.userId)
 			return;
 
-		if !Workflow.checkCreatePermissions(spaceId, this.userId, options?.company_id)
+		if !WorkflowCore.checkCreatePermissions(spaceId, this.userId, options?.company_id)
 			throw  Meteor.Error("No permission");
 
 		db.flows.copy(this.userId, spaceId, flowId, options, false)
