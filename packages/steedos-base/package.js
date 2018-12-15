@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:base',
-	version: '0.0.89',
+	version: '0.0.90',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/creator/tree/master/packages/steedos-base'
 });

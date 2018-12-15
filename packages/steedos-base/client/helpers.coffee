@@ -204,7 +204,7 @@ TemplateHelpers =
 
 	isMobile: ->
 
-		if DevExpress
+		if window.DevExpress
 			return DevExpress.devices._currentDevice.phone
 		else
 			return $(window).width()<767
