@@ -307,6 +307,7 @@ if (Meteor.isServer)
 				orgs = su.organizations
 				orgs.push(doc._id)
 				db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
+				db.space_users.update_organizations_parents(su._id, orgs)
 
 		# 新增部门后在audit_logs表中添加一条记录
 		insertedDoc = db.organizations.findOne({_id: doc._id})
@@ -454,7 +455,11 @@ if (Meteor.isServer)
 			updateFields.fullname = obj.calculateFullname()
 			children = db.organizations.find({parents: doc._id});
 			children.forEach (child) ->
-				db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
+				childSet = {fullname: child.calculateFullname()}
+				if modifier.$set.parent
+					childSet.parents = child.calculateParents()
+				db.organizations.direct.update(child._id, {$set: childSet})
+
 		if !_.isEmpty(updateFields)
 			db.organizations.direct.update(obj._id, {$set: updateFields})
 
@@ -471,6 +476,7 @@ if (Meteor.isServer)
 					orgs = su.organizations
 					orgs.push(doc._id)
 					db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
+					db.space_users.update_organizations_parents(su._id, orgs)
 			if removed_users.length > 0
 				removed_space_users = db.space_users.find({space: doc.space, user: {$in: removed_users}}).fetch()
 				root_org = db.organizations.findOne({space: doc.space, is_company: true, parent: null}, {fields: {_id: 1}})
@@ -479,6 +485,7 @@ if (Meteor.isServer)
 					orgs = su.organizations
 					if orgs.length is 1
 						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [root_org._id], organization: root_org._id, company_id: root_org._id}})
+						db.space_users.update_organizations_parents(su._id, [root_org._id])
 					else if orgs.length > 1
 						new_orgs = _.filter(orgs, (org_id)->
 							return org_id isnt doc._id
@@ -488,6 +495,7 @@ if (Meteor.isServer)
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs, organization: new_orgs[0], company_id: top_organization.company_id}})
 						else
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs}})
+						db.space_users.update_organizations_parents(su._id, new_orgs)
 
 		old_company_id = this.previous.company_id
 		new_company_id = modifier.$set.company_id or doc.company_id
@@ -498,6 +506,14 @@ if (Meteor.isServer)
 				db.organizations.update({_id: {$in: doc.children}}, {$set: {company_id: new_company_id}},{multi: true})
 			# 当前部门的company_id值变化时，同步主部门为当前部门的space_users的company_id值
 			db.space_users.direct.update({space: doc.space, organization: doc._id }, {$set: {company_id: new_company_id}},{multi: true})
+
+		#修改部门的parent时, 需要其space_user的organizations_parents
+		if modifier.$set.parent
+			children = db.organizations.find({parents: doc._id}, {fields: {_id: 1}});
+			children.forEach (child) ->
+				childUsers = db.space_users.find({organizations: child._id}, {fields: {_id: 1, organizations: 1}})
+				childUsers.forEach (su)->
+					db.space_users.update_organizations_parents(su._id, su.organizations)
 
 		# 更新部门后在audit_logs表中添加一条记录
 		updatedDoc = db.organizations.findOne({_id: doc._id})

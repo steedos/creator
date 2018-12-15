@@ -24,6 +24,12 @@ Creator.Objects.space_users =
 			multiple: true
 			defaultValue: []
 			required: true
+		organizations_parents:
+			type: "lookup"
+			reference_to: "organizations"
+			multiple: true
+			omit: true
+			hidden: true
 		position:
 			type: "text"
 			label:'职务'
@@ -408,6 +414,9 @@ Meteor.startup ()->
 				user: doc.user
 				user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
 
+			if doc.organizations
+				db.space_users.update_organizations_parents(doc._id, doc.organizations)
+
 		db.space_users.before.update (userId, doc, fieldNames, modifier, options) ->
 			modifier.$set = modifier.$set || {};
 
@@ -556,6 +565,9 @@ Meteor.startup ()->
 						user: doc.user
 						user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
 
+			if modifier.$set.organizations
+				db.space_users.update_organizations_parents(doc._id, modifier.$set.organizations)
+
 
 		db.space_users.before.remove (userId, doc) ->
 			# check space exists
@@ -610,6 +622,11 @@ Meteor.startup ()->
 						html: content
 			catch e
 				console.error e.stack
+
+		db.space_users.update_organizations_parents = (_id, organizations)->
+			orgs = db.organizations.find({_id: {$in: organizations}}, {fields: {parents: 1}}).fetch()
+			organizations_parents = _.compact(_.uniq(_.flatten([organizations, _.pluck(orgs, 'parents')])))
+			db.space_users.direct.update({_id: _id}, {$set: {organizations_parents: organizations_parents}})
 
 
 		Meteor.publish 'space_users', (spaceId)->
