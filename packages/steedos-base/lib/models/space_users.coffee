@@ -17,6 +17,9 @@ Creator.Objects.space_users =
 			required: true
 			searchable:true
 			index:true
+		position:
+			type: "text"
+			label:'职务'
 		organizations:
 			type: "lookup"
 			label:'所属部门'
@@ -31,9 +34,6 @@ Creator.Objects.space_users =
 			multiple: true
 			omit: true
 #			hidden: true
-		position:
-			type: "text"
-			label:'职务'
 		manager:
 			type: "lookup"
 			label:'上级主管'
