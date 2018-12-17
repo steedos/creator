@@ -67,6 +67,10 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 
 		form.created_by = uid
 
+		form.modified = form.created
+
+		form.modified_by = uid
+
 		form.historys = []
 
 		form.current._id = new Mongo.ObjectID()._str
@@ -112,6 +116,10 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 			flow.created = new Date()
 
 			flow.created_by = uid
+
+			flow.modified = flow.created
+
+			flow.modified_by = uid
 
 			delete flow.company_id
 			if company_id
