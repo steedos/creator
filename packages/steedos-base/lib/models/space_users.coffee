@@ -25,11 +25,12 @@ Creator.Objects.space_users =
 			defaultValue: []
 			required: true
 		organizations_parents:
+			label: '所属部门（含上级）'
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
 			omit: true
-			hidden: true
+#			hidden: true
 		position:
 			type: "text"
 			label:'职务'
