@@ -1,7 +1,7 @@
 Package.describe({
 
 	name: 'steedos:creator',
-	version: '0.0.7',
+	version: '0.0.9',
 	summary: 'Steedos Creator',
 	git: '',
 	documentation: null
@@ -87,7 +87,6 @@ Package.onUse(function (api) {
 
 	// api.use('steedos:autoform-bs-datetimepicker');
 
-	api.use('steedos:lightning-design-system@0.0.2');
 	api.use('steedos:datatables-extensions@0.0.1');
 
 	api.use('steedos:logger@0.0.2');
@@ -101,6 +100,8 @@ Package.onUse(function (api) {
 	api.use('steedos:app-admin@0.0.1');
 	api.use('steedos:devexpress@18.1.4');
 	api.use('steedos:odata@0.0.3');
+	api.use('blaze-html-templates@1.1.2');
+	api.use('steedos:lightning-design-system@0.0.2');
 
 	api.addFiles('core.coffee');
 	api.addFiles('menu.coffee', "server");

@@ -134,7 +134,7 @@ Template.filter_option_list.onCreated ->
 			Blaze.remove self.optionbox
 	
 	#绑定事件从document委托到.wrapper中是为了避免过虑器中选人控件会解决该事件
-	$(document).on "click",".content-wrapper, .oneHeader", self.destroyOptionbox
+	$(document).on "click",".creator-content-wrapper, .oneHeader", self.destroyOptionbox
 
 	self.filterItems = new ReactiveVar()
 	self.autorun -> 
