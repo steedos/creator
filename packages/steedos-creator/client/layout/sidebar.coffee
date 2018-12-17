@@ -44,6 +44,10 @@ Template.creatorSidebar.onRendered ->
 			if object_name or template_name
 				e.component.selectItem(e.itemData)
 			if object_name
-				FlowRouter.go("/app/admin/#{object_name}/grid/all")
+				listViews = Creator.getListViews(object_name)
+				if listViews && listViews.length > 0
+					FlowRouter.go("/app/admin/#{object_name}/grid/#{listViews[0]?._id}")
+				else
+					FlowRouter.go("/app/admin/#{object_name}/grid/all")
 			else if template_name
 				FlowRouter.go("/app/admin/_template/#{template_name}")
