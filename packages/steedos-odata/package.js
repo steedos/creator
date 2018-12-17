@@ -1,8 +1,9 @@
 Package.describe({
 	name: 'steedos:odata',
-	version: '0.0.1',
+	version: '0.0.3',
 	summary: 'Steedos odata libraries',
-	git: ''
+	git: '',
+	documentation: null
 });
 
 Npm.depends({
@@ -25,7 +26,7 @@ Package.onUse(function(api) {
 	api.use('ddp-common');
 	api.use(['webapp'], 'server');
 
-	api.use('steedos:objects');
+	api.use('steedos:objects@0.0.7');
 
 	api.addFiles('lib/restivus/auth.coffee', 'server');
 	api.addFiles('lib/restivus/iron-router-error-to-response.js', 'server');

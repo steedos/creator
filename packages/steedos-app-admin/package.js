@@ -8,7 +8,7 @@ Package.describe({
 
 Package.onUse(function(api) {
 
-	api.use('steedos:objects');
+	api.use('steedos:objects@0.0.7');
 	api.use('steedos:application-package@0.0.1')
 	api.use('coffeescript@1.11.1_4');
 	api.addFiles('admin.app.coffee', "server");

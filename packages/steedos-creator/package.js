@@ -1,9 +1,10 @@
 Package.describe({
 
 	name: 'steedos:creator',
-	version: '0.0.5',
+	version: '0.0.7',
 	summary: 'Steedos Creator',
-	git: ''
+	git: '',
+	documentation: null
 });
 
 Npm.depends({
@@ -65,7 +66,7 @@ Package.onUse(function (api) {
 
 	api.use('natestrauser:select2@4.0.3');
 	api.use('aldeed:autoform-select2@1.0.5');
-	api.use('steedos:autoform-lookup');
+	api.use('steedos:autoform-lookup@0.3.11');
 
 	api.use('steedos:cfs-standard-packages@0.5.10');
 	api.use('steedos:cfs-s3@0.1.4');
@@ -86,7 +87,7 @@ Package.onUse(function (api) {
 
 	// api.use('steedos:autoform-bs-datetimepicker');
 
-	api.use('steedos:lightning-design-system@0.0.1');
+	api.use('steedos:lightning-design-system@0.0.2');
 	api.use('steedos:datatables-extensions@0.0.1');
 
 	api.use('steedos:logger@0.0.2');
@@ -96,8 +97,10 @@ Package.onUse(function (api) {
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
-	api.use('steedos:objects');
-	api.use('steedos:app-admin');
+	api.use('steedos:objects@0.0.7');
+	api.use('steedos:app-admin@0.0.1');
+	api.use('steedos:devexpress@18.1.4');
+	api.use('steedos:odata@0.0.3');
 
 	api.addFiles('core.coffee');
 	api.addFiles('menu.coffee', "server");

@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:lightning-design-system',
-	version: '0.0.1',
+	version: '0.0.2',
 	summary: 'Steedos Saleforce',
 	git: ''
 });

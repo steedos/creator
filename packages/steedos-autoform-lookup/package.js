@@ -3,8 +3,9 @@
 Package.describe({
     name: 'steedos:autoform-lookup',
     summary: 'Steedos Autoform Lookup',
-    version: '0.3.10',
-    git: ''
+    version: '0.3.11',
+    git: '',
+    documentation: null
 });
 
 Package.onUse(function(api) {
