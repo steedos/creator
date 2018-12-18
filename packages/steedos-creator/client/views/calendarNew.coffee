@@ -32,9 +32,7 @@ _dataSource = (options) ->
 				startDate = loadOptions.dxScheduler.startDate
 				endDate = loadOptions.dxScheduler.endDate
 				_f = [
-					[[ options.startDateExpr, ">=", startDate], 'and', [ options.startDateExpr, "<=", endDate]],
-					"or",
-					[[ options.endDateExpr, ">=", startDate], 'and', [ options.endDateExpr, "<=", endDate]]
+					[[ options.endDateExpr, ">=", startDate], 'and', [ options.startDateExpr, "<=", endDate]]
 				]
 
 				if loadOptions.filter && _.isArray(loadOptions.filter)
@@ -64,6 +62,7 @@ _dataSource = (options) ->
 
 _getAppointmentTemplate = (options)->
 	appointmentTemplate = (data)->
+		console.log('appointmentTemplate data', data);
 		title = data[options.textExpr || 'name'];
 		if options.title && _.isArray(options.title) && options.title.length > 0
 			title = ''
