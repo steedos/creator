@@ -129,7 +129,8 @@ _fields = (object_name, list_view_id)->
 
 	fields = _.compact(fields)
 	fieldsName = Creator.getObjectFieldsName(object_name)
-	return _.intersection(fieldsName, fields)
+	# 注意这里intersection函数中两个参数次序不能换，否则字段的先后显示次序就错了
+	return _.intersection(fields, fieldsName)
 
 _removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
 	# 移除主键字段，即columns中的reference_to等于object_name的字段
@@ -325,7 +326,7 @@ Template.creator_grid.onRendered ->
 					selectColumns = _.intersection(settingColumns, defaultColumns)
 					selectColumns = _.union(selectColumns, defaultColumns)
 				else
-					selectColumns = _fields(curObjectName)
+					selectColumns = _fields(curObjectName, list_view_id)
 				return selectColumns
 
 			pageIndex = Tracker.nonreactive ()->
