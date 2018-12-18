@@ -419,8 +419,14 @@ CFDataManager.getRoot = function (spaceId, options) {
 
 	var isCompanyOnly = options && options.showCompanyOnly
 	if(isCompanyOnly){
-		query._id = Session.get("user_company_id");
-		delete query.parent
+		user_company_id = Session.get("user_company_id");
+		if(user_company_id){
+			query._id = user_company_id;
+			delete query.parent;
+		}
+		else{
+			console.error("公司级别的组织机构要求当前用户的company_id不为空，已还原为非公司级，请修正相关数据");
+		}
 	}
 
 	return SteedosDataManager.organizationRemote.find(query, {
@@ -480,7 +486,13 @@ CFDataManager.getChild = function (spaceId, parentId, options) {
 			$ne: true
 		};
 		if (isCompanyOnly) {
-			query._id = Session.get("user_company_id");
+			user_company_id = Session.get("user_company_id");
+			if(user_company_id){
+				query._id = user_company_id;
+			}
+			else{
+				console.error("公司级别的组织机构要求当前用户的company_id不为空，已还原为非公司级，请修正相关数据");
+			}
 		}
 	}
 
