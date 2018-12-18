@@ -5,7 +5,7 @@ if Meteor.isClient
 		url = "/packages/steedos_admin/assets/designer/index.html?locale=#{locale}&space=#{space}"
 		if flow
 			url = url + "&flow=#{flow}"
-		if companyId
+		if companyId && !Creator.isSpaceAdmin(space, Meteor.userId())
 			url = url + "&companyId=#{companyId}"
 		Steedos.openWindow Steedos.absoluteUrl(url)
 
