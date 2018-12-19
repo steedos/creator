@@ -98,6 +98,9 @@ Template.creator_table_cell.helpers
 		this_object = Creator.getObject(object_name)
 
 		this_name_field_key = this_object.NAME_FIELD_KEY
+		if object_name == "organizations"
+			# 显示组织列表时，特殊处理name_field_key为name字段
+			this_name_field_key = "name"
 
 		_field = this.field
 

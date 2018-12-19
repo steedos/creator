@@ -70,6 +70,9 @@ _itemClick = (e, curObjectName, list_view_id)->
 			object = Creator.getObject(objectName)
 			collectionName = object.label
 			name_field_key = object.NAME_FIELD_KEY
+			if objectName == "organizations"
+				# 显示组织列表时，特殊处理name_field_key为name字段
+				name_field_key = "name"
 			Session.set("action_fields", undefined)
 			Session.set("action_collection", "Creator.Collections.#{objectName}")
 			Session.set("action_collection_name", collectionName)
