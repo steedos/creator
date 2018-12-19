@@ -31,7 +31,6 @@ Creator.Objects.flow_positions =
 			label: "管辖范围"
 			reference_to: "organizations"
 			required: true
-			is_name: true
 			filter_by_company: true
 
 		company_id:
