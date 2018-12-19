@@ -18,15 +18,19 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 
 			if _.isEmpty(category)
 				category_id = new Mongo.ObjectID()._str;
-				db.categories.direct.insert({
+				new_category = {
 					_id: category_id,
 					name: form.category_name,
 					space: spaceId,
 					created: new Date,
 					created_by: uid,
 					modified: new Date,
-					modified_by: uid
-				});
+					modified_by: uid,
+					owner: uid
+				}
+				if company_id
+					new_category.company_id = company_id
+				db.categories.direct.insert(new_category);
 				form.category = category_id
 			else
 				form.category = category._id
@@ -41,6 +45,12 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 					if !rules
 						nr.space = spaceId
 						nr._id = new Mongo.ObjectID()._str
+						nr.created = new Date
+						nr.created_by = uid
+						nr.modified = new Date
+						nr.modified_by = uid
+						if company_id
+							nr.company_id = company_id
 						db.instance_number_rules.direct.insert(nr)
 				catch e
 					console.log "steedosImport.workflow", e
@@ -92,6 +102,8 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 			form.company_id = company_id
 
 		form.import = true
+
+		form.owner = uid
 
 		db.forms.direct.insert(form)
 
@@ -187,8 +199,9 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 								_id: role_id
 								name: role_name
 								space: spaceId
-								create: new Date
-								create_by: uid
+								created: new Date
+								created_by: uid
+								owner: uid
 							}
 
 							if company_id
@@ -205,6 +218,8 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 					delete step.approver_roles_name
 
 			flow.import = true
+
+			flow.owner = uid
 
 			db.flows.direct.insert(flow)
 
