@@ -65,7 +65,6 @@ Creator.Objects.space_users =
 			type: "lookup"
 			reference_to: "organizations"
 			omit: true
-			hidden: true
 		company_id:
 			label: "所属单位"
 			type: "lookup"

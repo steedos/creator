@@ -22,6 +22,7 @@ Creator.Objects.organizations =
 			type: "text"
 			omit: true
 			hidden: true
+			is_name: true
 
 		parent:
 			label: "上级部门"
