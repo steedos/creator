@@ -61,6 +61,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/flow_positions.coffee');
 	api.addFiles('models/space_user_signs.coffee');
 	api.addFiles('models/webhooks.coffee');
+	api.addFiles('models/instance_number_rules.coffee');
 
 	api.addFiles('cfs/instances.coffee');
 
