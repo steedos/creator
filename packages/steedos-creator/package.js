@@ -348,6 +348,10 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/contacts_settings_limit_modal.coffee', 'client');
 	api.addFiles('client/views/contacts_settings_no_force_phone_modal.html', 'client');
 	api.addFiles('client/views/contacts_settings_no_force_phone_modal.coffee', 'client');
+	
+	api.addFiles('client/views/about.html', 'client');
+	api.addFiles('client/views/about.coffee', 'client');
+	api.addFiles('client/views/about.less', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
