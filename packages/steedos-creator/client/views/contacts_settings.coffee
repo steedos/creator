@@ -56,8 +56,7 @@ Template.contacts_settings.events
 		index = event.currentTarget.dataset.index
 		spaceId = Steedos.spaceId()
 		swal {
-			title: t('flow_db_admin_confirm_delete')
-			text: t('flow_db_admin_confirm_delete_document')
+			title: t('delete_confirm')
 			type: 'warning'
 			showCancelButton: true
 			closeOnConfirm: true

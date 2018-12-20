@@ -342,12 +342,12 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/contacts_settings.html', 'client');
 	api.addFiles('client/views/contacts_settings.coffee', 'client');
 	api.addFiles('client/views/contacts_settings.less', 'client');
-	api.addFiles('client/views/settings_hidden_modal.html', 'client');
-	api.addFiles('client/views/settings_hidden_modal.coffee', 'client');
-	api.addFiles('client/views/settings_limit_modal.html', 'client');
-	api.addFiles('client/views/settings_limit_modal.coffee', 'client');
-	api.addFiles('client/views/settings_no_force_phone_modal.html', 'client');
-	api.addFiles('client/views/settings_no_force_phone_modal.coffee', 'client');
+	api.addFiles('client/views/contacts_settings_hidden_modal.html', 'client');
+	api.addFiles('client/views/contacts_settings_hidden_modal.coffee', 'client');
+	api.addFiles('client/views/contacts_settings_limit_modal.html', 'client');
+	api.addFiles('client/views/contacts_settings_limit_modal.coffee', 'client');
+	api.addFiles('client/views/contacts_settings_no_force_phone_modal.html', 'client');
+	api.addFiles('client/views/contacts_settings_no_force_phone_modal.coffee', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
