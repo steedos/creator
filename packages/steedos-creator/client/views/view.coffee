@@ -39,10 +39,11 @@ Template.creator_view.helpers
 		r = false;
 
 		if t && t.length > 0
+			_object = Creator.getObject(Session.get("object_name"))
 			_.find t, (fieldKey)->
 				if !fieldKey
 					return
-				if Creator.getObject(Session.get("object_name")).schema._schema[fieldKey]?.type.name != 'Object'
+				if _object.schema._schema[fieldKey]?.type.name != 'Object' && _object.fields[fieldKey].type != 'lookup' && _object.fields[fieldKey].type != 'master_detail'
 					r = true;
 				return true;
 		return r;
@@ -50,7 +51,8 @@ Template.creator_view.helpers
 	isObjectField: (fieldKey)->
 		if !fieldKey
 			return
-		return Creator.getObject(Session.get("object_name")).schema._schema[fieldKey]?.type.name == 'Object'
+		_object = Creator.getObject(Session.get("object_name"))
+		return _object.schema._schema[fieldKey]?.type.name == 'Object' && _object.fields[fieldKey].type != 'lookup' && _object.fields[fieldKey].type != 'master_detail'
 
 	objectField: (fieldKey)->
 		schema = Creator.getObject(Session.get("object_name")).schema
