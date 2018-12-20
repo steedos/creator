@@ -52,7 +52,7 @@ Creator.bootstrap = (spaceId, callback)->
 					else
 						app.visible = false
 			
-			Creator.Menus = result.assigned_menus
+			Creator.Menus = _.sortBy result.assigned_menus, 'sort'
 
 			if _.isFunction(callback)
 				callback()
