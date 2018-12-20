@@ -13,9 +13,9 @@
 				{{else}}
 					{{#if href}}
 						{{#if openWindow}}
-							<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false" title="{{value}}" class="slds-truncate link-detail list-item-link-{{id}}">{{value}}</a>
+							<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false" title="{{value}}" class="link-detail list-item-link-{{id}}">{{value}}</a>
 						{{else}}
-							<a href="{{href}}" title="{{value}}" class="slds-truncate link-detail list-item-link-{{id}}">{{value}}</a>
+							<a href="{{href}}" title="{{value}}" class="link-detail list-item-link-{{id}}">{{value}}</a>
 						{{/if}}
 					{{else}}
 						<span class="">{{{value}}}&nbsp;</span>
