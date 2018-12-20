@@ -158,6 +158,9 @@ Package.onUse(function (api) {
 	api.addFiles('server/publications/related_objects_records.coffee', 'server');
 	api.addFiles('server/publications/space_user_info.coffee', 'server');
 
+	api.addFiles('server/publications/contacts_view_limits.coffee', 'server');
+	api.addFiles('server/publications/contacts_no_force_phone_users.coffee', 'server');
+
 	api.addFiles('server/lib/permission_manager.coffee', 'server');
 	api.addFiles('server/lib/uuflow_manager.coffee', 'server');
 
@@ -335,6 +338,16 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/account_personal.html', 'client');
 	api.addFiles('client/views/account_personal.coffee', 'client');
 	api.addFiles('client/views/account_profile.less', 'client');
+
+	api.addFiles('client/views/contacts_settings.html', 'client');
+	api.addFiles('client/views/contacts_settings.coffee', 'client');
+	api.addFiles('client/views/contacts_settings.less', 'client');
+	api.addFiles('client/views/settings_hidden_modal.html', 'client');
+	api.addFiles('client/views/settings_hidden_modal.coffee', 'client');
+	api.addFiles('client/views/settings_limit_modal.html', 'client');
+	api.addFiles('client/views/settings_limit_modal.coffee', 'client');
+	api.addFiles('client/views/settings_no_force_phone_modal.html', 'client');
+	api.addFiles('client/views/settings_no_force_phone_modal.coffee', 'client');
 
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');

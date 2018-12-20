@@ -75,5 +75,8 @@
 
 	"creator_request_oversized": "Request Entity Too Large",
 
-	"creator_permission_share_miss": "Please fill in at least one value in the authorized organization or authorized user"
+	"creator_permission_share_miss": "Please fill in at least one value in the authorized organization or authorized user",
+
+	"no_force_phone": "Not mandatory to bind phone number of users",
+	"no_force_phone_tips": "In addition to not mandatory binding phone number of users, require binding phone number before entering the system"
 }

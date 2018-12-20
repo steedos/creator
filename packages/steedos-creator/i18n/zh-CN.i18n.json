@@ -76,5 +76,8 @@
 
 	"creator_request_oversized": "请求文件太大了",
 
-	"creator_permission_share_miss": "请在授权组织或授权用户中至少填写一个值"
+	"creator_permission_share_miss": "请在授权组织或授权用户中至少填写一个值",
+
+	"no_force_phone": "不强制绑定手机号的用户",
+	"no_force_phone_tips": "除了不强制绑定手机号的用户外，都要求绑定手机号后才能进入系统"
 }
