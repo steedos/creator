@@ -201,6 +201,7 @@ steedos:ui@0.0.1
 steedos:useraccounts-bootstrap@1.14.2_8
 steedos:useraccounts-core@1.14.2_6
 steedos:useraccounts-flow-routing@1.14.2_4
+steedos:version@1.0.5
 steedos:weixin@0.0.1
 steedos:weixin-aes@0.0.1
 steedos:weixin-template-message-queue@0.0.1

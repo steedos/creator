@@ -75,7 +75,7 @@ Package.onUse(function (api) {
 
 
 	api.use('accounts-base@1.3.4');
-	api.use('steedos:sso@0.0.4')
+	api.use('steedos:sso@0.0.4');
 	api.use('steedos:adminlte@2.3.12_3');
 	api.use('steedos:base@0.0.79');
 	api.use('steedos:accounts@0.0.31');
@@ -83,6 +83,7 @@ Package.onUse(function (api) {
 	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:autoform@0.0.13');
 	api.use('steedos:creator-autoform-modals@0.0.1');
+	api.use('steedos:version@1.0.5')
 	api.use('raix:push@3.0.2');
 
 	// api.use('steedos:autoform-bs-datetimepicker');
