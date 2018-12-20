@@ -29,7 +29,7 @@ Template.creator_table_cell.onRendered ->
 		record_id = self.data._id
 		record = Creator.getCollection(object_name).findOne(record_id)
 		if record
-			if  _field.type == "grid"
+			if  _field?.type == "grid"
 				val = _field.name.split('.').reduce (o, x) ->
 								o[x]
 						, record
@@ -61,7 +61,7 @@ Template.creator_table_cell.onRendered ->
 					height: "auto"
 		
 		# 显示额外的其他字段
-		extra_field = _field.extra_field
+		extra_field = _field?.extra_field
 		if extra_field and self.data.is_detail_view
 			extraContainer = self.$(".cell-extra-field-container")
 			unless extraContainer.find(".creator_table_cell").length
@@ -161,7 +161,6 @@ Template.creator_table_cell.helpers
 						val = if val then [val] else []
 					try
 						# debugger;
-
 						reference_to_object = Creator.getObject(reference_to)
 
 						reference_to_object_name_field_key = reference_to_object.NAME_FIELD_KEY
