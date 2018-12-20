@@ -10,7 +10,7 @@ Creator.Objects.contract_company =
 		name:
 			type: "text"
 			label: "公司名称"
- 		remarks:
+		remarks:
 			type: "text"
 			label: "说明"
 		created:

@@ -1,7 +1,7 @@
 Package.describe({
-	name: 'steedos:app-archive',
-	version: '0.0.5',
-	summary: 'Creator archive',
+	name: 'steedos:app-contract',
+	version: '0.0.1',
+	summary: 'Creator contract',
 	git: ''
 });
 
@@ -16,66 +16,20 @@ Package.onUse(function(api) {
 	api.addFiles('client/archive.css','client');
 
 
-	// 档案管理
-	api.addFiles('archive_manage.coffee');
-	api.addFiles('models/archive_manage/archive_chuantong.coffee');
-	api.addFiles('models/archive_manage/archive_dianzi.coffee');
-	api.addFiles('models/archive_manage/archive_dichan.coffee');
-	api.addFiles('models/archive_manage/archive_hetong.coffee');
-	api.addFiles('models/archive_manage/archive_keji.coffee');
-	api.addFiles('models/archive_manage/archive_kejiditu.coffee');
-	api.addFiles('models/archive_manage/archive_kuaiji.coffee');
-	api.addFiles('models/archive_manage/archive_renshi.coffee');
-	api.addFiles('models/archive_manage/archive_rongyu.coffee');
-	api.addFiles('models/archive_manage/archive_shengxiang.coffee');
-	api.addFiles('models/archive_manage/archive_shenji.coffee');
-	api.addFiles('models/archive_manage/archive_tongji.coffee');
-	api.addFiles('models/archive_manage/archive_wenshu.coffee');
-	api.addFiles('models/archive_manage/archive_wuzi.coffee');
-	api.addFiles('models/archive_manage/archive_yinjian.coffee');
+	// 合同管理
+	api.addFiles('contract_manage.coffee');
+	api.addFiles('models/contract_manage/contracts.coffee');
 	
-	// 档案借阅
-	api.addFiles('archive_borrow.coffee');
-	api.addFiles('models/archive_borrow/archive_borrow.coffee');
 
-	// 档案借阅
-	api.addFiles('archive_borrow.coffee');
-	api.addFiles('models/archive_borrow/archive_borrow.coffee');
-
-	// 档案销毁
-	api.addFiles('archive_destroy.coffee');
-	api.addFiles('models/archive_destroy/archive_destroy.coffee');
-
-	// 档案移交
-	api.addFiles('archive_transfer.coffee');
-	api.addFiles('models/archive_transfer/archive_transfer.coffee');
-
-	// 档案统计
-	api.addFiles('archive_statistics.coffee');
-
-	// 档案维护
-	api.addFiles('archive_setting.coffee');
-	api.addFiles('models/archive_setting/archive_fonds.coffee');
-	api.addFiles('models/archive_setting/archive_organization.coffee');
-	api.addFiles('models/archive_setting/archive_retention.coffee');
-	api.addFiles('models/archive_setting/archive_classification.coffee');
-	api.addFiles('models/archive_setting/archive_audit.coffee');
-	api.addFiles('models/archive_setting/archive_entity_relation.coffee');
-	api.addFiles('models/archive_setting/archive_rules.coffee');
+	// 合同维护
+	api.addFiles('contract_setting.coffee');
+	api.addFiles('models/contract_setting/contract_company_type.coffee');
+	api.addFiles('models/contract_setting/contract_company.coffee');
+	api.addFiles('models/contract_setting/contract_file_uploadMessage.coffee');
+	api.addFiles('models/contract_setting/contract_rate.coffee');
+	api.addFiles('models/contract_setting/contract_state.coffee');
+	api.addFiles('models/contract_setting/contract_type.coffee');
 
 	
 	// 方法
-	api.addFiles('server/methods/archive_borrow.coffee', 'server');
-	api.addFiles('server/methods/archive_destroy.coffee', 'server');
-	api.addFiles('server/methods/archive_export.coffee', 'server');
-	api.addFiles('server/methods/archive_new_audit.coffee', 'server');
-	api.addFiles('server/methods/archive_receive.coffee', 'server');
-	api.addFiles('server/methods/archive_transfer.coffee', 'server');
-
-	//同步用户 space_user表的company字段
-	api.export('SyncSpaceUserOrganizationCompany');
-	api.addFiles('server/methods/start_SyncSpaceUserOrganizationCompany.coffee', 'server');
-	api.addFiles('server/lib/syncSpaceUserOrganizationCompany.coffee', 'server');
-
-	api.addFiles('client/methods/call_syncSpaceUserOrganizationCompany.coffee', 'client');	
 })

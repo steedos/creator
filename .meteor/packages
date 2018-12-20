@@ -107,6 +107,7 @@ steedos:sso
 steedos:app-workflow
 steedos:app-admin
 #steedos:app-example
+steedos:app-contract
 steedos:creator
 natestrauser:select2
 meteorhacks:unblock@1.1.0
