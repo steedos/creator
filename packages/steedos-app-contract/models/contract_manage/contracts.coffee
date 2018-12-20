@@ -3,19 +3,16 @@ Creator.Objects.contracts =
 	icon: "record"
 	label: "合同信息"
 	enable_search: true
+	enable_files: true
+	enable_api: true
+	enable_tree: true
 	fields:
-		_id:
-			type:'text'
-			label:"合同id"
 		no:
 			type:'text'
 			label:"合同编号"
 		name:
 			type:"text"
 			label:"合同名称"
-			is_name:true
-			required:true
-			searchable:true
 		project:
 			type:'text'
 			label:"计划编号"
@@ -33,7 +30,6 @@ Creator.Objects.contracts =
 			type: "lookup"
 			label: "合同类型"
 			reference_to: "contract_type"
-			hidden: true
 		startdate:
 			type: "date"
 			label: "开始时间"

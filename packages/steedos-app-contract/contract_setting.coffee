@@ -1,5 +1,5 @@
 Creator.Apps.contract_setting = 
-	url: "/app/contract_setting/archive_company/grid/all"
+	url: "/app/contract_setting/contract_company/grid/all"
 	name: "合同维护"
 	icon_slds: "resource_skill"
 	objects: [
