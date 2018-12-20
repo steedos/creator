@@ -4,7 +4,6 @@
 * http://js.devexpress.com/themebuilder/
 */
 
-@import 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700';
 .dx-colorview-palette-handle {
   background: -webkit-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #fff 7px,  #fff 12px,  rgba(0, 0, 0, 0.2) 13px);
   background: -webkit-radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #fff 7px,  #fff 12px,  rgba(0, 0, 0, 0.2) 13px);
@@ -1245,30 +1244,7 @@
   width: auto;
   float: none;
 }
-@font-face {
-  font-family: 'RobotoFallback';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Roboto Light'), local('Roboto-Light'), url(fonts/Roboto-300.woff2) format('woff2'), url(fonts/Roboto-300.woff) format('woff'), url(fonts/Roboto-300.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'RobotoFallback';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Roboto'), local('Roboto-Regular'), url(fonts/Roboto-400.woff2) format('woff2'), url(fonts/Roboto-400.woff) format('woff'), url(fonts/Roboto-400.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'RobotoFallback';
-  font-style: normal;
-  font-weight: 500;
-  src: local('Roboto Medium'), local('Roboto-Medium'), url(fonts/Roboto-500.woff2) format('woff2'), url(fonts/Roboto-500.woff) format('woff'), url(fonts/Roboto-500.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'RobotoFallback';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Roboto Bold'), local('Roboto-Bold'), url(fonts/Roboto-700.woff2) format('woff2'), url(fonts/Roboto-700.woff) format('woff'), url(fonts/Roboto-700.ttf) format('truetype');
-}
+
 .dx-theme-material-typography {
   background-color: #fff;
   color: rgba(0, 0, 0, 0.87);
