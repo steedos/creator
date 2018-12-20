@@ -351,13 +351,14 @@ Template.creator_grid.onRendered ->
 				extra_columns = _.union extra_columns, defaultExtraColumns
 			
 			selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
+			#expand_fields 不需要包含 extra_columns
+			expand_fields = _expandFields(curObjectName, selectColumns)
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
-			expand_fields = _expandFields(curObjectName, selectColumns)
 			actions = Creator.getActions(curObjectName)
 			if actions.length
 				showColumns.push
@@ -427,7 +428,7 @@ Template.creator_grid.onRendered ->
 			if !is_related and localPageSize
 				pageSize = localPageSize
 			else
-				pageSize = 10
+				pageSize = 50
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
 			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
@@ -553,28 +554,33 @@ Template.creator_grid.onRendered ->
 							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 							localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
-				onNodesInitialized: (e)->
-					if creator_obj.enable_tree
-						# 默认展开第一个节点
-						rootNode = e.component.getRootNode()
-						firstNodeKey = rootNode?.children[0]?.key
-						if firstNodeKey
-							e.component.expandRow(firstNodeKey)
+				# onNodesInitialized: (e)->
+				# 	if creator_obj.enable_tree
+				# 		# 默认展开第一个节点
+				# 		rootNode = e.component.getRootNode()
+				# 		firstNodeKey = rootNode?.children[0]?.key
+				# 		if firstNodeKey
+				# 			e.component.expandRow(firstNodeKey)
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
-				dxOptions.parentIdExpr = "parent._id"
-				dxOptions.expandNodesOnFiltering = false
+				dxOptions.parentIdExpr = "parent"
+				dxOptions.expandNodesOnFiltering = true
+				# tree 模式不能设置filter，filter由tree动态生成
+				dxOptions.dataSource.filter = null
+				dxOptions.rootValue = null
 				dxOptions.remoteOperations = 
 					filtering: true
 					sorting: false
 					grouping: false
+				dxOptions.scrolling = null
+				dxOptions.pageing = 
+					pageSize: 1000
 				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
 				# dxOptions.autoExpandAll = true
 				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
 				dxOptions.pager = null 
-				dxOptions.paging = null 
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
