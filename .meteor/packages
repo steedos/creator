@@ -160,3 +160,4 @@ steedos:application-template
 # steedos:app-chat
 
 steedos:autoform-lookup
+steedos:app-tableau

@@ -8,4 +8,5 @@ Creator.Menus.push(
     { _id: 'instance_number_rules', name: '流程编号规则', permission_sets: ["admin", "workflow_admin"], object_name: "instance_number_rules", parent: 'menu_workflow', sort: 50 },
     { _id: 'space_user_signs', name: '图片签名', permission_sets: ["admin", "workflow_admin"], object_name: "space_user_signs", parent: 'menu_workflow', sort: 60 },
     { _id: 'instances_statistic', name: '效率统计', permission_sets: ["admin", "workflow_admin"], object_name: "instances_statistic", parent: 'menu_workflow', sort: 70 },
+    { _id: 'tableau_info', name: 'Tableau', permission_sets: ["admin", "workflow_admin"], template_name: "tableau_info", parent: 'menu_workflow', sort: 80 },
 );
