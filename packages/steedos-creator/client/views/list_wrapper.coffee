@@ -17,11 +17,14 @@ Template.creator_list_wrapper.onRendered ->
 
 Template.creator_list_wrapper.helpers Creator.helpers
 
+isCalendarView = ()->
+	view = Creator.getListView(Session.get "object_name", Session.get("list_view_id"))
+	return view.type == 'calendar'
+
 Template.creator_list_wrapper.helpers
 
 	isCalendarView: ()->
-		view = Creator.getListView(Session.get "object_name", Session.get("list_view_id"))
-		return view.type == 'calendar'
+		return isCalendarView()
 
 	object_listviews_fields: ()->
 		listview_fields = Creator.getObject("object_listviews").fields
@@ -86,7 +89,10 @@ Template.creator_list_wrapper.helpers
 
 	actions: ()->
 		actions = Creator.getActions()
+		isCalendar = isCalendarView()
 		actions = _.filter actions, (action)->
+			if isCalendar && action.todo == "standard_query"
+				return false
 			if action.on == "list"
 				if typeof action.visible == "function"
 					return action.visible()
