@@ -302,7 +302,6 @@ Template.creator_calendar.helpers Creator.helpers
 
 Template.creator_calendar.helpers
 	actions: ()->
-		actions: ()->
 		actions = Creator.getActions()
 		actions = _.filter actions, (action)->
 			if action.on == "list" && action.todo != "standard_query"
