@@ -19,7 +19,7 @@ Template.creator_list_wrapper.helpers Creator.helpers
 
 isCalendarView = ()->
 	view = Creator.getListView(Session.get "object_name", Session.get("list_view_id"))
-	return view.type == 'calendar'
+	return view?.type == 'calendar'
 
 Template.creator_list_wrapper.helpers
 
