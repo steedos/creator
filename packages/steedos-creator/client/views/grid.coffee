@@ -345,6 +345,7 @@ Template.creator_grid.onRendered ->
 			extra_columns = ["owner"]
 			if creator_obj.enable_tree
 				extra_columns.push("parent")
+				extra_columns.push("children")
 			object = Creator.getObject(curObjectName)
 			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
 			if defaultExtraColumns
@@ -566,6 +567,10 @@ Template.creator_grid.onRendered ->
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent"
+				dxOptions.hasItemsExpr = (params)->
+					if params?.children?.length>0
+						return true 
+					return false;
 				dxOptions.expandNodesOnFiltering = true
 				# tree 模式不能设置filter，filter由tree动态生成
 				dxOptions.dataSource.filter = null
