@@ -132,6 +132,8 @@ Template.creator_calendar.onRendered ->
 	self = this
 	self.autorun (c)->
 		object_name = Session.get("object_name")
+		unless Session.get("object_name") is "meeting"
+			return
 		if Steedos.spaceId()
 			dxSchedulerInstance =  $("#scheduler").dxScheduler({
 				dataSource: _dataSource()
