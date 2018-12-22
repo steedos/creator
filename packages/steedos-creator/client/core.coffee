@@ -216,7 +216,25 @@ if Meteor.isClient
 			record_object_name = Creator.getObjectRecord().name
 			selector.push("and", [related_field_name, "=", record_object_name])
 		else
-			selector.push("and", [related_field_name, "=", record_id])
+
+			related_object_fields = Creator.getObject(related_object_name)?.fields
+
+			if related_object_fields
+				related_field = related_object_fields[related_field_name]
+
+			if related_field && (related_field.type == 'master_detail' or related_field.type == 'lookup')
+				if _.isFunction(related_field.reference_to)
+					if _.isArray(related_field.reference_to())
+						selector.push("and", ["#{related_field_name}.ids", "=", record_id])
+					else
+						selector.push("and", [related_field_name, "=", record_id])
+
+				else if _.isArray(related_field.reference_to)
+					selector.push("and", ["#{related_field_name}.ids", "=", record_id])
+				else
+					selector.push("and", [related_field_name, "=", record_id])
+			else
+				selector.push("and", [related_field_name, "=", record_id])
 
 		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
 		if !permissions.viewAllRecords and permissions.allowRead
