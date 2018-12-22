@@ -17,9 +17,23 @@ _getSelect = (options)->
 
 	return _.uniq(select)
 
+getExpand = (options)->
+	objectFields = Creator.getObject(Session.get("object_name")).fields
+	expand = []
+	_.forEach options.title, (fname)->
+		f = objectFields[fname]
+		if (f.type == 'lookup' || f.type == 'master_detail') && _.isString(f.reference_to)
+			re_object_name_field = Creator.getObject(f.reference_to)?.NAME_FIELD_KEY
+			if re_object_name_field
+				expand.push("#{fname}($select=#{re_object_name_field})")
+	if expand.length < 1
+		return
+	return expand;
+
 _dataSource = (options) ->
 	filter = Creator.getODataFilter(Session.get("list_view_id"), Session.get('object_name'))
 	url = "/api/odata/v4/#{Steedos.spaceId()}/#{Session.get('object_name')}"
+	expand = getExpand(options)
 	dataSource = {
 		store:
 			type: "odata"
@@ -55,21 +69,44 @@ _dataSource = (options) ->
 						error.message = t "creator_odata_unexpected_character"
 				toastr.error(error.message)
 		select: _getSelect(options)
-		expand: ["owner($select=name)"]
+		expand: expand || ["owner($select=name)"]
 		filter: filter
 	}
 	return dataSource
 
 _getAppointmentTemplate = (options)->
 	appointmentTemplate = (data)->
-		console.log('appointmentTemplate data', data);
 		title = data[options.textExpr || 'name'];
 		if options.title && _.isArray(options.title) && options.title.length > 0
 			title = ''
 			fields = Creator.getObject().fields;
 			_.each options.title, (t)->
 				f = fields[t]
-				title += "#{f.label || t}: #{data[t]}&#10;"
+				fvalue = data[t]
+				if fvalue
+					if (f.type == 'lookup' || f.type == 'master_detail') && _.isString(f.reference_to)
+						re_object_name_field = Creator.getObject(f.reference_to)?.NAME_FIELD_KEY
+						if _.isArray(fvalue)
+							fvalue = _.pluck(fvalue, re_object_name_field).join(',')
+						else
+							fvalue = fvalue[re_object_name_field]
+					else if f.type == 'select'
+						f_options = f.options
+
+						if _.isFunction(f_options)
+							f_options = f_options()
+
+						f_option = _.find f_options, (o)->
+							return o.value == fvalue
+
+						fvalue = f_option?.label || ''
+
+					else if f.type == 'datetime'
+						fvalue = DevExpress.localization.formatDate(new Date(fvalue), 'yyyy-MM-dd hh:mm a')
+				else
+					fvalue = ''
+
+				title += "#{f.label || t}: #{fvalue}&#10;"
 		return $("""
 				<div style='height: 100%;' title='#{title}'>
 					<div class='dx-scheduler-appointment-title'>#{data[options.textExpr || 'name']}</div>
@@ -187,6 +224,10 @@ _executeAction = (action_name, data)->
 		else
 			Creator.executeAction objectName, action, data._id
 
+_newData = (data)->
+	Session.set("cmDoc", data)
+	_executeAction 'standard_new' , data
+
 _editData = (data)->
 	_executeAction 'standard_edit' , data
 
@@ -196,10 +237,14 @@ _deleteData = (data)->
 Template.creator_calendarNew.onCreated ->
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
+			if $("#creatorScheduler").length < 1
+				return;
 			dxSchedulerInstance.repaint()
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->
+			if $("#creatorScheduler").length < 1
+				return;
 			dxSchedulerInstance.repaint()
 	,false
 
@@ -207,7 +252,9 @@ Template.creator_calendarNew.onRendered ->
 	self = this
 	view = Creator.getListView(Session.get("object_name"), 'calendarView')
 	self.autorun (c)->
-		object_name = Session.get("object_name")
+		object_name = Session.get("object_name");
+		if $("#creatorScheduler").length < 1
+			return;
 		if Steedos.spaceId()
 
 			dxSchedulerConfig = {
@@ -218,7 +265,7 @@ Template.creator_calendarNew.onRendered ->
 				}, {
 					type:"week",
 					maxAppointmentsPerCell:"unlimited"
-				}, "month"]
+				}, "month", "agenda"]
 				currentView: "month"
 				currentDate: new Date()
 				firstDayOfWeek: 1
@@ -239,6 +286,13 @@ Template.creator_calendarNew.onRendered ->
 					allowUpdating: false,
 				},
 				appointmentTemplate: _getAppointmentTemplate(view.options)
+				onCellClick: (e) ->
+					cellData = e.cellData
+					doc = {
+						"#{view.options.startDateExpr}" : cellData.startDate
+						"#{view.options.endDateExpr}" : cellData.endDate
+					}
+					_newData(doc)
 				onAppointmentClick: (e) ->
 					if e.event.currentTarget.className.includes("dx-list-item")
 						e.cancel = true
@@ -297,6 +351,6 @@ Template.creator_calendarNew.onRendered ->
 
 			_.extend(dxSchedulerConfig, view.options)
 
-			dxSchedulerInstance =  $("#scheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
+			dxSchedulerInstance =  $("#creatorScheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
 
 			window.dxSchedulerInstance = dxSchedulerInstance;

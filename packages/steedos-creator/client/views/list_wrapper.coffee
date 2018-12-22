@@ -163,7 +163,10 @@ Template.creator_list_wrapper.events
 		Session.set("action_fields", undefined)
 		Session.set("action_collection", "Creator.Collections.#{objectName}")
 		Session.set("action_collection_name", collection_name)
-		Session.set("action_save_and_insert", true)
+		if isCalendarView()
+			Session.set("action_save_and_insert", false)
+		else
+			Session.set("action_save_and_insert", true)
 		Creator.executeAction objectName, this
 
 	'click .export-data-grid': (event, template)->
