@@ -120,31 +120,40 @@ _getAppointmentTemplate = (options)->
 
 	return appointmentTemplate;
 
-_getTooltipTemplate = (data, options) ->
-
+getPermission = (data)->
 	permission = Creator.getRecordPermissions(Session.get('object_name'), data, Meteor.userId())
+	if data
+		actions = Creator.getActions()
 
-	actions = Creator.getActions()
-
-	editAction = _.find actions, (action)->
+		editAction = _.find actions, (action)->
 			return action.name == 'standard_edit'
 
-	if _.isFunction(editAction.visible)
-		editAction._visible = editAction.visible(Session.get('object_name'), data._id, permission)
-	else
-		editAction._visible = editAction.visible
+		if _.isFunction(editAction.visible)
+			editAction._visible = editAction.visible(Session.get('object_name'), data._id, permission)
+		else
+			editAction._visible = editAction.visible
 
-	deleteAction = _.find actions, (action)->
-		return action.name == 'standard_delete'
+		deleteAction = _.find actions, (action)->
+			return action.name == 'standard_delete'
 
-	if _.isFunction(deleteAction.visible)
-		deleteAction._visible = deleteAction.visible(Session.get('object_name'), data._id, permission)
-	else
-		deleteAction._visible = deleteAction.visible
+		if _.isFunction(deleteAction.visible)
+			deleteAction._visible = deleteAction.visible(Session.get('object_name'), data._id, permission)
+		else
+			deleteAction._visible = deleteAction.visible
+
+	return {
+		allowCreate: permission.allowCreate,
+		allowEdit: permission.allowEdit && editAction?._visible,
+		allowDelete: permission.allowDelete && deleteAction?._visible
+	}
+
+_getTooltipTemplate = (data, options) ->
+
+	permission = getPermission(data)
 
 	deleteBtn = ""
 
-	if permission.allowDelete && deleteAction._visible
+	if permission.allowDelete
 		deleteBtn = """
 			<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
 				<i class="dx-icon dx-icon-trash"></i>
@@ -157,7 +166,7 @@ _getTooltipTemplate = (data, options) ->
 		</div>
 	"""
 
-	if permission.allowEdit && editAction._visible
+	if permission.allowEdit
 		editBtn = """
 			<div class="dx-button dx-button-normal dx-widget dx-button-has-text edit dx-button-default" role="button" aria-label="编辑" tabindex="0">
 				<span class="dx-button-text">编辑</span>
@@ -241,20 +250,32 @@ setResource = (data, fieldName, value)->
 	Creator.odata.update Session.get("object_name"), data._id, {"#{fieldName}" : value}, ()->
 		dxSchedulerInstance.repaint()
 
-getAppointmentContextMenuItems = (options)->
+getAppointmentContextMenuItems = (e, options)->
+	console.log('getAppointmentContextMenuItems', e);
 	menuItems = []
-	fields = Creator.getObject(Session.get("object_name"))?.fields
-	if fields
-		_.each options.groups, (g)->
-			f = fields[g]
-			if f
-				menuItems.push { text: "设置#{f.label}", beginGroup: true, disabled: true }
-	if options.resources && options.resources.length > 0 && options.resources[0].dataSource
-		fieldExpr = options.resources[0].fieldExpr
-		_.each options.resources[0].dataSource, (ds)->
-			ds.onItemClick = (e, clickEvent)->
-				setResource(e.targetedAppointmentData, fieldExpr, clickEvent.itemData.id)
-			menuItems.push ds
+
+	permission = getPermission(e.targetedAppointmentData)
+
+	if permission.allowDelete
+		menuItems.push text: '删除', onItemClick: (itemE)->
+			_deleteData(itemE.targetedAppointmentData)
+
+	if permission.allowEdit
+		menuItems.unshift text: '编辑', onItemClick: (itemE)->
+			_editData(itemE.targetedAppointmentData)
+
+		fields = Creator.getObject(Session.get("object_name"))?.fields
+		if fields
+			_.each options.groups, (g)->
+				f = fields[g]
+				if f
+					menuItems.push { text: "设置#{f.label}", beginGroup: true, disabled: true }
+		if options.resources && options.resources.length > 0 && options.resources[0].dataSource
+			fieldExpr = options.resources[0].fieldExpr
+			_.each options.resources[0].dataSource, (ds)->
+				ds.onItemClick = (e, clickEvent)->
+					setResource(e.targetedAppointmentData, fieldExpr, clickEvent.itemData.id)
+				menuItems.push ds
 	return menuItems
 
 getAppointmentMenuTemplate = (itemData) ->
@@ -284,11 +305,15 @@ showCurrentDate = (e) ->
 	scheduler.option("currentDate", new Date());
 
 getCellContextMenuItems = (options)->
-	enuItems = [
-		{ text: '新建', onItemClick: _newData },
+	menuItems = [
 		{ text: '分组/取消分组', beginGroup: true, onItemClick: groupCell },
 		{ text: '去今天', onItemClick: showCurrentDate }
 	]
+	permission = getPermission()
+	if permission.allowCreate
+		menuItems.unshift { text: '新建', onItemClick: _newData }
+
+	return menuItems
 
 Template.creator_calendarNew.onCreated ->
 	AutoForm.hooks creatorAddForm:
@@ -306,14 +331,13 @@ Template.creator_calendarNew.onCreated ->
 
 Template.creator_calendarNew.onRendered ->
 	self = this
-	view = Creator.getListView(Session.get("object_name"), 'calendarView')
+	view = Creator.getListView(Session.get("object_name"), Session.get("list_view_id"))
 	self.autorun (c)->
 		object_name = Session.get("object_name");
 		if $("#creator-scheduler").length < 1
 			return;
 		if Steedos.spaceId()
 
-			appointmentContextMenuItems = getAppointmentContextMenuItems(view.options)
 			cellContextMenuItems = getCellContextMenuItems(view.options)
 			dxSchedulerConfig = {
 				dataSource: _dataSource(view.options)
@@ -348,7 +372,9 @@ Template.creator_calendarNew.onRendered ->
 				dataCellTemplate: null
 				onCellClick: (e) ->
 					e.cancel = true
-					_newData(e, view.options)
+					permission = getPermission()
+					if permission.allowCreate
+						_newData(e, view.options)
 				onAppointmentClick: (e) ->
 					if e.event.currentTarget.className.includes("dx-list-item")
 						e.cancel = true
@@ -407,7 +433,7 @@ Template.creator_calendarNew.onRendered ->
 				onAppointmentContextMenu: (e) ->
 					contextMenuEvent = e;
 					$("#creator-scheduler-appointment-context-menu").dxContextMenu({
-						dataSource: appointmentContextMenuItems,
+						dataSource: getAppointmentContextMenuItems(contextMenuEvent, view.options),
 						width: 200,
 						target: ".dx-scheduler-appointment",
 						itemTemplate: (itemData) ->

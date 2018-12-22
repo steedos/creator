@@ -42,6 +42,7 @@ Creator.Objects.tasks =
 				{label:"暂停", value:"paused"}, 
 			]
 			sortable: true
+			required: true
 
 		related_to:
 			label: "相关项"
@@ -88,7 +89,7 @@ Creator.Objects.tasks =
 			columns: ["name", "due_date", "state", "assignees", "related_to"]
 			filter_scope: "space"
 
-		calendarView: {
+		calendar_view: {
 			type: 'calendar',
 			label: '日历视图',
 			filter_scope: "space",
