@@ -51,13 +51,24 @@ if Meteor.isServer
 
 	Creator.getAssignedMenus = (spaceId, userId)->
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, name:1}}).fetch()
+		adminMenus = Creator.Apps.admin.admin_menus
+		aboutMenu = adminMenus.find (n) ->
+			n._id == 'about'
+		adminMenus = adminMenus.filter (n) ->
+			n._id != 'about'
+		otherMenuApps = _.sortBy _.filter(_.values(Creator.Apps), (n) ->
+			return n.admin_menus and n._id != 'admin'
+		), 'sort'
+		otherMenus = _.flatten(_.pluck(otherMenuApps, "admin_menus"))
+		# 菜单有三部分组成设置APP菜单、其他APP菜单以及about菜单
+		allMenus = _.union(adminMenus, otherMenus, [aboutMenu])
 		if Creator.isSpaceAdmin(spaceId, userId)
 			# 工作区管理员有全部菜单功能
-			return Creator.Menus
+			return allMenus
 		else
 			currentPsetNames = psets.map (n) ->
 				return n.name
-			menus = Creator.Menus.filter (menu)->
+			menus = allMenus.filter (menu)->
 				psetsMenu = menu.permission_sets
 				# 如果普通用户有权限，则直接返回true
 				if psetsMenu.indexOf("user") > -1
