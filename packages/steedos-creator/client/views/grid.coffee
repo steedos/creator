@@ -107,10 +107,15 @@ _actionItems = (object_name, record_id, record_permissions)->
 			return false
 	return actions
 
-_fields = (object_name, list_view_id)->
+_fields = (object_name, list_view_id, is_sidebar)->
 	object = Creator.getObject(object_name)
 	name_field_key = object.NAME_FIELD_KEY
+	if object.name == "organizations"
+		# 显示组织列表时，特殊处理name_field_key为name字段
+		name_field_key = "name"
 	fields = [name_field_key]
+	if is_sidebar
+		return fields
 	if Creator.getCollection("object_listviews").findOne(list_view_id)
 		fields = Creator.getCollection("object_listviews").findOne(list_view_id).columns
 	else if object.list_views
@@ -265,7 +270,10 @@ _depandOnFields = (object_name, columns)->
 Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
+		is_sidebar = self.data.is_sidebar
 		is_related = self.data.is_related
+		if is_sidebar
+			list_view_id = "all"
 		if is_related
 			list_view_id = Creator.getListView(self.data.related_object_name, "all")._id
 		else
@@ -320,7 +328,8 @@ Template.creator_grid.onRendered ->
 			curObjectName = if is_related then related_object_name else object_name
 
 			selectColumns = Tracker.nonreactive ()->
-				grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
+				unless is_sidebar
+					grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
 				if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
 					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
 
@@ -329,7 +338,7 @@ Template.creator_grid.onRendered ->
 					selectColumns = _.intersection(settingColumns, defaultColumns)
 					selectColumns = _.union(selectColumns, defaultColumns)
 				else
-					selectColumns = _fields(curObjectName, list_view_id)
+					selectColumns = _fields(curObjectName, list_view_id, is_sidebar)
 				return selectColumns
 
 			pageIndex = Tracker.nonreactive ()->
@@ -432,7 +441,6 @@ Template.creator_grid.onRendered ->
 				pageSize = 50
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
-			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
@@ -444,18 +452,12 @@ Template.creator_grid.onRendered ->
 				scrolling: 
 					mode: "virtual",
 					rowRenderingMode: "virtual"
-				export:
-					enabled: true
-					fileName: fileName
-					allowExportSelectedData: false
 				showColumnLines: false
 				allowColumnReordering: true
 				allowColumnResizing: true
 				columnResizingMode: "widget"
 				showRowLines: true
 				savingTimeout: 1000
-				#selection: 
-				#	mode: "multiple"
 				stateStoring:{
 		   			type: "custom"
 					enabled: true
@@ -562,8 +564,18 @@ Template.creator_grid.onRendered ->
 				# 		firstNodeKey = rootNode?.children[0]?.key
 				# 		if firstNodeKey
 				# 			e.component.expandRow(firstNodeKey)
+			
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
+			if is_sidebar
+				dxOptions.selection = 
+					mode: "single"
+			else
+				fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
+				dxOptions.export =
+					enabled: true
+					fileName: fileName
+					allowExportSelectedData: false
 			if creator_obj.enable_tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent"

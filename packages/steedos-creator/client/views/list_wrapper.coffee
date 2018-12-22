@@ -43,6 +43,14 @@ Template.creator_list_wrapper.helpers
 	recordsTotalCount: ()->
 		return Template.instance().recordsTotal.get()
 	
+	list_data_left: ()->
+		object_name = Session.get "object_name"
+		sidebar = Creator.Objects[object_name]?.sidebar
+		if sidebar
+			return {object_name: sidebar.reference_to, is_sidebar: true}
+		else
+			return null
+	
 	list_data: ()->
 		object_name = Session.get "object_name"
 		return {object_name: object_name, total: Template.instance().recordsTotal}

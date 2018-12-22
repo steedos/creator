@@ -7,6 +7,8 @@ Creator.Objects.space_users =
 	label: "人员"
 	icon: "user"
 	enable_search: true
+	sidebar:
+		reference_to: "organizations"
 	fields:
 		name:
 			label: "姓名"
