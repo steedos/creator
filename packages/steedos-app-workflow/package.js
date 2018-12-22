@@ -51,7 +51,6 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/flow_copy.coffee', 'server');
 
 	api.addFiles('workflow.app.coffee', "server");
-	api.addFiles('menu.coffee', "server");
 	api.addFiles('models/Instances.coffee');
 	api.addFiles('models/forms.coffee');
 	api.addFiles('models/flows.coffee');

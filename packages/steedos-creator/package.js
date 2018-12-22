@@ -105,7 +105,6 @@ Package.onUse(function (api) {
 	api.use('steedos:lightning-design-system@0.0.2');
 
 	api.addFiles('core.coffee');
-	api.addFiles('menu.coffee', "server");
 
 	api.addFiles('lib/actions.coffee');
 

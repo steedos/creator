@@ -7,35 +7,39 @@ Creator.Apps.admin =
 	is_creator:true
 	objects: ["organizations", "space_users", "apps",
 		"objects", "permission_set"]
+
+	# Menu 支持两种类型的参数
+	# - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
+	# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/	
 	admin_menus: [
-		{ _id: 'account', name: '我的账户', permission_sets: ["user"], sort: 10, expanded: false },
-		# { _id: 'account_personal', name: '个人信息', permission_sets: ["user"], template_name: "account_personal", parent: 'account', sort: 10 },
-		{ _id: 'account_avatar', name: '头像', permission_sets: ["user"], template_name: "account_avatar", parent: 'account', sort: 20 },
-		{ _id: 'account_setting', name: '账户', permission_sets: ["user"], template_name: "account_setting", parent: 'account', sort: 30 },
-		{ _id: 'account_password', name: '密码', permission_sets: ["user"], template_name: "account_password", parent: 'account', sort: 40 },
-		{ _id: 'account_background', name: '背景图', permission_sets: ["user"], template_name: "account_background", parent: 'account', sort: 50 }
+		{ _id: 'account', name: '我的账户', permission_sets: ["user"], expanded: false },
+		# { _id: 'account_personal', name: '个人信息', permission_sets: ["user"], template_name: "account_personal", parent: 'account' },
+		{ _id: 'account_avatar', name: '头像', permission_sets: ["user"], template_name: "account_avatar", parent: 'account' },
+		{ _id: 'account_setting', name: '账户', permission_sets: ["user"], template_name: "account_setting", parent: 'account' },
+		{ _id: 'account_password', name: '密码', permission_sets: ["user"], template_name: "account_password", parent: 'account' },
+		{ _id: 'account_background', name: '背景图', permission_sets: ["user"], template_name: "account_background", parent: 'account' }
 
-		{ _id: 'menu_users', name: '用户', permission_sets: ["admin"], sort: 20, expanded: false },
-		{ _id: 'organizations', name: '部门', permission_sets: ["admin"], object_name: "organizations", parent: 'menu_users', sort: 10 },
-		{ _id: 'space_users', name: '用户', permission_sets: ["admin"], object_name: "space_users", parent: 'menu_users', sort: 20 },
-		{ _id: 'permission_set', name: '权限组', permission_sets: ["admin"], object_name: "permission_set", parent: 'menu_users', sort: 30 },
-		{ _id: 'spaces', name: '公司信息', permission_sets: ["admin"], object_name: "spaces", parent: 'menu_users', sort: 40 },
-		{ _id: 'contacts_limit', name: '通讯录权限', permission_sets: ["admin"], template_name: "contacts_settings", parent: 'menu_users', sort: 50 },
+		{ _id: 'menu_users', name: '用户', permission_sets: ["admin"], expanded: false },
+		{ _id: 'organizations', name: '部门', permission_sets: ["admin"], object_name: "organizations", parent: 'menu_users' },
+		{ _id: 'space_users', name: '用户', permission_sets: ["admin"], object_name: "space_users", parent: 'menu_users' },
+		{ _id: 'permission_set', name: '权限组', permission_sets: ["admin"], object_name: "permission_set", parent: 'menu_users' },
+		{ _id: 'spaces', name: '公司信息', permission_sets: ["admin"], object_name: "spaces", parent: 'menu_users' },
+		{ _id: 'contacts_limit', name: '通讯录权限', permission_sets: ["admin"], template_name: "contacts_settings", parent: 'menu_users' },
 		
-		{ _id: 'menu_objects', name: '应用', permission_sets: ["admin"], sort: 30, expanded: false },
-		{ _id: 'apps', name: '应用', permission_sets: ["admin"], object_name: "apps", parent: 'menu_objects', sort: 10 },
-		{ _id: 'objects', name: '对象', permission_sets: ["admin"], object_name: "objects", parent: 'menu_objects', sort: 20 },
-		{ _id: 'permission_objects', name: '对象权限', permission_sets: ["admin"], object_name: "permission_objects", parent: 'menu_objects', sort: 30 },
-		{ _id: 'permission_shares', name: '共享规则', permission_sets: ["admin"], object_name: "permission_shares", parent: 'menu_objects', sort: 40 },
-		{ _id: 'object_workflows', name: '对象流程', permission_sets: ["admin"], object_name: "object_workflows", parent: 'menu_objects', sort: 50 },
+		{ _id: 'menu_objects', name: '应用', permission_sets: ["admin"], expanded: false },
+		{ _id: 'apps', name: '应用', permission_sets: ["admin"], object_name: "apps", parent: 'menu_objects' },
+		{ _id: 'objects', name: '对象', permission_sets: ["admin"], object_name: "objects", parent: 'menu_objects' },
+		{ _id: 'permission_objects', name: '对象权限', permission_sets: ["admin"], object_name: "permission_objects", parent: 'menu_objects' },
+		{ _id: 'permission_shares', name: '共享规则', permission_sets: ["admin"], object_name: "permission_shares", parent: 'menu_objects' },
+		{ _id: 'object_workflows', name: '对象流程', permission_sets: ["admin"], object_name: "object_workflows", parent: 'menu_objects' },
 
-		{ _id: 'menu_development', name: '开发', permission_sets: ["admin"], sort: 50, expanded: false },
-		{ _id: 'application_package', name: '软件包', permission_sets: ["admin"], object_name: "application_package", parent: 'menu_development', sort: 10 },
-		{ _id: 'queue_import', name: '数据导入', permission_sets: ["admin"], object_name: "queue_import", parent: 'menu_development', sort: 20 },
-		{ _id: 'OAuth2Clients', name: 'OAuth2 应用', permission_sets: ["admin"], object_name: "OAuth2Clients", parent: 'menu_development', sort: 30 },
-		{ _id: 'OAuth2AccessTokens', name: 'OAuth2 Token', permission_sets: ["admin"], object_name: "OAuth2AccessTokens", parent: 'menu_development', sort: 40 },
-		{ _id: 'webhooks', name: 'Webhooks', permission_sets: ["admin"], object_name: "webhooks", parent: 'menu_development', sort: 50 },
+		{ _id: 'menu_development', name: '开发', permission_sets: ["admin"], expanded: false },
+		{ _id: 'application_package', name: '软件包', permission_sets: ["admin"], object_name: "application_package", parent: 'menu_development' },
+		{ _id: 'queue_import', name: '数据导入', permission_sets: ["admin"], object_name: "queue_import", parent: 'menu_development' },
+		{ _id: 'OAuth2Clients', name: 'OAuth2 应用', permission_sets: ["admin"], object_name: "OAuth2Clients", parent: 'menu_development' },
+		{ _id: 'OAuth2AccessTokens', name: 'OAuth2 Token', permission_sets: ["admin"], object_name: "OAuth2AccessTokens", parent: 'menu_development' },
+		{ _id: 'webhooks', name: 'Webhooks', permission_sets: ["admin"], object_name: "webhooks", parent: 'menu_development' },
 		
-		{ _id: 'about', name: '关于', permission_sets: ["user"], template_name: "creator_about", sort: 1000 }
+		{ _id: 'about', name: '关于', permission_sets: ["user"], template_name: "creator_about" }
 	]
 		
