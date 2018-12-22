@@ -441,9 +441,9 @@ Template.creator_grid.onRendered ->
 					allowedPageSizes: [10, 50, 100, 200],
 					showInfo: false,
 					showNavigationButtons: true
-				scrolling: 
-					mode: "virtual",
-					rowRenderingMode: "virtual"
+				# scrolling: 
+				# 	mode: "virtual",
+				# 	rowRenderingMode: "virtual"
 				export:
 					enabled: true
 					fileName: fileName
