@@ -88,6 +88,41 @@ Creator.Objects.tasks =
 			columns: ["name", "due_date", "state", "assignees", "related_to"]
 			filter_scope: "space"
 
+		calendarView: {
+			type: 'calendar',
+			label: '日历视图',
+			filter_scope: "space",
+#			filters: [["is_deleted", "=", false], ["state", "=", "enabled"]],
+			options: {
+				startDateExpr: 'created',
+				endDateExpr: 'due_date',
+				textExpr: 'name',
+				title: ['name', 'due_date', 'assignees', 'state'],
+				currentView: 'month'
+				groups: ['state']
+				resources: [{
+					fieldExpr: "state"
+					dataSource: [{
+						text : "未开始",
+						id: 'not_started',
+						color: "rgb(118, 118, 118)"
+					},{
+						text : "进行中",
+						id: 'in_progress',
+						color: "rgb(29, 186, 174)"
+					},{
+						text : "已完成",
+						id: 'completed',
+						color: "rgb(32, 194, 46)"
+					},{
+						text : "暂停",
+						id: 'paused',
+						color: "rgb(118, 118, 118)"
+					}]
+				}]
+			}
+		}
+
 	permission_set:
 		user:
 			allowCreate: true
