@@ -147,26 +147,20 @@ _getTooltipTemplate = (data, options) ->
 	if permission.allowDelete && deleteAction._visible
 		deleteBtn = """
 			<div class="dx-button dx-button-normal dx-widget dx-button-has-icon delete" role="button" aria-label="trash" tabindex="0">
-				<div class="dx-button-content">
-					<i class="dx-icon dx-icon-trash"></i>
-				</div>
+				<i class="dx-icon dx-icon-trash"></i>
 			</div>
 		"""
 
 	editBtn = """
 		<div class="dx-button dx-button-normal dx-widget dx-button-has-text read dx-button-default" role="button" aria-label="查看" tabindex="0">
-			<div class="dx-button-content">
-				<span class="dx-button-text">查看</span>
-			</div>
+			<span class="dx-button-text">查看</span>
 		</div>
 	"""
 
 	if permission.allowEdit && editAction._visible
 		editBtn = """
 			<div class="dx-button dx-button-normal dx-widget dx-button-has-text edit dx-button-default" role="button" aria-label="编辑" tabindex="0">
-				<div class="dx-button-content">
-					<span class="dx-button-text">编辑</span>
-				</div>
+				<span class="dx-button-text">编辑</span>
 			</div>
 		"""
 
