@@ -218,18 +218,9 @@ _executeAction = (action_name, data)->
 		else
 			Creator.executeAction objectName, action, data._id
 
-_newData = (e, options)->
-	cellData = e.cellData
-
-	doc = {
-		"#{options.startDateExpr}" : cellData.startDate
-		"#{options.endDateExpr}" : cellData.endDate
-	}
-
-	if cellData.groups
-		_.extend doc, cellData.groups
-	Session.set("cmDoc", doc)
-	_executeAction 'standard_new' , doc
+_newData = (data)->
+	Session.set("cmDoc", data)
+	_executeAction 'standard_new' , data
 
 _editData = (data)->
 	_executeAction 'standard_edit' , data
@@ -237,69 +228,16 @@ _editData = (data)->
 _deleteData = (data)->
 	_executeAction 'standard_delete' , data
 
-setResource = (data, fieldName, value)->
-	Creator.odata.update Session.get("object_name"), data._id, {"#{fieldName}" : value}, ()->
-		dxSchedulerInstance.repaint()
-
-getAppointmentContextMenuItems = (options)->
-	menuItems = []
-	fields = Creator.getObject(Session.get("object_name"))?.fields
-	if fields
-		_.each options.groups, (g)->
-			f = fields[g]
-			if f
-				menuItems.push { text: "设置#{f.label}", beginGroup: true, disabled: true }
-	if options.resources && options.resources.length > 0 && options.resources[0].dataSource
-		fieldExpr = options.resources[0].fieldExpr
-		_.each options.resources[0].dataSource, (ds)->
-			ds.onItemClick = (e, clickEvent)->
-				setResource(e.targetedAppointmentData, fieldExpr, clickEvent.itemData.id)
-			menuItems.push ds
-	return menuItems
-
-getAppointmentMenuTemplate = (itemData) ->
-	template = $('<div></div>');
-
-	if(itemData.color)
-		template.append("<div class='item-badge' style='background-color:" + itemData.color + ";'></div>");
-
-	template.append(itemData.text);
-
-	if(itemData.text == "New Appointment until the end of the week")
-		template.append('<hr />');
-
-	return template;
-
-groupCell = (e, options) ->
-	scheduler = e.component;
-	if(scheduler.option("groups"))
-		scheduler.option("crossScrollingEnabled", false);
-		scheduler.option("groups", undefined);
-	else
-		scheduler.option("crossScrollingEnabled", true);
-		scheduler.option("groups", options.groups);
-
-showCurrentDate = (e) ->
-	scheduler = e.component;
-	scheduler.option("currentDate", new Date());
-
-getCellContextMenuItems = (options)->
-	enuItems = [
-		{ text: '新建', onItemClick: _newData },
-		{ text: '分组/取消分组', beginGroup: true, onItemClick: groupCell },
-		{ text: '去今天', onItemClick: showCurrentDate }
-	]
-
 Template.creator_calendarNew.onCreated ->
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
-			if $("#creator-scheduler").length < 1
+			if $("#creatorScheduler").length < 1
 				return;
 			dxSchedulerInstance.repaint()
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->
-			if $("#creator-scheduler").length < 1
+			if $("#creatorScheduler").length < 1
 				return;
 			dxSchedulerInstance.repaint()
 	,false
@@ -309,12 +247,10 @@ Template.creator_calendarNew.onRendered ->
 	view = Creator.getListView(Session.get("object_name"), 'calendarView')
 	self.autorun (c)->
 		object_name = Session.get("object_name");
-		if $("#creator-scheduler").length < 1
+		if $("#creatorScheduler").length < 1
 			return;
 		if Steedos.spaceId()
 
-			appointmentContextMenuItems = getAppointmentContextMenuItems(view.options)
-			cellContextMenuItems = getCellContextMenuItems(view.options)
 			dxSchedulerConfig = {
 				dataSource: _dataSource(view.options)
 				views: [{
@@ -336,7 +272,6 @@ Template.creator_calendarNew.onRendered ->
 				height: "100%"
 				crossScrollingEnabled: true
 				cellDuration: 30
-				recurrenceEditMode: "series"
 				editing: {
 					allowAdding: false,
 					allowDragging: false,
@@ -345,10 +280,13 @@ Template.creator_calendarNew.onRendered ->
 					allowUpdating: false,
 				},
 				appointmentTemplate: _getAppointmentTemplate(view.options)
-				dataCellTemplate: null
 				onCellClick: (e) ->
-					e.cancel = true
-					_newData(e, view.options)
+					cellData = e.cellData
+					doc = {
+						"#{view.options.startDateExpr}" : cellData.startDate
+						"#{view.options.endDateExpr}" : cellData.endDate
+					}
+					_newData(doc)
 				onAppointmentClick: (e) ->
 					if e.event.currentTarget.className.includes("dx-list-item")
 						e.cancel = true
@@ -403,36 +341,10 @@ Template.creator_calendarNew.onRendered ->
 					})
 
 					return markup;
-
-				onAppointmentContextMenu: (e) ->
-					contextMenuEvent = e;
-					$("#creator-scheduler-appointment-context-menu").dxContextMenu({
-						dataSource: appointmentContextMenuItems,
-						width: 200,
-						target: ".dx-scheduler-appointment",
-						itemTemplate: (itemData) ->
-							template = getAppointmentMenuTemplate(itemData);
-							return template;
-						,
-						onItemClick: (e) ->
-							if(!e.itemData.items && e.itemData.onItemClick)
-								e.itemData.onItemClick(contextMenuEvent, e);
-
-					});
-				onCellContextMenu: (e)->
-					contextMenuEvent = e;
-
-					$("#creator-scheduler-context-menu").dxContextMenu({
-						dataSource: cellContextMenuItems,
-						width: 200,
-						target: ".dx-scheduler-date-table-cell",
-						onItemClick: (e) ->
-							e.itemData.onItemClick(contextMenuEvent, view.options)
-					})
 			}
 
 			_.extend(dxSchedulerConfig, view.options)
 
-			dxSchedulerInstance =  $("#creator-scheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
+			dxSchedulerInstance =  $("#creatorScheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
 
 			window.dxSchedulerInstance = dxSchedulerInstance;
