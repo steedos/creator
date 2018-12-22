@@ -331,7 +331,7 @@ Template.creator_calendarNew.onCreated ->
 
 Template.creator_calendarNew.onRendered ->
 	self = this
-	view = Creator.getListView(Session.get("object_name"), 'calendarView')
+	view = Creator.getListView(Session.get("object_name"), Session.get("list_view_id"))
 	self.autorun (c)->
 		object_name = Session.get("object_name");
 		if $("#creator-scheduler").length < 1
