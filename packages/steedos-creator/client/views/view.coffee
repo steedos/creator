@@ -51,8 +51,8 @@ Template.creator_view.helpers
 					if _.isFunction(reference_to)
 						reference_to = reference_to()
 					if _.isArray(reference_to)
-						r = false;
-				return true;
+						r = true;
+				return r;
 		return r;
 
 	isObjectField: (fieldKey)->
