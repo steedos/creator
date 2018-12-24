@@ -43,12 +43,14 @@ Creator.bootstrap = (spaceId, callback)->
 			_.each Creator.Apps, (app, key) ->
 				if !app._id
 					app._id = key
+				unless app.is_creator
+					app.visible = false
 
 			apps = result.assigned_apps
 			if apps.length
 				_.each Creator.Apps, (app, key)->
 					if apps.indexOf(key) > -1
-						app.visible = true
+						app.visible = app.is_creator
 					else
 						app.visible = false
 			

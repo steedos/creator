@@ -57,7 +57,6 @@ Creator.Objects.apps =
 		is_creator:
 			type:"boolean"
 			label: "creator应用"
-			hidden:true
 			defaultValue:true
 		unique_id:
 			type: 'text',
