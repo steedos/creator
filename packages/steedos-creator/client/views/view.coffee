@@ -43,9 +43,17 @@ Template.creator_view.helpers
 			_.find t, (fieldKey)->
 				if !fieldKey
 					return
-				if _object.schema._schema[fieldKey]?.type.name != 'Object' && _object.fields[fieldKey].type != 'lookup' && _object.fields[fieldKey].type != 'master_detail'
+				field = _object.fields[fieldKey]
+				if _object.schema._schema[fieldKey]?.type.name != 'Object'
 					r = true;
+				if field.type == 'lookup' || field.type == 'master_detail'
+					reference_to = field.reference_to
+					if _.isFunction(reference_to)
+						reference_to = reference_to()
+					if _.isArray(reference_to)
+						r = false;
 				return true;
+		console.log('t', t, r);
 		return r;
 
 	isObjectField: (fieldKey)->
