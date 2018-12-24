@@ -61,8 +61,8 @@ Package.onUse(function (api) {
 	api.use('es5-shim@4.6.15');
 	api.use('simple:json-routes@2.1.0');
 	api.use('steedos:fullcalendar@3.4.0_3');
-	api.use('steedos:filesize@0.0.1');
-	api.use('steedos:location@0.0.1');
+	api.use('steedos:autoform-filesize@0.0.1');
+	api.use('steedos:autoform-location@0.0.1');
 
 	api.use('natestrauser:select2@4.0.3');
 	api.use('aldeed:autoform-select2@1.0.5');
