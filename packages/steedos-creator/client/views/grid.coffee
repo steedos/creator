@@ -647,7 +647,7 @@ Template.creator_grid.events
 			field.push(this.field_name)
 			field = field.join(",")
 
-		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else Session.get("object_name")
+		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else (template.data?.object_name || Session.get("object_name"))
 		collection_name = Creator.getObject(objectName).label
 		# rowData = this.doc
 
@@ -664,6 +664,8 @@ Template.creator_grid.events
 				Meteor.defer ()->
 					$(".btn.creator-cell-edit").click()
 
+		return false
+	
 	'dblclick td': (event) ->
 		$(".table-cell-edit", event.currentTarget).click()
 
