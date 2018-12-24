@@ -8,5 +8,6 @@ Creator.Apps.contract_setting =
 		"contract_file_uploadMessage",
 		"contract_rate",
 		"contract_state",
-		"contract_type"
+		"contract_type",
+		"contract_othercompany"
 		]

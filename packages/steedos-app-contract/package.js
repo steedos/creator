@@ -29,6 +29,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/contract_setting/contract_rate.coffee');
 	api.addFiles('models/contract_setting/contract_state.coffee');
 	api.addFiles('models/contract_setting/contract_type.coffee');
+	api.addFiles('models/contract_setting/contract_othercompany.coffee');
 
 	
 	// 方法
