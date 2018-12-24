@@ -2,7 +2,8 @@ Package.describe({
 	name: 'steedos:application-package',
 	version: '0.0.1',
 	summary: 'Steedos Application Package',
-	git: ''
+	git: '',
+	documentation: null
 });
 
 Package.onUse(function(api) {
