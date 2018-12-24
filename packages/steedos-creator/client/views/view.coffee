@@ -53,7 +53,6 @@ Template.creator_view.helpers
 					if _.isArray(reference_to)
 						r = false;
 				return true;
-		console.log('t', t, r);
 		return r;
 
 	isObjectField: (fieldKey)->
