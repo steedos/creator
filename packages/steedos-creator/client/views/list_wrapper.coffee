@@ -45,9 +45,9 @@ Template.creator_list_wrapper.helpers
 	
 	list_data_left: ()->
 		object_name = Session.get "object_name"
-		sidebar = Creator.Objects[object_name]?.sidebar
+		sidebar = Creator.getObject(object_name)?.sidebar
 		if sidebar
-			return {object_name: sidebar.reference_to, is_sidebar: true}
+			return {object_name: sidebar.reference_to, is_sidebar: true, sidebar_multiple: sidebar.multiple}
 		else
 			return null
 	

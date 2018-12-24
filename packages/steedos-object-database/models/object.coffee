@@ -57,6 +57,12 @@ Creator.Objects.objects =
 			label: "Description"
 			type: "textarea"
 			is_wide: true
+		sidebar:
+			type: "object"
+			label: "左侧列表"
+			blackbox: true
+			omit: true
+			hidden: true
 		fields:
 			type: "object"
 			label: "字段"

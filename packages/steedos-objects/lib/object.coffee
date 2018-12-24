@@ -37,6 +37,7 @@ Creator.Object = (options)->
 	self.open_window = options.open_window
 	self.filter_company = options.filter_company
 	self.calendar = _.clone(options.calendar)
+	self.sidebar = _.clone(options.sidebar)
 	if (!options.fields)
 		throw new Error('Creator.Object options must specify name');
 

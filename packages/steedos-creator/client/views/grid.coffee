@@ -115,6 +115,7 @@ _fields = (object_name, list_view_id, is_sidebar)->
 		name_field_key = "name"
 	fields = [name_field_key]
 	if is_sidebar
+		# 左侧grid视图，只显示name字段
 		return fields
 	if Creator.getCollection("object_listviews").findOne(list_view_id)
 		fields = Creator.getCollection("object_listviews").findOne(list_view_id).columns
@@ -271,6 +272,7 @@ Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
 		is_sidebar = self.data.is_sidebar
+		sidebar_multiple = self.data.sidebar_multiple
 		is_related = self.data.is_related
 		if is_sidebar
 			list_view_id = "all"
@@ -288,6 +290,7 @@ Template.creator_grid.onRendered ->
 		if !creator_obj
 			return
 
+		sidebar = creator_obj.sidebar
 		related_object_name = self.data.related_object_name
 		name_field_key = creator_obj.NAME_FIELD_KEY
 		record_id = Session.get("record_id")
@@ -323,7 +326,21 @@ Template.creator_grid.onRendered ->
 				if listTreeCompany and  listTreeCompany!='undefined' and creator_obj?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
-
+				
+				if sidebar
+					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据
+					left_sidebar_grid_selected = Session.get("left_sidebar_grid_selected")
+					if left_sidebar_grid_selected and left_sidebar_grid_selected.length
+						sidebar_values = _.pluck(Session.get("left_sidebar_grid_selected"),"_id")
+						if sidebar_values.length == 1
+							sidebarFilter = [ sidebar.field_key, "=", sidebar_values[0] ]
+						else if sidebar_values.length > 1
+							sidebarFilter = []
+							sidebar_values.forEach (value_item)->
+								sidebarFilter.push [ sidebar.field_key, "=", value_item ]
+								sidebarFilter.push "or"
+							sidebar_values.shift()
+						filter = [ filter, "and", sidebarFilter ]
 
 			curObjectName = if is_related then related_object_name else object_name
 
@@ -569,7 +586,9 @@ Template.creator_grid.onRendered ->
 				dxOptions.pager.showPageSizeSelector = false
 			if is_sidebar
 				dxOptions.selection = 
-					mode: "single"
+					mode: if sidebar_multiple then "multiple" else "single"
+				dxOptions.onSelectionChanged = (selectionInfo)->
+					Session.set "left_sidebar_grid_selected", selectionInfo.selectedRowsData
 			else
 				fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
 				dxOptions.export =

@@ -9,6 +9,8 @@ Creator.Objects.space_users =
 	enable_search: true
 	sidebar:
 		reference_to: "organizations"
+		field_key: "organizations"
+		multiple: false
 	fields:
 		name:
 			label: "姓名"
