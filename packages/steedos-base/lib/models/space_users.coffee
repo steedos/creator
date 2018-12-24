@@ -75,6 +75,7 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			sortable: true
 			index:true
+			omit:true
 		user_accepted:
 			type: "boolean"
 			label:'有效'
