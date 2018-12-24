@@ -128,6 +128,13 @@ Meteor.startup ->
 		error['innererror'] = innererror
 		body['error'] = error
 		return body
+
+	removeInvalidMethod = (queryParams)->
+		if queryParams.$filter && queryParams.$filter.indexOf('tolower(') > -1
+			removeMethod = ($1)->
+				return $1.replace('tolower(', '').replace(')', '')
+			queryParams.$filter = queryParams.$filter.replace(/tolower\(([^\)]+)\)/g, removeMethod)
+
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
 			try
@@ -147,6 +154,7 @@ Meteor.startup ->
 					}
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
 				if permissions.viewAllRecords or (permissions.allowRead and @userId)
+					removeInvalidMethod(@queryParams)
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 					if key is 'cfs.files.filerecord'
@@ -347,6 +355,7 @@ Meteor.startup ->
 					recent_view_records_ids = recent_view_records_ids.getProperty("ids")
 					recent_view_records_ids = _.flatten(recent_view_records_ids)
 					recent_view_records_ids = _.uniq(recent_view_records_ids)
+					removeInvalidMethod(@queryParams)
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 					if key is 'cfs.files.filerecord'
@@ -542,6 +551,7 @@ Meteor.startup ->
 					permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 					if permissions.allowRead
 						unreadable_fields = permissions.unreadable_fields || []
+						removeInvalidMethod(@queryParams)
 						qs = decodeURIComponent(querystring.stringify(@queryParams))
 						createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 						createQuery.query._id =  @urlParams._id
@@ -828,6 +838,7 @@ Meteor.startup ->
 
 							permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 							if permissions.viewAllRecords or (permissions.allowRead and @userId)
+									removeInvalidMethod(@queryParams)
 									qs = decodeURIComponent(querystring.stringify(@queryParams))
 									createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 
