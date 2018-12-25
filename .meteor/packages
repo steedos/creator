@@ -162,5 +162,6 @@ steedos:application-template
 steedos:autoform-lookup
 steedos:app-tableau
 steedos:app-portal
+steedos:app-mailbase
 
 steedos:mailqueue

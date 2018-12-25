@@ -1,7 +1,7 @@
 Package.describe({
 	name: 'steedos:app-portal',
 	version: '0.0.1',
-	summary: 'Creator portal',
+	summary: 'Creator Portal',
 	git: '',
 	documentation: null
 });

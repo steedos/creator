@@ -138,6 +138,7 @@ steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.1
 steedos:app-crm@0.0.1
+steedos:app-mailbase@0.0.1
 steedos:app-meeting@0.0.1
 steedos:app-portal@0.0.1
 steedos:app-tableau@0.0.10
