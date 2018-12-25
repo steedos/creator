@@ -37,7 +37,6 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			multiple: true
 			omit: true
-#			hidden: true
 		manager:
 			type: "lookup"
 			label:'上级主管'
@@ -90,7 +89,6 @@ Creator.Objects.space_users =
 			type: "master_detail"
 			reference_to: "users"
 			index:true
-			# required: true
 			omit: true
 			hidden: true
 		hr:
