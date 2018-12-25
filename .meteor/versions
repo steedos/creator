@@ -139,6 +139,7 @@ steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.1
 steedos:app-crm@0.0.1
 steedos:app-meeting@0.0.1
+steedos:app-portal@0.0.1
 steedos:app-tableau@0.0.10
 steedos:app-workflow@0.0.4
 steedos:application-package@0.0.1
