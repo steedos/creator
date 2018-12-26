@@ -14,6 +14,9 @@ Creator.Objects.instance_number_rules =
 			type: "number",
 			label: "年份"
 			readonly: true
+			defaultValue: ()->
+				if Meteor.isClient
+					return (new Date).getFullYear()
 		
 		first_number:
 			type: "number"
