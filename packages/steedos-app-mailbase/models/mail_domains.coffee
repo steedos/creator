@@ -23,7 +23,7 @@ Creator.Objects.mail_domains =
 			label: "SMTP加密"
 			type: "boolean"
 			required: true
-			defaultValue: "false"
+			defaultValue: false
 		
 		smtp_port: 
 			label: "SMTP端口"
@@ -40,7 +40,7 @@ Creator.Objects.mail_domains =
 			label: "IMAP加密"
 			type: "boolean"
 			required: true
-			defaultValue: "false"
+			defaultValue: false
 		
 		imap_port: 
 			label: "IMAP端口"
