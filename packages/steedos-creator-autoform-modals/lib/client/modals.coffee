@@ -544,7 +544,6 @@ Template.CreatorAfModal.events
 										trigger.todo.apply({object_name: object_name},[userId, result])
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
-					console.log insertDoc
 
 					userId = Meteor.userId()
 					cmCollection = Session.get 'cmCollection'
@@ -579,6 +578,14 @@ Template.CreatorAfModal.events
 
 						# insertDoc里面的值是最全最精确的
 						updateDoc["$set"] = insertDoc
+
+						_.each updateDoc.$unset, (v, k)->
+							foo = k.split(".")
+							if foo.length > 1 && _.has(insertDoc, foo[0])
+								delete updateDoc.$unset[k]
+
+						if _.keys(updateDoc.$unset).length == 0
+							delete updateDoc.$unset
 
 						_ids = _id.split(",")
 						_.each _ids, (id)->
