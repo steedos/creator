@@ -152,7 +152,7 @@ steedos:autoform-file@0.4.2_3
 steedos:autoform-filesize@0.0.1
 steedos:autoform-location@0.0.1
 steedos:autoform-lookup@0.3.11
-steedos:base@0.0.90
+steedos:base@0.1.0
 steedos:bootstrap3-datetimepicker@4.17.47
 steedos:cfs-access-point@0.1.50
 steedos:cfs-aliyun@0.1.0
