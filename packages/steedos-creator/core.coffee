@@ -107,10 +107,14 @@ Creator.getObjectUrl = (object_name, record_id, app_id) ->
 			return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
 
 Creator.getListViewUrl = (object_name, app_id, list_view_id) ->
+	url = Creator.getListViewRelativeUrl(object_name, app_id, list_view_id)
+	return Creator.getRelativeUrl(url)
+		
+Creator.getListViewRelativeUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id is "calendar"
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
+		return "/app/" + app_id + "/" + object_name + "/calendar/"
 	else
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
+		return "/app/" + app_id + "/" + object_name + "/grid/" + list_view_id
 
 Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id

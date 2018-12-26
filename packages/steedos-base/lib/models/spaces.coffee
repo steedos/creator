@@ -128,6 +128,14 @@ Creator.Objects.spaces =
 			columns: ["name"]
 			filter_scope: "all"
 			filters: [["_id", "=", "{spaceId}"]]
+	actions: 
+		pay_records:
+			label: "订单"
+			on: "record"
+			visible: true
+			todo: ()->
+				url = Creator.getListViewRelativeUrl("billing_pay_records","admin","all")
+				FlowRouter.go(url)
 	permission_set:
 		user:
 			allowCreate: true
