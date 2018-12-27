@@ -579,13 +579,14 @@ Template.CreatorAfModal.events
 						# insertDoc里面的值是最全最精确的
 						updateDoc["$set"] = insertDoc
 
-						_.each updateDoc.$unset, (v, k)->
-							foo = k.split(".")
-							if foo.length > 1 && _.has(insertDoc, foo[0])
-								delete updateDoc.$unset[k]
+						if updateDoc.$unset
+							_.each updateDoc.$unset, (v, k)->
+								foo = k.split(".")
+								if foo.length > 1 && _.has(insertDoc, foo[0])
+									delete updateDoc.$unset[k]
 
-						if _.keys(updateDoc.$unset).length == 0
-							delete updateDoc.$unset
+							if _.keys(updateDoc.$unset).length == 0
+								delete updateDoc.$unset
 
 						_ids = _id.split(",")
 						_.each _ids, (id)->
