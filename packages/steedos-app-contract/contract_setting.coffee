@@ -4,10 +4,10 @@ Creator.Apps.contract_setting =
 	icon_slds: "resource_skill"
 	objects: [
 		"contract_company_type",
-		"contract_company",
-		"contract_file_uploadMessage",
-		"contract_rate",
-		"contract_state",
+		# "contract_company",
+		# "contract_file_uploadMessage",
+		# "contract_rate",
+		# "contract_state",
 		"contract_type",
 		"contract_othercompany"
 		]
