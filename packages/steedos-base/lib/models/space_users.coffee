@@ -45,13 +45,16 @@ Creator.Objects.space_users =
 		mobile:
 			type: "text"
 			label:'手机'
+			searchable:true
 			group:'-'
 		email:
 			type: "text"
 			label:'邮件'
+			searchable:true
 		work_phone:
 			type: "text"
 			label:'工作电话'
+			searchable:true
 
 		company:
 			type: "text"
