@@ -156,7 +156,7 @@ Creator.import_app_package = (userId, space_id, imp_data, from_template)->
 				if !report.object_name || !_.isString(report.object_name)
 					throw new Meteor.Error("500", "报表'#{report.name}'的object_name属性无效")
 				if !_.include(object_names, report.object_name) && !_.include(imp_object_names, report.object_name)
-					throw new Meteor.Error("500", "权限集'#{report.name}'中指定的对象'#{report.object_name}'不存在")
+					throw new Meteor.Error("500", "报表'#{report.name}'中指定的对象'#{report.object_name}'不存在")
 
 	###数据校验 结束###
 
