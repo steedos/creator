@@ -392,7 +392,11 @@ if (Meteor.isServer)
 					company_id = doc._id
 				else
 					company_id = parentOrg.company_id
-				modifier.$set.company_id = company_id
+				if company_id
+					modifier.$set.company_id = company_id
+				else
+					modifier.$unset = modifier.$unset || {}
+					modifier.$unset.company_id = 1
 
 		else
 			# 根组织的is_company不能为false

@@ -453,6 +453,7 @@ Meteor.startup ()->
 					if organization.company_id
 						modifier.$set.company_id = organization.company_id
 					else
+						modifier.$unset = modifier.$unset || {}
 						modifier.$unset.company_id = 1
 
 			newMobile = modifier.$set.mobile
