@@ -1,5 +1,4 @@
-_standardQuery = (curObjectName)->
-	standard_query = Session.get("standard_query")
+_standardQuery = (curObjectName, standard_query)->
 	object_fields = Creator.getObject(curObjectName).fields
 	if !standard_query or !standard_query.query or !_.size(standard_query.query) or standard_query.object_name != curObjectName
 		delete Session.keys["standard_query"]
@@ -313,7 +312,11 @@ Template.creator_grid.onRendered ->
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name)
 
-				standardQuery = _standardQuery(object_name)
+				if is_sidebar
+					# 左侧sidebar的grid代码不需要支持搜索
+					standardQuery = _standardQuery(object_name)
+				else
+					standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
 					if filter
 						filter = [filter, "and", standardQuery]
