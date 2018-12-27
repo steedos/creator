@@ -35,13 +35,6 @@ Creator.Objects.spaces =
 		phone:
 			label:'联系电话'
 			type:'text'
-		owner:
-			label: "所有者"
-			type: "lookup"
-			reference_to: "users"
-			readonly: true
-			omit: false
-			hidden: false
 		admins:
 			label: "管理员"
 			type: "lookup"
@@ -123,6 +116,13 @@ Creator.Objects.spaces =
 			label:'允许新用户注册'
 			type: "boolean"
 			defaultValue:false
+		owner:
+			label: "所有者"
+			type: "lookup"
+			reference_to: "users"
+			readonly: true
+			omit: false
+			hidden: false
 	list_views:
 		all:
 			label:"所有"
