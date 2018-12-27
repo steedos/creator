@@ -217,6 +217,10 @@ Meteor.startup ()->
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该用户已在此工作区")
 
+			if doc.username
+				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
+					throw new Meteor.Error(400, "space_paid_info_title")
+
 		db.space_users.updatevaildate = (userId, doc, modifier) ->
 			if doc.invite_state == "refused" or doc.invite_state == "pending"
 				throw new Meteor.Error(400, "该用户还未接受加入工作区，不能修改他的个人信息")
@@ -373,6 +377,9 @@ Meteor.startup ()->
 					if doc.email
 						email = [{address: doc.email, verified: false}]
 						options.emails = email
+
+					if doc.username
+						options.username = doc.username
 
 					doc.user = db.users.insert options
 
