@@ -23,7 +23,7 @@ Creator.Objects.billing_pay_records =
 			hidden: true
 		
 		total_fee:
-			label:"金额"
+			label:"金额￥"
 			type: "number"
 			defaultValue: 100
 			omit: true

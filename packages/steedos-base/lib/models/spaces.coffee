@@ -41,6 +41,7 @@ Creator.Objects.spaces =
 			reference_to: "users"
 			readonly: true
 			omit: false
+			hidden: false
 		admins:
 			label: "管理员"
 			type: "lookup"
@@ -136,6 +137,12 @@ Creator.Objects.spaces =
 			todo: ()->
 				url = Creator.getListViewRelativeUrl("billing_pay_records","admin","all")
 				FlowRouter.go(url)
+		upgrade:
+			label: "升级"
+			on: "record"
+			visible: true
+			todo: ()->
+				Modal.show('space_recharge_modal')
 	permission_set:
 		user:
 			allowCreate: true

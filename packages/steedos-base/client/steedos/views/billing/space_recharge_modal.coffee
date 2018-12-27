@@ -1,3 +1,17 @@
+Template.space_recharge_modal.onCreated ->
+	Steedos.subs["Modules"] = new SubsManager()
+	Steedos.subs["Modules"].subscribe("modules");
+
+	if Session.get('spaceId')
+		Meteor.call 'get_space_user_count', Session.get('spaceId'), (err, result)->
+			if err
+				console.log err.reason
+			if result
+				Session.set('space_user_count', result.accepted_user_count)
+
+Template.space_recharge_modal.onDestroyed ->
+	Steedos.subs["Modules"].clear()
+
 Template.space_recharge_modal.onRendered ()->
 	$("#space_recharge_end_date").datetimepicker({
 		format: "YYYY-MM-DD",
