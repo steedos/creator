@@ -3,8 +3,8 @@
 ### 导出数据
 ```
 {
-	apps:[{}], 软件包选中的apps
-	objects:[{}], 选中的object及其fields, list_views, triggers, actions, permission_set等
+    apps:[{}], 软件包选中的apps
+    objects:[{}], 选中的object及其fields, list_views, triggers, actions, permission_set等
     list_views:[{}], 软件包选中的list_views
     permissions:[{}], 软件包选中的权限集
     permission_objects:[{}], 软件包选中的权限对象
