@@ -38,7 +38,7 @@ less
 accounts-ui
 accounts-password
 
-fortawesome:fontawesome
+# fortawesome:fontawesome
 tap:i18n
 
 raix:push
@@ -52,8 +52,12 @@ steedos:bootstrap3-datetimepicker
 steedos:creator-autoform-modals
 steedos:autoform-bs-minicolors
 steedos:autoform-file
+steedos:autoform-lookup
+yogiben:autoform-tags
+q42:autoform-markdown
+steedos:markdown@0.0.1
+
 steedos:devexpress
-steedos:version
 
 gwendall:simple-schema-i18n
 
@@ -101,15 +105,42 @@ steedos:cfs-ui
 steedos:e164-phones-countries
 steedos:i18n-iso-countries
 steedos:qcloud-smsqueue
-steedos:oauth2-server
+#steedos:oauth2-server
 
 smoral:sweetalert@1.1.1
 
 peppelg:bootstrap-3-modal@1.0.4
 
-keepnox:perfect-scrollbar
+# keepnox:perfect-scrollbar
 
-steedos:ionicons@0.1.7
+# steedos:ionicons@0.1.7
+
+
+natestrauser:select2
+meteorhacks:unblock@1.1.0
+
+steedos:lightning-design-system
+
+
+steedos:odata
+
+steedos:logger@0.0.2
+
+steedos:object-database
+
+
+# steedos:weixin
+# steedos:pay
+
+# steedos:weixin-template-message-queue
+# steedos:mini-web
+
+
+steedos:application-template
+
+steedos:mailqueue
+
+
 
 # 档案系统相关
 # steedos:app-archive
@@ -120,50 +151,32 @@ steedos:ionicons@0.1.7
 # steedos:vip-post
 steedos:objects
 steedos:sso
+
+
+## 应用 apps
 steedos:app-crm
 # steedos:app-informations
 # ssteedos:app-cms
 steedos:app-workflow
 steedos:app-admin
 # steedos:app-example
-steedos:creator
-natestrauser:select2
-meteorhacks:unblock@1.1.0
-
-steedos:lightning-design-system
-
 # steedos:cms
-
-steedos:odata
-yogiben:autoform-tags
-
-steedos:logger@0.0.2
-
-steedos:object-database
-
-steedos:instance-record-queue
-
-steedos:instances-statistics
 steedos:app-meeting
 
-steedos:weixin
-# steedos:pay
 
-steedos:weixin-template-message-queue
-# steedos:mini-web
+steedos:creator
 
-q42:autoform-markdown
-steedos:markdown@0.0.1
-
-steedos:application-template
+# steedos:instance-record-queue
+# steedos:instances-statistics
 # steedos:love
 # steedos:app-chat
 
-steedos:autoform-lookup
-steedos:app-tableau
-steedos:app-portal
-steedos:app-mailbase
-
-steedos:mailqueue
+# steedos:app-tableau
+# steedos:app-portal
+# steedos:app-mailbase
 
 steedos:app-contract
+
+
+# 正式发布时开启
+# steedos:version

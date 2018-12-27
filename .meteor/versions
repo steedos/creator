@@ -62,7 +62,6 @@ inter-process-messaging@0.1.0
 jquery@1.11.10
 kadira:blaze-layout@2.3.0
 kadira:flow-router@2.12.1
-keepnox:perfect-scrollbar@0.6.8
 lai:collection-extensions@0.1.4
 launch-screen@1.1.1
 less@2.8.0
@@ -73,7 +72,6 @@ matb33:collection-hooks@0.9.0-rc.4
 mdg:validation-error@0.2.0
 meteor@1.9.2
 meteor-base@1.4.0
-meteorhacks:async@1.0.0
 meteorhacks:meteorx@1.0.2
 meteorhacks:ssr@2.2.0
 meteorhacks:subs-manager@1.6.4
@@ -139,10 +137,7 @@ steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.1
 steedos:app-contract@0.0.1
 steedos:app-crm@0.0.1
-steedos:app-mailbase@0.0.1
 steedos:app-meeting@0.0.1
-steedos:app-portal@0.0.1
-steedos:app-tableau@0.0.10
 steedos:app-workflow@0.0.5
 steedos:application-package@0.0.1
 steedos:application-template@0.0.1
@@ -184,8 +179,6 @@ steedos:e164-phones-countries@1.0.3
 steedos:fullcalendar@3.4.0_3
 steedos:i18n@0.0.11
 steedos:i18n-iso-countries@3.3.0
-steedos:instance-record-queue@0.0.1
-steedos:instances-statistics@0.0.1
 steedos:ionicons@0.1.7
 steedos:jstree@3.3.2
 steedos:lightning-design-system@0.0.2
@@ -193,7 +186,6 @@ steedos:loaders-css@0.1.2
 steedos:logger@0.0.2
 steedos:mailqueue@0.0.1
 steedos:markdown@0.0.1
-steedos:oauth2-server@0.0.6
 steedos:object-database@0.0.1
 steedos:objects@0.0.7
 steedos:odata@0.0.3
@@ -207,9 +199,6 @@ steedos:useraccounts-bootstrap@1.14.2_8
 steedos:useraccounts-core@1.14.2_6
 steedos:useraccounts-flow-routing@1.14.2_4
 steedos:version@1.0.5
-steedos:weixin@0.0.1
-steedos:weixin-aes@0.0.1
-steedos:weixin-template-message-queue@0.0.1
 tap:i18n@1.8.2
 templating@1.3.2
 templating-compiler@1.3.2
