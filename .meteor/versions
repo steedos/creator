@@ -133,7 +133,7 @@ spacebars-compiler@1.1.2
 srp@1.0.12
 standard-minifier-js@2.4.0
 steedos:accounts@0.0.34
-steedos:accounts-phone@0.0.4
+steedos:accounts-phone@0.0.5
 steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.1
