@@ -447,7 +447,10 @@ Meteor.startup ()->
 			if modifier.$set.organization
 				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1})
 				if organization
-					doc.company_id = organization.company_id
+					if organization.company_id
+						modifier.$set.company_id = organization.company_id
+					else
+						modifier.$unset.company_id = 1
 
 			newMobile = modifier.$set.mobile
 			# 当把手机号设置为空值时，newMobile为undefined，modifier.$unset.mobile为空字符串
