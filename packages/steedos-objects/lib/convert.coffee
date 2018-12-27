@@ -176,6 +176,10 @@ Meteor.startup ()->
 					field._defaultValue = field.defaultValue.toString()
 			else
 				defaultValue = field._defaultValue
+
+				if !defaultValue && _.isString(field.defaultValue) && field.defaultValue.startsWith("function")
+					defaultValue = field.defaultValue
+
 				if defaultValue && _.isString(defaultValue)
 					try
 						field.defaultValue = Creator.eval("(#{defaultValue})")

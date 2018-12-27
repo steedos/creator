@@ -55,6 +55,9 @@ Creator.Objects.object_fields =
 			regEx: SimpleSchema.RegEx.field
 		label:
 			type: "text"
+		is_name:
+			type: "boolean"
+			hidden: true
 		object:
 			type: "master_detail"
 			reference_to: "objects"
