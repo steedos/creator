@@ -298,10 +298,6 @@ Meteor.startup ()->
 				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
 					throw new Meteor.Error(400, "space_paid_info_title")
 
-				if modifier.$set?.username and modifier.$set.username != doc.username
-					if db.users.find({ username: modifier.$set?.username }).count()
-						throw new Meteor.Error(400, "此用户名已被使用，请更换其他用户名")
-
 
 		db.space_users.before.insert (userId, doc) ->
 			doc.created_by = userId;
