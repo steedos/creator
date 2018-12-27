@@ -448,13 +448,20 @@ Meteor.startup ()->
 					modifier.$set.organization = modifier.$set.organizations[0]
 
 			if modifier.$set.organization
-				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1})
+				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1, parent:1, is_company:1})
 				if organization
 					if organization.company_id
 						modifier.$set.company_id = organization.company_id
 					else
-						modifier.$unset = modifier.$unset || {}
-						modifier.$unset.company_id = 1
+						if !organization.parent and organization.is_company
+							modifier.$set.company_id = organization._id
+						else
+							rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
+							if rootOrg
+								modifier.$set.company_id = rootOrg._id
+							else
+								modifier.$unset = modifier.$unset || {}
+								modifier.$unset.company_id = 1
 
 			newMobile = modifier.$set.mobile
 			# 当把手机号设置为空值时，newMobile为undefined，modifier.$unset.mobile为空字符串

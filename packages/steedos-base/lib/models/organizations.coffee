@@ -395,8 +395,15 @@ if (Meteor.isServer)
 				if company_id
 					modifier.$set.company_id = company_id
 				else
-					modifier.$unset = modifier.$unset || {}
-					modifier.$unset.company_id = 1
+					if !parentOrg.parent and parentOrg.is_company
+						modifier.$set.company_id = parentOrg._id
+					else
+						rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
+						if rootOrg
+							modifier.$set.company_id = rootOrg._id
+						else
+							modifier.$unset = modifier.$unset || {}
+							modifier.$unset.company_id = 1
 
 		else
 			# 根组织的is_company不能为false
