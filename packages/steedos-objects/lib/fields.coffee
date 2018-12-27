@@ -39,6 +39,9 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = String
 			fs.autoform.type = "textarea"
 			fs.autoform.rows = field.rows || 6
+		else if field.type == "password"
+			fs.type = String
+			fs.autoform.type = "password"
 		else if field.type == "date"
 			fs.type = Date
 			if Meteor.isClient

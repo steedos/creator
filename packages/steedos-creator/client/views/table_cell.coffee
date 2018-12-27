@@ -216,6 +216,12 @@ Template.creator_table_cell.helpers
 			else
 				val = ''
 			data.push {value: val, id: this._id}
+		else if _field.type == "password"
+			if val
+				val = '******'
+			else
+				val = ''
+			data.push {value: val, id: this._id}
 		else
 			if (val instanceof Date)
 				if this.agreement == "odata"
