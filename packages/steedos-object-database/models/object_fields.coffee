@@ -77,6 +77,7 @@ Creator.Objects.object_fields =
 				datetime: "日期时间"
 				number: "数值"
 				currency: "金额"
+				password: "密码"
 				lookup: "相关表"
 				master_detail: "主表/子表"
 				grid: "表格"
