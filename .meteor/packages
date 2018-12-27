@@ -165,3 +165,5 @@ steedos:app-portal
 steedos:app-mailbase
 
 steedos:mailqueue
+
+steedos:app-contract
