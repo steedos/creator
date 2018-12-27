@@ -99,13 +99,17 @@ Creator.Objects.space_users =
 			blackbox: true
 			omit: true
 			hidden: true
-	
+
+		username:
+			type: "text"
+			label: "用户名"
+
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "organization", "position", "mobile", "email", "sort_no", "company_id"]
-			filter_scope: "space"	
-	
+			columns: ["name", "organization", "position", "mobile", "email", "sort_no", "company_id", "username"]
+			filter_scope: "space"
+
 	permission_set:
 		user:
 			allowCreate: false
@@ -290,6 +294,14 @@ Meteor.startup ()->
 				if repeatNumberUser and repeatNumberUser._id != doc.user
 					throw new Meteor.Error(400, "space_users_error_phone_already_existed")
 
+			if modifier.$set?.hasOwnProperty('username') or modifier.$unset?.hasOwnProperty('username')
+				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
+					throw new Meteor.Error(400, "space_paid_info_title")
+
+				if modifier.$set?.username and modifier.$set.username != doc.username
+					if db.users.find({ username: modifier.$set?.username }).count()
+						throw new Meteor.Error(400, "此用户名已被使用，请更换其他用户名")
+
 
 		db.space_users.before.insert (userId, doc) ->
 			doc.created_by = userId;
@@ -378,7 +390,7 @@ Meteor.startup ()->
 				# 如果主组织未设置或设置的值不在doc.organizations内，则自动设置为第一个组织
 				unless doc.organizations.includes doc.organization
 					doc.organization = doc.organizations[0]
-			
+
 			if doc.organization
 				organization = db.organizations.findOne(doc.organization,fields:{company_id:1})
 				if organization
@@ -431,7 +443,7 @@ Meteor.startup ()->
 				# 修改所有组织且修改后的组织不包含原主组织，则把主组织自动设置为第一个组织
 				unless modifier.$set.organizations.includes doc.organization
 					modifier.$set.organization = modifier.$set.organizations[0]
-			
+
 			if modifier.$set.organization
 				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1})
 				if organization
@@ -526,6 +538,12 @@ Meteor.startup ()->
 				}
 				db.users.update({_id: doc.user}, {$unset: {emails: emails}, $set: {steedos_id: doc.user}})
 				db.space_users.direct.update({user: doc.user}, {$unset: {email: ""}}, {multi: true})
+
+			if modifier.$set.username && modifier.$set.username != doc.username
+				db.users.update({ _id: doc.user }, { $set: { username: modifier.$set.username } })
+
+			if modifier.$unset?.hasOwnProperty('username')
+				db.users.update({ _id: doc.user }, { $unset: { username: 1 } })
 
 
 		db.space_users.after.update (userId, doc, fieldNames, modifier, options) ->
