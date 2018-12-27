@@ -195,7 +195,7 @@ _expandFields = (object_name, columns)->
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
 
-_columns = (object_name, columns, list_view_id, is_related)->
+_columns = (object_name, columns, list_view_id, is_related, is_sidebar)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns, object.enable_tree)
@@ -225,7 +225,7 @@ _columns = (object_name, columns, list_view_id, is_related)->
 				if /\w+\.\$\.\w+/g.test(field_name)
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
-				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
+				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata", is_sidebar: is_sidebar}
 				if field.type is "markdown"
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
@@ -385,11 +385,11 @@ Template.creator_grid.onRendered ->
 			expand_fields = _expandFields(curObjectName, selectColumns)
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
-			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
+			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related, is_sidebar)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
-			actions = Creator.getActions(curObjectName)
+			actions = if is_sidebar then [] else Creator.getActions(curObjectName)
 			if actions.length
 				showColumns.push
 					dataField: "_id_actions"
@@ -416,7 +416,7 @@ Template.creator_grid.onRendered ->
 						"""
 						$("<div>").append(htmlText).appendTo(container);
 			
-			unless creator_obj.enable_tree
+			if !creator_obj.enable_tree and !is_sidebar
 				nameFieldKey = Creator.getObject(curObjectName).NAME_FIELD_KEY
 				needToShowLinkForIndexColumn = false
 				if selectColumns.indexOf(nameFieldKey) < 0

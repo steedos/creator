@@ -80,6 +80,9 @@ Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
 	openWindow: ()->
+		if Template.instance().data?.is_sidebar
+			# 左侧sidebar的grid列表链接统一改为弹出新窗口
+			return true
 		object_name = this.object_name
 		this_object = Creator.getObject(object_name)
 		if this_object?.open_window == true || this.reference_to # 所有的相关链接 改为弹出新窗口 #735
@@ -291,6 +294,8 @@ Template.creator_table_cell.helpers
 		return true
 
 	showEditIcon: ()->
+		if Template.instance().data?.is_sidebar
+			return false
 		if this.hideIcon
 			return false
 		return true
