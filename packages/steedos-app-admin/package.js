@@ -27,8 +27,8 @@ Package.onUse(function(api) {
 	api.use('steedos:base');
 	api.use('steedos:i18n@0.0.11');
 
-	// tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
-	// api.addFiles(tapi18nFiles, ['client', 'server']);
+	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
+	api.addFiles(tapi18nFiles, ['client', 'server']);
 	
 	api.addFiles('admin.app.coffee', "server");
 	api.addFiles('models/OAuth2Clients.coffee','server');
