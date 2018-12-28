@@ -288,10 +288,12 @@ Template.creator_grid.onRendered ->
 
 		if !creator_obj
 			return
-
-		sidebar = creator_obj.sidebar
+		
 		related_object_name = self.data.related_object_name
-		name_field_key = creator_obj.NAME_FIELD_KEY
+		curObjectName = if is_related then related_object_name else object_name
+		curObject = Creator.getObject(curObjectName)
+
+		sidebar = curObject.sidebar
 		record_id = Session.get("record_id")
 
 		listTreeCompany = Session.get('listTreeCompany')
@@ -326,12 +328,12 @@ Template.creator_grid.onRendered ->
 				if !filter
 					filter = ["_id", "<>", -1]
 
-				if listTreeCompany and  listTreeCompany!='undefined' and creator_obj?.filter_company==true
+				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
 				
-				if sidebar
-					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据
+				if sidebar and !is_related
+					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
 					left_sidebar_grid_selected = Session.get("left_sidebar_grid_selected")
 					if left_sidebar_grid_selected and left_sidebar_grid_selected.length
 						sidebar_values = _.pluck(Session.get("left_sidebar_grid_selected"),"_id")
@@ -344,8 +346,6 @@ Template.creator_grid.onRendered ->
 								sidebarFilter.push "or"
 							sidebar_values.shift()
 						filter = [ filter, "and", sidebarFilter ]
-
-			curObjectName = if is_related then related_object_name else object_name
 
 			selectColumns = Tracker.nonreactive ()->
 				unless is_sidebar
@@ -372,10 +372,10 @@ Template.creator_grid.onRendered ->
 					return 0
 
 			extra_columns = ["owner"]
-			if creator_obj.enable_tree
+			if !is_related and curObject.enable_tree
 				extra_columns.push("parent")
 				extra_columns.push("children")
-			object = Creator.getObject(curObjectName)
+			# object = Creator.getObject(curObjectName)
 			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
 			if defaultExtraColumns
 				extra_columns = _.union extra_columns, defaultExtraColumns
@@ -416,8 +416,8 @@ Template.creator_grid.onRendered ->
 						"""
 						$("<div>").append(htmlText).appendTo(container);
 			
-			if !creator_obj.enable_tree and !is_sidebar
-				nameFieldKey = Creator.getObject(curObjectName).NAME_FIELD_KEY
+			if is_related || (!curObject.enable_tree and !is_sidebar)
+				nameFieldKey = curObject.NAME_FIELD_KEY
 				needToShowLinkForIndexColumn = false
 				if selectColumns.indexOf(nameFieldKey) < 0
 					needToShowLinkForIndexColumn = true
@@ -534,7 +534,7 @@ Template.creator_grid.onRendered ->
 				sorting: 
 					mode: "multiple"
 				customizeExportData: (col, row)->
-					fields = creator_obj.fields
+					fields = curObject.fields
 					_.each row, (r)->
 						_.each r.values, (val, index)->
 							if val
@@ -569,7 +569,7 @@ Template.creator_grid.onRendered ->
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
 					unless is_related
-						unless creator_obj.enable_tree
+						unless curObject.enable_tree
 							# 不支持tree格式的翻页
 							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
@@ -595,7 +595,8 @@ Template.creator_grid.onRendered ->
 					enabled: true
 					fileName: fileName
 					allowExportSelectedData: false
-			if creator_obj.enable_tree
+			if !is_related and curObject.enable_tree
+				# 如果是tree则过虑条件适用tree格式，要排除相关项is_related的情况，因为相关项列表不需要支持tree
 				dxOptions.keyExpr = "_id"
 				dxOptions.parentIdExpr = "parent"
 				dxOptions.hasItemsExpr = (params)->
