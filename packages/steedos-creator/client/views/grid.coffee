@@ -118,6 +118,10 @@ _fields = (object_name, list_view_id, is_sidebar)->
 		return fields
 	if Creator.getCollection("object_listviews").findOne(list_view_id)
 		fields = Creator.getCollection("object_listviews").findOne(list_view_id).columns
+		if !fields
+			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+			if defaultColumns
+				fields = defaultColumns
 	else if object.list_views
 		if object.list_views[list_view_id]?.columns
 			fields = object.list_views[list_view_id].columns
@@ -352,7 +356,6 @@ Template.creator_grid.onRendered ->
 					grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
 				if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
 					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-
 				if settingColumns
 					defaultColumns = _fields(curObjectName, list_view_id)
 					selectColumns = _.intersection(settingColumns, defaultColumns)

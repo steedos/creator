@@ -168,7 +168,7 @@ steedos:app-meeting
 
 steedos:creator
 
-# steedos:instance-record-queue
+steedos:instance-record-queue
 # steedos:instances-statistics
 # steedos:love
 # steedos:app-chat
