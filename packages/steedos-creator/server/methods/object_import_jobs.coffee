@@ -1,6 +1,6 @@
-fs = Npm.require 'fs'
-path = Npm.require('path')
-xlsx = Npm.require('node-xlsx')
+fs = require 'fs'
+path = require('path')
+xlsx = require('node-xlsx')
 logger = new Logger 'QUEUE_IMPORT'
 converterString = (field_name, dataCell,jsonObj)->
 	text_error = ""

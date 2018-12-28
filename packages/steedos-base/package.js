@@ -5,13 +5,6 @@ Package.describe({
 	git: 'https://github.com/steedos/creator/tree/master/packages/steedos-base'
 });
 
-Npm.depends({
-	"node-schedule": "1.1.1",
-	cookies: "0.6.1",
-	"weixin-pay": "1.1.7",
-	"xml2js": "0.4.17",
-	mkdirp: "0.3.5"
-});
 
 Package.onUse(function(api) {
 	api.versionsFrom('METEOR@1.3');
@@ -73,6 +66,8 @@ Package.onUse(function(api) {
 	api.use('steedos:e164-phones-countries@1.0.3');
 	api.use('steedos:i18n-iso-countries@3.3.0');
 	api.use('steedos:objects@0.0.7');
+
+	api.addFiles('checkNpm.js', "server");
 
 	api.addFiles('lib/meteor_fix.js', ['client', 'server']);
 	api.addFiles('lib/steedos_util.js', ['client', 'server']);

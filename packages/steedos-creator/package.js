@@ -7,20 +7,13 @@ Package.describe({
 	documentation: null
 });
 
-Npm.depends({
-	busboy: "0.2.13",
-	mkdirp: "0.3.5",
-	"xml2js": "0.4.19",
-	"node-xlsx": "0.12.0",
-	"aliyun-sdk": "1.11.7"
-});
-
 Package.onUse(function (api) {
 	api.versionsFrom('1.0');
 
 	api.use('reactive-var@1.0.10');
 	api.use('reactive-dict@1.1.8');
 	api.use('coffeescript@1.11.1_4');
+	api.use('ecmascript');
 	api.use('random@1.0.10');
 	api.use('ddp@1.2.5');
 	api.use('check@1.2.3');
@@ -30,7 +23,7 @@ Package.onUse(function (api) {
 	api.use('session@1.1.6');
 	api.use('blaze@2.1.9');
 	api.use('templating@1.2.15');
-	// api.use('modules');  //此package 不能移除，否则会导致eval执行异常
+
 	api.use('flemay:less-autoprefixer@1.2.0');
 	api.use('simple:json-routes@2.1.0');
 	api.use('nimble:restivus@0.8.7');
@@ -50,7 +43,6 @@ Package.onUse(function (api) {
 	api.use('steedos:autoform-bs-minicolors@1.0.0');
 
 	api.use('meteorhacks:ssr@2.2.0');
-	api.use('tap:i18n@1.7.0');
 	api.use('meteorhacks:subs-manager@1.6.4');
 
 	api.use(['webapp@1.3.11'], 'server');
@@ -83,7 +75,6 @@ Package.onUse(function (api) {
 	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:autoform@0.0.13');
 	api.use('steedos:creator-autoform-modals@0.0.1');
-	api.use('steedos:version@1.0.5')
 	api.use('raix:push@3.0.2');
 
 	// api.use('steedos:autoform-bs-datetimepicker');
@@ -92,17 +83,13 @@ Package.onUse(function (api) {
 
 	api.use('steedos:logger@0.0.2');
 
-	api.use('tap:i18n@1.7.0');
-
-	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
-	api.addFiles(tapi18nFiles, ['client', 'server']);
-
-	api.use('steedos:objects@0.0.7');
 	api.use('steedos:app-admin@0.0.1');
 	api.use('steedos:devexpress@18.1.4');
 	api.use('steedos:odata@0.0.3');
 	api.use('blaze-html-templates@1.1.2');
 	api.use('steedos:lightning-design-system@0.0.2');
+
+	api.addFiles('checkNpm.js', "server");
 
 	api.addFiles('core.coffee');
 

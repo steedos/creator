@@ -119,6 +119,8 @@ if Meteor.isServer
 				opsetAdmin.allowRead = posAdmin.allowRead
 				opsetAdmin.modifyAllRecords = posAdmin.modifyAllRecords
 				opsetAdmin.viewAllRecords = posAdmin.viewAllRecords
+				opsetAdmin.modifyCompanyRecords = posAdmin.modifyCompanyRecords
+				opsetAdmin.viewCompanyRecords = posAdmin.viewCompanyRecords
 				opsetAdmin.disabled_list_views = posAdmin.disabled_list_views
 				opsetAdmin.disabled_actions = posAdmin.disabled_actions
 				opsetAdmin.unreadable_fields = posAdmin.unreadable_fields
@@ -133,6 +135,8 @@ if Meteor.isServer
 				opsetUser.allowRead = posUser.allowRead
 				opsetUser.modifyAllRecords = posUser.modifyAllRecords
 				opsetUser.viewAllRecords = posUser.viewAllRecords
+				opsetUser.modifyCompanyRecords = posUser.modifyCompanyRecords
+				opsetUser.viewCompanyRecords = posUser.viewCompanyRecords
 				opsetUser.disabled_list_views = posUser.disabled_list_views
 				opsetUser.disabled_actions = posUser.disabled_actions
 				opsetUser.unreadable_fields = posUser.unreadable_fields
@@ -147,6 +151,8 @@ if Meteor.isServer
 				opsetMember.allowRead = posMember.allowRead
 				opsetMember.modifyAllRecords = posMember.modifyAllRecords
 				opsetMember.viewAllRecords = posMember.viewAllRecords
+				opsetMember.modifyCompanyRecords = posMember.modifyCompanyRecords
+				opsetMember.viewCompanyRecords = posMember.viewCompanyRecords
 				opsetMember.disabled_list_views = posMember.disabled_list_views
 				opsetMember.disabled_actions = posMember.disabled_actions
 				opsetMember.unreadable_fields = posMember.unreadable_fields
@@ -161,6 +167,8 @@ if Meteor.isServer
 				opsetGuest.allowRead = posGuest.allowRead
 				opsetGuest.modifyAllRecords = posGuest.modifyAllRecords
 				opsetGuest.viewAllRecords = posGuest.viewAllRecords
+				opsetGuest.modifyCompanyRecords = posGuest.modifyCompanyRecords
+				opsetGuest.viewCompanyRecords = posGuest.viewCompanyRecords
 				opsetGuest.disabled_list_views = posGuest.disabled_list_views
 				opsetGuest.disabled_actions = posGuest.disabled_actions
 				opsetGuest.unreadable_fields = posGuest.unreadable_fields
@@ -175,6 +183,8 @@ if Meteor.isServer
 				opsetWorkflowAdmin.allowRead = posWorkflowAdmin.allowRead
 				opsetWorkflowAdmin.modifyAllRecords = posWorkflowAdmin.modifyAllRecords
 				opsetWorkflowAdmin.viewAllRecords = posWorkflowAdmin.viewAllRecords
+				opsetWorkflowAdmin.modifyCompanyRecords = posWorkflowAdmin.modifyCompanyRecords
+				opsetWorkflowAdmin.viewCompanyRecords = posWorkflowAdmin.viewCompanyRecords
 				opsetWorkflowAdmin.disabled_list_views = posWorkflowAdmin.disabled_list_views
 				opsetWorkflowAdmin.disabled_actions = posWorkflowAdmin.disabled_actions
 				opsetWorkflowAdmin.unreadable_fields = posWorkflowAdmin.unreadable_fields
@@ -224,6 +234,10 @@ if Meteor.isServer
 					permissions.modifyAllRecords = true
 				if po.viewAllRecords
 					permissions.viewAllRecords = true
+				if po.modifyCompanyRecords
+					permissions.modifyCompanyRecords = true
+				if po.viewCompanyRecords
+					permissions.viewCompanyRecords = true
 
 				permissions.disabled_list_views = unionPlus(permissions.disabled_list_views, po.disabled_list_views)
 				permissions.disabled_actions = unionPlus(permissions.disabled_actions, po.disabled_actions)
@@ -244,6 +258,10 @@ if Meteor.isServer
 					permissions.modifyAllRecords = true
 				if opsetWorkflowAdmin.viewAllRecords
 					permissions.viewAllRecords = true
+				if opsetWorkflowAdmin.modifyCompanyRecords
+					permissions.modifyCompanyRecords = true
+				if opsetWorkflowAdmin.viewCompanyRecords
+					permissions.viewCompanyRecords = true
 
 				permissions.disabled_list_views = unionPlus(permissions.disabled_list_views, opsetWorkflowAdmin.disabled_list_views)
 				permissions.disabled_actions = unionPlus(permissions.disabled_actions, opsetWorkflowAdmin.disabled_actions)
@@ -256,6 +274,7 @@ if Meteor.isServer
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 			permissions.modifyAllRecords = false
+			permissions.modifyCompanyRecords = false
 			permissions.disabled_actions = []
 
 		Creator.processPermissions permissions

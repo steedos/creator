@@ -1,15 +1,15 @@
-Creator.Objects.permission_objects = 
+Creator.Objects.permission_objects =
 	name: "permission_objects"
 	label: "对象权限"
 	icon: "user"
-	fields: 
+	fields:
 		name:
 			label: "名称",
 			type: "text",
 			searchable:true
 			index:true
 			required: true
-		permission_set_id: 
+		permission_set_id:
 			label: "权限组",
 			type: "master_detail"
 			required: true
@@ -25,24 +25,30 @@ Creator.Objects.permission_objects =
 					if !o.hidden
 						_options.push { label: o.label, value: k, icon: o.icon }
 				return _options
-		allowRead: 
+		allowRead:
 			type: "boolean"
 			label: "允许查看",
-		allowCreate: 
+		allowCreate:
 			label: "允许创建",
 			type: "boolean"
-		allowEdit: 
+		allowEdit:
 			label: "允许编辑",
 			type: "boolean"
-		allowDelete: 
+		allowDelete:
 			label: "允许删除",
 			type: "boolean"
-		viewAllRecords: 
+		viewAllRecords:
 			type: "boolean"
 			label: "查看所有记录",
-		modifyAllRecords: 
+		modifyAllRecords:
 			type: "boolean"
 			label: "修改所有记录",
+		viewCompanyRecords:
+			type: "boolean"
+			label: "查看本单位",
+		modifyCompanyRecords:
+			type: "boolean"
+			label: "修改本单位",
 		disabled_list_views:
 			type: "lookup"
 			label:'禁用列表视图'
@@ -102,7 +108,7 @@ Creator.Objects.permission_objects =
 				icon = _object.icon
 				_.forEach fields, (f, k)->
 					unless f.omit
-						if _.indexOf(values.unreadable_fields, k) < 0 
+						if _.indexOf(values.unreadable_fields, k) < 0
 							_options.push {label: f.label || k, value: k, icon: icon}
 				return _options
 		unrelated_objects:
@@ -119,20 +125,20 @@ Creator.Objects.permission_objects =
 					_options.push {label: _object.label || i, value: i, icon: _object.icon}
 				return _options
 
-	list_views:		
+	list_views:
 		all:
 			label:"全部"
 			columns: ["name", "permission_set_id", "object_name", "allowCreate", "allowDelete", "allowEdit", "allowRead", "modifyAllRecords", "viewAllRecords"]
 			filter_scope: "space"
 
 	triggers:
-		"before.insert.server.process": 
+		"before.insert.server.process":
 			on: "server"
 			when: "before.insert"
 			todo: (userId, doc)->
 				Creator.processPermissions doc
-				
-		"before.update.server.process": 
+
+		"before.update.server.process":
 			on: "server"
 			when: "before.update"
 			todo: (userId, doc, fieldNames, modifier, options)->
@@ -145,11 +151,11 @@ Creator.Objects.permission_objects =
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true

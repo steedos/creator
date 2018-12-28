@@ -71,11 +71,11 @@ Creator.removeCollection = (object_name)->
 
 Creator.isSpaceAdmin = (spaceId, userId)->
 	if Meteor.isClient
-		if !spaceId 
+		if !spaceId
 			spaceId = Session.get("spaceId")
 		if !userId
 			userId = Meteor.userId()
-	
+
 	space = Creator.getObject("spaces")?.db?.findOne(spaceId)
 	if space?.admins
 		return space.admins.indexOf(userId) >= 0
@@ -89,7 +89,7 @@ Creator.evaluateFormula = (formular, context, options)->
 	if Creator.Formular.checkFormula(formular)
 		return Creator.Formular.run(formular, context, options)
 
-	return formular				
+	return formular
 
 Creator.evaluateFilters = (filters, context)->
 	selector = {}
@@ -270,3 +270,7 @@ Creator.processPermissions = (po)->
 		po.allowRead = true
 		po.allowEdit = true
 		po.viewAllRecords = true
+	if po.modifyCompanyRecords
+		po.allowRead = true
+		po.allowEdit = true
+		po.viewCompanyRecords = true
