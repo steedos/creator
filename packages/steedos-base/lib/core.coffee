@@ -400,7 +400,7 @@ if Meteor.isServer
 #	Steedos.chargeAPIcheck = (spaceId)->
 
 if Meteor.isServer
-	Cookies = Npm.require("cookies")
+	Cookies = require("cookies")
 	#TODO 添加服务端是否手机的判断(依据request)
 	Steedos.isMobile = ()->
 		return false;
@@ -533,7 +533,7 @@ if Meteor.isServer
 
 
 if Meteor.isServer
-	crypto = Npm.require('crypto');
+	crypto = require('crypto');
 	Steedos.decrypt = (password, key, iv)->
 		try
 			key32 = ""
@@ -768,7 +768,7 @@ if Meteor.isServer
 if Meteor.isServer
 	_.extend Steedos,
 		getSteedosToken: (appId, userId, authToken)->
-			crypto = Npm.require('crypto')
+			crypto = require('crypto')
 			app = db.apps.findOne(appId)
 			if app
 				secret = app.secret
