@@ -89,7 +89,7 @@ Package.onUse(function (api) {
 	api.use('blaze-html-templates@1.1.2');
 	api.use('steedos:lightning-design-system@0.0.2');
 
-	api.addFiles('checkNpm.js');
+	api.addFiles('checkNpm.js', "server");
 
 	api.addFiles('core.coffee');
 

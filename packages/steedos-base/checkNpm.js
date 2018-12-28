@@ -1,8 +1,8 @@
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions';
 checkNpmVersions({
-	"node-schedule": "1.1.1",
-	cookies: "0.6.1",
-	"weixin-pay": "1.1.7",
-	"xml2js": "0.4.17",
-	mkdirp: "0.3.5"
+	"node-schedule": "1.3.x",
+	cookies: "0.6.x",
+	"weixin-pay": "1.1.x",
+	"xml2js": "0.4.x",
+	mkdirp: "0.3.x"
 }, 'steedos:base');
