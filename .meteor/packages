@@ -38,6 +38,8 @@ less
 accounts-ui
 accounts-password
 
+tmeasday:check-npm-versions
+
 # fortawesome:fontawesome
 tap:i18n
 
