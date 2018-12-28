@@ -7,6 +7,7 @@
   "dependencies": {
     "@babel/runtime": "^7.2.0",
     "aliyun-sdk": "^1.11.12",
+    "basic-auth": "^2.0.1",
     "bcrypt": "3.0.2",
     "busboy": "^0.2.13",
     "cookies": "^0.6.2",
@@ -18,6 +19,11 @@
     "mkdirp": "^0.3.5",
     "node-schedule": "^1.3.1",
     "node-xlsx": "^0.12.0",
+    "odata-v4-mongodb": "^0.1.12",
+    "odata-v4-parser": "^0.1.29",
+    "odata-v4-service-document": "0.0.3",
+    "odata-v4-service-metadata": "^0.1.6",
+    "querystring": "^0.2.0",
     "weixin-pay": "^1.1.7",
     "xml2js": "^0.4.19"
   }

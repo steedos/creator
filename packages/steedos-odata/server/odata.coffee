@@ -1,7 +1,7 @@
 Meteor.startup ->
 
-	odataV4Mongodb = Npm.require 'odata-v4-mongodb'
-	querystring = Npm.require 'querystring'
+	odataV4Mongodb = require 'odata-v4-mongodb'
+	querystring = require 'querystring'
 
 	visitorParser = (visitor)->
 		parsedOpt = {}
