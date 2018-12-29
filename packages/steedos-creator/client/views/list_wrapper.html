@@ -159,16 +159,16 @@
 				</div>
 				<div class="weui-flex" style="height: 100%;">
 					<div style="width: calc(100% - 30px);" class="slds-grid table-grid-content weui-flex__item">
-						<div class="slds-col slds-no-space {{#if list_data_left}}sidebar-open{{/if}}">
+						<div class="slds-col slds-no-space {{#if sidebar_data}}sidebar-open{{/if}}">
 						{{#if list_view_visible}}
 							{{#if isCalendarView}}
 								<div class="tale-content list-table-container td-cell-wrap">
 									{{> Template.dynamic template='creator_calendarNew' data=list_data}}
 								</div>
 							{{else}}
-								{{#if list_data_left}}
+								{{#if sidebar_data}}
 									<div class="slds-table tale-content list-table-container td-cell-wrap list-table-sidebar">
-										{{> Template.dynamic template=list_template data=list_data_left}}
+										{{> Template.dynamic template=sidebar_data.template_name}}
 									</div>
 								{{/if}}
 								<div class="slds-table tale-content list-table-container td-cell-wrap">
