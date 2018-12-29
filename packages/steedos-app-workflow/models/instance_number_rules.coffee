@@ -17,12 +17,12 @@ Creator.Objects.instance_number_rules =
 			defaultValue: ()->
 				if Meteor.isClient
 					return (new Date).getFullYear()
-		
+
 		first_number:
 			type: "number"
 			label: "起始序号"
 			defaultValue: 1
-		
+
 		number:
 			type: "number"
 			label: "序号"
@@ -51,11 +51,6 @@ Creator.Objects.instance_number_rules =
 			columns: ["name", "year","first_number","number","rules"]
 			label: "所有"
 
-		company:
-			filter_scope: "company"
-			columns: ["name", "year","first_number","number","rules"]
-			label: "本单位"
-
 	permission_set:
 		user:
 			allowCreate: false
@@ -63,7 +58,7 @@ Creator.Objects.instance_number_rules =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -76,9 +71,11 @@ Creator.Objects.instance_number_rules =
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
-			viewAllRecords: true
-			disabled_list_views: ['all']
+			modifyAllRecords: false
+			viewAllRecords: false
+			modifyCompanyRecords: true
+			viewCompanyRecords: true
+			disabled_list_views: []
 			disabled_actions: []
 			unreadable_fields: []
 			uneditable_fields: []

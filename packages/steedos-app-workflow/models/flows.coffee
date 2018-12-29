@@ -315,10 +315,6 @@ Creator.Objects.flows =
 			filter_scope: "space"
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
 			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form"]
-		company:
-			filter_scope: "company"
-			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form"]
-			label: "本单位"
 
 	actions:
 		# standard_query:
@@ -475,7 +471,7 @@ Creator.Objects.flows =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: false
@@ -488,9 +484,11 @@ Creator.Objects.flows =
 			allowDelete: false
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
-			viewAllRecords: true
-			disabled_list_views: ['all']
+			modifyAllRecords: false
+			viewAllRecords: false
+			modifyCompanyRecords: true
+			viewCompanyRecords: true
+			disabled_list_views: []
 			disabled_actions: []
 			unreadable_fields: []
 			uneditable_fields: []

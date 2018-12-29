@@ -142,15 +142,14 @@ if Meteor.isClient
 							if selector.length > 0
 								selector.push "and"
 							selector.push ["owner", "=", userId]
+					else if permissions.viewCompanyRecords
+						if selector.length > 0
+							selector.push "and"
+						selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
 					else if permissions.allowRead
 						if selector.length > 0
 							selector.push "and"
 						selector.push ["owner", "=", userId]
-
-		if filter_scope == "company"
-			if selector.length > 0
-				selector.push "and"
-			selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
 
 		if selector.length == 0
 			return undefined
