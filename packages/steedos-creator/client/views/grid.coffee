@@ -106,16 +106,13 @@ _actionItems = (object_name, record_id, record_permissions)->
 			return false
 	return actions
 
-_fields = (object_name, list_view_id, is_sidebar)->
+_fields = (object_name, list_view_id)->
 	object = Creator.getObject(object_name)
 	name_field_key = object.NAME_FIELD_KEY
 	if object.name == "organizations"
 		# 显示组织列表时，特殊处理name_field_key为name字段
 		name_field_key = "name"
 	fields = [name_field_key]
-	if is_sidebar
-		# 左侧grid视图，只显示name字段
-		return fields
 	if Creator.getCollection("object_listviews").findOne(list_view_id)
 		fields = Creator.getCollection("object_listviews").findOne(list_view_id).columns
 		if !fields
@@ -199,7 +196,7 @@ _expandFields = (object_name, columns)->
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
 
-_columns = (object_name, columns, list_view_id, is_related, is_sidebar)->
+_columns = (object_name, columns, list_view_id, is_related)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	defaultWidth = _defaultWidth(columns, object.enable_tree)
@@ -229,7 +226,7 @@ _columns = (object_name, columns, list_view_id, is_related, is_sidebar)->
 				if /\w+\.\$\.\w+/g.test(field_name)
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
-				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata", is_sidebar: is_sidebar}
+				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
 				if field.type is "markdown"
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
@@ -274,11 +271,7 @@ _depandOnFields = (object_name, columns)->
 Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
-		is_sidebar = self.data.is_sidebar
-		sidebar_multiple = self.data.sidebar_multiple
 		is_related = self.data.is_related
-		if is_sidebar
-			list_view_id = "all"
 		if is_related
 			list_view_id = Creator.getListView(self.data.related_object_name, "all")._id
 		else
@@ -297,7 +290,6 @@ Template.creator_grid.onRendered ->
 		curObjectName = if is_related then related_object_name else object_name
 		curObject = Creator.getObject(curObjectName)
 
-		sidebar = curObject.sidebar
 		record_id = Session.get("record_id")
 
 		listTreeCompany = Session.get('listTreeCompany')
@@ -318,11 +310,7 @@ Template.creator_grid.onRendered ->
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name)
 
-				if is_sidebar
-					# 左侧sidebar的grid代码不需要支持搜索
-					standardQuery = _standardQuery(object_name)
-				else
-					standardQuery = _standardQuery(object_name, Session.get("standard_query"))
+				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
 					if filter
 						filter = [filter, "and", standardQuery]
@@ -335,7 +323,7 @@ Template.creator_grid.onRendered ->
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
-
+				
 				unless is_related
 					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
 					sidebarFilter = Session.get("grid_sidebar_filters")
@@ -343,8 +331,7 @@ Template.creator_grid.onRendered ->
 						filter = [ filter, "and", sidebarFilter ]
 
 			selectColumns = Tracker.nonreactive ()->
-				unless is_sidebar
-					grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
+				grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
 				if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
 					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
 				if settingColumns
@@ -352,7 +339,7 @@ Template.creator_grid.onRendered ->
 					selectColumns = _.intersection(settingColumns, defaultColumns)
 					selectColumns = _.union(selectColumns, defaultColumns)
 				else
-					selectColumns = _fields(curObjectName, list_view_id, is_sidebar)
+					selectColumns = _fields(curObjectName, list_view_id)
 				return selectColumns
 
 			pageIndex = Tracker.nonreactive ()->
@@ -379,11 +366,11 @@ Template.creator_grid.onRendered ->
 			expand_fields = _expandFields(curObjectName, selectColumns)
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
-			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related, is_sidebar)
+			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
-			actions = if is_sidebar then [] else Creator.getActions(curObjectName)
+			actions = Creator.getActions(curObjectName)
 			if actions.length
 				showColumns.push
 					dataField: "_id_actions"
@@ -410,7 +397,7 @@ Template.creator_grid.onRendered ->
 						"""
 						$("<div>").append(htmlText).appendTo(container);
 			
-			if is_related || (!curObject.enable_tree and !is_sidebar)
+			if is_related || !curObject.enable_tree
 				nameFieldKey = curObject.NAME_FIELD_KEY
 				needToShowLinkForIndexColumn = false
 				if selectColumns.indexOf(nameFieldKey) < 0
@@ -578,17 +565,11 @@ Template.creator_grid.onRendered ->
 			
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
-			if is_sidebar
-				dxOptions.selection = 
-					mode: if sidebar_multiple then "multiple" else "single"
-				dxOptions.onSelectionChanged = (selectionInfo)->
-					Session.set "left_sidebar_grid_selected", selectionInfo.selectedRowsData
-			else
-				fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
-				dxOptions.export =
-					enabled: true
-					fileName: fileName
-					allowExportSelectedData: false
+			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
+			dxOptions.export =
+				enabled: true
+				fileName: fileName
+				allowExportSelectedData: false
 			if !is_related and curObject.enable_tree
 				# 如果是tree则过虑条件适用tree格式，要排除相关项is_related的情况，因为相关项列表不需要支持tree
 				dxOptions.keyExpr = "_id"
