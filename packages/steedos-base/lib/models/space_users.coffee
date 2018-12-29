@@ -8,9 +8,7 @@ Creator.Objects.space_users =
 	icon: "user"
 	enable_search: true
 	sidebar:
-		reference_to: "organizations"
-		field_key: "organizations"
-		multiple: false
+		template_name: "creator_grid_sidebar_organizations"
 	fields:
 		name:
 			label: "姓名"

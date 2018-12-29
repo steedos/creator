@@ -335,20 +335,11 @@ Template.creator_grid.onRendered ->
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
-				
-				if sidebar and !is_related
+
+				unless is_related
 					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
-					left_sidebar_grid_selected = Session.get("left_sidebar_grid_selected")
-					if left_sidebar_grid_selected and left_sidebar_grid_selected.length
-						sidebar_values = _.pluck(Session.get("left_sidebar_grid_selected"),"_id")
-						if sidebar_values.length == 1
-							sidebarFilter = [ sidebar.field_key, "=", sidebar_values[0] ]
-						else if sidebar_values.length > 1
-							sidebarFilter = []
-							sidebar_values.forEach (value_item)->
-								sidebarFilter.push [ sidebar.field_key, "=", value_item ]
-								sidebarFilter.push "or"
-							sidebar_values.shift()
+					sidebarFilter = Session.get("grid_sidebar_filters")
+					if sidebarFilter and sidebarFilter.length
 						filter = [ filter, "and", sidebarFilter ]
 
 			selectColumns = Tracker.nonreactive ()->
