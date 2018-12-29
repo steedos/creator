@@ -70,7 +70,7 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 			dxOptions.rootValue = null
 			dxOptions.dataStructure = "plain"
 			dxOptions.virtualModeEnabled = true 
-			self.dxDataGridInstance = self.$(".gridContainer").dxTreeView(dxOptions).dxTreeView('instance')
+			self.$(".gridSidebarContainer").dxTreeView(dxOptions).dxTreeView('instance')
 			
 Template.creator_grid_sidebar_organizations.helpers Creator.helpers
 
