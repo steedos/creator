@@ -79,3 +79,6 @@ Template.creator_grid_sidebar_organizations.helpers
 Template.creator_grid_sidebar_organizations.events
 
 Template.creator_grid_sidebar_organizations.onCreated ->
+
+Template.creator_grid_sidebar_organizations.onDestroyed ->
+	Session.set "grid_sidebar_filters", null
