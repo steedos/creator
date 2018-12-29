@@ -111,8 +111,8 @@ if Meteor.isServer
 		if rules
 			throw new Meteor.Error(400, "instance_number_rules_name_only");
 
-		if (!Steedos.isSpaceAdmin(doc.space, userId))
-			throw new Meteor.Error(400, "error_space_admins_only");
+		# if (!Steedos.isSpaceAdmin(doc.space, userId))
+		# 	throw new Meteor.Error(400, "error_space_admins_only");
 
 		console.log userId + "; insert instance_number_rules",  doc
 
@@ -130,8 +130,8 @@ if Meteor.isServer
 
 	db.instance_number_rules.before.remove (userId, doc) ->
 
-		if (!Steedos.isSpaceAdmin(doc.space, userId))
-			throw new Meteor.Error(400, "error_space_admins_only");
+		# if (!Steedos.isSpaceAdmin(doc.space, userId))
+		# 	throw new Meteor.Error(400, "error_space_admins_only");
 
 		console.log userId + "; remove instance_number_rules",  doc
 
