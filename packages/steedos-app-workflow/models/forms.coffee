@@ -88,10 +88,7 @@ Creator.Objects.forms =
 			filter_scope: "space"
 			filters: [["is_deleted", "=", false]]
 			columns: ["name", "category", "modified", "modified_by", "auto_remind", "state"]
-		company:
-			filter_scope: "company"
-			columns: ["name"]
-			label: "本单位"
+
 	actions:
 		standard_new:
 			visible: false
@@ -110,7 +107,7 @@ Creator.Objects.forms =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: false
 			allowDelete: false
@@ -124,8 +121,10 @@ Creator.Objects.forms =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
-			disabled_list_views: ['all']
+			viewAllRecords: false
+			modifyCompanyRecords: true
+			viewCompanyRecords: true
+			disabled_list_views: []
 			disabled_actions: []
 			unreadable_fields: []
 			uneditable_fields: []

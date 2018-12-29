@@ -84,12 +84,20 @@ Creator.Objects.object_listviews =
 			# hidden: true
 		filters:
 			label: "过滤器"
-			type: "[Object]"
-			omit: true
+			type: "grid"
 		"filters.$":
 			label: "过滤条件"
 			blackbox: true
-			omit: true
+			type: "Object"
+		"filters.$.field":
+			label: "字段"
+			type: "text"
+		"filters.$.operation":
+			label: "运算符"
+			type: "text"
+		"filters.$.value":
+			label: "值"
+			type: "text"
 		filter_logic:
 			label: "过滤逻辑"
 			type: String

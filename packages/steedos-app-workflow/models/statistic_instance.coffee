@@ -72,16 +72,6 @@ Creator.Objects.instances_statistic =
 			"owner_organization",
 			"owner_organizations","company_id"]
 
-		company:
-			label: "本单位"
-			filter_scope: "company"
-			columns: ["user","year","month",
-			"month_finished_count","inbox_count",
-			"month_finished_time","inbox_time",
-			"month_finished_avg","inbox_avg","avg_time",
-			"owner_organization",
-			"owner_organizations","company_id"]
-
 	permission_set:
 		user:
 			allowCreate: false
@@ -103,8 +93,10 @@ Creator.Objects.instances_statistic =
 			allowEdit: false
 			allowRead: false
 			modifyAllRecords: false
-			viewAllRecords: true
-			disabled_list_views: ['all']
+			viewAllRecords: false
+			modifyCompanyRecords: true
+			viewCompanyRecords: true
+			disabled_list_views: []
 			disabled_actions: []
 			unreadable_fields: []
 			uneditable_fields: []

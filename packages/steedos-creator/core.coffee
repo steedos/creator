@@ -109,7 +109,7 @@ Creator.getObjectUrl = (object_name, record_id, app_id) ->
 Creator.getListViewUrl = (object_name, app_id, list_view_id) ->
 	url = Creator.getListViewRelativeUrl(object_name, app_id, list_view_id)
 	return Creator.getRelativeUrl(url)
-		
+
 Creator.getListViewRelativeUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id is "calendar"
 		return "/app/" + app_id + "/" + object_name + "/calendar/"
@@ -169,11 +169,11 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	if record
 		isOwner = record.owner == userId || record.owner?._id == userId
-		if !permissions.modifyAllRecords and !isOwner
+		if !permissions.modifyAllRecords and !isOwner and !permissions.modifyCompanyRecords
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 
-		if !permissions.viewAllRecords and !isOwner
+		if !permissions.viewAllRecords and !isOwner and !permissions.viewCompanyRecords
 			permissions.allowRead = false
 
 	return permissions

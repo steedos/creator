@@ -168,10 +168,7 @@ Creator.Objects.instances =
 			label: "已办文件"
 			filter_scope: "space"
 			filters: [["outbox_users", "=", "{userId}"]]
-		company:
-			filter_scope: "company"
-			columns: ["name", "applicant", "applicant_organization", "modified"]
-			label: "本单位"
+
 	permission_set:
 		user:
 			allowCreate: false
@@ -179,7 +176,7 @@ Creator.Objects.instances =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: false
 			allowDelete: false
@@ -193,8 +190,10 @@ Creator.Objects.instances =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
-			disabled_list_views: ['all','inbox','outbox']
+			viewAllRecords: false
+			modifyCompanyRecords: false
+			viewCompanyRecords: true
+			disabled_list_views: ['inbox','outbox']
 			disabled_actions: []
 			unreadable_fields: []
 			uneditable_fields: []
