@@ -87,6 +87,10 @@ Package.onUse(function (api) {
 	api.use('steedos:odata@0.0.3');
 	api.use('blaze-html-templates@1.1.2');
 	api.use('steedos:lightning-design-system@0.0.2');
+	api.use('universe:i18n');
+
+	api.addFiles('i18n/en.i18n.json');
+	api.addFiles('i18n/zh-CN.i18n.json');
 
 	api.addFiles('checkNpm.js', "server");
 

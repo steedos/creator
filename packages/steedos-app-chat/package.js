@@ -19,8 +19,6 @@ Package.onUse(function(api) {
 	api.use('templating@1.2.15');
 	api.use('steedos:base@0.0.79');
 
-	api.use('tap:i18n@1.8.2');
-
 
 	api.addFiles('app.chat.coffee','server');
 	api.addFiles('models/chat_subscriptions.coffee','server');

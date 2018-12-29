@@ -209,6 +209,7 @@ twbs:bootstrap@3.3.6
 ui@1.0.13
 underscore@1.0.10
 underscorestring:underscore.string@3.3.4
+universe:i18n@1.13.0
 url@1.2.0
 webapp@1.7.0
 webapp-hashing@1.0.9

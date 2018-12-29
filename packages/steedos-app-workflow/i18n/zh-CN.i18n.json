@@ -1,4 +1,6 @@
 {
+	"_namespace": "",
+
 	"Steedos Workflow": "审批中心",
 	"inbox": "待审核",
 	"outbox": "已审核",

@@ -29,8 +29,6 @@ Package.onUse(function(api) {
 	api.use('kadira:blaze-layout@2.3.0');
 	api.use('kadira:flow-router@2.10.1');
 
-	api.use('tap:i18n@1.7.0');
-
 	api.use('accounts-password@1.3.0');
 
 	api.use('steedos:e164-phones-countries@1.0.3');
