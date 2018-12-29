@@ -104,6 +104,11 @@
 												<span>{{_ "creator_list_export_list_view"}}</span>
 											</a>
 										</li>
+										<li class="slds-dropdown__item copy-list-view {{#if isTree}}hidden{{/if}}" role="presentation">
+											<a href="javascript:void(0);" title="export" class="" role="option" tabindex="-1">
+												<span>{{_ "复制视图"}}</span>
+											</a>
+										</li>
 										{{#if is_custom_list_view}}
 											{{#if is_view_owner}}
 												<li class="slds-dropdown__item edit-list-view" role="presentation">
