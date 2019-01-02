@@ -18,9 +18,11 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 						onLoaded: (results)->
 							if results and _.isArray(results)
 								_.each results, (item)->
+									# 判断是否有下级节点
 									item.hasItems = false
 									if item.children?.length > 0
 										item.hasItems = true
+									# 根节点自动展开
 									if !item.parent
 										item.expanded = true
 						beforeSend: (request) ->
