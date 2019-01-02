@@ -22,10 +22,13 @@ getExpand = (options)->
 	expand = []
 	_.forEach options.title, (fname)->
 		f = objectFields[fname]
-		if (f.type == 'lookup' || f.type == 'master_detail') && _.isString(f.reference_to)
-			re_object_name_field = Creator.getObject(f.reference_to)?.NAME_FIELD_KEY
-			if re_object_name_field
-				expand.push("#{fname}($select=#{re_object_name_field})")
+		if (f.type == 'lookup' || f.type == 'master_detail')
+			if _.isString(f.reference_to)
+				re_object_name_field = Creator.getObject(f.reference_to)?.NAME_FIELD_KEY
+				if re_object_name_field
+					expand.push("#{fname}($select=#{re_object_name_field})")
+			else
+				expand.push("#{fname}($select=name)")
 	if expand.length < 1
 		return
 	return expand;
@@ -76,6 +79,7 @@ _dataSource = (options) ->
 
 _getAppointmentTemplate = (options)->
 	appointmentTemplate = (data)->
+		console.log('data', data);
 		title = data[options.textExpr || 'name'];
 		if options.title && _.isArray(options.title) && options.title.length > 0
 			title = ''
@@ -84,12 +88,16 @@ _getAppointmentTemplate = (options)->
 				f = fields[t]
 				fvalue = data[t]
 				if fvalue
-					if (f.type == 'lookup' || f.type == 'master_detail') && _.isString(f.reference_to)
-						re_object_name_field = Creator.getObject(f.reference_to)?.NAME_FIELD_KEY
+					if (f.type == 'lookup' || f.type == 'master_detail')
+						reference_to = f.reference_to
+						re_object_name_field = "name"
+						if _.isString(reference_to)
+							re_object_name_field = Creator.getObject(reference_to)?.NAME_FIELD_KEY
+
 						if _.isArray(fvalue)
 							fvalue = _.pluck(fvalue, re_object_name_field).join(',')
 						else
-							fvalue = fvalue[re_object_name_field]
+							fvalue = fvalue?[re_object_name_field]
 					else if f.type == 'select'
 						f_options = f.options
 

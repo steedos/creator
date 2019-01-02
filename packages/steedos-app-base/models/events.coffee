@@ -71,6 +71,42 @@ Creator.Objects.events =
 			filter_scope: "space"
 			columns: ["name", "start", "end", "assignees", "related_to"]
 
+		calendar_view: {
+			type: 'calendar',
+			label: '日历视图',
+			filter_scope: "space",
+			options: {
+				startDateExpr: 'start',
+				endDateExpr: 'end',
+				textExpr: 'name',
+				title: ['name', "start", "end", 'assignees', 'related_to'],
+				currentView: 'month'
+				startDayHour: 8
+				endDayHour: 18
+#				groups: ['state']
+#				resources: [{
+#					fieldExpr: "state"
+#					dataSource: [{
+#						text : "未开始",
+#						id: 'not_started',
+#						color: "rgb(118, 118, 118)"
+#					},{
+#						text : "进行中",
+#						id: 'in_progress',
+#						color: "rgb(29, 186, 174)"
+#					},{
+#						text : "已完成",
+#						id: 'completed',
+#						color: "rgb(32, 194, 46)"
+#					},{
+#						text : "暂停",
+#						id: 'paused',
+#						color: "rgb(118, 118, 118)"
+#					}]
+#				}]
+			}
+		}
+
 
 	permission_set:
 		user:
