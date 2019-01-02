@@ -1,6 +1,6 @@
 Template.import_users_modal.helpers
 	import_simple_url: ()->
-		return Steedos.absoluteUrl("excel/steedos_import_users_simple.xls")
+		return Steedos.absoluteUrl("packages/steedos_users-import/assets/excel/steedos_import_users_simple.xls")
 	row_number: (i)->
 		return i + 1;
 	items: ()->

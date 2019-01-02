@@ -38,4 +38,6 @@ Package.onUse(function(api) {
 	api.addFiles('client/views/import_users_modal.coffee', 'client');
 	
 	api.addFiles('server/methods/import_users.coffee', 'server');
+
+	api.addAssets('assets/excel/steedos_import_users_simple.xls', 'client');
 });
