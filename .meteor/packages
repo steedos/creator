@@ -179,6 +179,7 @@ steedos:instance-record-queue
 
 steedos:app-contract
 steedos:users-import
+steedos:app-base
 
 
 # 正式发布时开启
