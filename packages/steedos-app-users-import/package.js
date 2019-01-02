@@ -1,7 +1,7 @@
 Package.describe({
-	name: 'steedos:app-admin',
+	name: 'steedos:app-users-import',
 	version: '0.0.1',
-	summary: 'Creator admin',
+	summary: 'Creator Users Import',
 	git: '',
 	documentation: null
 });
@@ -31,7 +31,12 @@ Package.onUse(function(api) {
 	api.addFiles('i18n/en.i18n.json');
 	api.addFiles('i18n/zh-CN.i18n.json');
 	
-	api.addFiles('admin.app.coffee', "server");
-	api.addFiles('models/OAuth2Clients.coffee','server');
-	api.addFiles('models/OAuth2AccessTokens.coffee','server');
+	api.addFiles('users_import.app.coffee', "server");
+	api.addFiles('space_users_actions.coffee');
+	
+	api.addFiles('client/views/import_users_modal.less', 'client');
+	api.addFiles('client/views/import_users_modal.html', 'client');
+	api.addFiles('client/views/import_users_modal.coffee', 'client');
+	
+	api.addFiles('server/methods/import_users.coffee', 'server');
 });
