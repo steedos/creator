@@ -90,6 +90,15 @@ Package.onUse(function(api) {
 	api.addFiles('client/coreform/inputTypes/coreform-url/url.html', 'client');
 	api.addFiles('client/coreform/inputTypes/coreform-url/url.js', 'client');
 
+	api.addFiles('client/coreform/inputTypes/coreform-widearea/lib/widearea.css', 'client');
+	api.addFiles('client/coreform/inputTypes/coreform-widearea/lib/widearea.js', 'client');
+	api.addFiles('client/coreform/inputTypes/coreform-widearea/widearea.html', 'client');
+	api.addFiles('client/coreform/inputTypes/coreform-widearea/widearea.coffee', 'client');
+
+	// api.addFiles('client/coreform/inputTypes/coreform-autosizearea/lib/autosize.js', 'client');
+	// api.addFiles('client/coreform/inputTypes/coreform-autosizearea/autosize-area.html', 'client');
+	// api.addFiles('client/coreform/inputTypes/coreform-autosizearea/autosize-area.coffee', 'client');
+
 	api.addFiles('client/coreform/inputTypes/coreform-typeahead/typeahead.js/bloodhound.js', 'client');
 	api.addFiles('client/coreform/inputTypes/coreform-typeahead/typeahead.js/typeahead.bundle.js', 'client');
 	api.addFiles('client/coreform/inputTypes/coreform-typeahead/typeahead.js/typeahead.jquery.js', 'client');
