@@ -1,5 +1,5 @@
 Package.describe({
-	name: 'steedos:app-users-import',
+	name: 'steedos:users-import',
 	version: '0.0.1',
 	summary: 'Creator Users Import',
 	git: '',
@@ -31,7 +31,6 @@ Package.onUse(function(api) {
 	api.addFiles('i18n/en.i18n.json');
 	api.addFiles('i18n/zh-CN.i18n.json');
 	
-	api.addFiles('users_import.app.coffee', "server");
 	api.addFiles('space_users_actions.coffee');
 	
 	api.addFiles('client/views/import_users_modal.less', 'client');
