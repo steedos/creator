@@ -3,6 +3,24 @@ Meteor.startup ->
 	odataV4Mongodb = require 'odata-v4-mongodb'
 	querystring = require 'querystring'
 
+	handleError = (e)->
+		console.error e.stack
+		body = {}
+		error = {}
+		error['message'] = e.message
+		statusCode = 500
+		if e.error and _.isNumber(e.error)
+			statusCode = e.error 
+		error['code'] = statusCode
+		error['error'] = statusCode
+		error['details'] = e.details
+		error['reason'] = e.reason
+		body['error'] = error
+		return {
+			statusCode: statusCode
+			body:body
+		}
+
 	visitorParser = (visitor)->
 		parsedOpt = {}
 		if visitor.projection
@@ -262,19 +280,8 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,"get")
 					}
 			catch e
-				console.error e.stack
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
+
 		post: ()->
 			try
 				key = @urlParams.object_name
@@ -320,18 +327,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'post')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 
 	})
 	SteedosOdataAPI.addRoute(':object_name/recent', {authRequired: true, spaceRequired: false}, {
@@ -425,18 +421,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'get')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 })
 
 	SteedosOdataAPI.addRoute(':object_name/:_id', {authRequired: true, spaceRequired: false}, {
@@ -481,18 +466,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'post')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 		get:()->
 
 			key = @urlParams.object_name
@@ -617,18 +591,7 @@ Meteor.startup ->
 							body: setErrorMessage(403,collection,key,'get')
 						}
 				catch e
-					body = {}
-					error = {}
-					error['message'] = e.message
-					error['code'] = 500
-					error['error'] = e.error
-					error['details'] = e.details
-					error['reason'] = e.reason
-					body['error'] = error
-					return {
-						statusCode: 500
-						body:body
-					}
+					return handleError e
 
 		put:()->
 			try
@@ -698,18 +661,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'put')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 		delete:()->
 			try
 				key = @urlParams.object_name
@@ -757,18 +709,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key)
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 	})
 
 	# _id可传all
@@ -812,18 +753,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key)
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 
 	})
 
