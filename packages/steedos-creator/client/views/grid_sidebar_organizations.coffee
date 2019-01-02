@@ -13,6 +13,16 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 						version: 4
 						url: Steedos.absoluteUrl(url)
 						withCredentials: false
+						onLoading: (loadOptions)->
+							loadOptions.select = ["name", "parent", "children"]
+						onLoaded: (results)->
+							if results and _.isArray(results)
+								_.each results, (item)->
+									item.hasItems = false
+									if item.children?.length > 0
+										item.hasItems = true
+									if !item.parent
+										item.expanded = true
 						beforeSend: (request) ->
 							request.headers['X-User-Id'] = Meteor.userId()
 							request.headers['X-Space-Id'] = Steedos.spaceId()
@@ -62,12 +72,7 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 			dxOptions.keyExpr = "_id"
 			dxOptions.parentIdExpr = "parent"
 			dxOptions.displayExpr = "name"
-			# hasItemsExpr功能有bug，function模式时能进入hasItemsExpr函数，但是参数params始终为undefined
-			# dxOptions.hasItemsExpr = "children"
-			dxOptions.hasItemsExpr = (params)=>
-				if params?.children?.length>0
-					return true 
-				return false;
+			dxOptions.hasItemsExpr = "hasItems"
 			dxOptions.rootValue = null
 			dxOptions.dataStructure = "plain"
 			dxOptions.virtualModeEnabled = true 
