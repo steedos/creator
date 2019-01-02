@@ -31,13 +31,13 @@ Creator.getObjectSchema = (obj) ->
 			fs.autoform.type = "tags"
 		else if field.type == 'code'
 			fs.type = String
-			fs.autoform.type = "textarea"
+			fs.autoform.type = "widearea"
 			fs.autoform.rows = field.rows || 12
 			if field.language
 				fs.autoform.language = field.language
 		else if field.type == "textarea"
 			fs.type = String
-			fs.autoform.type = "textarea"
+			fs.autoform.type = "widearea"
 			fs.autoform.rows = field.rows || 6
 		else if field.type == "password"
 			fs.type = String

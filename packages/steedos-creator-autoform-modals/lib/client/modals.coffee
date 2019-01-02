@@ -410,6 +410,9 @@ helpers =
 	isSingle: ()->
 		return Session.get("cmEditSingleField")
 
+	isOverflowVisible: ()->
+		return Session.get("cmContentOverflowVisible")
+
 	isFullScreen: ()->
 		return Session.get("cmFullScreen")
 
@@ -476,14 +479,24 @@ Template.CreatorAfModal.events
 		else
 			title = html
 
+		object_name = getObjectName t.data.collection
+		object_fields = Creator.getObject(object_name).fields
+
 		#新增_ids虚拟字段，以实现条记录同时更新
 		fields = t.data.fields
 		if fields and fields.length
 			if fields.split(",").length == 1
 				Session.set "cmEditSingleField", true
+
+				if object_fields[fields.split(",")[0]].type != 'code' && object_fields[fields.split(",")[0]].type != 'textarea' && object_fields[fields.split(",")[0]].type != 'autosizearea'
+					Session.set "cmContentOverflowVisible", true
+				else
+					Session.set "cmContentOverflowVisible", false
+
 			fields = _.union(fields.split(","),"_ids","_object_name").join(",")
 		else
 			Session.set "cmEditSingleField", false
+			Session.set "cmContentOverflowVisible", false
 
 		Session.set 'cmCollection', t.data.collection
 		Session.set 'cmOperation', t.data.operation
