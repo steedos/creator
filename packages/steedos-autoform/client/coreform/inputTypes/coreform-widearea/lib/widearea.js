@@ -44,7 +44,7 @@
       defaultColorScheme: 'light',
       closeIconLabel: 'Close WideArea',
       changeThemeIconLabel: 'Toggle Color Scheme',
-      fullScreenIconLabel: 'WideArea Mode',
+      fullScreenIconLabel: '全屏模式',
       autoSaveKeyPrefix: 'WDATA-'
     };
 
