@@ -14,6 +14,12 @@ sprintf = require('sprintf-js').sprintf;
 	else
 		return sprintf(i18n.__(key, options), replaces)
 
+# 重写tap:i18n函数，向后兼容
+Meteor.startup ->
+	if TAPi18n
+		TAPi18n.__ = (key, options, lang)->
+			return i18n.__ key, options;
+
 
 if Meteor.isClient
 	getBrowserLocale = ()->
