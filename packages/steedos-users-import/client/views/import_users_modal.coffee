@@ -83,7 +83,8 @@ Template.import_users_modal.events
 				$("body").removeClass("loading")
 				toastr.error(error.reason);
 			else
-				$.jstree.reference('#steedos_contacts_org_tree').refresh()
+				# 导入成功后刷新当前路由，左侧组织及右侧用户列表都会重新刷新
+				FlowRouter.reload()
 				$("body").removeClass("loading")
 
 				totalCount = template.items.get().length
