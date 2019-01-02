@@ -15,6 +15,7 @@ Package.onUse(function(api) {
 	api.use('check@1.2.3');
 	api.use('ddp-rate-limiter@1.0.5');
 	api.use('underscore@1.0.10');
+	api.use('ecmascript');
 	api.use('tracker@1.1.0');
 	api.use('session@1.1.6');
 	api.use('blaze@2.1.9');
@@ -30,6 +31,8 @@ Package.onUse(function(api) {
 
 	api.addFiles('i18n/en.i18n.json');
 	api.addFiles('i18n/zh-CN.i18n.json');
+
+	api.addFiles('checkNpm.js', 'server');
 	
 	api.addFiles('space_users_actions.coffee');
 	
@@ -40,4 +43,7 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/import_users.coffee', 'server');
 
 	api.addAssets('assets/excel/steedos_import_users_simple.xls', 'client');
+
+	api.addAssets('server/ejs/export_space_users.ejs', 'server');
+	api.addFiles('routes/api_space_users_export.coffee', 'server');
 });

@@ -46,6 +46,7 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 			dxOptions.showCheckBoxesMode = if sidebar_multiple then "normal" else "none"
 			dxOptions.onItemSelectionChanged = (selectionInfo)->
 				selectedKeys = selectionInfo.component.getSelectedNodesKeys()
+				Session.set "grid_sidebar_selected", selectedKeys
 				if selectedKeys and selectedKeys.length
 					sidebar_filter_key = "organizations"
 					if selectedKeys.length == 1
@@ -81,4 +82,5 @@ Template.creator_grid_sidebar_organizations.events
 Template.creator_grid_sidebar_organizations.onCreated ->
 
 Template.creator_grid_sidebar_organizations.onDestroyed ->
+	Session.set "grid_sidebar_selected", null
 	Session.set "grid_sidebar_filters", null
