@@ -58,7 +58,13 @@ Creator.importObject = (userId, space_id, object, list_views_id_maps) ->
 
 		if Creator.isAllView(list_view) || Creator.isRecentView(list_view)
 	# 创建object时，会自动添加all view、recent view
-			Creator.getCollection("object_listviews").update({object_name: object.name, name: list_view.name, space: space_id}, {$set: list_view})
+
+			options = {$set: list_view}
+
+			if !list_view.columns
+				options.$unset = {columns: ''}
+
+			Creator.getCollection("object_listviews").update({object_name: object.name, name: list_view.name, space: space_id}, options)
 		else
 			new_id = Creator.getCollection("object_listviews").insert(list_view)
 			list_views_id_maps[object.name + "_" + old_id] = new_id

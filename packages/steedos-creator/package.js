@@ -52,7 +52,6 @@ Package.onUse(function (api) {
 
 	api.use('es5-shim@4.6.15');
 	api.use('simple:json-routes@2.1.0');
-	api.use('steedos:fullcalendar@3.4.0_3');
 	api.use('steedos:autoform-filesize@0.0.1');
 	api.use('steedos:autoform-location@0.0.1');
 
@@ -88,6 +87,10 @@ Package.onUse(function (api) {
 	api.use('steedos:odata@0.0.3');
 	api.use('blaze-html-templates@1.1.2');
 	api.use('steedos:lightning-design-system@0.0.2');
+	api.use('universe:i18n');
+
+	api.addFiles('i18n/en.i18n.json');
+	api.addFiles('i18n/zh-CN.i18n.json');
 
 	api.addFiles('checkNpm.js', "server");
 
@@ -240,6 +243,9 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/view.coffee', 'client');
 	api.addFiles('client/views/view.less', 'client');
 	api.addFiles('client/views/app_home.html', 'client');
+	api.addFiles('client/views/grid_sidebar_organizations.html', 'client');
+	api.addFiles('client/views/grid_sidebar_organizations.coffee', 'client');
+	api.addFiles('client/views/grid_sidebar_organizations.less', 'client');
 
 	api.addFiles('client/views/filter_logic.html', 'client');
 	api.addFiles('client/views/filter_logic.coffee', 'client');

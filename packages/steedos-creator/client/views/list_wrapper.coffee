@@ -43,13 +43,9 @@ Template.creator_list_wrapper.helpers
 	recordsTotalCount: ()->
 		return Template.instance().recordsTotal.get()
 	
-	list_data_left: ()->
+	sidebar_data: ()->
 		object_name = Session.get "object_name"
-		sidebar = Creator.getObject(object_name)?.sidebar
-		if sidebar
-			return {object_name: sidebar.reference_to, is_sidebar: true, sidebar_multiple: sidebar.multiple}
-		else
-			return null
+		return Creator.getObject(object_name)?.sidebar
 	
 	list_data: ()->
 		object_name = Session.get "object_name"
@@ -161,6 +157,14 @@ Template.creator_list_wrapper.helpers
 		object = Creator.getObject(objectName)
 		return object.enable_tree
 
+transformFilters = (filters)->
+	_filters = []
+	_.each filters, (f)->
+		if _.isArray(f) && f.length == 3
+			_filters.push {field: f[0], operation: f[1], value: f[2]}
+		else
+			_filters.push f
+	return _filters
 
 Template.creator_list_wrapper.events
 
@@ -189,6 +193,23 @@ Template.creator_list_wrapper.events
 		$(".filter-list-container").addClass("slds-hide")
 	
 	'click .add-list-view': (event, template)->
+		$(".btn-add-list-view").click()
+
+	'click .copy-list-view': (event, template)->
+
+		current_list_view = _.clone(Creator.getListView(Session.get("object_name"), Session.get("list_view_id")))
+
+		delete current_list_view._id
+
+		delete current_list_view.name
+
+		delete current_list_view.label
+
+		if current_list_view.filters
+			current_list_view.filters = transformFilters(current_list_view.filters)
+
+		Session.set "cmDoc", current_list_view
+
 		$(".btn-add-list-view").click()
 
 	'click .reset-column-width': (event, template)->

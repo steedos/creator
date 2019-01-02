@@ -104,6 +104,11 @@
 												<span>{{_ "creator_list_export_list_view"}}</span>
 											</a>
 										</li>
+										<li class="slds-dropdown__item copy-list-view {{#if isTree}}hidden{{/if}}" role="presentation">
+											<a href="javascript:void(0);" title="{{_ "creator_list_copy_list_view"}}" class="" role="option" tabindex="-1">
+												<span>{{_ "creator_list_copy_list_view"}}</span>
+											</a>
+										</li>
 										{{#if is_custom_list_view}}
 											{{#if is_view_owner}}
 												<li class="slds-dropdown__item edit-list-view" role="presentation">
@@ -159,16 +164,16 @@
 				</div>
 				<div class="weui-flex" style="height: 100%;">
 					<div style="width: calc(100% - 30px);" class="slds-grid table-grid-content weui-flex__item">
-						<div class="slds-col slds-no-space {{#if list_data_left}}sidebar-open{{/if}}">
+						<div class="slds-col slds-no-space {{#if sidebar_data}}sidebar-open{{/if}}">
 						{{#if list_view_visible}}
 							{{#if isCalendarView}}
 								<div class="tale-content list-table-container td-cell-wrap">
 									{{> Template.dynamic template='creator_calendarNew' data=list_data}}
 								</div>
 							{{else}}
-								{{#if list_data_left}}
+								{{#if sidebar_data}}
 									<div class="slds-table tale-content list-table-container td-cell-wrap list-table-sidebar">
-										{{> Template.dynamic template=list_template data=list_data_left}}
+										{{> Template.dynamic template=sidebar_data.template_name}}
 									</div>
 								{{/if}}
 								<div class="slds-table tale-content list-table-container td-cell-wrap">

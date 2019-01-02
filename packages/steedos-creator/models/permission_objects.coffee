@@ -43,12 +43,12 @@ Creator.Objects.permission_objects =
 		modifyAllRecords:
 			type: "boolean"
 			label: "修改所有记录",
-		# viewCompanyRecords:
-		# 	type: "boolean"
-		# 	label: "查看本单位",
-		# modifyCompanyRecords:
-		# 	type: "boolean"
-		# 	label: "修改本单位",
+		viewCompanyRecords:
+			type: "boolean"
+			label: "查看本单位",
+		modifyCompanyRecords:
+			type: "boolean"
+			label: "修改本单位",
 		disabled_list_views:
 			type: "lookup"
 			label:'禁用列表视图'
@@ -128,7 +128,7 @@ Creator.Objects.permission_objects =
 	list_views:
 		all:
 			label:"全部"
-			columns: ["name", "permission_set_id", "object_name", "allowCreate", "allowDelete", "allowEdit", "allowRead", "modifyAllRecords", "viewAllRecords"]
+			columns: ["name", "permission_set_id", "object_name", "allowCreate", "allowDelete", "allowEdit", "allowRead", "modifyAllRecords", "viewAllRecords", "modifyCompanyRecords", "viewCompanyRecords"]
 			filter_scope: "space"
 
 	triggers:

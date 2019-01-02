@@ -27,11 +27,6 @@ Creator.Objects.flow_roles =
 			columns: ["name", "company_id"]
 			label: "所有"
 
-		company:
-			filter_scope: "company"
-			columns: ["name","company_id"]
-			label: "本单位"
-
 	permission_set:
 		user:
 			allowCreate: false
@@ -39,7 +34,7 @@ Creator.Objects.flow_roles =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -52,9 +47,11 @@ Creator.Objects.flow_roles =
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
-			modifyAllRecords: true
-			viewAllRecords: true
-			disabled_list_views: ['all']
+			modifyAllRecords: false
+			viewAllRecords: false
+			modifyCompanyRecords: true
+			viewCompanyRecords: true
+			disabled_list_views: []
 			disabled_actions: []
 			unreadable_fields: []
 			uneditable_fields: []

@@ -1,4 +1,6 @@
 {
+	"_namespace": "",
+
 	"accounts_phone_already_existed": "该手机号已被其他用户注册",
 	"accounts_phone_invalid": "手机号无效",
 	"accounts_phone_code_invalid": "验证码无效",

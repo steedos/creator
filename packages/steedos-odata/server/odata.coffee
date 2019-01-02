@@ -135,6 +135,10 @@ Meteor.startup ->
 				return $1.replace('tolower(', '').replace(')', '')
 			queryParams.$filter = queryParams.$filter.replace(/tolower\(([^\)]+)\)/g, removeMethod)
 
+	isSameCompany = (spaceId, userId, companyId)->
+		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1 } })
+		return su.company_id == companyId
+
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
 			try
@@ -152,11 +156,13 @@ Meteor.startup ->
 						statusCode: 404
 						body:setErrorMessage(404,collection,key)
 					}
+
+				removeInvalidMethod(@queryParams)
+				qs = decodeURIComponent(querystring.stringify(@queryParams))
+				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
-				if permissions.viewAllRecords or (permissions.allowRead and @userId)
-					removeInvalidMethod(@queryParams)
-					qs = decodeURIComponent(querystring.stringify(@queryParams))
-					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
+				if permissions.viewAllRecords or (permissions.allowRead and @userId) or (permissions.viewCompanyRecords && isSameCompany(spaceId, @userId, createQuery.query.company_id))
+
 					if key is 'cfs.files.filerecord'
 						createQuery.query['metadata.space'] = spaceId
 					else if key is 'spaces'
@@ -216,7 +222,7 @@ Meteor.startup ->
 							if field.indexOf('$')<0
 								#if fields[field]?.multiple!= true
 								createQuery.projection[field] = 1
-					if not permissions.viewAllRecords
+					if not permissions.viewAllRecords && !permissions.viewCompanyRecords
 						if object.enable_share
 							# 满足共享规则中的记录也要搜索出来
 							delete createQuery.query.owner
@@ -577,7 +583,7 @@ Meteor.startup ->
 						entity = collection.findOne(createQuery.query,visitorParser(createQuery))
 						entities = []
 						if entity
-							isAllowed = entity.owner == @userId or permissions.viewAllRecords
+							isAllowed = entity.owner == @userId or permissions.viewAllRecords or (permissions.viewCompanyRecords && isSameCompany(@urlParams.spaceId, @userId, entity.company_id))
 							if object.enable_share and !isAllowed
 								shares = []
 								orgs = Steedos.getUserOrganizations(@urlParams.spaceId, @userId, true)
@@ -646,7 +652,10 @@ Meteor.startup ->
 					record_owner = @urlParams._id
 				else
 					record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
-				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId )
+
+				companyId = collection.findOne({ _id: @urlParams._id }, { fields: { company_id: 1 } })?.company_id
+
+				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId ) or (permissions.modifyCompanyRecords && isSameCompany(spaceId, @userId, companyId))
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest' or spaceId is 'common' or key == "users"
@@ -719,8 +728,10 @@ Meteor.startup ->
 					}
 				spaceId = @urlParams.spaceId
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
-				record_owner = collection.findOne({_id: @urlParams._id})?.owner
-				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete)  or (permissions.allowDelete and record_owner==@userId )
+				recordData = collection.findOne({_id: @urlParams._id}, { fields: { owner: 1, company_id: 1 } })
+				record_owner = recordData?.owner
+				companyId = recordData?.company_id
+				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.allowDelete and record_owner==@userId ) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId))
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest'

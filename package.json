@@ -24,6 +24,7 @@
     "odata-v4-service-document": "0.0.3",
     "odata-v4-service-metadata": "^0.1.6",
     "querystring": "^0.2.0",
+    "sprintf-js": "^1.0.3",
     "weixin-pay": "^1.1.7",
     "xml2js": "^0.4.19"
   }
