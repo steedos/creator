@@ -105,7 +105,7 @@ Creator.Objects.space_users =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "organization", "position", "mobile", "email", "sort_no", "company_id", "username"]
+			columns: ["name", "position", "mobile", "email", "sort_no"]
 			filter_scope: "space"
 
 	permission_set:
