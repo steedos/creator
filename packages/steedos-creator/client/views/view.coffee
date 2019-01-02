@@ -135,7 +135,7 @@ Template.creator_view.helpers
 		record = Creator.getObjectRecord()
 #		return record[key]
 		key.split('.').reduce (o, x) ->
-				o[x]
+				o?[x]
 		, record
 
 	keyField: (key) ->

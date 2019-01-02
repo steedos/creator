@@ -72,7 +72,7 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields, space
 								reference_ids = parent[p_k].getProperty(s_k)
 							else
 								reference_ids = key.split('.').reduce (o, x) ->
-										o[x]
+										o?[x]
 								, parent
 
 							reference_to = reference_field.reference_to
