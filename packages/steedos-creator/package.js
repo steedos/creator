@@ -88,6 +88,7 @@ Package.onUse(function (api) {
 	api.use('blaze-html-templates@1.1.2');
 	api.use('steedos:lightning-design-system@0.0.2');
 	api.use('universe:i18n');
+	api.use('steedos:app-base');
 
 	api.addFiles('i18n/en.i18n.json');
 	api.addFiles('i18n/zh-CN.i18n.json');
@@ -120,8 +121,6 @@ Package.onUse(function (api) {
 	api.addFiles('models/cfs_avatars.coffee');
 
 	api.addFiles('models/reports.coffee');
-	api.addFiles('models/tasks.coffee');
-	api.addFiles('models/notes.coffee');
 	api.addFiles('models/queue_import.coffee');
 	api.addFiles('models/settings.coffee');
 	// api.addFiles('models/user_star.coffee');

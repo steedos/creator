@@ -5,4 +5,4 @@ Creator.Apps.sales =
 	icon: "ion-ios-people-outline" 
 	icon_slds: "account" 
 	is_creator:true
-	objects: ["accounts", "contacts", "contracts", "contract_receipts", "tasks", "notes", "reports"]
+	objects: ["accounts", "contacts", "contracts", "contract_receipts", "tasks", "events", "notes", "reports"]
