@@ -178,6 +178,7 @@ steedos:instance-record-queue
 # steedos:app-mailbase
 
 steedos:app-contract
+steedos:app-base
 
 
 # 正式发布时开启
