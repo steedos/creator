@@ -44,7 +44,7 @@ Package.onUse(function (api) {
 	api.use('momentjs:moment', 'client');
 	api.use('mrt:moment-timezone', 'client');
 
-	api.use('tap:i18n', ['client', 'server']);
+	api.use('universe:i18n');
 
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);

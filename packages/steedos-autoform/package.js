@@ -37,9 +37,10 @@ Package.onUse(function(api) {
 	api.use('simple:json-routes@2.1.0');
 
 	api.use('steedos:jstree@3.3.2')
+	api.use('universe:i18n');
+
 	api.use('steedos:base@0.0.66');
 	api.use('rubaxa:sortable@1.3.0');
-	api.use('tap:i18n', ['client', 'server']);
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 

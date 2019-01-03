@@ -13,7 +13,7 @@ Package.onUse(function(api) {
 	api.use('blaze@2.1.9');
 	api.use('templating@1.2.15');
 
-	api.use('tap:i18n@1.8.2');
+	api.use('universe:i18n');
 	
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles);

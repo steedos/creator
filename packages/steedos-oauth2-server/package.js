@@ -33,6 +33,7 @@ Package.onUse(function(api) {
 	api.use('http');
 
 	api.use('steedos:base@0.0.72');
+	api.use('universe:i18n');
 	// api.addFiles('lib/random.coffee', ['client', 'server']);
 
 	api.addFiles('lib/common.js', ['client', 'server']);
