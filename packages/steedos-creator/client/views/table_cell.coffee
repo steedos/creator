@@ -191,7 +191,7 @@ Template.creator_table_cell.helpers
 									val = selectedOptions.getProperty("label").join(',')
 									data.push {value: val}
 						else
-							values = Creator.Collections[reference_to].find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
+							values = Creator.getCollection(reference_to).find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
 							values = Creator.getOrderlySetByIds(values, val)
 							values.forEach (v)->
 								href = Creator.getObjectUrl(reference_to, v._id)

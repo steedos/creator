@@ -12,11 +12,11 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields, space
 	if spaceId
 		_object_name = Creator.getObjectName(_object)
 
-	_table = Tabular.tablesByName[tableName];
+	object_colleciton = Creator.getCollection(_object_name)
 
-	_fields = Creator.objectsByName[_object_name]?.fields
 
-	if !_fields || !_table
+	_fields = _object?.fields
+	if !_fields || !object_colleciton
 		return this.ready()
 
 	reference_fields = _.filter _fields, (f)->
@@ -35,7 +35,7 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields, space
 					unless /\w+(\.\$){1}\w?/.test(f)
 						field_keys[f] = 1
 				
-				return _table.collection.find({_id: {$in: ids}}, {fields: field_keys});
+				return object_colleciton.find({_id: {$in: ids}}, {fields: field_keys});
 		}
 
 		data.children = []
@@ -114,6 +114,6 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields, space
 		return {
 			find: ()->
 				self.unblock();
-				return _table.collection.find({_id: {$in: ids}}, {fields: fields})
+				return object_colleciton.find({_id: {$in: ids}}, {fields: fields})
 		};
 
