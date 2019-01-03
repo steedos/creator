@@ -11,6 +11,7 @@ Creator.Objects.cms_files =
 			type: "text"
 			searchable:true
 			index:true
+			is_wide: true
 		description:
 			label: "描述"
 			type: "textarea"
@@ -29,8 +30,9 @@ Creator.Objects.cms_files =
 			collection: "files"
 			multiple: true
 			omit: true
+			hidden: true
 		parent:
-			label: "起始版本"
+			label: "所属记录"
 			type: "lookup"
 			omit: true
 			reference_to: ()->
