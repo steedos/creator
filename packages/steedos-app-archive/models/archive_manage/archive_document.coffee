@@ -62,6 +62,22 @@ Creator.Objects.archive_document =
 			filter_scope: "space"
 			columns:["name","flow_name","submitter","submit_date","archive_date"]
 	
+	permission_set:
+		user:
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: true
+		admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: true
+			viewAllRecords: true 
+
 	actions:
 		standard_view:
 			label: "查看表单"

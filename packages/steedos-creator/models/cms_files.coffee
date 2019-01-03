@@ -48,9 +48,9 @@ Creator.Objects.cms_files =
 
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
