@@ -11,7 +11,6 @@ Creator.Objects.archive_document =
 			type: "lookup"
 			label: "流程分类"
 			reference_to: "archive_classification"
-			hidden: true
 		name:
 			type: "text"
 			label: "标题"
