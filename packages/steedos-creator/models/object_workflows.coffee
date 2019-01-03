@@ -28,6 +28,7 @@ Creator.Objects.object_workflows =
 		field_map:
 			label: "字段映射关系"
 			type: "grid"
+			is_wide: true
 			depend_on: ["object_name", "flow_id"]
 
 		"field_map.$.object_field":
@@ -56,7 +57,6 @@ Creator.Objects.object_workflows =
 						{value:"finish_date",label:"结束时间"},
 						{value:"final_decision",label:"最终意见"}
 					]
-				console.log('表单字段 --> values', values)
 				form_fields = []
 				if values?.flow_id
 					res_flow = Creator.odata.get("flows",values.flow_id,"form")
