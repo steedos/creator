@@ -21,15 +21,19 @@ Creator.odata = {}
 # 					toastr?.error?(error)
 # 	else
 # 		toastr.error("未找到记录")
-Creator.odata.get = (object_name, record_id,field_name, callback)->
+Creator.odata.get = (object_name, record_id, select_fields, callback)->
 	result = null
 	isAsync = if typeof callback == "function" then true else false
 	if object_name and record_id
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
+		request_data = {}
+		if select_fields
+			request_data = 
+				"$select": select_fields
 		$.ajax
 			type: "get"
 			url: url
-			data:{'$select':field_name}
+			data: request_data
 			dataType: "json"
 			contentType: "application/json"
 			async: isAsync
