@@ -71,6 +71,7 @@ Creator.Objects.cms_files =
 		download:
 			label: "下载"
 			visible: (object_name, record_id, record_permissions) ->
+				# 只在cms_files详细界面显示按钮，不在列表上显示
 				return Session.get("object_name") == "cms_files"
 			on: "record"
 			todo: (object_name, record_id, fields)->
@@ -89,10 +90,11 @@ Creator.Objects.cms_files =
 		new_version:
 			label: "上传新版本"
 			visible: (object_name, record_id, record_permissions) ->
+				# 只在cms_files详细界面显示按钮，不在列表上显示
 				return Session.get("object_name") == "cms_files"
 			is_file: true
 			on: "record"
 			todo: (object_name, record_id, fields)->
-		
+				# 功能代码在文件详细界面，这里只是把按钮显示出来
 		standard_delete:
 			label: "删除"
