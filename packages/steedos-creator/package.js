@@ -97,7 +97,6 @@ Package.onUse(function (api) {
 
 	api.addFiles('core.coffee');
 
-	api.addFiles('lib/actions.coffee');
 
 	api.addFiles('lib/apps.coffee');
 	api.addFiles('lib/user_object_view.coffee', 'server');

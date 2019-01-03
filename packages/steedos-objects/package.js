@@ -41,6 +41,7 @@ Package.onUse(function(api) {
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
+	api.addFiles('client/odata.coffee', 'client');
 	api.addFiles('client/helpers.coffee', 'client');
 	api.addFiles('client/steedos_icon.html','client');
 	api.addFiles('client/steedos_icon.coffee','client');
@@ -63,6 +64,7 @@ Package.onUse(function(api) {
 	api.addFiles('lib/triggers.coffee');
 	api.addFiles('lib/permission_sets.coffee');
 	api.addFiles('lib/collections.coffee');
+	api.addFiles('lib/actions.coffee');
 	api.addFiles('lib/resources.coffee',  "client");
 
 
