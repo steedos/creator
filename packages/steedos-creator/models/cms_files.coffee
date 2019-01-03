@@ -14,6 +14,7 @@ Creator.Objects.cms_files =
 		description:
 			label: "描述"
 			type: "textarea"
+			is_wide: true
 		extention:
 			label: "文件后缀"
 			type: "text"
@@ -67,5 +68,31 @@ Creator.Objects.cms_files =
 				collection.remove {"metadata.parent": doc._id}
 
 	actions:
+		download:
+			label: "下载"
+			visible: (object_name, record_id, record_permissions) ->
+				return Session.get("object_name") == "cms_files"
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				file = Creator.getObjectRecord(object_name,record_id)
+				fileId = file?.versions?[0]
+				if fileId
+					if Meteor.isCordova
+						url = Steedos.absoluteUrl("/api/files/files/#{fileId}")
+						filename = file.name
+						rev = fileId
+						length = file.size
+						Steedos.cordovaDownload(url, filename, rev, length)
+					else
+						window.location = Steedos.absoluteUrl("/api/files/files/#{fileId}?download=true")
+		
+		new_version:
+			label: "上传新版本"
+			visible: (object_name, record_id, record_permissions) ->
+				return Session.get("object_name") == "cms_files"
+			is_file: true
+			on: "record"
+			todo: (object_name, record_id, fields)->
+		
 		standard_delete:
 			label: "删除"
