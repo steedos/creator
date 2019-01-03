@@ -54,6 +54,10 @@ Template.standard_query_modal.helpers
 					{label: "否", value: "false"}
 				]
 
+			if ["code", "textarea"].includes(object_fields[field].type)
+				schema[field].autoform = {}
+				schema[field].autoform.type = "text"
+
 			if schema[field].autoform
 				schema[field].autoform.readonly = false
 				schema[field].autoform.disabled = false
