@@ -38,13 +38,17 @@ Creator.bootstrap = (spaceId, callback)->
 				_.extend object.list_views, object_listviews[object_name]
 				Creator.loadObjects object, object_name
 
-			Creator.Apps = result.apps
-
-			_.each Creator.Apps, (app, key) ->
+			_.each result.apps, (app, key) ->
 				if !app._id
 					app._id = key
 				unless app.is_creator
 					app.visible = false
+			
+			sortedApps = _.sortBy _.values(result.apps), 'sort'
+			# 按钮sort排序次序设置Creator.Apps值
+			Creator.Apps = {}
+			_.each sortedApps, (n) ->
+				Creator.Apps[n._id] = n
 
 			apps = result.assigned_apps
 			if apps.length
