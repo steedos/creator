@@ -81,7 +81,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, value.itemData.record, ()->
 					self.dxDataGridInstance.refresh()
 			else
-				Creator.executeAction objectName, action, recordId, value.itemElement, value.itemData.record
+				Creator.executeAction objectName, action, recordId, value.itemElement
 	unless actions.length
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"

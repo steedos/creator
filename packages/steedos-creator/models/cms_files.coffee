@@ -70,14 +70,14 @@ Creator.Objects.cms_files =
 				collection.remove {"metadata.parent": doc._id}
 
 	actions:
+		standard_delete:
+			label: "删除"
 		download:
 			label: "下载"
-			visible: (object_name, record_id, record_permissions) ->
-				# 只在cms_files详细界面显示按钮，不在列表上显示
-				return Session.get("object_name") == "cms_files"
+			visible: true
 			on: "record"
-			todo: (object_name, record_id, fields)->
-				file = Creator.getObjectRecord(object_name,record_id)
+			todo: (object_name, record_id)->
+				file = this.record
 				fileId = file?.versions?[0]
 				if fileId
 					if Meteor.isCordova
@@ -96,7 +96,5 @@ Creator.Objects.cms_files =
 				return Session.get("object_name") == "cms_files"
 			is_file: true
 			on: "record"
-			todo: (object_name, record_id, fields)->
+			todo: (object_name, record_id)->
 				# 功能代码在文件详细界面，这里只是把按钮显示出来
-		standard_delete:
-			label: "删除"
