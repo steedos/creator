@@ -14,7 +14,7 @@ if Meteor.isClient
 				todo = Creator.actionsByName[action.todo]
 			else if typeof action.todo == "function"
 				todo = action.todo	
-			if !record
+			if !record && object_name && record_id
 				record = Creator.odata.get(object_name, record_id)
 			if todo
 				# item_element为空时应该设置默认值（对象的name字段），否则moreArgs拿到的后续参数位置就不对
