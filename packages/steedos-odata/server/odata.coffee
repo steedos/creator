@@ -10,7 +10,7 @@ Meteor.startup ->
 		error['message'] = e.message
 		statusCode = 500
 		if e.error and _.isNumber(e.error)
-			statusCode = e.error 
+			statusCode = e.error
 		error['code'] = statusCode
 		error['error'] = statusCode
 		error['details'] = e.details
@@ -550,7 +550,7 @@ Meteor.startup ->
 							createQuery.projection = projection
 						if not createQuery.projection or !_.size(createQuery.projection)
 							readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
-							fields = Creator.getObject(key).fields
+							fields = Creator.getObject(key, @urlParams.spaceId).fields
 							_.each readable_fields,(field)->
 								if field.indexOf('$')<0
 									createQuery.projection[field] = 1
