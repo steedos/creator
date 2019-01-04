@@ -18,17 +18,16 @@ Creator.Objects["cfs.files.filerecord"] =
 		"original.size":
 			label:"文件大小"
 			type: "number"
-		"original.type":
-			label:"文件类型"
-			type: "text"
 		metadata:
 			label:"文件属性"
 			type: "object"
 			blackbox: true
 			omit: true
-		"metadata.owner_name":
+		"metadata.owner":
 			label:"上传者"
-			type: "text"
+			type: "lookup"
+			reference_to: "users"
+			omit: true
 		"metadata.parent":
 			label:"所属文件"
 			type: "master_detail"
@@ -36,6 +35,10 @@ Creator.Objects["cfs.files.filerecord"] =
 		uploadedAt: 
 			label:"上传时间"
 			type: "datetime"
+		created_by:
+			hidden: true
+		modified_by:
+			hidden: true
 
 	list_views:
 		all:
