@@ -97,6 +97,28 @@ Creator.Objects.organizations =
 				{"field_name":"name", "order":"asc"}
 			]
 
+	actions: 
+		addSubOrganization:
+			label: "添加子部门"
+			visible: ()->
+				permissions = Creator.getPermissions()
+				if permissions
+					return permissions["allowCreate"]
+			on: "record"
+			todo: (object_name, record_id)->
+				if record_id
+					if Steedos.isMobile()
+						record = Creator.getObjectRecord(object_name, record_id)
+						Session.set 'cmDoc', {parent: record._id}
+						Session.set 'reload_dxlist', false
+						Meteor.defer ()->
+							$(".btn.creator-add").click()
+					else
+						if this.record
+							Session.set 'cmDoc', {parent: this.record._id}
+							Meteor.defer ()->
+								$(".btn.creator-add").click()
+
 	permission_set:
 		user:
 			allowCreate: false
