@@ -11,35 +11,38 @@ Creator.Objects["cfs.files.filerecord"] =
 			type: "object"
 			blackbox: true
 			omit: true
-			hidden: true
-		"original.$.name":
+		"original.name":
 			label:"名称"
 			type: "text"
-		"original.$.size":
+			is_name:true
+		"original.size":
 			label:"文件大小"
+			type: "number"
+		"original.type":
+			label:"文件类型"
 			type: "text"
 		metadata:
 			label:"文件属性"
 			type: "object"
 			blackbox: true
 			omit: true
-			hidden: true
-		"metadata.$.owner_name":
+		"metadata.owner_name":
 			label:"上传者"
 			type: "text"
-		uploadedAt: 
-			label:"上传时间"
-			type: "datetime"
-		"metadata.$.parent":
+		"metadata.parent":
 			label:"所属文件"
 			type: "master_detail"
 			reference_to: "cms_files"
-
+		uploadedAt: 
+			label:"上传时间"
+			type: "datetime"
 
 	list_views:
 		all:
 			filter_scope: "space"
-			columns: ["original.$.name","original.$.size","metadata.$.owner_name","uploadedAt"]
+			# columns: ["original.name","original.size","metadata.owner_name","uploadedAt"]
+			columns: ["uploadedAt"]
+	
 	permission_set:
 		user:
 			allowCreate: false
