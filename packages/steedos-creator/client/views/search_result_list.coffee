@@ -229,18 +229,17 @@ Template.search_result_list.events
 
 		objectName = this.object_name
 		collection_name = Creator.getObject(objectName).label
-
-		Meteor.call "object_record", Session.get("spaceId"), objectName, this._id, (error, result)->
-			if result
-				Session.set 'cmDoc', result
-				Session.set("action_fields", field)
-				Session.set("action_collection", "Creator.Collections.#{objectName}")
-				Session.set("action_collection_name", collection_name)
-				Session.set("action_save_and_insert", false)
-				Session.set 'cmIsMultipleUpdate', true
-				Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
-				Meteor.defer ()->
-					$(".btn.creator-cell-edit").click()
+		record = Creator.odata.get(objectName, this._id)
+		if record
+			Session.set 'cmDoc', record
+			Session.set("action_fields", field)
+			Session.set("action_collection", "Creator.Collections.#{objectName}")
+			Session.set("action_collection_name", collection_name)
+			Session.set("action_save_and_insert", false)
+			Session.set 'cmIsMultipleUpdate', true
+			Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
+			Meteor.defer ()->
+				$(".btn.creator-cell-edit").click()
 	
 	"click .btn-more-records": (event, template) ->
 		object_name = Template.instance().data.object_name

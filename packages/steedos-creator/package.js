@@ -131,7 +131,6 @@ Package.onUse(function (api) {
 	api.addFiles('server/methods/object_listviews_options.coffee', 'server');
 	api.addFiles('server/methods/report_data.coffee', 'server');
 	api.addFiles('server/methods/user_tabular_settings.coffee', 'server');
-	api.addFiles('server/methods/object_record.coffee', 'server');
 	api.addFiles('server/methods/object_export2xml.coffee', 'server');
 	api.addFiles('server/methods/object_import_jobs.coffee', 'server');
 	api.addFiles('server/methods/related_objects_records.coffee', 'server');

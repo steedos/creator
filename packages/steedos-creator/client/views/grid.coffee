@@ -625,20 +625,18 @@ Template.creator_grid.events
 
 		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else (template.data?.object_name || Session.get("object_name"))
 		collection_name = Creator.getObject(objectName).label
-		# rowData = this.doc
-
-		Meteor.call "object_record", Session.get("spaceId"), objectName, this._id, (error, result)->
-			if result
-				Session.set("cmFullScreen", full_screen)
-				Session.set 'cmDoc', result
-				Session.set("action_fields", field)
-				Session.set("action_collection", "Creator.Collections.#{objectName}")
-				Session.set("action_collection_name", collection_name)
-				Session.set("action_save_and_insert", false)
-				Session.set 'cmIsMultipleUpdate', true
-				Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
-				Meteor.defer ()->
-					$(".btn.creator-cell-edit").click()
+		record = Creator.odata.get(objectName, this._id)
+		if record
+			Session.set("cmFullScreen", full_screen)
+			Session.set 'cmDoc', record
+			Session.set("action_fields", field)
+			Session.set("action_collection", "Creator.Collections.#{objectName}")
+			Session.set("action_collection_name", collection_name)
+			Session.set("action_save_and_insert", false)
+			Session.set 'cmIsMultipleUpdate', true
+			Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
+			Meteor.defer ()->
+				$(".btn.creator-cell-edit").click()
 
 		return false
 	
