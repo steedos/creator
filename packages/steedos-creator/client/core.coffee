@@ -21,20 +21,6 @@ Creator.createObject = (object_name,object_data)->
 	Meteor.defer ->
 		$(".creator-add").click()
 
-Creator.editObject = (object_name,record_id)->
-	object = Creator.getObject(object_name)
-	collection_name = "Creator.Collections."+object_name
-	Session.set("action_collection",collection_name)
-	Session.set("action_save_and_insert",false)
-	Session.set("action_collection_name",object.label)
-	Session.set('action_object_name',object_name)
-	Session.set("action_record_id",record_id)
-	Session.set("action_fields",undefined)
-	Meteor.call "object_record", Session.get("spaceId"), object_name, record_id, (error, result)->
-		if result
-			Session.set 'cmDoc', result
-			$(".btn.creator-edit").click()
-
 if Meteor.isClient
 	# 定义全局变量以Session.get("object_name")为key记录其选中的记录id集合
 	Creator.TabularSelectedIds = {}
