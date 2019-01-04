@@ -52,11 +52,10 @@ if Meteor.isClient
 				else
 					Session.set 'action_object_name', object_name
 					Session.set 'action_record_id', record_id
-					Meteor.call "object_record", Session.get("spaceId"), object_name, record_id, (error, result)->
-						if result
-							Session.set 'cmDoc', result
-							Meteor.defer ()->
-								$(".btn.creator-edit").click()
+					if this.record
+						Session.set 'cmDoc', this.record
+						Meteor.defer ()->
+							$(".btn.creator-edit").click()
 
 		"standard_delete": (object_name, record_id, record_title, list_view_id, call_back)->
 			console.log("standard_delete", object_name, record_id, record_title, list_view_id)
