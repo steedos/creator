@@ -17,6 +17,7 @@ Creator.Objects.contracts =
 	enable_instances: true
 	enable_api: true
 	enable_tree: false
+	enable_chatter: true
 	fields:
 		# 新增字段：所属单位，类似子管理员作分级权限。
 		# 待处理：comapany拆分、分级权限。

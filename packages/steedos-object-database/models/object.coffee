@@ -45,6 +45,8 @@ Creator.Objects.objects =
 			defaultValue: false
 		enable_instances:
 			type: "boolean"
+		enable_chatter:
+			type: "boolean"
 		is_view:
 			type: 'boolean'
 			defaultValue: false

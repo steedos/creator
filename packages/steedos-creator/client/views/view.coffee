@@ -315,6 +315,9 @@ Template.creator_view.helpers
 		related_object_name = obj.object_name
 		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
 
+	enable_chatter: ()->
+		return Creator.getObject(Session.get("object_name"))?.enable_chatter
+
 Template.creator_view.events
 
 	'click .record-action-custom': (event, template) ->

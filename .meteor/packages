@@ -171,7 +171,7 @@ steedos:creator
 steedos:instance-record-queue
 # steedos:instances-statistics
 # steedos:love
-# steedos:app-chat
+steedos:app-chat
 
 # steedos:app-tableau
 # steedos:app-portal

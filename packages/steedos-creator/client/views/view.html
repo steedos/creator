@@ -181,8 +181,8 @@
 				</div>
 
 				<div class="row row-main">
-					<div class="column region-main">
-					
+					{{#if related_list}}
+					<div class="column {{#if enable_chatter}}region-main{{/if}}">
 						<div id="creator-tabular" class="">
 							{{#each related_list}}
 								<div class="slds-card slds-card_boundary forceRelatedListCardDesktop related-object-tabular">
@@ -223,9 +223,14 @@
 							{{/each}}
 						</div>
 					</div>
-					<div class="column region-sidebar-right">
-
+					{{/if}}
+					{{#if enable_chatter}}
+					<div class="column {{#if related_list}}region-sidebar-right{{/if}}">
+						<div class="slds-card slds-card_boundary forceRelatedListCardDesktop">
+							{{> steedos_record_chat object_name=object_name record_id=record._id}}
+						</div>
 					</div>
+					{{/if}}
 				</div>
 			</div>
 		</div>
