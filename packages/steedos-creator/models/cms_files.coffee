@@ -91,9 +91,8 @@ Creator.Objects.cms_files =
 		
 		new_version:
 			label: "上传新版本"
-			visible: (object_name, record_id, record_permissions) ->
-				# 只在cms_files详细界面显示按钮，不在列表上显示
-				return Session.get("object_name") == "cms_files"
+			visible: true
+			only_detail: true
 			is_file: true
 			on: "record"
 			todo: (object_name, record_id)->
