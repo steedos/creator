@@ -42,8 +42,8 @@
       wideAreaAttr: 'data-widearea',
       exitOnEsc: true,
       defaultColorScheme: 'light',
-      closeIconLabel: 'Close WideArea',
-      changeThemeIconLabel: 'Toggle Color Scheme',
+      closeIconLabel: '返回',
+      changeThemeIconLabel: '切换背景',
       fullScreenIconLabel: '全屏模式',
       autoSaveKeyPrefix: 'WDATA-'
     };
