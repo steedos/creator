@@ -69,7 +69,7 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 	check instance_from_client["record_ids"], [{o: String, ids: [String]}]
 
 	# 校验是否record已经发起的申请还在审批中
-	uuflowManager.checkIsInApproval(instance_from_client["record_ids"][0])
+	uuflowManager.checkIsInApproval(instance_from_client["record_ids"][0], instance_from_client["space"])
 
 	space_id = instance_from_client["space"]
 	flow_id = instance_from_client["flow"]
@@ -163,7 +163,7 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 	appr_obj.is_read = true
 	appr_obj.is_error = false
 	appr_obj.description = ''
-	appr_obj.values = uuflowManager.initiateValues(ins_obj.record_ids[0], flow_id)
+	appr_obj.values = uuflowManager.initiateValues(ins_obj.record_ids[0], flow_id, space_id)
 
 	trace_obj.approves = [appr_obj]
 	ins_obj.traces = [trace_obj]
@@ -186,17 +186,17 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 
 	uuflowManager.initiateAttach(ins_obj.record_ids[0], space_id, ins_obj._id, appr_obj._id)
 
-	uuflowManager.initiateRecordInstanceInfo(ins_obj.record_ids[0], new_ins_id)
+	uuflowManager.initiateRecordInstanceInfo(ins_obj.record_ids[0], new_ins_id, space_id)
 
 	return new_ins_id
 
-uuflowManager.initiateValues = (recordIds, flowId) ->
+uuflowManager.initiateValues = (recordIds, flowId, spaceId) ->
 	values = {}
 	ow = Creator.Collections.object_workflows.findOne({
 		object_name: recordIds.o,
 		flow_id: flowId
 	})
-	record = Creator.getCollection(recordIds.o).findOne(recordIds.ids[0])
+	record = Creator.getCollection(recordIds.o, spaceId).findOne(recordIds.ids[0])
 	if ow and record
 		tableFieldCodes = []
 		tableFieldMap = []
@@ -212,6 +212,20 @@ uuflowManager.initiateValues = (recordIds, flowId) ->
 						object_table_field_code: oTableCode
 					}))
 					tableFieldMap.push(fm)
+
+			# 处理lookup类型字段
+			else if fm.object_field.indexOf('.') > 0 and fm.object_field.indexOf('.$.') == -1
+				objectFieldName = fm.object_field.split('.')[0]
+				lookupFieldName = fm.object_field.split('.')[1]
+				object = Creator.getObject(recordIds.o, spaceId)
+				if object
+					objectField = object.fields[objectFieldName]
+					if objectField.type == "lookup" && !objectField.multiple
+						fieldsObj = {}
+						fieldsObj[lookupFieldName] = 1
+						lookupObject = Creator.getCollection(objectField.reference_to, spaceId).findOne(record[objectFieldName], { fields: fieldsObj })
+						if lookupObject
+							values[fm.workflow_field] = lookupObject[lookupFieldName]
 
 			else if record.hasOwnProperty(fm.object_field)
 				values[fm.workflow_field] = record[fm.object_field]
@@ -266,8 +280,8 @@ uuflowManager.initiateAttach = (recordIds, spaceId, insId, approveId) ->
 
 	return
 
-uuflowManager.initiateRecordInstanceInfo = (recordIds, insId) ->
-	Creator.getCollection(recordIds.o).update(recordIds.ids[0], {
+uuflowManager.initiateRecordInstanceInfo = (recordIds, insId, spaceId) ->
+	Creator.getCollection(recordIds.o, spaceId).update(recordIds.ids[0], {
 		$push: {
 			instances: {
 				$each: [{
@@ -281,8 +295,8 @@ uuflowManager.initiateRecordInstanceInfo = (recordIds, insId) ->
 
 	return
 
-uuflowManager.checkIsInApproval = (recordIds) ->
-	record = Creator.getCollection(recordIds.o).findOne({
+uuflowManager.checkIsInApproval = (recordIds, spaceId) ->
+	record = Creator.getCollection(recordIds.o, spaceId).findOne({
 		_id: recordIds.ids[0], instances: { $exists: true }
 	}, { fields: { instances: 1 } })
 
