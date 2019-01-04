@@ -17,25 +17,25 @@ Template.account_background.helpers
 	bgBodys: ->
 		bgs = [{
 			name: "flower",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/flower.jpg")
+			url: "/packages/steedos_theme/client/background/flower.jpg"
 		}, {
 			name: "beach",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/beach.jpg")
+			url: "/packages/steedos_theme/client/background/beach.jpg"
 		}, {
 			name: "birds",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/birds.jpg")
+			url: "/packages/steedos_theme/client/background/birds.jpg"
 		}, {
 			name: "books",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/books.jpg")
+			url: "/packages/steedos_theme/client/background/books.jpg"
 		}, {
 			name: "cloud",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/cloud.jpg")
+			url: "/packages/steedos_theme/client/background/cloud.jpg"
 		}, {
 			name: "sea",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/sea.jpg")
+			url: "/packages/steedos_theme/client/background/sea.jpg"
 		}, {
 			name: "fish",
-			url: Steedos.absoluteUrl("/packages/steedos_theme/client/background/fish.jpg")
+			url: "/packages/steedos_theme/client/background/fish.jpg"
 		}]
 
 		background = Meteor.settings?.public?.admin?.background
@@ -45,6 +45,10 @@ Template.account_background.helpers
 				url: background
 
 		return bgs
+
+	absoluteUrl: (url)->
+		return Steedos.absoluteUrl url
+
 
 Template.account_background.events
 
