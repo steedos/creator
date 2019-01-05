@@ -56,5 +56,5 @@ Template.steedos_record_chat.events
 
 	'click a': (e, t)->
 		e.preventDefault()
-		if e.target?.href
+		if e.target?.href && e.target.href != 'javascript:void(0);'
 			Steedos.openWindow(e.target.href)
