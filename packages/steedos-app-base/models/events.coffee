@@ -66,16 +66,11 @@ Creator.Objects.events =
 			is_wide: true
 
 	list_views:
-		all:
-			label: "全部"
-			filter_scope: "space"
-			columns: ["name", "start", "end", "assignees", "related_to"]
-
-		calendar_view: {
+		calendar_view:
 			type: 'calendar',
 			label: '日历视图',
 			filter_scope: "space",
-			options: {
+			options:
 				startDateExpr: 'start',
 				endDateExpr: 'end',
 				textExpr: 'name',
@@ -104,8 +99,12 @@ Creator.Objects.events =
 #						color: "rgb(118, 118, 118)"
 #					}]
 #				}]
-			}
-		}
+
+
+		all:
+			label: "全部"
+			filter_scope: "space"
+			columns: ["name", "start", "end", "assignees", "related_to"]
 
 
 	permission_set:
