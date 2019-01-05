@@ -22,9 +22,10 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/record_chat_input.html','client');
 	api.addFiles('client/record_chat_input.coffee','client');
+	api.addFiles('client/record_chat_messages.html','client');
+	api.addFiles('client/record_chat_messages.coffee','client');
 	api.addFiles('client/record_chat.html','client');
 	api.addFiles('client/record_chat.coffee','client');
-	api.addFiles('client/subcribe.coffee','client');
 	api.addFiles('client/record_chat.less','client');
 
 	api.addFiles('lib/chat_messages.coffee','client');
