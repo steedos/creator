@@ -14,7 +14,6 @@ Creator.Objects["cfs.files.filerecord"] =
 		"original.name":
 			label:"名称"
 			type: "text"
-			is_name:true
 		"original.size":
 			label:"文件大小"
 			type: "number"
