@@ -9,7 +9,7 @@ Creator.Apps.admin =
 		"objects", "permission_set"]
 
 	# Menu 支持两种类型的参数
-	# - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
+	# - template_name 指向 Meteor Template, url=/app/admin/page/{template_name}/
 	# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/	
 	admin_menus: [
 		{ _id: 'account', name: '我的账户', permission_sets: ["user"], expanded: false },

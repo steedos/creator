@@ -37,7 +37,7 @@ Template.creatorSidebar.onRendered ->
 		selectNodesRecursive: false
 		# selectByClick: true
 		onItemClick: (e) ->
-			# - template_name 指向 Meteor Template, url=/app/admin/_template/{template_name}/
+			# - template_name 指向 Meteor Template, url=/app/admin/page/{template_name}/
 			# - object_name 指向对象, url=/app/admin/{object_name}/grid/all/
 			object_name = e.itemData?.object_name
 			template_name = e.itemData?.template_name
@@ -50,4 +50,4 @@ Template.creatorSidebar.onRendered ->
 				else
 					FlowRouter.go("/app/admin/#{object_name}/grid/all")
 			else if template_name
-				FlowRouter.go("/app/admin/_template/#{template_name}")
+				FlowRouter.go("/app/admin/page/#{template_name}")
