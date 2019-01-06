@@ -140,6 +140,7 @@ steedos:app-chat@0.0.1
 steedos:app-contract@0.0.1
 steedos:app-crm@0.0.1
 steedos:app-meeting@0.0.1
+steedos:app-projects@0.0.1
 steedos:app-workflow@0.0.5
 steedos:application-package@0.0.1
 steedos:application-template@0.0.1

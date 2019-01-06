@@ -59,10 +59,10 @@ Creator.Objects.tasks =
 			type: "textarea"
 			is_wide: true
 
-		tags:
-			label: "标签"
-			type: "text"
-			multiple: true
+		# tags:
+		# 	label: "标签"
+		# 	type: "text"
+		# 	multiple: true
 
 		# is_closed:
 		# 	label: "已完成"

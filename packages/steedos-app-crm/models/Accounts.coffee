@@ -8,7 +8,7 @@ Creator.Objects.accounts =
 	enable_notes: false
 	enable_api: true
 	enable_share: true
-	enable_chatter: true
+	enable_chatter: false
 	fields:
 		owner:
 			label: "所有人"

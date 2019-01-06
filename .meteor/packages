@@ -164,6 +164,7 @@ steedos:app-admin
 # steedos:app-example
 # steedos:cms
 steedos:app-meeting
+steedos:app-projects
 
 
 steedos:creator
