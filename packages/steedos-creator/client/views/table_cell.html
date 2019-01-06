@@ -10,6 +10,8 @@
 					{{/each}}
 				{{else if isImage}}
 					<img class="creator-table-cell-image" src="{{baseUrl}}/{{value}}"/>
+				{{else if isType "textarea"}}
+					<pre class="">{{{value}}}&nbsp;</pre>
 				{{else}}
 					{{#if href}}
 						{{#if openWindow}}
