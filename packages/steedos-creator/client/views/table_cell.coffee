@@ -222,6 +222,9 @@ Template.creator_table_cell.helpers
 				val = ''
 			data.push {value: val, id: this._id}
 		else if _field.type == "textarea"
+			if val
+				val = val.replace(/\n/g, '\n<br>');
+				val = val.replace(/ /g, '&nbsp;');
 			data.push {value: val, id: this._id, type: _field.type}
 		else
 			if (val instanceof Date)
