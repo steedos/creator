@@ -25,10 +25,9 @@ Creator.Objects.project_issues =
 			required: true
 
 		state:
-			label: "状态"
+			label: "进度"
 			type: "select"
 			options: [
-				{label:"草稿", value:"draft"}, 
 				{label:"待确认", value:"pending_confirm"}, 
 				{label:"处理中", value:"in_progress"}, 
 				{label:"暂停", value:"paused"}, 
@@ -47,37 +46,30 @@ Creator.Objects.project_issues =
 				{label:"低", value:"low"}
 			]
 
+		status:
+			label: "状态"
+			type: "select"
+			options: [
+				{label:"进行中", value:"open"}, 
+				{label:"已关闭", value:"closed"}
+			]
+			defaultValue: "open"
 
 	list_views:
+		open:
+			label: "进行中"
+			columns: ["name", "category", "created", "state", "priority"]
+			filter_scope: "space"
+			filters: [["status", "=", "open"]]
+		closed:
+			label: "已关闭"
+			columns: ["name", "category", "created", "state", "priority"]
+			filter_scope: "space"
+			filters: [["status", "=", "closed"]]
 		all:
 			label: "所有"
-			columns: ["name", "category", "owner", "created", "state"]
+			columns: ["name", "category", "created", "state", "priority"]
 			filter_scope: "space"
-		draft:
-			label: "草稿"
-			columns: ["name", "category", "assignees", "created", "state"]
-			filter_scope: "space"
-			filters: [["created_by", "=", "{userId}"]]
-		pending_confirm:
-			label: "待确认"
-			columns: ["name", "category", "created_by", "created"]
-			filter_scope: "space"
-			filters: [["state", "=", "pending_confirm"]]
-		in_progress:
-			label: "处理中"
-			columns: ["name", "category", "assignees", "due_date"]
-			filter_scope: "space"
-			filters: [["state", "=", "in_progress"]]
-		paused:
-			label: "暂停"
-			columns: ["name", "category", "created_by", "created"]
-			filter_scope: "space"
-			filters: [["state", "=", "paused"]]
-		completed:
-			label: "已完成"
-			columns: ["name", "category", "created_by", "created"]
-			filter_scope: "space"
-			filters: [["state", "=", "completed"]]
 
 
 	permission_set:
