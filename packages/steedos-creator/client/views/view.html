@@ -225,11 +225,13 @@
 					</div>
 					{{/if}}
 					{{#if enable_chatter}}
-					<div class="column {{#if related_list}}region-sidebar-right{{/if}}">
-						<div class="slds-card slds-card_boundary forceRelatedListCardDesktop">
-							{{> steedos_record_chat object_name=object_name record_id=record._id}}
-						</div>
-					</div>
+						{{#if show_chatter}}
+							<div class="column {{#if related_list}}region-sidebar-right{{/if}}">
+								<div class="slds-card slds-card_boundary forceRelatedListCardDesktop">
+									{{> steedos_record_chat object_name=object_name record_id=record._id}}
+								</div>
+							</div>
+						{{/if}}
 					{{/if}}
 				</div>
 			</div>

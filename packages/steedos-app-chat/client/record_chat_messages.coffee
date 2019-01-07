@@ -11,7 +11,10 @@ Template.steedos_record_chat_messages.onCreated ()->
 			name: 1,
 	#		type: 1
 		}
-	this.subscribe "chat_messages", Session.get("spaceId"), this.data.object_name, this.data.record_id, options
+	console.log('this.data', this.data);
+	self = this
+	this.autorun ()->
+		self.subscribe "chat_messages", Session.get("spaceId"), self.data.object_name, self.data.record_id, options
 
 
 Template.steedos_record_chat_messages.helpers
