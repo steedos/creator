@@ -596,7 +596,16 @@ Template.creator_grid.onRendered ->
 				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
 				# dxOptions.autoExpandAll = true
 				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
-				dxOptions.pager = null 
+				dxOptions.pager = null
+
+				_.forEach dxOptions.columns, (column)->
+					if column.dataField == 'name' || column.dataField == curObject.NAME_FIELD_KEY
+						column.allowSearch = true
+					else
+						column.allowSearch = false
+
+				console.log('dxOptions.columns', dxOptions.columns)
+
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
