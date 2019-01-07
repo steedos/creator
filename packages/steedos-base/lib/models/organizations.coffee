@@ -284,6 +284,10 @@ if (Meteor.isServer)
 				if nameOrg>0
 					throw new Meteor.Error(400, "organizations_error_organizations_name_exists")
 
+			# 公司级的部门的父部门必须也是公司级的部门
+			if doc.is_company and !parentOrg.is_company
+				throw new Meteor.Error(400, "organizations_error_parent_is_company_false_for_current_company");
+
 			# 如果是新建组织不是根组织，则应该设置其company_id值为其最近一个父组织的company_id值，除非其is_company为true
 			if doc.is_company
 				doc.company_id = doc._id
