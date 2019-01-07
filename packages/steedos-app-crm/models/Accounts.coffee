@@ -31,7 +31,19 @@ Creator.Objects.accounts =
 			inlineHelpText: ""
 			searchable:true
 			required: true
-			sortable: true
+			sortable: true	
+		creditcode:
+			type: "text"
+			label: "统一社会信用代码"
+			required: true
+		registeredcapital:
+			type: "currency"
+			label: "注册资金"
+			scale: 2
+		isConnectedTransaction:
+			type:"boolean"
+			label:"是否关联单位"
+			defaultValue: false
 		website: 
 			type: "text"
 			label: "网址"
