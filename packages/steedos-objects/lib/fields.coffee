@@ -48,6 +48,7 @@ Creator.getObjectSchema = (obj) ->
 				if Steedos.isMobile() || Steedos.isPad()
 					fs.autoform.type = 'date'
 				else
+					fs.autoform.outFormat = 'yyyy-MM-dd';
 					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dateTimePickerOptions参数会报错
 					fs.autoform.afFieldInput =
 						type: "bootstrap-datetimepicker"

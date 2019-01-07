@@ -22,6 +22,8 @@ _standardQuery = (curObjectName, standard_query)->
 			_.each query, (val, key)->
 				if object_fields[key]
 					if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						if object_fields[key].type == 'date' && val
+							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 ) # 处理grid中的datetime 偏移
 						query_arr.push([key, ">=", val])
 					else if ["text", "textarea", "html"].includes(object_fields[key].type)
 						# 特殊字符编码
@@ -34,6 +36,8 @@ _standardQuery = (curObjectName, standard_query)->
 				else
 					key = key.replace(/(_endLine)$/, "")
 					if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						if object_fields[key].type == 'date' && val
+							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 						query_arr.push([key, "<=", val])
 
 		is_logic_or = if standard_query.is_mini then true else false
