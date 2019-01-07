@@ -3,10 +3,17 @@ sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
 @t = (key, replaces...) ->
-	if _.isObject replaces[0]
-		return i18n.__ key, replaces
+	if TAPi18n?
+		if _.isObject replaces[0]
+			return TAPi18n.__ key, replaces
+		else
+			return sprintf(TAPi18n.__(key), replaces)
 	else
-		return sprintf(i18n.__(key), replaces)
+		if _.isObject replaces[0]
+			return i18n.__ key, replaces
+		else
+			return sprintf(i18n.__(key), replaces)
+
 
 @tr = (key, options, replaces...) ->
 	if _.isObject replaces[0]
