@@ -22,11 +22,11 @@ Package.onUse(function(api) {
 	api.addFiles('models/Accounts.coffee','server');
 	api.addFiles('models/Contacts.coffee','server');
 	api.addFiles('models/Contracts.coffee','server');
+	api.addFiles('models/contract_type.coffee','server');
 	api.addFiles('models/Payments.coffee','server');
 	api.addFiles('models/Receipts.coffee','server');
 	api.addFiles('reports/company.coffee','server');
 	api.addFiles('reports/contact.coffee','server');
 
-	api.addFiles('sales.coffee','server');
 	api.addFiles('crm.coffee','server');
 })

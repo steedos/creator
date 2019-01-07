@@ -178,7 +178,6 @@ steedos:app-chat
 # steedos:app-portal
 # steedos:app-mailbase
 
-steedos:app-contract
 steedos:users-import
 steedos:app-base
 
