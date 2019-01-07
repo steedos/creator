@@ -59,17 +59,6 @@ Creator.Objects.accounts =
 			label: "我的单位"
 			filter_scope: "mine"
 
-	actions: 
-		export:
-			label: "导出"
-			visible: false
-		print:
-			label: "打印"
-			on: "record"
-			only_detail: true
-			visible: false
-			todo: ()->
-				alert("you clicked on print button") 
 
 	permission_set:
 		user:
