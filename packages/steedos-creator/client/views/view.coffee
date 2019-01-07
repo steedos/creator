@@ -318,6 +318,9 @@ Template.creator_view.helpers
 	enable_chatter: ()->
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
+	show_chatter: ()->
+		return Creator.subs["CreatorRecord"].ready() && Creator.getObjectRecord()
+
 Template.creator_view.events
 
 	'click .record-action-custom': (event, template) ->
