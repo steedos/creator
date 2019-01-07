@@ -239,6 +239,8 @@ db.organizations.helpers
 if (Meteor.isServer)
 
 	db.organizations.before.insert (userId, doc) ->
+		if !userId and doc.owner
+			userId = doc.owner
 		doc.created_by = userId;
 		doc.created = new Date();
 		doc.modified_by = userId;
