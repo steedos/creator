@@ -8,6 +8,11 @@ Creator.Objects.contracts =
 	enable_notes: true
 	enable_api: true
 	fields:
+		no:
+			type:'text'
+			label:"合同编号"
+			required:true
+			sortable:true
 		name: 
 			label: "名称"
 			type: "text"
@@ -59,15 +64,11 @@ Creator.Objects.contracts =
 			is_company_only: true
 			hidden: true
 
-		no:
-			type:'text'
-			label:"合同编号"
-			required:true
-			sortable:true
 
 		subject:
 			type: "textarea"
 			label: "合同内容"
+			is_wide: true
 		project:
 			type:'text'
 			label:"计划编号"
@@ -165,6 +166,7 @@ Creator.Objects.contracts =
 				{label:"进行中",value: "进行中"},
 				{label:"解除",value: "解除"},
 				{label:"异常",value: "异常"},
+				{label:"已验收",value: "已验收"},
 				{label:"完毕",value: "完毕"},
 				{label:"违约但继续履行",value: "违约但继续履行"}],
 			allowedValues:["未签订","进行中","解除","异常","完毕","违约但继续履行"]
@@ -203,7 +205,7 @@ Creator.Objects.contracts =
 			filter_scope: "space"
 		all:
 			label: "所有合同"
-			columns: ["name", "amount", "signed_date", "account", "owner"]
+			columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contractstate"]
 			filter_scope: "space"
 		mine:
 			label: "我的合同"
