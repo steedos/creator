@@ -61,15 +61,37 @@ if Meteor.isClient
 		1.支持$in操作符，实现recent视图
 		$eq, $ne, $lt, $gt, $lte, $gte
 	###
-	Creator.getODataFilter = (list_view_id, object_name)->
+	Creator.getODataFilter = (list_view_id, object_name, filters_set)->
 		userId = Meteor.userId()
 		spaceId = Session.get("spaceId")
 		custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
+		unless filters_set
+			filters_set = {}
+			if custom_list_view
+				filters_set.filter_logic = custom_list_view.filter_logic
+				filters_set.filter_scope = custom_list_view.filter_scope
+				filters_set.filters = custom_list_view.filters
+			else
+				if spaceId and userId
+					list_view = Creator.getListView(object_name, list_view_id)
+					unless list_view
+						return ["_id", "=", -1]
+
+					filters_set.filter_scope = list_view.filter_scope
+					filters_set.filters = list_view.filters
+			
+		filter_logic = filters_set.filter_logic
+		filter_scope = filters_set.filter_scope
+		filters = filters_set.filters
+		# custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
 		selector = []
 		if custom_list_view
-			filter_logic = custom_list_view.filter_logic
-			filter_scope = custom_list_view.filter_scope
-			filters = custom_list_view.filters
+			# filter_logic = custom_list_view.filter_logic
+			# filter_scope = custom_list_view.filter_scope
+			# filters = custom_list_view.filters
+			# filter_logic = filters_set.filter_logic
+			# filter_scope = filters_set.filter_scope
+			# filters = filters_set.filters
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]
 
@@ -94,17 +116,17 @@ if Meteor.isClient
 						selector.push filter
 		else
 			if spaceId and userId
-				list_view = Creator.getListView(object_name, list_view_id)
-				unless list_view
-					return ["_id", "=", -1]
+				# list_view = Creator.getListView(object_name, list_view_id)
+				# unless list_view
+				# 	return ["_id", "=", -1]
 
-				filter_scope = list_view.filter_scope
+				# filter_scope = list_view.filter_scope
 
 				if object_name == "users"
 					selector.push ["_id", "=", userId]
 
-				if list_view.filters
-					filters = Creator.formatFiltersToDev(list_view.filters)
+				if filters
+					filters = Creator.formatFiltersToDev(filters)
 					if filters and filters.length > 0
 						if selector.length > 0
 							selector.push "and"
@@ -117,14 +139,14 @@ if Meteor.isClient
 								else
 									selector.push filter
 
-					if list_view.filter_scope == "mine"
+					if filter_scope == "mine"
 						if selector.length > 0
 							selector.push "and"
 						selector.push ["owner", "=", userId]
 				else
 					permissions = Creator.getPermissions(object_name)
 					if permissions.viewAllRecords
-						if list_view.filter_scope == "mine"
+						if filter_scope == "mine"
 							if selector.length > 0
 								selector.push "and"
 							selector.push ["owner", "=", userId]

@@ -307,12 +307,23 @@ Template.creator_grid.onRendered ->
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
+				filter_logic = Session.get("filter_logic")
+				filter_scope = Session.get("filter_scope")
+				filter_items = Session.get("filter_items")
+				if filter_items
+					filters_set = 
+						filter_logic: filter_logic
+						filter_scope: filter_scope
+						filters: filter_items
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
-					filter = undefined
+					if filters_set
+						filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
+					else
+						filter = undefined
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-					filter = Creator.getODataFilter(list_view_id, object_name)
+					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 
 				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
