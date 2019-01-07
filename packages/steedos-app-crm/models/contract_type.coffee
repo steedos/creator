@@ -1,18 +1,14 @@
-Creator.Objects.contract_type = 
-    name: "contract_type"
+Creator.Objects.contract_types = 
+    name: "contract_types"
     icon: "record"
-    label: "合同类型"
+    label: "合同分类"
     fields:
-        number2:
-            type: "number"
-            label: "序号"
-            sortable: true
         name:
             type: "text"
-            label: "合同分类"
+            label: "名称"
         remarks:
             type: "text"
-            label: "合同说明"
+            label: "备注"
         yinhuashuilv:
             type: "number"
             label: "印花税率"
@@ -20,11 +16,11 @@ Creator.Objects.contract_type =
     
     permission_set:
         user:
-            allowCreate: true
-            allowDelete: true
-            allowEdit: true
-            allowRead: true
-            modifyAllRecords: true
+            allowCreate: false
+            allowDelete: false
+            allowEdit: false
+            allowRead: false
+            modifyAllRecords: false
             viewAllRecords: true 
         admin:
             allowCreate: true
@@ -38,4 +34,4 @@ Creator.Objects.contract_type =
         all:
             label: "全部"
             filter_scope: "space"
-            columns:["number2","name","remarks","yinhuashuilv"]
+            columns:["name","remarks","yinhuashuilv"]

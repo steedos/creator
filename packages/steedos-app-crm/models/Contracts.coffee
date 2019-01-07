@@ -108,8 +108,8 @@ Creator.Objects.contracts =
 			defaultValue: false
 		contracttype:
 			type: "lookup"
-			label: "合同类型"
-			reference_to: "contract_type"
+			label: "合同分类"
+			reference_to: "contract_types"
 			required:true
 
 		# 按要求新增字段：合同税前金额。
