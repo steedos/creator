@@ -216,6 +216,7 @@ Creator.Objects.archive_wenshu =
 			type: "text"
 			label:"年度"
 			sortable:true
+			searchable:true
 			default_width: 80
 			group:"档号"
 		
@@ -224,6 +225,7 @@ Creator.Objects.archive_wenshu =
 			label:"保管期限"
 			reference_to:"archive_retention"
 			sortable:true
+			searchable:true
 			default_width: 85
 			group:"档号"
 		
@@ -231,6 +233,7 @@ Creator.Objects.archive_wenshu =
 			type:"master_detail"
 			label:"机构"
 			reference_to: "archive_organization"
+			searchable:true
 			default_width: 115
 			group:"档号"
 		
@@ -238,12 +241,14 @@ Creator.Objects.archive_wenshu =
 			type:"master_detail"
 			label:"类别号"
 			reference_to: "archive_classification"
+			searchable:true
 			group:"档号"
 		
 		item_number:
 			type: "number"
 			label:"件号"
 			sortable:true
+			searchable:true
 			default_width: 70
 			group:"档号"
 		
@@ -265,21 +270,25 @@ Creator.Objects.archive_wenshu =
 		parallel_title:
 			type: "text"
 			label:"并列题名"
+			searchable:true
 			group:"内容描述"
 		
 		other_title_information:
 			type:"text"
 			label:"说明题名文字"
+			searchable:true
 			group:"内容描述"
 		
 		annex_title:
 			type:"textarea"
 			label:"附件题名"
+			searchable:true
 			group:"内容描述"
 		
 		main_dept:
 			type:"text",
 			label:"主办部室"
+			searchable:true
 			group:"内容描述"
 		
 		descriptor:
@@ -297,22 +306,26 @@ Creator.Objects.archive_wenshu =
 		abstract:
 			type:"text"
 			label:"摘要"
+			searchable:true
 			group:"内容描述"
 		
 		personal_name:
 			type:"text"
 			label:"人名"
+			searchable:true
 			group:"内容描述"
 		
 		document_number:
 			type:"text"
 			label:"文件编号"
+			searchable:true
 			default_width: 135
 			group:"内容描述"
 		
 		author:
 			type:"text"
 			label:"责任者"
+			searchable:true
 			default_width: 115
 			group:"内容描述"
 		
@@ -321,12 +334,14 @@ Creator.Objects.archive_wenshu =
 			label:"文件日期"
 			format:"YYYYMMDD"
 			sortable:true
+			searchable:true
 			default_width: 118
 			group:"内容描述"
 		
 		prinpipal_receiver:
 			type:"text",
 			label:"主送",
+			searchable:true
 			is_wide:true
 			group:"内容描述"
 		
@@ -354,6 +369,7 @@ Creator.Objects.archive_wenshu =
 				{label: "普通", value: "普通"}
 			]
 			allowedValues:["公开","限制","秘密","机密","绝密","非密","普通"]
+			searchable:true
 			group:"内容描述"
 
 		secrecy_period:
@@ -370,16 +386,19 @@ Creator.Objects.archive_wenshu =
 		applicant_organization_name:
 			type:"text"
 			label:"拟稿单位"
+			searchable:true
 			group:"内容描述"
 		
 		applicant_name:
 			type:"text"
 			label:"拟稿人"
+			searchable:true
 			group:"内容描述"
 
 		reference:
 			type: "text"
 			label:"参见"
+			searchable:true
 			group:"内容描述"
 		
 		destroy_date:
@@ -426,6 +445,7 @@ Creator.Objects.archive_wenshu =
 		document_type:
 			type:"text"
 			label:"文件类型"
+			searchable:true
 			group:"形式特征"
 		
 		produce_flag:
@@ -773,7 +793,7 @@ Creator.Objects.archive_wenshu =
 		# 	label: "最近查看"
 		# 	filter_scope: "space"
 		all:
-			label: "全部"
+			label: "已归档"
 			filter_scope: "space"
 			filters: [["is_received", "=", true],["is_destroyed", "=", false]]
 			columns:[
