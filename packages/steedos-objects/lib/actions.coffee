@@ -83,10 +83,15 @@ if Meteor.isClient
 							else
 								info = "删除成功"
 							toastr.success info
-
-							dxDataGridInstance = $(".gridContainer").dxDataGrid().dxDataGrid('instance')
+							if object.enable_tree
+								dxDataGridInstance = $(".gridContainer").dxTreeList().dxTreeList('instance')
+							else
+								dxDataGridInstance = $(".gridContainer").dxDataGrid().dxDataGrid('instance')
 							if dxDataGridInstance
-								Template.creator_grid.refresh(dxDataGridInstance)
+								if object.enable_tree
+									dxDataGridInstance.refresh()
+								else
+									Template.creator_grid.refresh(dxDataGridInstance)
 							else if record_id == Session.get("record_id") and !Steedos.isMobile() and list_view_id != 'calendar'
 								appid = Session.get("app_id")
 								unless list_view_id
