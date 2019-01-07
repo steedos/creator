@@ -97,7 +97,12 @@ Creator.Objects.organizations =
 				{"field_name":"name", "order":"asc"}
 			]
 
-	actions: 
+	actions:
+		standard_query:
+			label: "查找"
+			visible: false
+			on: "list"
+			todo: "standard_query"
 		addSubOrganization:
 			label: "添加子部门"
 			visible: ()->
