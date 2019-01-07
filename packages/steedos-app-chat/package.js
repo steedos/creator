@@ -6,13 +6,9 @@ Package.describe({
 	documentation: null
 });
 
-Npm.depends({
-	'socket.io': '1.4.8',
-	'socket.io-client': "1.4.8",
-});
-
 Package.onUse(function(api) {
 	api.versionsFrom('METEOR@1.2.0.1');
+	api.use('ecmascript');
 	api.use('coffeescript@1.11.1_4');
 	api.use('steedos:creator@0.0.3');
 	api.use('blaze@2.1.9');
@@ -27,6 +23,8 @@ Package.onUse(function(api) {
 	api.addFiles('client/record_chat.html','client');
 	api.addFiles('client/record_chat.coffee','client');
 	api.addFiles('client/record_chat.less','client');
+
+	api.addFiles('checkNpm.js', "server");
 
 	api.addFiles('lib/chat_messages.coffee','client');
 

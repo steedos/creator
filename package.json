@@ -28,6 +28,8 @@
     "weixin-pay": "^1.1.7",
     "xml2js": "^0.4.19",
     "ejs": "^2.5.5",
-    "ejs-lint": "^0.2.0"
+    "ejs-lint": "^0.2.0",
+    "socket.io": "1.4.8",
+    "socket.io-client": "1.4.8"
   }
 }
