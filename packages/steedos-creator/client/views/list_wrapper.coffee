@@ -5,9 +5,11 @@ Template.creator_list_wrapper.onRendered ->
 		if Session.get("list_view_id")
 			self.$(".btn-filter-list").removeClass("slds-is-selected")
 			self.$(".filter-list-container").addClass("slds-hide")
+			self.$("#grid-search").val('')
 
 	self.autorun ->
 		if Session.get("list_view_id")
+			Session.set("standard_query", null)
 			list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 			if list_view_obj
 				if list_view_obj.filter_scope
