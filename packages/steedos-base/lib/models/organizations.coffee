@@ -97,7 +97,12 @@ Creator.Objects.organizations =
 				{"field_name":"name", "order":"asc"}
 			]
 
-	actions: 
+	actions:
+		standard_query:
+			label: "查找"
+			visible: false
+			on: "list"
+			todo: "standard_query"
 		addSubOrganization:
 			label: "添加子部门"
 			visible: ()->
@@ -234,6 +239,8 @@ db.organizations.helpers
 if (Meteor.isServer)
 
 	db.organizations.before.insert (userId, doc) ->
+		if !userId and doc.owner
+			userId = doc.owner
 		doc.created_by = userId;
 		doc.created = new Date();
 		doc.modified_by = userId;

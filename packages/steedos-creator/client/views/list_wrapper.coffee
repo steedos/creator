@@ -304,18 +304,24 @@ Template.creator_list_wrapper.events
 	'keydown input#grid-search': (event, template)->
 		if event.keyCode == "13" or event.key == "Enter"
 			searchKey = $(event.currentTarget).val().trim()
+			object_name = Session.get("object_name")
+			obj = Creator.getObject(object_name)
 			if searchKey
-				object_name = Session.get("object_name")
-				obj = Creator.getObject(object_name)
-				obj_fields = obj.fields
-				query = {}
-				_.each obj_fields, (field,field_name)->
-					if field.searchable || field_name == obj.NAME_FIELD_KEY
-						query[field_name] = searchKey
-				standard_query = object_name: object_name, query: query, is_mini: true
-				Session.set 'standard_query', standard_query
+				if obj.enable_tree
+					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText(searchKey)
+				else
+					obj_fields = obj.fields
+					query = {}
+					_.each obj_fields, (field,field_name)->
+						if field.searchable || field_name == obj.NAME_FIELD_KEY
+							query[field_name] = searchKey
+					standard_query = object_name: object_name, query: query, is_mini: true
+					Session.set 'standard_query', standard_query
 			else
-				Session.set 'standard_query', null
+				if obj.enable_tree
+					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText()
+				else
+					Session.set 'standard_query', null
 
 
 Template.creator_list_wrapper.onCreated ->
