@@ -11,11 +11,20 @@ Template.creator_list_wrapper.onRendered ->
 		if Session.get("list_view_id")
 			Session.set("standard_query", null)
 			list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+			console.log "======creator_list_wrapper.onRendered====list_view_obj=====", list_view_obj
 			if list_view_obj
 				if list_view_obj.filter_scope
 					Session.set("filter_scope", list_view_obj.filter_scope)
+				else
+					Session.set("filter_scope", null)
 				if list_view_obj.filters
 					Session.set("filter_items", list_view_obj.filters)
+				else
+					Session.set("filter_items", null)
+			else
+				Session.set("filter_scope", null)
+				Session.set("filter_items", null)
+
 
 Template.creator_list_wrapper.helpers Creator.helpers
 
@@ -120,12 +129,13 @@ Template.creator_list_wrapper.helpers
 			return true
 		return false
 
-	is_filter_list_disabled: ()->
-		list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
-		if !list_view or list_view.owner != Meteor.userId()
-			return "disabled"
+	# is_filter_list_disabled: ()->
+	# 	list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+	# 	if !list_view or list_view.owner != Meteor.userId()
+	# 		return "disabled"
 
 	is_filter_changed: ()->
+		console.log "======is_filter_changed====="
 		list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 		if list_view_obj
 			original_filter_scope = list_view_obj.filter_scope
