@@ -161,12 +161,12 @@ InstanceRecordQueue.Configure = function (options) {
 	self.syncInsFields = ['name', 'submitter_name', 'applicant_name', 'applicant_organization_name', 'applicant_organization_fullname', 'state',
 		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision'
 	];
-	self.syncValues = function (obj, field_map, values, ins) {
+	self.syncValues = function (obj, field_map_back, values, ins) {
 		var
 			tableFieldCodes = [],
 			tableFieldMap = [];
 
-		field_map.forEach(function (fm) {
+		field_map_back.forEach(function (fm) {
 			// 判断是否是子表字段
 			if (fm.workflow_field.indexOf('.$.') > 0 && fm.object_field.indexOf('.$.') > 0) {
 				var wTableCode = fm.workflow_field.split('.$.')[0];
@@ -226,7 +226,8 @@ InstanceRecordQueue.Configure = function (options) {
 		var fields = {
 			flow: 1,
 			values: 1,
-			applicant: 1
+			applicant: 1,
+			space: 1
 		};
 		self.syncInsFields.forEach(function (f) {
 			fields[f] = 1;
@@ -234,7 +235,7 @@ InstanceRecordQueue.Configure = function (options) {
 		var ins = Creator.getCollection('instances').findOne(insId, {
 			fields: fields
 		});
-		var values = ins.values;
+		var values = ins.values, spaceId = ins.space;
 
 		if (records) {
 			// 此情况属于从creator中发起审批
@@ -244,7 +245,7 @@ InstanceRecordQueue.Configure = function (options) {
 				flow_id: ins.flow
 			});
 			var
-				objectCollection = Creator.getCollection(objectName),
+				objectCollection = Creator.getCollection(objectName, spaceId),
 				sync_attachment = ow.sync_attachment;
 			objectCollection.find({
 				_id: {
@@ -255,7 +256,7 @@ InstanceRecordQueue.Configure = function (options) {
 				try {
 					var setObj = {};
 
-					self.syncValues(setObj, ow.field_map, values, ins);
+					self.syncValues(setObj, ow.field_map_back, values, ins);
 
 					setObj['instances.$.state'] = 'completed';
 
@@ -308,13 +309,12 @@ InstanceRecordQueue.Configure = function (options) {
 			}).forEach(function (ow) {
 				try {
 					var newObj = {},
-						objectCollection = Creator.getCollection(ow.object_name),
+						objectCollection = Creator.getCollection(ow.object_name, spaceId),
 						sync_attachment = ow.sync_attachment,
 						newRecordId = objectCollection._makeNewID(),
-						spaceId = ow.space,
 						objectName = ow.object_name;
 
-					self.syncValues(newObj, ow.field_map, values, ins);
+					self.syncValues(newObj, ow.field_map_back, values, ins);
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
