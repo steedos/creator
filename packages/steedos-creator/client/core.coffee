@@ -83,15 +83,8 @@ if Meteor.isClient
 		filter_logic = filters_set.filter_logic
 		filter_scope = filters_set.filter_scope
 		filters = filters_set.filters
-		# custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
 		selector = []
 		if custom_list_view
-			# filter_logic = custom_list_view.filter_logic
-			# filter_scope = custom_list_view.filter_scope
-			# filters = custom_list_view.filters
-			# filter_logic = filters_set.filter_logic
-			# filter_scope = filters_set.filter_scope
-			# filters = filters_set.filters
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]
 
@@ -116,11 +109,6 @@ if Meteor.isClient
 						selector.push filter
 		else
 			if spaceId and userId
-				# list_view = Creator.getListView(object_name, list_view_id)
-				# unless list_view
-				# 	return ["_id", "=", -1]
-
-				# filter_scope = list_view.filter_scope
 
 				if object_name == "users"
 					selector.push ["_id", "=", userId]
