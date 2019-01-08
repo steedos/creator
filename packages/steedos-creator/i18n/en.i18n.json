@@ -62,5 +62,8 @@
 	"creator_home_apps": "Steedos Office",
 	"creator_detail_info": "DETAILS",
 	"creator_detail_related": "RELATED",
-	"creator_new": "New"
+	"creator_new": "New",
+
+	"true": "YES",
+	"false": "NO"
 }
