@@ -107,8 +107,10 @@ Creator.Objects.instances =
 			label:"流程分类"
 			hidden: true
 		state:
-			type: "string"
 			label:"申请单状态"
+			type: "select"
+			options: [{label: "草稿",value: "draft"},{label: "进行中",value: "pending"},{label: "已完成",value: "completed"}]
+			readonly: true
 
 		is_recorded:
 			type: "boolean"
