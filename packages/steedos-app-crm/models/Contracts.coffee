@@ -77,8 +77,8 @@ Creator.Objects.contracts =
 			type:'text'
 			label:"对方单位名称"
 
-		# 待处理：选择对方单位后，自动赋值registeredcapital	
-		registeredcapital:
+		# 待处理：选择对方单位后，自动赋值registered_capital	
+		registered_capital:
 			type: "currency"
 			label: "注册资金"
 			scale: 2
@@ -90,24 +90,24 @@ Creator.Objects.contracts =
 
 		# 新增字段：重大合同，
 		# 待处理：按规则自动赋值	
-		isimportant:
+		is_important:
 			type:"boolean"
 			label:"重大合同"
 			defaultValue:false	
 
-		isbidding:
+		is_bidding:
 			type:"boolean"
 			label:"是否招投标"
 			defaultValue:false
-		isConnectedTransaction:
+		is_connected_transaction:
 			type:"boolean"
 			label:"是否关联交易"
 			defaultValue: false
-		isSolidInvestment:
+		is_solid_investment:
 			type:"boolean"
 			label:"是否固投项目"
 			defaultValue: false
-		contracttype:
+		contract_type:
 			type: "lookup"
 			label: "合同分类"
 			reference_to: "contract_types"
@@ -115,7 +115,7 @@ Creator.Objects.contracts =
 
 		# 按要求新增字段：合同税前金额。
 		# 待处理：前后统一计，导入时，拟统一赋值为 合同金额。
-		pretaxamount:
+		pretax_amount:
 			type:'currency'
 			label:"合同税前金额"
 			scale: 2
@@ -125,25 +125,25 @@ Creator.Objects.contracts =
 			type:'currency'
 			label:"合同税"
 			scale: 2
-		advanceamount:
+		advance_amount:
 			type:'currency'
 			label:"预付款金额"
 			scale: 2
 
-		outstandingamount:
+		outstanding_amount:
 			type:'currency'
 			label:"未结金额"
 			scale: 2
 
 		# 待处理：修改质保比例，则自动赋值质量保证金；修改质量保证金，则自动赋值质保比例
-		qualitybond:
+		quality_bond:
 			type:'currency'
 			label:"质量保证金"
 			scale: 2
-		qualityproportion:
+		quality_proportion:
 			type:'text'
 			label:"质保比例"
-		shelfLife:
+		shelf_life:
 			type: "text"
 			label: "质保期"
 
@@ -152,13 +152,13 @@ Creator.Objects.contracts =
 			type: "number"
 			label: "印花税率"
 			scale: 4
-		# 待处理:合同类型、合同税前金额复制后，自动赋值stampduty=pretaxamount*yinhuashuilv
-		stampduty:
+		# 待处理:合同类型、合同税前金额复制后，自动赋值stamp_duty=pretax_amount*yinhuashuilv
+		stamp_duty:
 			type:'currency'
 			label:"印花税额"
 			scale: 2
 
-		contractstate:
+		contract_state:
 			type: "select"
 			label: "合同履行状态"
 			options:[
@@ -182,14 +182,14 @@ Creator.Objects.contracts =
 		chengbanren:
 			type: "text"
 			label: "承办人"	
-		bsigned:
+		b_signed:
 			type: "text"
 			label: "对方签署人"
-		asigned:
+		a_signed:
 			type: "text"
 			label: "己方签署人"
 
-		BoP:
+		bop:
 			type: "select"
 			label:"收支类别"
 			defaultValue: "收入"
@@ -205,7 +205,7 @@ Creator.Objects.contracts =
 			filter_scope: "space"
 		all:
 			label: "所有合同"
-			columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contractstate"]
+			columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
 			filter_scope: "space"
 		mine:
 			label: "我的合同"

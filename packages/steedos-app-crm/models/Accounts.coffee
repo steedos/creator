@@ -32,6 +32,18 @@ Creator.Objects.accounts =
 			searchable:true
 			required: true
 			sortable: true
+		credit_code:
+			type: "text"
+			label: "统一社会信用代码"
+			required: true
+		registered_capital:
+			type: "currency"
+			label: "注册资金"
+			scale: 2
+		is_connected_transaction:
+			type:"boolean"
+			label:"是否关联单位"
+			defaultValue: false
 		website: 
 			type: "text"
 			label: "网址"
