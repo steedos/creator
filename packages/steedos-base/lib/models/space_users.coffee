@@ -27,7 +27,8 @@ Creator.Objects.space_users =
 			label:'所属部门'
 			reference_to: "organizations"
 			multiple: true
-			defaultValue: []
+			defaultValue: ()->
+				return Session.get("grid_sidebar_selected")
 			required: true
 		organizations_parents:
 			label: '所属部门（含上级）'
