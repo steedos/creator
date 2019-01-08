@@ -66,7 +66,7 @@ Creator.Objects.accounts =
 			sortable: true
 			index:true
 			is_company_only: true
-			required: Meteor.settings?.public?.is_group_company
+			required: true
 			defaultValue: ()->
 				if Meteor.isClient
 					return Session.get("user_company_id")
