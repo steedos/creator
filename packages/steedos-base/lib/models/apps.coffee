@@ -48,7 +48,7 @@ Creator.Objects.apps =
 					_options.push {label: o.label, value: o.name, icon: o.icon}
 				return _options
 		visible:
-			label: "可见性"
+			label: "是否可见"
 			type: "boolean"
 		sort:
 			label: "排序"

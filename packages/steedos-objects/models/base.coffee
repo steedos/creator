@@ -22,7 +22,7 @@ Creator.baseObject =
 #					return Session.get("spaceId")
 		created:
 			type: "datetime"
-			label:"创建日期"
+			label:"创建时间"
 			readonly: true
 			sortable: true
 			omit: true
