@@ -143,8 +143,8 @@ Template.filter_option_list.onCreated ->
 			Session.set("filter_logic", list_view_obj.filter_logic)
 
 	self.autorun ->
-		if Session.get("filter_items")
-			filters = Session.get("filter_items")
+		filters = Session.get("filter_items")
+		if filters
 			self.filterItems.set(filters)
 			object_name = Template.instance().data?.object_name
 			fields = Creator.getObject(object_name)?.fields
@@ -180,7 +180,9 @@ Template.filter_option_list.onCreated ->
 									options_labels.push option.label
 						filter.valuelabel = options_labels
 				else
-					self.filterItems.set(filters)	
+					self.filterItems.set(filters)
+		else
+			self.filterItems.set(null)
 
 Template.filter_option_list.onRendered ->
 	$("#info_popover").dxPopover({

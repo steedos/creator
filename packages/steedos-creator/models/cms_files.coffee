@@ -1,6 +1,6 @@
 Creator.Objects.cms_files =
 	name: "cms_files"
-	label: "文件"
+	label: "附件"
 	icon: "drafts"
 	enable_search: true
 	enable_api: true

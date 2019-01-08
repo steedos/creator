@@ -14,8 +14,16 @@ Template.creator_list_wrapper.onRendered ->
 			if list_view_obj
 				if list_view_obj.filter_scope
 					Session.set("filter_scope", list_view_obj.filter_scope)
+				else
+					Session.set("filter_scope", null)
 				if list_view_obj.filters
 					Session.set("filter_items", list_view_obj.filters)
+				else
+					Session.set("filter_items", null)
+			else
+				Session.set("filter_scope", null)
+				Session.set("filter_items", null)
+
 
 Template.creator_list_wrapper.helpers Creator.helpers
 
@@ -120,13 +128,12 @@ Template.creator_list_wrapper.helpers
 			return true
 		return false
 
-	is_filter_list_disabled: ()->
-		list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
-		if !list_view or list_view.owner != Meteor.userId()
-			return "disabled"
-
 	is_filter_changed: ()->
 		list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+		is_filter_list_disabled = !list_view_obj or list_view_obj.owner != Meteor.userId()
+		if is_filter_list_disabled
+			# 只读视图不能存在到数据库
+			return false
 		if list_view_obj
 			original_filter_scope = list_view_obj.filter_scope
 			original_filter_items = list_view_obj.filters
@@ -297,18 +304,24 @@ Template.creator_list_wrapper.events
 	'keydown input#grid-search': (event, template)->
 		if event.keyCode == "13" or event.key == "Enter"
 			searchKey = $(event.currentTarget).val().trim()
+			object_name = Session.get("object_name")
+			obj = Creator.getObject(object_name)
 			if searchKey
-				object_name = Session.get("object_name")
-				obj = Creator.getObject(object_name)
-				obj_fields = obj.fields
-				query = {}
-				_.each obj_fields, (field,field_name)->
-					if field.searchable || field_name == obj.NAME_FIELD_KEY
-						query[field_name] = searchKey
-				standard_query = object_name: object_name, query: query, is_mini: true
-				Session.set 'standard_query', standard_query
+				if obj.enable_tree
+					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText(searchKey)
+				else
+					obj_fields = obj.fields
+					query = {}
+					_.each obj_fields, (field,field_name)->
+						if field.searchable || field_name == obj.NAME_FIELD_KEY
+							query[field_name] = searchKey
+					standard_query = object_name: object_name, query: query, is_mini: true
+					Session.set 'standard_query', standard_query
 			else
-				Session.set 'standard_query', null
+				if obj.enable_tree
+					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText()
+				else
+					Session.set 'standard_query', null
 
 
 Template.creator_list_wrapper.onCreated ->

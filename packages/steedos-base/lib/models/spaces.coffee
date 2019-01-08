@@ -129,7 +129,7 @@ Creator.Objects.spaces =
 			columns: ["name"]
 			filter_scope: "all"
 			filters: [["_id", "=", "{spaceId}"]]
-	actions: 
+	actions:
 		pay_records:
 			label: "订单"
 			on: "record"
@@ -251,7 +251,7 @@ if Meteor.isServer
 			rootOrg = db.organizations.findOne({space: doc._id,is_company: true, parent: null})
 			children = db.organizations.find({parents: rootOrg._id});
 			children.forEach (child) ->
-		    db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
+			db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
 
 
 	db.spaces.before.remove (userId, doc) ->
@@ -315,6 +315,7 @@ if Meteor.isServer
 		org.name = space.name
 		org.fullname = space.name
 		org.is_company = true
+		org.owner = space.owner
 		org_id = db.organizations.insert(org)
 		if !org_id
 			return false
@@ -329,6 +330,7 @@ if Meteor.isServer
 			_org.fullname = org.name + '/' + _org.name
 			_org.parents = [org_id]
 			_org.parent = org_id
+			_org.owner = space.owner
 			if sortNo
 				_org.sort_no=sortNo
 			db.organizations.insert(_org)

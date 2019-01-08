@@ -22,6 +22,8 @@ _standardQuery = (curObjectName, standard_query)->
 			_.each query, (val, key)->
 				if object_fields[key]
 					if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						if object_fields[key].type == 'date' && val
+							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 ) # 处理grid中的datetime 偏移
 						query_arr.push([key, ">=", val])
 					else if ["text", "textarea", "html"].includes(object_fields[key].type)
 						# 特殊字符编码
@@ -34,6 +36,8 @@ _standardQuery = (curObjectName, standard_query)->
 				else
 					key = key.replace(/(_endLine)$/, "")
 					if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						if object_fields[key].type == 'date' && val
+							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 						query_arr.push([key, "<=", val])
 
 		is_logic_or = if standard_query.is_mini then true else false
@@ -303,12 +307,23 @@ Template.creator_grid.onRendered ->
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
+				filter_logic = Session.get("filter_logic")
+				filter_scope = Session.get("filter_scope")
+				filter_items = Session.get("filter_items")
+				if filter_items
+					filters_set = 
+						filter_logic: filter_logic
+						filter_scope: filter_scope
+						filters: filter_items
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
-					filter = undefined
+					if filters_set
+						filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
+					else
+						filter = undefined
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-					filter = Creator.getODataFilter(list_view_id, object_name)
+					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 
 				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
@@ -592,7 +607,16 @@ Template.creator_grid.onRendered ->
 				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
 				# dxOptions.autoExpandAll = true
 				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
-				dxOptions.pager = null 
+				dxOptions.pager = null
+
+				_.forEach dxOptions.columns, (column)->
+					if column.dataField == 'name' || column.dataField == curObject.NAME_FIELD_KEY
+						column.allowSearch = true
+					else
+						column.allowSearch = false
+
+				console.log('dxOptions.columns', dxOptions.columns)
+
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
