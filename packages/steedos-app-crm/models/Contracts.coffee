@@ -1,4 +1,4 @@
-Creator.Objects.contracts = 
+Creator.Objects.contracts =
 	name: "contracts"
 	label: "合同"
 	icon: "contract"
@@ -13,7 +13,7 @@ Creator.Objects.contracts =
 			label:"合同编号"
 			required:true
 			sortable:true
-		name: 
+		name:
 			label: "名称"
 			type: "text"
 			required: true
@@ -25,7 +25,7 @@ Creator.Objects.contracts =
 			required: true
 			sortable: true
 		signed_date:
-			label: "签订日期" 
+			label: "签订日期"
 			type: "date"
 			sortable: true
 		owner:
@@ -44,11 +44,11 @@ Creator.Objects.contracts =
 			label: "开始日期"
 			type: "date"
 			sortable: true
-		end_date: 
+		end_date:
 			label: "结束日期"
 			type: "date"
 			sortable: true
-		description: 
+		description:
 			label: "备注"
 			type: "textarea"
 			is_wide: true
@@ -77,7 +77,7 @@ Creator.Objects.contracts =
 			type:'text'
 			label:"对方单位名称"
 
-		# 待处理：选择对方单位后，自动赋值registered_capital	
+		# 待处理：选择对方单位后，自动赋值registered_capital
 		registered_capital:
 			type: "currency"
 			label: "注册资金"
@@ -89,11 +89,11 @@ Creator.Objects.contracts =
 			label:"对方联系人"
 
 		# 新增字段：重大合同，
-		# 待处理：按规则自动赋值	
+		# 待处理：按规则自动赋值
 		is_important:
 			type:"boolean"
 			label:"重大合同"
-			defaultValue:false	
+			defaultValue:false
 
 		is_bidding:
 			type:"boolean"
@@ -181,7 +181,7 @@ Creator.Objects.contracts =
 			label: "承办科室"
 		chengbanren:
 			type: "text"
-			label: "承办人"	
+			label: "承办人"
 		b_signed:
 			type: "text"
 			label: "对方签署人"
@@ -213,12 +213,12 @@ Creator.Objects.contracts =
 
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -226,3 +226,17 @@ Creator.Objects.contracts =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		workflow_admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyAllRecords: false
+			viewAllRecords: false
+			modifyCompanyRecords: true
+			viewCompanyRecords: true
+			disabled_list_views: []
+			disabled_actions: []
+			unreadable_fields: []
+			uneditable_fields: []
+			unrelated_objects: []
