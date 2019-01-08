@@ -159,7 +159,7 @@ Creator.Objects.instances =
 		all:
 			label:'所有'
 			filter_scope: "space"
-			columns: ["name", "applicant", "applicant_organization", "modified"]
+			columns: ["name", "applicant", "applicant_organization", "modified", "state"]
 		inbox:
 			label: "待办文件"
 			filter_scope: "space"

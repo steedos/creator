@@ -79,7 +79,7 @@ if Meteor.isClient
 
 					filters_set.filter_scope = list_view.filter_scope
 					filters_set.filters = list_view.filters
-			
+
 		filter_logic = filters_set.filter_logic
 		filter_scope = filters_set.filter_scope
 		filters = filters_set.filters
@@ -228,6 +228,9 @@ if Meteor.isClient
 					selector.push("and", ["#{related_field_name}.ids", "=", record_id])
 				else
 					selector.push("and", [related_field_name, "=", record_id])
+			else if related_field && (related_field.type == 'grid')
+				selector.push("and", ["#{related_field_name}.o", "=", object_name])
+				selector.push("and", ["#{related_field_name}.ids", "=", record_id])
 			else
 				selector.push("and", [related_field_name, "=", record_id])
 

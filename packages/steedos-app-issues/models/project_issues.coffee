@@ -5,6 +5,7 @@ Creator.Objects.project_issues =
 	enable_files: true
 	enable_search: true
 	enable_tasks: true
+	enable_instances: true
 	fields:
 		name:
 			label: '标题'
@@ -12,7 +13,7 @@ Creator.Objects.project_issues =
 			is_wide: true
 			required: true
 
-		description: 
+		description:
 			label: '问题描述'
 			type: 'textarea'
 			is_wide: true
@@ -28,9 +29,9 @@ Creator.Objects.project_issues =
 			label: "级别"
 			type: "select"
 			options: [
-				{label:"厂级责任部室", value:"sub"}, 
-				{label:"厂领导", value:"sub_leader"}, 
-				{label:"机关责任处室", value:"company"}, 
+				{label:"厂级责任部室", value:"sub"},
+				{label:"厂领导", value:"sub_leader"},
+				{label:"机关责任处室", value:"company"},
 				{label: "公司领导", value:"company_leader"}
 				{label: "暂时不能解决", value:"paused"}
 			]
@@ -41,9 +42,9 @@ Creator.Objects.project_issues =
 			label: "进度"
 			type: "select"
 			options: [
-				{label:"待确认", value:"pending_confirm"}, 
-				{label:"处理中", value:"in_progress"}, 
-				{label:"暂停", value:"paused"}, 
+				{label:"待确认", value:"pending_confirm"},
+				{label:"处理中", value:"in_progress"},
+				{label:"暂停", value:"paused"},
 				{label: "已完成", value:"completed"}
 				{label: "已取消", value:"cancelled"}
 			]
@@ -54,8 +55,8 @@ Creator.Objects.project_issues =
 			label: '优先级'
 			type: "select"
 			options: [
-				{label:"高", value:"high"}, 
-				{label:"中", value:"medium"}, 
+				{label:"高", value:"high"},
+				{label:"中", value:"medium"},
 				{label:"低", value:"low"}
 			]
 
@@ -63,12 +64,12 @@ Creator.Objects.project_issues =
 			label: "状态"
 			type: "select"
 			options: [
-				{label:"进行中", value:"open"}, 
+				{label:"进行中", value:"open"},
 				{label:"已关闭", value:"closed"}
 			]
 			defaultValue: "open"
 
-		solution: 
+		solution:
 			label: '拟上措施'
 			type: 'textarea'
 			is_wide: true
