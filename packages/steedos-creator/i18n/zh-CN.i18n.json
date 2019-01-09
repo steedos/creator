@@ -1,4 +1,6 @@
 {
+	"_namespace": "",
+
 	"Steedos Creator": "开发平台",
 
 	"Refresh": "刷新",
@@ -29,6 +31,7 @@
 	"creator_list_matching_all_filters": "匹配所有筛选器",
 	"creator_list_view_controls": "列表视图控制",
 	"creator_list_export_list_view": "导出Excel",
+  	"creator_list_copy_list_view": "复制视图",
 	"reset_column_width": "重置列宽",
 	"creator_list_edit": "编辑视图",
 
@@ -63,18 +66,7 @@
 	"creator_detail_related": "相关",
 	"creator_new": "新建",
 
-	"creator_odata_api_not_found": "很抱歉，您要访问的资源不存在或者您没有权限访问该资源！",
-	"creator_odata_unexpected_character" :"不支持的特殊字符",
-	"creator_odata_authentication":"您需要提供身份验证",
-	"creator_odata_user_privileges":"用户没有访问实体的权限",
-	"creator_list_no_actions_tip": "没有可做的操作",
-	"creator_list_view_permissions_lost": "您没有权限访问该视图",
+	"true": "是",
+	"false": "否"
 
-	"creator_report_drill_down_label": "下钻数据",
-	"creator_report_drill_down_total_label": "总",
-	"creator_listview_update":"列表视图已更新",
-
-	"creator_request_oversized": "请求文件太大了",
-
-	"creator_permission_share_miss": "请在授权组织或授权用户中至少填写一个值"
 }

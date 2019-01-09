@@ -6,8 +6,6 @@ db.users.allow
 		if userId == doc._id
 			return true
 
-db.users._simpleSchema = new SimpleSchema
-
 Creator.Objects.users =
 	name: "users"
 	label: "用户"
@@ -23,20 +21,19 @@ Creator.Objects.users =
 			label:'头像URL'
 			type:'text'
 			omit: true
-		
+
 		name:
 			label: "姓名"
 			type: "text"
 			required: true
 			searchable:true
 			index:true
-			group:'-'
-		
+
 		company:
 			type: "text"
 			label:'公司'
 			required: true
-		
+
 		position:
 			type: "text"
 			label:'职务'
@@ -55,11 +52,11 @@ Creator.Objects.users =
 			required: true
 			hidden:true
 			group:'-'
-		
+
 		wechat:
 			type: "text"
 			label:'微信号'
-		
+
 		work_phone:
 			type: "text"
 			label:'座机'
@@ -179,19 +176,19 @@ Creator.Objects.users =
 			multiple: true
 			omit: true
 
-		username: 
+		username:
 			type:'text'
 			unique: true
 			omit: true
-		
-		steedos_id: 
+
+		steedos_id:
 			type:'text'
 			unique: true
 			readonly: true
 			omit: true
-			hidden:true
 
-		locale: 
+		locale:
+			label: "语言"
 			type: "select"
 			allowedValues: [
 				"en-us",
@@ -206,25 +203,24 @@ Creator.Objects.users =
 			}]
 
 		email_notification:
+			label: "接收邮件通知"
 			type: "boolean"
-			omit: true
-			hidden:true
 
 		primary_email_verified:
 			type: "boolean"
 			omit: true
 			hidden:true
-		
+
 		last_logon:
 			type:'date'
 			omit: true
 			hidden:true
-		
+
 		is_cloudadmin:
 			type: "boolean"
 			omit: true
 			hidden:true
-		
+
 		is_deleted:
 			type: "boolean"
 			omit: true
@@ -250,7 +246,7 @@ Creator.Objects.users =
 					user = Creator.getCollection("users").findOne({_id: userId}, fields: {avatarUrl: 1})
 					unless user.avatarUrl
 						modifier.$set.avatarUrl = profileAvatar
-	
+
 	permission_set:
 		guest:
 			allowCreate: false
@@ -261,9 +257,6 @@ Creator.Objects.users =
 			viewAllRecords: true
 
 
-if Meteor.isClient
-	db.users._simpleSchema.i18n("users")
-
 db.users.helpers
 	spaces: ->
 		spaces = []
@@ -273,7 +266,7 @@ db.users.helpers
 		return spaces;
 
 	displayName: ->
-		if this.name 
+		if this.name
 			return this.name
 		else if this.username
 			return this.username
@@ -298,15 +291,15 @@ if Meteor.isServer
 
 		if !u
 			db.users.update({_id: userId}, {$push: {secrets: secretToken}})
-		
+
 	db.users.checkEmailValid = (email) ->
-		existed = db.users.find 
+		existed = db.users.find
 			"emails.address": email
 		if existed.count()>0
 			throw new Meteor.Error(400, "users_error_email_exists");
 
 	db.users.checkUsernameValid = (username) ->
-		existed = db.users.find 
+		existed = db.users.find
 			"username": username
 		if existed.count()>0
 			throw new Meteor.Error(400, "users_error_username_exists");
@@ -379,7 +372,7 @@ if Meteor.isServer
 			doc.mobile = doc.profile.mobile
 
 		if !doc.steedos_id && doc.username
-			doc.steedos_id = doc.username 
+			doc.steedos_id = doc.username
 
 		if !doc.name
 			doc.name = doc.steedos_id.split('@')[0]
@@ -407,7 +400,7 @@ if Meteor.isServer
 		if space_registered
 			# 从工作区特定的注册界面注册的用户，需要自动加入到工作区中
 			user_email = doc.emails[0].address
-			rootOrg = db.organizations.findOne({space:space_registered, is_company:true},{fields: {_id:1}})
+			rootOrg = db.organizations.findOne({space:space_registered, is_company:true, parent: null},{fields: {_id:1}})
 			db.space_users.insert
 				email: user_email
 				user: doc._id
@@ -439,7 +432,7 @@ if Meteor.isServer
 					tokenRecord = {
 						token: token,
 						email: email,
-						when: now        
+						when: now
 					};
 					db.users.update(doc._id, {$set: {"services.password.reset":tokenRecord}});
 					Meteor._ensure(doc, 'services', 'password').reset = tokenRecord;
@@ -516,7 +509,7 @@ if Meteor.isServer
 		throw new Meteor.Error(400, "users_error_cloud_admin_required");
 
 
-			
+
 	Meteor.publish 'userData', ->
 		unless this.userId
 			return this.ready()

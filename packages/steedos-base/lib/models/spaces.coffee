@@ -1,10 +1,5 @@
 db.spaces = new Meteor.Collection('spaces')
 
-db.spaces.allow
-	update: (userId, doc, fields, modifier) ->
-		return doc.owner == userId;
-
-db.spaces._simpleSchema = new SimpleSchema
 
 Creator.Objects.spaces =
 	name: "spaces"
@@ -20,42 +15,35 @@ Creator.Objects.spaces =
 			required: true
 			searchable:true
 			index:true
-		industry:
-            label: "行业"
-            type: "select"
-            options:[
-                {label:'餐饮',value:'food'},
-                {label:'酒店住宿',value:'accommodation'},
-                {label:'出行',value:'travel'},
-                {label:'休闲娱乐',value:'entertainment'},
-                {label:'丽人',value:'beauty'},
-                {label:'教育',value:'education'},
-                {label:'母婴亲子',value:'parent-child'},
-                {label:'运动健身',value:'sport'},
-                {label:'家具装修',value:'decoration'},
-                {label:'生活服务',value:'life'},
-                {label:'宠物',value:'pets'},
-                {label:'汽车服务',value:'car'}
-            ]
-		owner:
-			label: "所有者"
-			type: "lookup"
-			reference_to: "users"
-			readonly: true
-			omit: false
+		# industry:
+  #           label: "行业"
+  #           type: "select"
+  #           options:[
+  #               {label:'餐饮',value:'food'},
+  #               {label:'酒店住宿',value:'accommodation'},
+  #               {label:'出行',value:'travel'},
+  #               {label:'休闲娱乐',value:'entertainment'},
+  #               {label:'丽人',value:'beauty'},
+  #               {label:'教育',value:'education'},
+  #               {label:'母婴亲子',value:'parent-child'},
+  #               {label:'运动健身',value:'sport'},
+  #               {label:'家具装修',value:'decoration'},
+  #               {label:'生活服务',value:'life'},
+  #               {label:'宠物',value:'pets'},
+  #               {label:'汽车服务',value:'car'}
+  #           ]
+		phone:
+			label:'联系电话'
+			type:'text'
 		admins:
 			label: "管理员"
 			type: "lookup"
 			reference_to: "users"
 			index:true
 			multiple: true
-		apps:
-			label: "应用"
-			type: "lookup"
-			reference_to: "apps"
-			multiple: true
+			is_wide: true
 		avatar:
-			label:'头像'
+			label:'公司Logo'
 			type:'avatar'
 		cover:
 			label:'封面照片'
@@ -64,30 +52,38 @@ Creator.Objects.spaces =
 			label:'地址'
 			type:'location'
 			system: 'gcj02'
-		phone:
-			label:'联系电话'
-			type:'text'
+			omit: true
+			hidden: true
+		apps:
+			label: "启用应用"
+			type: "lookup"
+			reference_to: "apps"
+			multiple: true
 		apps_paid:
 			label:'已付费应用'
 			type: "[text]"
 			omit: true
-		hostname: 
-			label:'域名'
+		hostname:
+			label:'绑定域名'
 			type: "[text]"
-		balance: 
-			label:'余额'
-			type:"number"
-			scale:2
-			omit: true
-		is_paid: 
+		is_paid:
 			label: t("Spaces_isPaid")
 			type: "boolean"
+			group: "账务"
+			omit: true
+			readonly: true
+		balance:
+			label:'账户余额'
+			type:"number"
+			group: "账务"
+			scale:2
 			omit: true
 			readonly: true
 		services:
 			type: "object"
 			blackbox: true
 			omit: true
+			hidden: true
 		is_deleted:
 			type: "boolean"
 			omit: true
@@ -95,32 +91,58 @@ Creator.Objects.spaces =
 		"billing.remaining_months":
 			type:"number"
 			omit: true
+			hidden: true
 		user_limit:
-			label:'用户数限制'
+			label:'已购买用户数'
 			type:"number"
 			omit: true
+			group: "账务"
 		start_date:
-			label:'开始时间'
+			label:'付费开始时间'
 			type: "datetime"
 			omit: true
+			group: "账务"
 		end_date:
-			label:'结束时间'
+			label:'付费截止时间'
 			type: "datetime"
 			omit: true
+			group: "账务"
 		modules:
 			label:'模块'
 			type: "[text]"
 			omit: true
+			hidden: true
 		enable_register:
 			label:'允许新用户注册'
 			type: "boolean"
 			defaultValue:false
+		owner:
+			label: "所有者"
+			type: "lookup"
+			reference_to: "users"
+			readonly: true
+			omit: false
+			hidden: false
 	list_views:
 		all:
 			label:"所有"
 			columns: ["name"]
 			filter_scope: "all"
 			filters: [["_id", "=", "{spaceId}"]]
+	actions:
+		pay_records:
+			label: "订单"
+			on: "record"
+			visible: true
+			todo: ()->
+				url = Creator.getListViewRelativeUrl("billing_pay_records","admin","all")
+				FlowRouter.go(url)
+		upgrade:
+			label: "升级"
+			on: "record"
+			visible: true
+			todo: ()->
+				Modal.show('space_recharge_modal')
 	permission_set:
 		user:
 			allowCreate: true
@@ -132,14 +154,7 @@ Creator.Objects.spaces =
 		admin:
 			allowCreate: true
 			allowDelete: false
-			allowEdit: false
-			allowRead: true
-			modifyAllRecords: false
-			viewAllRecords: true
-		member:
-			allowCreate: true
-			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
@@ -152,18 +167,13 @@ Creator.Objects.spaces =
 			viewAllRecords: true
 
 
-if Meteor.isClient
-	db.spaces._simpleSchema.i18n("spaces")
-
-db.spaces.attachSchema(db.spaces._simpleSchema)
-
 
 db.spaces.helpers
 
 	owner_name: ->
 		owner = db.space_users.findOne({user: this.owner});
 		return owner && owner.name;
-	
+
 	admins_name: ->
 		if (!this.admins)
 			return ""
@@ -176,7 +186,7 @@ db.spaces.helpers
 
 
 if Meteor.isServer
-	
+
 	db.spaces.before.insert (userId, doc) ->
 		if !userId and doc.owner
 			userId = doc.owner
@@ -186,7 +196,7 @@ if Meteor.isServer
 		doc.modified_by = userId
 		doc.modified = new Date()
 		doc.is_deleted = false;
-		
+
 		if !userId
 			throw new Meteor.Error(400, "spaces_error_login_required");
 
@@ -202,14 +212,14 @@ if Meteor.isServer
 		db.spaces.createTemplateOrganizations(doc._id)
 		_.each doc.admins, (admin) ->
 			db.spaces.space_add_user(doc._id, admin, true)
-			
+
 
 	db.spaces.before.update (userId, doc, fieldNames, modifier, options) ->
-		modifier.$set = modifier.$set || {}; 
+		modifier.$set = modifier.$set || {};
 		if doc.owner != userId
 			throw new Meteor.Error(400, "spaces_error_space_owner_only");
 		if (!Steedos.isLegalVersion(doc._id,"workflow.professional")) and modifier.$set.avatar
-			throw new Meteor.Error(400, "space_paid_info_title");	
+			throw new Meteor.Error(400, "space_paid_info_title");
 		modifier.$set.modified_by = userId;
 		modifier.$set.modified = new Date();
 
@@ -221,10 +231,10 @@ if Meteor.isServer
 					delete modifier.$set.admins
 			else if (modifier.$set.admins.indexOf(modifier.$set.owner) <0)
 				modifier.$set.admins.push(modifier.$set.owner)
-		
+
 		# 管理员不能为空
-		if (!modifier.$set.admins)
-			throw new Meteor.Error(400, "spaces_error_space_admins_required");
+		# if (!modifier.$set.admins)
+		# 	throw new Meteor.Error(400, "spaces_error_space_admins_required");
 
 		# 必须启用 admin app
 		# if modifier.$set.apps_enabled
@@ -237,11 +247,11 @@ if Meteor.isServer
 		# 工作区修改后，该工作区的根部门的name也要修改，根部门和子部门的fullname也要修改
 		if modifier.$set.name
 			# 直接修改根部门名字，跳过验证
-			db.organizations.direct.update({space: doc._id,is_company: true},{$set:{name: doc.name,fullname:doc.name}})
-			rootOrg = db.organizations.findOne({space: doc._id,is_company: true})
+			db.organizations.direct.update({space: doc._id,is_company: true, parent: null},{$set:{name: doc.name,fullname:doc.name}})
+			rootOrg = db.organizations.findOne({space: doc._id,is_company: true, parent: null})
 			children = db.organizations.find({parents: rootOrg._id});
 			children.forEach (child) ->
-		    db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
+			db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
 
 
 	db.spaces.before.remove (userId, doc) ->
@@ -263,7 +273,7 @@ if Meteor.isServer
 			return;
 		now = new Date
 		if (spaceUserObj)
-			db.space_users.direct.update spaceUserObj._id, 
+			db.space_users.direct.update spaceUserObj._id,
 				$set:
 					name: userObj.name
 					email: userObj.emails?[0]?.address
@@ -273,8 +283,8 @@ if Meteor.isServer
 					invite_state: "accepted"
 					modified: now
 					modified_by: userId
-		else 
-			root_org = db.organizations.findOne({space: spaceId, is_company:true})
+		else
+			root_org = db.organizations.findOne({space: spaceId, is_company:true, parent: null})
 			db.space_users.direct.insert
 				name: userObj.name
 				email: userObj.emails?[0]?.address
@@ -287,7 +297,7 @@ if Meteor.isServer
 				created: now
 				created_by: userId
 			root_org.updateUsers()
-		
+
 	db.spaces.createTemplateOrganizations = (space_id)->
 		space = db.spaces.findOne(space_id)
 		if !space
@@ -305,6 +315,7 @@ if Meteor.isServer
 		org.name = space.name
 		org.fullname = space.name
 		org.is_company = true
+		org.owner = space.owner
 		org_id = db.organizations.insert(org)
 		if !org_id
 			return false
@@ -319,6 +330,7 @@ if Meteor.isServer
 			_org.fullname = org.name + '/' + _org.name
 			_org.parents = [org_id]
 			_org.parent = org_id
+			_org.owner = space.owner
 			if sortNo
 				_org.sort_no=sortNo
 			db.organizations.insert(_org)

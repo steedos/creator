@@ -1,4 +1,6 @@
 {
+	"_namespace": "",
+
 	"accounts-sign-in": "登录",
 	"accounts-sign-out": "退出",
 	"accounts-sign-up": "注册",
@@ -94,7 +96,6 @@
 	"Link your LinkedIn account": "Link your LinkedIn account",
 	"Link your Instagram account": "Link your Instagram account",
 	"Contact Form": "联系我们",
-	"Full Name": "姓名",
 	"Body": "内容",
 	"Send": "发送",
 	"Chat with us": "在线交谈",
@@ -119,10 +120,8 @@
 
 	"Account Settings": "账户设置",
 	"Account": "账户",
-	"Settings": "设置",
 	"Select Space": "选择工作区",
 	"Add space": "新增工作区",
-	"Password": "密码",
 	"Accountzoom": "字体",
 	"Backgroundimage": "背景",
 	"binding_mailbox": "绑定邮箱",
@@ -245,7 +244,6 @@
 	"spaces_owner_name()": "所有者",
 	"spaces_admins_name()": "管理员",
 	"spaces_apps_enabled": "启用应用",
-	"Spaces_isPaid": "已付费",
 	"spaces_enable_register":"是否允许注册",
 	"spaces_max_user_count": "最大用户数",
 	"spaces_is_deleted": "已删除",
@@ -269,7 +267,7 @@
 	"organizations_children": "下级部门",
 	"organizations_created": "创建时间",
 	"organizations_created_by": "创建者",
-	"organizations_is_company": "根部门",
+	"organizations_is_company": "公司级",
 	"organizations_modified": "修改时间",
 	"organizations_modified_by": "修改者",
 	"organizations_parents": "所有上级部门",
@@ -339,7 +337,6 @@
 	"space_users_error_user_required": "user必填",
 	"space_users_error_name_required": "用户名必填",
 	"space_users_error_space_users_exists": "该用户已经存在",
-	"space_users_error_space_not_found": "未找到该工作区",
 	"space_users_error_email_readonly": "用户邮箱不允许修改",
 	"space_users_error_space_readonly": "无法修改工作区",
 	"space_users_error_user_readonly": "无法修改用户",
@@ -514,7 +511,6 @@
 	"billing_pay_records_order_total_fee()": "金额 ￥",
 	"billing_pay_records_order_paid()": "状态",
 	"loading_reload_button_title": "重新加载",
-	"loading_reload_button_title": "重新加载",
 	"apps_members": "授权对象",
 	"apps_members_users": "授权人员",
 	"apps_members_organizations": "授权部门",
@@ -537,5 +533,41 @@
 
 	"space_users_error_roles_used": "已有角色指定该用户：__names__",
 	"space_users_error_flows_used": "已有流程指定该用户为处理人：__names__",
-	"contact_need_phone_or_email": "手机和邮箱不能同时为空"
+	"contact_need_phone_or_email": "手机和邮箱不能同时为空",
+
+	"organizations_error_is_company_false_in_root": "根部门“公司级”属性不能为否",
+	"organizations_error_parent_is_company_false_for_current_company": "公司级的部门的父部门必须也是公司级的部门",
+	"organizations_error_children_is_company_true_for_current_company": "部门的子部门中存在公司级的部门时，不能直接把该部门设置为非公司级",
+	"organizations_error_parent_is_not_found": "未找到父组织",
+	"organizations_error_root_parent_can_not_set": "不能修改根组织的父组织属性",
+	"organizations_error_space_admins_only_for_is_company": "只有工作区的管理员才能设置部门的公司级属性",
+
+	"creator_odata_api_not_found": "很抱歉，您要访问的资源不存在或者您没有权限访问该资源！",
+	"creator_odata_unexpected_character" :"不支持的特殊字符",
+	"creator_odata_authentication":"您需要提供身份验证",
+	"creator_odata_user_privileges":"用户没有访问实体的权限",
+	"creator_list_no_actions_tip": "没有可做的操作",
+	"creator_list_view_permissions_lost": "您没有权限访问该视图",
+
+	"creator_report_drill_down_label": "下钻数据",
+	"creator_report_drill_down_total_label": "总",
+	"creator_listview_update":"列表视图已更新",
+
+	"creator_request_oversized": "请求文件太大了",
+
+	"creator_permission_share_miss": "请在授权组织或授权用户中至少填写一个值",
+
+	"no_force_phone": "不强制绑定手机号的用户",
+	"no_force_phone_tips": "除了不强制绑定手机号的用户外，都要求绑定手机号后才能进入系统",
+
+
+
+    "creator_odata_post_fail":  "记录添加失败",
+    "creator_odata_record_query_fail": "未找到符合查询条件的记录",
+    "creator_odata_collection_query_fail": "未找到符合查询条件的集合",
+    "creator_odata_creator_odata_authentication_required": "用户需提供身份认证",
+    "creator_odata_user_access_fail": "用户无访问该对象的权限",
+    "creator_odata_user_create_fail": "用户无创建该对象的权限",
+    "creator_odata_user_update_fail": "用户无更新该对象的权限",
+    "creator_odata_user_remove_fail": "用户无删除该对象的权限"
 }

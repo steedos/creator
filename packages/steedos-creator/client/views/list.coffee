@@ -61,7 +61,6 @@ Template.creator_list.helpers
 					_.each filters, (filter)->
 						selector = _.extend selector, filter
 					
-					console.log "filters", selector
 					if list_view.filter_scope == "mine"
 						selector.owner = Meteor.userId()
 					return selector

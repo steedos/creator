@@ -7,6 +7,8 @@ Creator.Objects.space_users =
 	label: "人员"
 	icon: "user"
 	enable_search: true
+	sidebar:
+		template_name: "creator_grid_sidebar_organizations"
 	fields:
 		name:
 			label: "姓名"
@@ -17,15 +19,23 @@ Creator.Objects.space_users =
 			required: true
 			searchable:true
 			index:true
+		position:
+			type: "text"
+			label:'职务'
 		organizations:
 			type: "lookup"
 			label:'所属部门'
 			reference_to: "organizations"
 			multiple: true
-			defaultValue: []
-		position:
-			type: "text"
-			label:'职务'
+			defaultValue: ()->
+				return Session.get("grid_sidebar_selected")
+			required: true
+		organizations_parents:
+			label: '所属部门（含上级）'
+			type: "lookup"
+			reference_to: "organizations"
+			multiple: true
+			omit: true
 		manager:
 			type: "lookup"
 			label:'上级主管'
@@ -34,13 +44,16 @@ Creator.Objects.space_users =
 		mobile:
 			type: "text"
 			label:'手机'
+			searchable:true
 			group:'-'
 		email:
 			type: "text"
 			label:'邮件'
+			searchable:true
 		work_phone:
 			type: "text"
 			label:'工作电话'
+			searchable:true
 
 		company:
 			type: "text"
@@ -53,16 +66,17 @@ Creator.Objects.space_users =
 			label:'排序号'
 			group:'-'
 		organization:
+			label:'主部门'
 			type: "lookup"
 			reference_to: "organizations"
 			omit: true
-			hidden: true
-		organization_company: 
+		company_id:
+			label: "所属单位"
 			type: "lookup"
-			label: '所属公司'
 			reference_to: "organizations"
-			omit: true
-			hidden: true
+			sortable: true
+			index:true
+			omit:true
 		user_accepted:
 			type: "boolean"
 			label:'有效'
@@ -77,7 +91,6 @@ Creator.Objects.space_users =
 			type: "master_detail"
 			reference_to: "users"
 			index:true
-			# required: true
 			omit: true
 			hidden: true
 		hr:
@@ -85,13 +98,17 @@ Creator.Objects.space_users =
 			blackbox: true
 			omit: true
 			hidden: true
-	
+
+		username:
+			type: "text"
+			label: "用户名"
+
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "organizations","position", "mobile", "email", "sort_no"]
-			filter_scope: "space"	
-	
+			columns: ["name", "position", "sort_no"]
+			filter_scope: "space"
+
 	permission_set:
 		user:
 			allowCreate: false
@@ -199,6 +216,10 @@ Meteor.startup ()->
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该用户已在此工作区")
 
+			if doc.username
+				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
+					throw new Meteor.Error(400, "space_paid_info_title")
+
 		db.space_users.updatevaildate = (userId, doc, modifier) ->
 			if doc.invite_state == "refused" or doc.invite_state == "pending"
 				throw new Meteor.Error(400, "该用户还未接受加入工作区，不能修改他的个人信息")
@@ -276,6 +297,10 @@ Meteor.startup ()->
 				if repeatNumberUser and repeatNumberUser._id != doc.user
 					throw new Meteor.Error(400, "space_users_error_phone_already_existed")
 
+			if modifier.$set?.hasOwnProperty('username') or modifier.$unset?.hasOwnProperty('username')
+				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
+					throw new Meteor.Error(400, "space_paid_info_title")
+
 
 		db.space_users.before.insert (userId, doc) ->
 			doc.created_by = userId;
@@ -352,6 +377,9 @@ Meteor.startup ()->
 						email = [{address: doc.email, verified: false}]
 						options.emails = email
 
+					if doc.username
+						options.username = doc.username
+
 					doc.user = db.users.insert options
 
 			if !doc.user
@@ -364,6 +392,11 @@ Meteor.startup ()->
 				# 如果主组织未设置或设置的值不在doc.organizations内，则自动设置为第一个组织
 				unless doc.organizations.includes doc.organization
 					doc.organization = doc.organizations[0]
+
+			if doc.organization
+				organization = db.organizations.findOne(doc.organization,fields:{company_id:1})
+				if organization
+					doc.company_id = organization.company_id
 
 		db.space_users.after.insert (userId, doc) ->
 			if doc.organizations
@@ -401,6 +434,9 @@ Meteor.startup ()->
 				user: doc.user
 				user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
 
+			if doc.organizations
+				db.space_users.update_organizations_parents(doc._id, doc.organizations)
+
 		db.space_users.before.update (userId, doc, fieldNames, modifier, options) ->
 			modifier.$set = modifier.$set || {};
 
@@ -409,6 +445,22 @@ Meteor.startup ()->
 				# 修改所有组织且修改后的组织不包含原主组织，则把主组织自动设置为第一个组织
 				unless modifier.$set.organizations.includes doc.organization
 					modifier.$set.organization = modifier.$set.organizations[0]
+
+			if modifier.$set.organization
+				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1, parent:1, is_company:1})
+				if organization
+					if organization.company_id
+						modifier.$set.company_id = organization.company_id
+					else
+						if !organization.parent and organization.is_company
+							modifier.$set.company_id = organization._id
+						else
+							rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
+							if rootOrg
+								modifier.$set.company_id = rootOrg._id
+							else
+								modifier.$unset = modifier.$unset || {}
+								modifier.$unset.company_id = 1
 
 			newMobile = modifier.$set.mobile
 			# 当把手机号设置为空值时，newMobile为undefined，modifier.$unset.mobile为空字符串
@@ -500,6 +552,12 @@ Meteor.startup ()->
 				db.users.update({_id: doc.user}, {$unset: {emails: emails}, $set: {steedos_id: doc.user}})
 				db.space_users.direct.update({user: doc.user}, {$unset: {email: ""}}, {multi: true})
 
+			if modifier.$set.username && modifier.$set.username != doc.username
+				db.users.update({ _id: doc.user }, { $set: { username: modifier.$set.username } })
+
+			if modifier.$unset?.hasOwnProperty('username')
+				db.users.update({ _id: doc.user }, { $unset: { username: 1 } })
+
 
 		db.space_users.after.update (userId, doc, fieldNames, modifier, options) ->
 			modifier.$set = modifier.$set || {};
@@ -543,6 +601,9 @@ Meteor.startup ()->
 						operation: modifier.$set.user_accepted ? "enable" : "disable"
 						user: doc.user
 						user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+
+			if modifier.$set.organizations
+				db.space_users.update_organizations_parents(doc._id, modifier.$set.organizations)
 
 
 		db.space_users.before.remove (userId, doc) ->
@@ -598,6 +659,11 @@ Meteor.startup ()->
 						html: content
 			catch e
 				console.error e.stack
+
+		db.space_users.update_organizations_parents = (_id, organizations)->
+			orgs = db.organizations.find({_id: {$in: organizations}}, {fields: {parents: 1}}).fetch()
+			organizations_parents = _.compact(_.uniq(_.flatten([organizations, _.pluck(orgs, 'parents')])))
+			db.space_users.direct.update({_id: _id}, {$set: {organizations_parents: organizations_parents}})
 
 
 		Meteor.publish 'space_users', (spaceId)->

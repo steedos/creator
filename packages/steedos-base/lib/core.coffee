@@ -207,6 +207,16 @@ if Meteor.isClient
 		if !app
 			FlowRouter.go("/")
 			return
+		
+		creatorSettings = Meteor.settings.public?.webservices?.creator
+		if app._id == "admin" and creatorSettings?.status == "active"
+			url = creatorSettings.url
+			reg = /\/$/
+			unless reg.test url
+				url += "/"
+			url = "#{url}app/admin"
+			Steedos.openWindow(url)
+			return
 
 		on_click = app.on_click
 		if app.is_use_ie
@@ -390,7 +400,7 @@ if Meteor.isServer
 #	Steedos.chargeAPIcheck = (spaceId)->
 
 if Meteor.isServer
-	Cookies = Npm.require("cookies")
+	Cookies = require("cookies")
 	#TODO 添加服务端是否手机的判断(依据request)
 	Steedos.isMobile = ()->
 		return false;
@@ -523,7 +533,7 @@ if Meteor.isServer
 
 
 if Meteor.isServer
-	crypto = Npm.require('crypto');
+	crypto = require('crypto');
 	Steedos.decrypt = (password, key, iv)->
 		try
 			key32 = ""
@@ -758,7 +768,7 @@ if Meteor.isServer
 if Meteor.isServer
 	_.extend Steedos,
 		getSteedosToken: (appId, userId, authToken)->
-			crypto = Npm.require('crypto')
+			crypto = require('crypto')
 			app = db.apps.findOne(appId)
 			if app
 				secret = app.secret

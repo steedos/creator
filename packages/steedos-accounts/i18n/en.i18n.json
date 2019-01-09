@@ -1,4 +1,6 @@
 {
+	"_namespace": "",
+
 	"accounts_phone_already_existed": "The phone number is already used.",
 	"accounts_phone_invalid": "Not a valid phone",
 	"accounts_phone_code_invalid": "Not a valid code",

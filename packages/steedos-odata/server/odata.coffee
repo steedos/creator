@@ -1,7 +1,25 @@
 Meteor.startup ->
 
-	odataV4Mongodb = Npm.require 'odata-v4-mongodb'
-	querystring = Npm.require 'querystring'
+	odataV4Mongodb = require 'odata-v4-mongodb'
+	querystring = require 'querystring'
+
+	handleError = (e)->
+		console.error e.stack
+		body = {}
+		error = {}
+		error['message'] = e.message
+		statusCode = 500
+		if e.error and _.isNumber(e.error)
+			statusCode = e.error
+		error['code'] = statusCode
+		error['error'] = statusCode
+		error['details'] = e.details
+		error['reason'] = e.reason
+		body['error'] = error
+		return {
+			statusCode: statusCode
+			body:body
+		}
 
 	visitorParser = (visitor)->
 		parsedOpt = {}
@@ -128,6 +146,17 @@ Meteor.startup ->
 		error['innererror'] = innererror
 		body['error'] = error
 		return body
+
+	removeInvalidMethod = (queryParams)->
+		if queryParams.$filter && queryParams.$filter.indexOf('tolower(') > -1
+			removeMethod = ($1)->
+				return $1.replace('tolower(', '').replace(')', '')
+			queryParams.$filter = queryParams.$filter.replace(/tolower\(([^\)]+)\)/g, removeMethod)
+
+	isSameCompany = (spaceId, userId, companyId)->
+		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1 } })
+		return su.company_id == companyId
+
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
 			try
@@ -145,10 +174,13 @@ Meteor.startup ->
 						statusCode: 404
 						body:setErrorMessage(404,collection,key)
 					}
+
+				removeInvalidMethod(@queryParams)
+				qs = decodeURIComponent(querystring.stringify(@queryParams))
+				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
-				if permissions.viewAllRecords or (permissions.allowRead and @userId)
-					qs = decodeURIComponent(querystring.stringify(@queryParams))
-					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
+				if permissions.viewAllRecords or (permissions.allowRead and @userId) or (permissions.viewCompanyRecords && isSameCompany(spaceId, @userId, createQuery.query.company_id))
+
 					if key is 'cfs.files.filerecord'
 						createQuery.query['metadata.space'] = spaceId
 					else if key is 'spaces'
@@ -208,7 +240,7 @@ Meteor.startup ->
 							if field.indexOf('$')<0
 								#if fields[field]?.multiple!= true
 								createQuery.projection[field] = 1
-					if not permissions.viewAllRecords
+					if not permissions.viewAllRecords && !permissions.viewCompanyRecords
 						if object.enable_share
 							# 满足共享规则中的记录也要搜索出来
 							delete createQuery.query.owner
@@ -248,19 +280,8 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,"get")
 					}
 			catch e
-				console.error e.stack
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
+
 		post: ()->
 			try
 				key = @urlParams.object_name
@@ -306,18 +327,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'post')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 
 	})
 	SteedosOdataAPI.addRoute(':object_name/recent', {authRequired: true, spaceRequired: false}, {
@@ -347,6 +357,7 @@ Meteor.startup ->
 					recent_view_records_ids = recent_view_records_ids.getProperty("ids")
 					recent_view_records_ids = _.flatten(recent_view_records_ids)
 					recent_view_records_ids = _.uniq(recent_view_records_ids)
+					removeInvalidMethod(@queryParams)
 					qs = decodeURIComponent(querystring.stringify(@queryParams))
 					createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 					if key is 'cfs.files.filerecord'
@@ -410,18 +421,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'get')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 })
 
 	SteedosOdataAPI.addRoute(':object_name/:_id', {authRequired: true, spaceRequired: false}, {
@@ -466,18 +466,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'post')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 		get:()->
 
 			key = @urlParams.object_name
@@ -542,6 +531,7 @@ Meteor.startup ->
 					permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 					if permissions.allowRead
 						unreadable_fields = permissions.unreadable_fields || []
+						removeInvalidMethod(@queryParams)
 						qs = decodeURIComponent(querystring.stringify(@queryParams))
 						createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 						createQuery.query._id =  @urlParams._id
@@ -560,14 +550,14 @@ Meteor.startup ->
 							createQuery.projection = projection
 						if not createQuery.projection or !_.size(createQuery.projection)
 							readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
-							fields = Creator.getObject(key).fields
+							fields = Creator.getObject(key, @urlParams.spaceId).fields
 							_.each readable_fields,(field)->
 								if field.indexOf('$')<0
 									createQuery.projection[field] = 1
 						entity = collection.findOne(createQuery.query,visitorParser(createQuery))
 						entities = []
 						if entity
-							isAllowed = entity.owner == @userId or permissions.viewAllRecords
+							isAllowed = entity.owner == @userId or permissions.viewAllRecords or (permissions.viewCompanyRecords && isSameCompany(@urlParams.spaceId, @userId, entity.company_id))
 							if object.enable_share and !isAllowed
 								shares = []
 								orgs = Steedos.getUserOrganizations(@urlParams.spaceId, @userId, true)
@@ -601,18 +591,7 @@ Meteor.startup ->
 							body: setErrorMessage(403,collection,key,'get')
 						}
 				catch e
-					body = {}
-					error = {}
-					error['message'] = e.message
-					error['code'] = 500
-					error['error'] = e.error
-					error['details'] = e.details
-					error['reason'] = e.reason
-					body['error'] = error
-					return {
-						statusCode: 500
-						body:body
-					}
+					return handleError e
 
 		put:()->
 			try
@@ -636,7 +615,10 @@ Meteor.startup ->
 					record_owner = @urlParams._id
 				else
 					record_owner = collection.findOne({ _id: @urlParams._id }, { fields: { owner: 1 } })?.owner
-				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId )
+
+				companyId = collection.findOne({ _id: @urlParams._id }, { fields: { company_id: 1 } })?.company_id
+
+				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId ) or (permissions.modifyCompanyRecords && isSameCompany(spaceId, @userId, companyId))
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest' or spaceId is 'common' or key == "users"
@@ -646,6 +628,8 @@ Meteor.startup ->
 						if _.indexOf(permissions.uneditable_fields, key) > -1
 							fields_editable = false
 					if fields_editable
+						if key is 'spaces'
+							delete selector.space
 						entityIsUpdated = collection.update selector, @bodyParams
 						if entityIsUpdated
 							#statusCode: 201
@@ -677,18 +661,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key,'put')
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 		delete:()->
 			try
 				key = @urlParams.object_name
@@ -707,8 +680,10 @@ Meteor.startup ->
 					}
 				spaceId = @urlParams.spaceId
 				permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
-				record_owner = collection.findOne({_id: @urlParams._id})?.owner
-				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete)  or (permissions.allowDelete and record_owner==@userId )
+				recordData = collection.findOne({_id: @urlParams._id}, { fields: { owner: 1, company_id: 1 } })
+				record_owner = recordData?.owner
+				companyId = recordData?.company_id
+				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.allowDelete and record_owner==@userId ) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId))
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest'
@@ -734,18 +709,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key)
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 	})
 
 	# _id可传all
@@ -789,18 +753,7 @@ Meteor.startup ->
 						body: setErrorMessage(403,collection,key)
 					}
 			catch e
-				body = {}
-				error = {}
-				error['message'] = e.message
-				error['code'] = 500
-				error['error'] = e.error
-				error['details'] = e.details
-				error['reason'] = e.reason
-				body['error'] = error
-				return {
-					statusCode: 500
-					body:body
-				}
+				return handleError e
 
 	})
 
@@ -826,6 +779,7 @@ Meteor.startup ->
 
 							permissions = Creator.getObjectPermissions(@urlParams.spaceId, @userId, key)
 							if permissions.viewAllRecords or (permissions.allowRead and @userId)
+									removeInvalidMethod(@queryParams)
 									qs = decodeURIComponent(querystring.stringify(@queryParams))
 									createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 

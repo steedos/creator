@@ -1,5 +1,6 @@
-# 手动执行
-npm use v8.11.3
+source /srv/git/nvm/nvm.sh
+nvm use v8.11.3
+meteor npm i
 #!/bin/bash
 BUNDLE_PATH="/srv/app-dzgy-archive"
 
@@ -13,6 +14,8 @@ if [ -d "$BUNDLE_PATH" ]; then
 	rm -f npm-shrinkwrap.json
 	npm install --registry https://registry.npm.taobao.org -d
 
+	cd $BUNDLE_PATH
+	pm2 restart creator.0
 else
 	echo "!!!=> Failed to create bundle path: $BUNDLE_PATH"
 fi

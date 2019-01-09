@@ -1,5 +1,6 @@
 renderTree = (container,isSelf)->
 	spaceId = Template.instance().data.spaceId
+	rootOrg = Template.instance().data.rootOrg
 	$(container).on('select_node.jstree', (e, data) ->
 		if(container == "#cf_organizations_tree_self")
 			$("#cf_organizations_tree").jstree().deselect_all?()
@@ -21,7 +22,7 @@ renderTree = (container,isSelf)->
 			themes: {"stripes": true, "variant": "large"},
 			three_state: false,
 			data: (node, cb) ->
-				cb(CFDataManager.getNode(spaceId, node, isSelf, true));
+				cb(CFDataManager.getNode(spaceId, node, {isSelf: isSelf, isNeedtoSelDefault: true, rootOrg: rootOrg}));
 
 				# if node.id != '#'
 					# Session.set("cf_selectOrgId", node.id);

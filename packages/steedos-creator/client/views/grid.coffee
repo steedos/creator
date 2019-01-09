@@ -1,5 +1,4 @@
-_standardQuery = (curObjectName)->
-	standard_query = Session.get("standard_query")
+_standardQuery = (curObjectName, standard_query)->
 	object_fields = Creator.getObject(curObjectName).fields
 	if !standard_query or !standard_query.query or !_.size(standard_query.query) or standard_query.object_name != curObjectName
 		delete Session.keys["standard_query"]
@@ -23,6 +22,8 @@ _standardQuery = (curObjectName)->
 			_.each query, (val, key)->
 				if object_fields[key]
 					if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						if object_fields[key].type == 'date' && val
+							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 ) # 处理grid中的datetime 偏移
 						query_arr.push([key, ">=", val])
 					else if ["text", "textarea", "html"].includes(object_fields[key].type)
 						# 特殊字符编码
@@ -35,6 +36,8 @@ _standardQuery = (curObjectName)->
 				else
 					key = key.replace(/(_endLine)$/, "")
 					if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+						if object_fields[key].type == 'date' && val
+							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 						query_arr.push([key, "<=", val])
 
 		is_logic_or = if standard_query.is_mini then true else false
@@ -70,13 +73,16 @@ _itemClick = (e, curObjectName, list_view_id)->
 			object = Creator.getObject(objectName)
 			collectionName = object.label
 			name_field_key = object.NAME_FIELD_KEY
+			if objectName == "organizations"
+				# 显示组织列表时，特殊处理name_field_key为name字段
+				name_field_key = "name"
 			Session.set("action_fields", undefined)
 			Session.set("action_collection", "Creator.Collections.#{objectName}")
 			Session.set("action_collection_name", collectionName)
 			Session.set("action_save_and_insert", true)
 			if action.todo == "standard_delete"
 				action_record_title = value.itemData.record[name_field_key]
-				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, ()->
+				Creator.executeAction objectName, action, recordId, action_record_title, list_view_id, value.itemData.record, ()->
 					self.dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
@@ -97,7 +103,6 @@ _actionItems = (object_name, record_id, record_permissions)->
 			if action.only_detail
 				return false
 			if typeof action.visible == "function"
-				console.log "action.visible,function:", object_name, record_id, record_permissions
 				return action.visible(object_name, record_id, record_permissions)
 			else
 				return action.visible
@@ -108,9 +113,16 @@ _actionItems = (object_name, record_id, record_permissions)->
 _fields = (object_name, list_view_id)->
 	object = Creator.getObject(object_name)
 	name_field_key = object.NAME_FIELD_KEY
+	if object.name == "organizations"
+		# 显示组织列表时，特殊处理name_field_key为name字段
+		name_field_key = "name"
 	fields = [name_field_key]
 	if Creator.getCollection("object_listviews").findOne(list_view_id)
 		fields = Creator.getCollection("object_listviews").findOne(list_view_id).columns
+		if !fields
+			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+			if defaultColumns
+				fields = defaultColumns
 	else if object.list_views
 		if object.list_views[list_view_id]?.columns
 			fields = object.list_views[list_view_id].columns
@@ -120,7 +132,7 @@ _fields = (object_name, list_view_id)->
 				fields = defaultColumns
 
 	fields = fields.map (n)->
-		if object.fields[n]?.type and !object.fields[n].hidden
+		if object.fields[n]?.type # and !object.fields[n].hidden
 			return n.split(".")[0]
 		else
 			return undefined
@@ -130,7 +142,8 @@ _fields = (object_name, list_view_id)->
 
 	fields = _.compact(fields)
 	fieldsName = Creator.getObjectFieldsName(object_name)
-	return _.intersection(fieldsName, fields)
+	# 注意这里intersection函数中两个参数次序不能换，否则字段的先后显示次序就错了
+	return _.intersection(fields, fieldsName)
 
 _removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
 	# 移除主键字段，即columns中的reference_to等于object_name的字段
@@ -202,7 +215,6 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	else if !_.isEmpty(list_view_sort)
 		list_view_sort = list_view_sort
 	else
-		console.log("default sort...")
 		#默认读取default view的sort配置
 		list_view_sort = column_default_sort
 	
@@ -286,7 +298,7 @@ Template.creator_grid.onRendered ->
 	self.autorun (c)->
 		is_related = self.data.is_related
 		if is_related
-			list_view_id = "all"
+			list_view_id = Creator.getListView(self.data.related_object_name, "all")._id
 		else
 			list_view_id = Session.get("list_view_id")
 		unless list_view_id
@@ -298,9 +310,11 @@ Template.creator_grid.onRendered ->
 
 		if !creator_obj
 			return
-
+		
 		related_object_name = self.data.related_object_name
-		name_field_key = creator_obj.NAME_FIELD_KEY
+		curObjectName = if is_related then related_object_name else object_name
+		curObject = Creator.getObject(curObjectName)
+
 		record_id = Session.get("record_id")
 
 		listTreeCompany = Session.get('listTreeCompany')
@@ -312,17 +326,27 @@ Template.creator_grid.onRendered ->
 					filter = undefined
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
-					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id)
+					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
+				filter_logic = Session.get("filter_logic")
+				filter_scope = Session.get("filter_scope")
+				filter_items = Session.get("filter_items")
+				if filter_items
+					filters_set = 
+						filter_logic: filter_logic
+						filter_scope: filter_scope
+						filters: filter_items
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
-					filter = undefined
+					if filters_set
+						filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
+					else
+						filter = undefined
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
-					filter = Creator.getODataFilter(list_view_id, object_name)
+					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 
-				standardQuery = _standardQuery(object_name)
-				console.log "standardQuery", standardQuery
+				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
 					if filter
 						filter = [filter, "and", standardQuery]
@@ -332,24 +356,26 @@ Template.creator_grid.onRendered ->
 				if !filter
 					filter = ["_id", "<>", -1]
 
-				if listTreeCompany and  listTreeCompany!='undefined' and creator_obj?.filter_company==true
+				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
-
-
-			curObjectName = if is_related then related_object_name else object_name
+				
+				unless is_related
+					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
+					sidebarFilter = Session.get("grid_sidebar_filters")
+					if sidebarFilter and sidebarFilter.length
+						filter = [ filter, "and", sidebarFilter ]
 
 			selectColumns = Tracker.nonreactive ()->
 				grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
 				if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
 					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-
 				if settingColumns
 					defaultColumns = _fields(curObjectName, list_view_id)
 					selectColumns = _.intersection(settingColumns, defaultColumns)
 					selectColumns = _.union(selectColumns, defaultColumns)
 				else
-					selectColumns = _fields(curObjectName)
+					selectColumns = _fields(curObjectName, list_view_id)
 				return selectColumns
 
 			pageIndex = Tracker.nonreactive ()->
@@ -363,21 +389,23 @@ Template.creator_grid.onRendered ->
 					return 0
 
 			extra_columns = ["owner"]
-			if creator_obj.enable_tree
+			if !is_related and curObject.enable_tree
 				extra_columns.push("parent")
-			object = Creator.getObject(curObjectName)
+				extra_columns.push("children")
+			# object = Creator.getObject(curObjectName)
 			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
 			if defaultExtraColumns
 				extra_columns = _.union extra_columns, defaultExtraColumns
 			
 			selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
+			#expand_fields 不需要包含 extra_columns
+			expand_fields = _expandFields(curObjectName, selectColumns)
 			
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
-			expand_fields = _expandFields(curObjectName, selectColumns)
 			actions = Creator.getActions(curObjectName)
 			if actions.length
 				showColumns.push
@@ -405,27 +433,28 @@ Template.creator_grid.onRendered ->
 						"""
 						$("<div>").append(htmlText).appendTo(container);
 			
-			unless creator_obj.enable_tree
-				nameFieldKey = Creator.getObject(curObjectName).NAME_FIELD_KEY
+			if is_related || !curObject.enable_tree
+				nameFieldKey = curObject.NAME_FIELD_KEY
 				needToShowLinkForIndexColumn = false
 				if selectColumns.indexOf(nameFieldKey) < 0
 					needToShowLinkForIndexColumn = true
 				showColumns.splice 0, 0, 
 					dataField: "_id_checkbox"
-					width: 60
+					width: 30
+					allowResizing: false
 					allowExporting: false
 					allowSorting: false
 					allowReordering: false
 					headerCellTemplate: (container) ->
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
 					cellTemplate: (container, options) ->
-						# console.log('[container]', container)
-						# console.log('[options]', options)
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 		
 				showColumns.splice 0, 0,
 					dataField: "_index"
-					width: 60
+					width: 50
+					allowResizing: false
+					alignment: "right"
 					allowExporting: true
 					allowSorting: false
 					allowReordering: false
@@ -442,17 +471,13 @@ Template.creator_grid.onRendered ->
 							$("<div>").append(htmlText).appendTo(container)
 			_.every showColumns, (n)->
 				n.sortingMethod = Creator.sortingMethod
-			# console.log "selectColumns", selectColumns
-			console.log "filter", filter
-			# console.log "expand_fields", expand_fields
 			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			if !is_related and localPageSize
 				pageSize = localPageSize
 			else
-				pageSize = 10
+				pageSize = 50
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
-			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
@@ -461,10 +486,6 @@ Template.creator_grid.onRendered ->
 					allowedPageSizes: [10, 50, 100, 200],
 					showInfo: false,
 					showNavigationButtons: true
-				export:
-					enabled: true
-					fileName: fileName
-					allowExportSelectedData: false
 				showColumnLines: false
 				allowColumnReordering: true
 				allowColumnResizing: true
@@ -526,10 +547,11 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
+				columnAutoWidth: true
 				sorting: 
 					mode: "multiple"
 				customizeExportData: (col, row)->
-					fields = creator_obj.fields
+					fields = curObject.fields
 					_.each row, (r)->
 						_.each r.values, (val, index)->
 							if val
@@ -553,7 +575,6 @@ Template.creator_grid.onRendered ->
 										val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
 										r.values[index] = val
 				onCellClick: (e)->
-					console.log "curObjectName", curObjectName
 					if e.column?.dataField ==  "_id_actions"
 						_itemClick.call(self, e, curObjectName)
 
@@ -565,30 +586,58 @@ Template.creator_grid.onRendered ->
 						recordsTotal[curObjectName] = self.dxDataGridInstance.totalCount()
 						self.data.recordsTotal.set recordsTotal
 					unless is_related
-						unless creator_obj.enable_tree
+						unless curObject.enable_tree
 							# 不支持tree格式的翻页
 							current_pagesize = self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize()
 							self.$(".gridContainer").dxDataGrid().dxDataGrid('instance').pageSize(current_pagesize)
 							localStorage.setItem("creator_pageSize:"+Meteor.userId(),current_pagesize)
-				onNodesInitialized: (e)->
-					if creator_obj.enable_tree
-						# 默认展开第一个节点
-						rootNode = e.component.getRootNode()
-						firstNodeKey = rootNode?.children[0]?.key
-						if firstNodeKey
-							e.component.expandRow(firstNodeKey)
+				# onNodesInitialized: (e)->
+				# 	if creator_obj.enable_tree
+				# 		# 默认展开第一个节点
+				# 		rootNode = e.component.getRootNode()
+				# 		firstNodeKey = rootNode?.children[0]?.key
+				# 		if firstNodeKey
+				# 			e.component.expandRow(firstNodeKey)
+			
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
-			if creator_obj.enable_tree
+			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
+			dxOptions.export =
+				enabled: true
+				fileName: fileName
+				allowExportSelectedData: false
+			if !is_related and curObject.enable_tree
+				# 如果是tree则过虑条件适用tree格式，要排除相关项is_related的情况，因为相关项列表不需要支持tree
 				dxOptions.keyExpr = "_id"
-				dxOptions.parentIdExpr = "parent._id"
-				dxOptions.expandNodesOnFiltering = false
-				dxOptions.remoteOperations = false
+				dxOptions.parentIdExpr = "parent"
+				dxOptions.hasItemsExpr = (params)->
+					if params?.children?.length>0
+						return true 
+					return false;
+				dxOptions.expandNodesOnFiltering = true
+				# tree 模式不能设置filter，filter由tree动态生成
+				dxOptions.dataSource.filter = null
+				dxOptions.rootValue = null
+				dxOptions.remoteOperations = 
+					filtering: true
+					sorting: false
+					grouping: false
+				dxOptions.scrolling = null
+				dxOptions.pageing = 
+					pageSize: 1000
 				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
 				# dxOptions.autoExpandAll = true
 				# 不支持tree格式的翻页，因为OData模式下，每次翻页都请求了完整数据，没有意义
-				dxOptions.pager = null 
-				dxOptions.paging = null 
+				dxOptions.pager = null
+
+				_.forEach dxOptions.columns, (column)->
+					if column.dataField == 'name' || column.dataField == curObject.NAME_FIELD_KEY
+						column.allowSearch = true
+					else
+						column.allowSearch = false
+
+				console.log('dxOptions.columns', dxOptions.columns)
+
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
@@ -619,23 +668,23 @@ Template.creator_grid.events
 			field.push(this.field_name)
 			field = field.join(",")
 
-		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else Session.get("object_name")
+		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else (template.data?.object_name || Session.get("object_name"))
 		collection_name = Creator.getObject(objectName).label
-		# rowData = this.doc
+		record = Creator.odata.get(objectName, this._id)
+		if record
+			Session.set("cmFullScreen", full_screen)
+			Session.set 'cmDoc', record
+			Session.set("action_fields", field)
+			Session.set("action_collection", "Creator.Collections.#{objectName}")
+			Session.set("action_collection_name", collection_name)
+			Session.set("action_save_and_insert", false)
+			Session.set 'cmIsMultipleUpdate', true
+			Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
+			Meteor.defer ()->
+				$(".btn.creator-cell-edit").click()
 
-		Meteor.call "object_record", Session.get("spaceId"), objectName, this._id, (error, result)->
-			if result
-				Session.set("cmFullScreen", full_screen)
-				Session.set 'cmDoc', result
-				Session.set("action_fields", field)
-				Session.set("action_collection", "Creator.Collections.#{objectName}")
-				Session.set("action_collection_name", collection_name)
-				Session.set("action_save_and_insert", false)
-				Session.set 'cmIsMultipleUpdate', true
-				Session.set 'cmTargetIds', Creator.TabularSelectedIds?[objectName]
-				Meteor.defer ()->
-					$(".btn.creator-cell-edit").click()
-
+		return false
+	
 	'dblclick td': (event) ->
 		$(".table-cell-edit", event.currentTarget).click()
 

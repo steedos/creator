@@ -21,20 +21,6 @@ Creator.createObject = (object_name,object_data)->
 	Meteor.defer ->
 		$(".creator-add").click()
 
-Creator.editObject = (object_name,record_id)->
-	object = Creator.getObject(object_name)
-	collection_name = "Creator.Collections."+object_name
-	Session.set("action_collection",collection_name)
-	Session.set("action_save_and_insert",false)
-	Session.set("action_collection_name",object.label)
-	Session.set('action_object_name',object_name)
-	Session.set("action_record_id",record_id)
-	Session.set("action_fields",undefined)
-	Meteor.call "object_record", Session.get("spaceId"), object_name, record_id, (error, result)->
-		if result
-			Session.set 'cmDoc', result
-			$(".btn.creator-edit").click()
-
 if Meteor.isClient
 	# 定义全局变量以Session.get("object_name")为key记录其选中的记录id集合
 	Creator.TabularSelectedIds = {}
@@ -43,7 +29,7 @@ if Meteor.isClient
 		object_name = Session.get("object_name")
 		if object_name
 			Creator.TabularSelectedIds[object_name] = []
-	
+
 	Creator.remainCheckboxState = (container)->
 		# 当Creator.TabularSelectedIds值，把container内的勾选框状态保持住
 		checkboxAll = container.find(".select-all")
@@ -70,20 +56,37 @@ if Meteor.isClient
 				checkboxAll.prop("checked",false)
 			else if selectedLength == checkboxs.length
 				checkboxAll.prop("checked",true)
-	
+
 	### TO DO LIST
 		1.支持$in操作符，实现recent视图
 		$eq, $ne, $lt, $gt, $lte, $gte
 	###
-	Creator.getODataFilter = (list_view_id, object_name)->
+	Creator.getODataFilter = (list_view_id, object_name, filters_set)->
 		userId = Meteor.userId()
 		spaceId = Session.get("spaceId")
 		custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
+		unless filters_set
+			filters_set = {}
+			if custom_list_view
+				filters_set.filter_logic = custom_list_view.filter_logic
+				filters_set.filter_scope = custom_list_view.filter_scope
+				filters_set.filters = custom_list_view.filters
+			else
+				if spaceId and userId
+					list_view = Creator.getListView(object_name, list_view_id)
+					unless list_view
+						return ["_id", "=", -1]
+
+					filters_set.filter_scope = list_view.filter_scope
+					filters_set.filters = list_view.filters
+
+		filter_logic = filters_set.filter_logic
+		filter_scope = filters_set.filter_scope
+		filters = filters_set.filters
 		selector = []
+		if _.isFunction(filters)
+			filters = filters()
 		if custom_list_view
-			filter_logic = custom_list_view.filter_logic
-			filter_scope = custom_list_view.filter_scope
-			filters = custom_list_view.filters
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]
 
@@ -102,21 +105,18 @@ if Meteor.isClient
 							if _.isString(obj?._value)
 								return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
 						return [obj.field, obj.operation, obj.value]
-					
+
 					filters = Creator.formatFiltersToDev(filters)
 					_.each filters, (filter)->
 						selector.push filter
 		else
 			if spaceId and userId
-				list_view = Creator.getListView(object_name, list_view_id)
-				unless list_view
-					return ["_id", "=", -1]
 
 				if object_name == "users"
 					selector.push ["_id", "=", userId]
 
-				if list_view.filters
-					filters = Creator.formatFiltersToDev(list_view.filters)
+				if filters
+					filters = Creator.formatFiltersToDev(filters)
 					if filters and filters.length > 0
 						if selector.length > 0
 							selector.push "and"
@@ -129,17 +129,21 @@ if Meteor.isClient
 								else
 									selector.push filter
 
-					if list_view.filter_scope == "mine"
+					if filter_scope == "mine"
 						if selector.length > 0
 							selector.push "and"
 						selector.push ["owner", "=", userId]
 				else
 					permissions = Creator.getPermissions(object_name)
 					if permissions.viewAllRecords
-						if list_view.filter_scope == "mine"
+						if filter_scope == "mine"
 							if selector.length > 0
 								selector.push "and"
 							selector.push ["owner", "=", userId]
+					else if permissions.viewCompanyRecords
+						if selector.length > 0
+							selector.push "and"
+						selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
 					else if permissions.allowRead
 						if selector.length > 0
 							selector.push "and"
@@ -149,7 +153,7 @@ if Meteor.isClient
 			return undefined
 		return selector
 
-	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id)->
+	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id, list_view_id)->
 		spaceId = Steedos.spaceId()
 		userId = Meteor.userId()
 		related_lists = Creator.getRelatedList(object_name, record_id)
@@ -158,8 +162,44 @@ if Meteor.isClient
 		_.each related_lists, (obj)->
 			if obj.object_name == related_object_name
 				related_field_name = obj.related_field_name
-		
+
 		related_field_name = related_field_name.replace(/\./g, "/")
+		if list_view_id
+			custom_list_view = Creator.getListView(related_object_name, list_view_id)
+			if custom_list_view
+				filter_logic = custom_list_view.filter_logic
+				filter_scope = custom_list_view.filter_scope
+				filters = custom_list_view.filters
+				if filter_scope == "mine"
+					selector.push ["owner", "=", Meteor.userId()]
+				else if filter_scope == "company"
+					if selector.length > 0
+						selector.push "and"
+					selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
+
+				if filter_logic
+					format_logic = Creator.formatLogicFiltersToDev(filters, filter_logic)
+					if selector.length
+						selector.push("and", format_logic)
+					else
+						selector.push(format_logic)
+				else
+					if filters and filters.length > 0
+						if selector.length > 0
+							selector.push "and"
+						filters = _.map filters, (obj)->
+							if _.isObject(obj) && !_.isArray(obj)
+								if Meteor.isClient
+									if _.isString(obj?._value)
+										return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
+								return [obj.field, obj.operation, obj.value]
+							else
+								return obj
+						filters = Creator.formatFiltersToDev(filters)
+						_.each filters, (filter)->
+							selector.push filter
+		if selector.length > 0
+			selector.push "and"
 
 		if related_object_name == "cfs.files.filerecord"
 			selector.push(["metadata/space", "=", spaceId])
@@ -173,12 +213,32 @@ if Meteor.isClient
 			record_object_name = Creator.getObjectRecord().name
 			selector.push("and", [related_field_name, "=", record_object_name])
 		else
-			selector.push("and", [related_field_name, "=", record_id])
-		
+
+			related_object_fields = Creator.getObject(related_object_name)?.fields
+
+			if related_object_fields
+				related_field = related_object_fields[related_field_name]
+
+			if related_field && (related_field.type == 'master_detail' or related_field.type == 'lookup')
+				if _.isFunction(related_field.reference_to)
+					if _.isArray(related_field.reference_to())
+						selector.push("and", ["#{related_field_name}.ids", "=", record_id])
+					else
+						selector.push("and", [related_field_name, "=", record_id])
+
+				else if _.isArray(related_field.reference_to)
+					selector.push("and", ["#{related_field_name}.ids", "=", record_id])
+				else
+					selector.push("and", [related_field_name, "=", record_id])
+			else if related_field && (related_field.type == 'grid')
+				selector.push("and", ["#{related_field_name}.o", "=", object_name])
+				selector.push("and", ["#{related_field_name}.ids", "=", record_id])
+			else
+				selector.push("and", [related_field_name, "=", record_id])
+
 		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
 		if !permissions.viewAllRecords and permissions.allowRead
 			selector.push("and", ["owner", "=", userId])
-
 		return selector
 
 # 切换工作区时，重置下拉框的选项
@@ -208,7 +268,11 @@ Meteor.startup ->
 
 	$(document).keydown (e) ->
 		if e.keyCode == "13" or e.key == "Enter"
+			if $(".modal").length > 1
+				return;
 			if e.target.tagName != "TEXTAREA" or $(e.target).closest("div").hasClass("bootstrap-tagsinput")
+				e.preventDefault()
+				e.stopPropagation()
 				if Session.get("cmOperation") == "update"
 					$(".creator-auotform-modals .btn-update").click()
 				else if Session.get("cmOperation") == "insert"

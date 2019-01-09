@@ -29,6 +29,7 @@ Creator.bootstrap = (spaceId, callback)->
 			# 	Steedos.setSpaceId(result.space._id)
 
 			Creator.USER_CONTEXT = result.USER_CONTEXT
+			Session.set "user_company_id", result.USER_CONTEXT.user?.company_id
 			Creator.Objects = result.objects
 			object_listviews = result.object_listviews
 			Creator.object_workflows = result.object_workflows
@@ -37,19 +38,27 @@ Creator.bootstrap = (spaceId, callback)->
 				_.extend object.list_views, object_listviews[object_name]
 				Creator.loadObjects object, object_name
 
-			Creator.Apps = result.apps
-
-			_.each Creator.Apps, (app, key) ->
+			_.each result.apps, (app, key) ->
 				if !app._id
 					app._id = key
+				unless app.is_creator
+					app.visible = false
+			
+			sortedApps = _.sortBy _.values(result.apps), 'sort'
+			# 按钮sort排序次序设置Creator.Apps值
+			Creator.Apps = {}
+			_.each sortedApps, (n) ->
+				Creator.Apps[n._id] = n
 
 			apps = result.assigned_apps
 			if apps.length
 				_.each Creator.Apps, (app, key)->
 					if apps.indexOf(key) > -1
-						app.visible = true
+						app.visible = app.is_creator
 					else
 						app.visible = false
+			
+			Creator.Menus = result.assigned_menus
 
 			if _.isFunction(callback)
 				callback()

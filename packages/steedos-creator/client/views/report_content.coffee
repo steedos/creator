@@ -164,6 +164,9 @@ getSelectFieldLabel = (value, options)->
 	label = if label then label else value
 	return if label then label else "--"
 
+getBooleanFieldLabel = (value, caption)->
+	return "#{caption}: #{value}"
+
 pivotGridChart = null
 gridLoadedArray = null
 maxLoadCount = 10000
@@ -575,6 +578,28 @@ renderSummaryReport = (reportObject)->
 
 	this.dataGridInstance?.set datagrid
 
+transformValue = (object_name, fields, result)->
+
+	fieldNames = _.compact(_.pluck(fields,"dataField"))
+
+	objectFields = Creator.getObject(object_name).fields
+
+	booleanFields = []
+
+	_.forEach fieldNames, (fn)->
+		field = objectFields[fn]
+		if field?.type == 'boolean'
+			booleanFields.push fn
+
+	if booleanFields.length > 0
+		_.forEach result, (r)->
+			_.forEach booleanFields, (fn)->
+				if _.isBoolean(r[fn]) && r[fn]
+					r[fn] = TAPi18n.__("true")
+				else
+					r[fn] = TAPi18n.__("false")
+	return result
+
 renderMatrixReport = (reportObject)->
 	self = this
 	userId = Meteor.userId()
@@ -609,6 +634,10 @@ renderMatrixReport = (reportObject)->
 			if rowField.type == "select"
 				field.customizeText = (data)->
 					return getSelectFieldLabel data.value, rowField.options
+			if rowField.type == 'boolean'
+				field.customizeText = (data)->
+					return getBooleanFieldLabel(data.value, caption)
+
 			if sorts[row]
 				field.sortOrder = sorts[row]
 			if columnWidths[row]
@@ -634,6 +663,9 @@ renderMatrixReport = (reportObject)->
 			if columnField.type == "select"
 				field.customizeText = (data)->
 					return getSelectFieldLabel data.value, columnField.options
+			if columnField.type == 'boolean'
+				field.customizeText = (data)->
+					return getBooleanFieldLabel(data.value, caption)
 			if sorts[column]
 				field.sortOrder = sorts[column]
 			if columnWidths[column]
@@ -757,7 +789,8 @@ renderMatrixReport = (reportObject)->
 					request.headers['X-User-Id'] = userId
 					request.headers['X-Space-Id'] = spaceId
 					request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
-				onLoaded: (loadOptions)->
+				onLoaded: (result)->
+					result = transformValue(reportObject.object_name, reportFields, result)
 					if _.where(reportFields,{area:"data"}).length
 						if reportObject.charting
 							self.is_chart_open.set(true)

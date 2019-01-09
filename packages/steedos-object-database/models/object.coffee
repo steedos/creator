@@ -45,6 +45,8 @@ Creator.Objects.objects =
 			defaultValue: false
 		enable_instances:
 			type: "boolean"
+		enable_chatter:
+			type: "boolean"
 		is_view:
 			type: 'boolean'
 			defaultValue: false
@@ -57,6 +59,12 @@ Creator.Objects.objects =
 			label: "Description"
 			type: "textarea"
 			is_wide: true
+		sidebar:
+			type: "object"
+			label: "左侧列表"
+			blackbox: true
+			omit: true
+			hidden: true
 		fields:
 			type: "object"
 			label: "字段"

@@ -1,17 +1,10 @@
 Package.describe({
 	name: 'steedos:base',
-	version: '0.0.85',
+	version: '0.1.0',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/creator/tree/master/packages/steedos-base'
 });
 
-Npm.depends({
-	"node-schedule": "1.1.1",
-	cookies: "0.6.1",
-	"weixin-pay": "1.1.7",
-	"xml2js": "0.4.17",
-	mkdirp: "0.3.5"
-});
 
 Package.onUse(function(api) {
 	api.versionsFrom('METEOR@1.3');
@@ -60,19 +53,21 @@ Package.onUse(function(api) {
 
 	api.use('momentjs:moment@2.14.1');
 
-	api.use('tap:i18n@1.8.2');
 	api.use('aldeed:simple-schema@1.5.3');
 	api.use('aldeed:tabular@1.6.1');
 	// api.use('momentjs:moment');
 	api.use('simple:json-routes@2.1.0');
+	api.use('universe:i18n');
 
 	api.use('steedos:ionicons@0.1.7');
-	api.use('steedos:i18n@0.0.10');
+	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:ui@0.0.1');
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:e164-phones-countries@1.0.3');
 	api.use('steedos:i18n-iso-countries@3.3.0');
-	api.use('steedos:objects');
+	api.use('steedos:objects@0.0.7');
+
+	api.addFiles('checkNpm.js', "server");
 
 	api.addFiles('lib/meteor_fix.js', ['client', 'server']);
 	api.addFiles('lib/steedos_util.js', ['client', 'server']);
@@ -235,7 +230,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/bootstrap_3_modal.js', 'client');
 
 	api.addFiles('client/steedos/router.coffee', 'client');
-	api.addFiles('client/steedos/tap-i18n-fix.js', 'client');
+	//api.addFiles('client/steedos/tap-i18n-fix.js', 'client');
 
 	api.addFiles('client/steedos/css/adminlte.less', 'client');
 

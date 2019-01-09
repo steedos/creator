@@ -2,9 +2,6 @@ import {moment} from 'meteor/momentjs:moment';
 
 Steedos.Helpers =
 
-	isMobile: ()->
-		return $(window).width() < 767
-
 	isPad: ()->
 		return /iP(ad)/.test(navigator.userAgent)
 
@@ -113,7 +110,6 @@ Steedos.Helpers =
 				reason: reason
 
 	handleOpenURL: (url)->
-		console.log("steedos received url: " + url)
 		search = url.split('?')[1]
 		if search
 			urlQuery = (name)->
@@ -207,7 +203,11 @@ TemplateHelpers =
 		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
 
 	isMobile: ->
-		return $(window).width()<767
+
+		if window.DevExpress
+			return DevExpress.devices._currentDevice.phone
+		else
+			return $(window).width()<767
 
 	isAndroidOrIOS: ->
 		return Steedos.isAndroidApp() || Steedos.isiOS()

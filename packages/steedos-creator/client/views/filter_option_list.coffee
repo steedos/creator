@@ -114,7 +114,6 @@ Template.filter_option_list.events
 			i++
 
 		val = arr.join(" AND ")
-		console.log "val", val
 		Session.set("filter_logic", val)
 		
 
@@ -135,7 +134,7 @@ Template.filter_option_list.onCreated ->
 			Blaze.remove self.optionbox
 	
 	#绑定事件从document委托到.wrapper中是为了避免过虑器中选人控件会解决该事件
-	$(document).on "click",".content-wrapper, .oneHeader", self.destroyOptionbox
+	$(document).on "click",".creator-content-wrapper, .oneHeader", self.destroyOptionbox
 
 	self.filterItems = new ReactiveVar()
 	self.autorun -> 
@@ -144,8 +143,8 @@ Template.filter_option_list.onCreated ->
 			Session.set("filter_logic", list_view_obj.filter_logic)
 
 	self.autorun ->
-		if Session.get("filter_items")
-			filters = Session.get("filter_items")
+		filters = Session.get("filter_items")
+		if filters
 			self.filterItems.set(filters)
 			object_name = Template.instance().data?.object_name
 			fields = Creator.getObject(object_name)?.fields
@@ -181,7 +180,9 @@ Template.filter_option_list.onCreated ->
 									options_labels.push option.label
 						filter.valuelabel = options_labels
 				else
-					self.filterItems.set(filters)	
+					self.filterItems.set(filters)
+		else
+			self.filterItems.set(null)
 
 Template.filter_option_list.onRendered ->
 	$("#info_popover").dxPopover({

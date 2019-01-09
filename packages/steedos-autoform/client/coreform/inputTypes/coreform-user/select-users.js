@@ -129,11 +129,28 @@ Template.afSelectUser.events({
     },
 
     'click .selectUser': function(event, template) {
-        if (Modal.allowMultiple) {
-            return;
+		if (Modal.allowMultiple) {
+			return;
+		}
+		if ("disabled" in template.data.atts)
+			return;
+
+		if(template.data.atts.filter_by_company && !Steedos.isSpaceAdmin() && !Steedos.isCloudAdmin()){
+			company_id = db.space_users.findOne({space: Session.get('spaceId'), user: Meteor.userId()}, {fields: {company_id:1}}).company_id
+			event.currentTarget.dataset.rootOrg = company_id
         }
-        if ("disabled" in template.data.atts)
-            return;
+
+		try{
+			if (AutoForm.getCurrentDataForForm()){
+				var fieldSchema = AutoForm.getSchemaForField(template.data.name);
+				if(fieldSchema && _.isFunction(fieldSchema.beforeOpenFunction)){
+					fieldSchema.beforeOpenFunction(event, template)
+				}
+			}
+		}catch(e){
+			console.log('click .selectUser e', e);
+		}
+
 
         var options = {};
 
@@ -172,6 +189,15 @@ Template.afSelectUser.events({
 
         if (dataset.showOrg && dataset.showOrg == 'false') {
             showOrg = false;
+        }
+
+        if(showOrg){
+
+			// dataset.rootOrg = 'YrZJ35kLyvq5RNHfd'
+
+            if(dataset.rootOrg && _.isString(dataset.rootOrg)){
+				options.rootOrg = dataset.rootOrg
+            }
         }
 
         var values = $("input[name='" + template.data.name + "']")[0].dataset.values;

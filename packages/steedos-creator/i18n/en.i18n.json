@@ -1,4 +1,5 @@
 {
+	"_namespace": "",
 	"Steedos Creator": "Creator",
 
 	"Refresh": "Refresh",
@@ -29,6 +30,7 @@
 	"creator_list_matching_all_filters": "Matching all these filters",
 	"creator_list_view_controls": "LIST VIEW CONTROLS",
 	"creator_list_export_list_view": "Export list view",
+  	"creator_list_copy_list_view": "Copy list view",
 	"reset_column_width": "Reset column width",
 	"creator_list_edit": "Edit List View",
 
@@ -62,18 +64,6 @@
 	"creator_detail_related": "RELATED",
 	"creator_new": "New",
 
-	"creator_odata_api_not_found": "Sorry, the resource you are trying to access does not exist or you do not have permission to access it!",
-	"creator_odata_unexpected_character" :"Unexpected character",
-	"creator_odata_authentication":"Authentication is required and has not been provided",
-	"creator_odata_user_privileges":"User does not have privileges to access the entity",
-	"creator_list_no_actions_tip": "no operation",
-	"creator_list_view_permissions_lost": "You do not have permission to access this view",
-
-	"creator_report_drill_down_label": "Drill Down Data",
-	"creator_report_drill_down_total_label": "Total",
-	"creator_listview_update":"list view updated",
-
-	"creator_request_oversized": "Request Entity Too Large",
-
-	"creator_permission_share_miss": "Please fill in at least one value in the authorized organization or authorized user"
+	"true": "YES",
+	"false": "NO"
 }

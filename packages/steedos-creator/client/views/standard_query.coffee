@@ -38,11 +38,15 @@ Template.standard_query_modal.helpers
 					schema[field].autoform.showIcon = false
 
 			if ["date", "datetime", "currency", "number"].includes(object_fields[field].type)
-				schema[field + "_endLine"] =  obj_schema[field]
+				schema[field + "_endLine"] =  _.clone(obj_schema[field])
 				if schema[field + "_endLine"].autoform
+					schema[field + "_endLine"].autoform = _.clone(obj_schema[field].autoform)
 					schema[field + "_endLine"].autoform.readonly = false
 					schema[field + "_endLine"].autoform.disabled = false
 					schema[field + "_endLine"].autoform.omit = false
+
+					if object_fields[field].type == 'date'
+						schema[field + "_endLine"].autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
 			
 			if ["boolean"].includes(object_fields[field].type)
 				schema[field].type = String
@@ -53,6 +57,10 @@ Template.standard_query_modal.helpers
 					{label: "是", value: "true"}
 					{label: "否", value: "false"}
 				]
+
+			if ["code", "textarea"].includes(object_fields[field].type)
+				schema[field].autoform = {}
+				schema[field].autoform.type = "text"
 
 			if schema[field].autoform
 				schema[field].autoform.readonly = false
@@ -65,9 +73,6 @@ Template.standard_query_modal.helpers
 
 			obj = _.pick(obj_schema, field + ".$")
 			_.extend(schema, obj)
-
-		console.log(schema)
-
 		return new SimpleSchema(schema)
 
 	fields: ()->

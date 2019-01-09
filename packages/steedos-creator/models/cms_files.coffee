@@ -11,10 +11,12 @@ Creator.Objects.cms_files =
 			type: "text"
 			searchable:true
 			index:true
+			is_wide: true
 		description:
 			label: "描述"
 			type: "textarea"
 			hidden: true
+			is_wide: true
 		extention:
 			label: "文件后缀"
 			type: "text"
@@ -33,7 +35,7 @@ Creator.Objects.cms_files =
 			omit: true
 			hidden: true
 		parent:
-			label: "起始版本"
+			label: "所属记录"
 			type: "lookup"
 			omit: true
 			reference_to: ()->
@@ -73,3 +75,28 @@ Creator.Objects.cms_files =
 	actions:
 		standard_delete:
 			label: "删除"
+		download:
+			label: "下载"
+			visible: true
+			on: "record"
+			todo: (object_name, record_id)->
+				file = this.record
+				fileId = file?.versions?[0]
+				if fileId
+					if Meteor.isCordova
+						url = Steedos.absoluteUrl("/api/files/files/#{fileId}")
+						filename = file.name
+						rev = fileId
+						length = file.size
+						Steedos.cordovaDownload(url, filename, rev, length)
+					else
+						window.location = Steedos.absoluteUrl("/api/files/files/#{fileId}?download=true")
+		
+		new_version:
+			label: "上传新版本"
+			visible: true
+			only_detail: true
+			is_file: true
+			on: "record"
+			todo: (object_name, record_id)->
+				# 功能代码在文件详细界面，这里只是把按钮显示出来

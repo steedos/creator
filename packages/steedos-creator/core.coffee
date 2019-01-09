@@ -1,14 +1,4 @@
-Creator.Apps = {}
-Creator.Reports = {}
-Creator.subs = {}
-
-
 Meteor.startup ->
-
-	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Match.OneOf(Function, String))})
-	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
-	SimpleSchema.extendOptions({createFunction: Match.Optional(Match.OneOf(Function, String))})
-
 	if Meteor.isServer
 		_.each Creator.Objects, (obj, object_name)->
 			Creator.loadObjects obj, object_name
@@ -48,15 +38,6 @@ Creator.loadObjects = (obj, object_name)->
 	# if Meteor.isServer
 	# 	Creator.initPermissions(object_name)
 
-Creator.getRelativeUrl = (url)->
-	if url
-		# url开头没有"/"，需要添加"/"
-		if !/^\//.test(url)
-			url = "/" + url
-		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX + url
-	else
-		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
-
 Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 	if Meteor.isClient
 		return Creator.USER_CONTEXT
@@ -64,7 +45,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 		if !(userId and spaceId)
 			throw new Meteor.Error 500, "the params userId and spaceId is required for the function Creator.getUserContext"
 			return null
-		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1}
+		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1, company_id: 1}
 		# check if user in the space
 		su = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: suFields})
 		if !su
@@ -90,6 +71,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 			position: su.position,
 			email: su.email
 			company: su.company
+			company_id: su.company_id
 		}
 		space_user_org = Creator.getCollection("organizations")?.findOne(su.organization)
 		if space_user_org
@@ -125,10 +107,14 @@ Creator.getObjectUrl = (object_name, record_id, app_id) ->
 			return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
 
 Creator.getListViewUrl = (object_name, app_id, list_view_id) ->
+	url = Creator.getListViewRelativeUrl(object_name, app_id, list_view_id)
+	return Creator.getRelativeUrl(url)
+
+Creator.getListViewRelativeUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id is "calendar"
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
+		return "/app/" + app_id + "/" + object_name + "/calendar/"
 	else
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
+		return "/app/" + app_id + "/" + object_name + "/grid/" + list_view_id
 
 Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 	if list_view_id
@@ -164,40 +150,6 @@ Creator.getObjectRecord = (object_name, record_id)->
 	if collection
 		return collection.findOne(record_id)
 
-# 该函数只在初始化Object时，把相关对象的计算结果保存到Object的related_objects属性中，后续可以直接从related_objects属性中取得计算结果而不用再次调用该函数来计算
-Creator.getObjectRelateds = (object_name)->
-	if Meteor.isClient
-		if !object_name
-			object_name = Session.get("object_name")
-
-	related_objects = []
-	# _object = Creator.getObject(object_name)
-	# 因Creator.getObject函数内部要调用该函数，所以这里不可以调用Creator.getObject取对象，只能调用Creator.Objects来取对象
-	_object = Creator.Objects[object_name]
-	if !_object
-		return related_objects
-
-	if _object.enable_files
-		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
-		
-	_.each Creator.Objects, (related_object, related_object_name)->
-		_.each related_object.fields, (related_field, related_field_name)->
-			if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
-				if related_object_name == "object_fields"
-					#TODO 待相关列表支持排序后，删除此判断
-					related_objects.splice(0, 0, {object_name:related_object_name, foreign_key: related_field_name})
-				else
-					related_objects.push {object_name:related_object_name, foreign_key: related_field_name}
-
-	if _object.enable_tasks
-		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
-	if _object.enable_notes
-		related_objects.push {object_name:"notes", foreign_key: "related_to"}
-	if _object.enable_instances
-		related_objects.push {object_name:"instances", foreign_key: "instances"}
-
-	return related_objects
-
 Creator.getPermissions = (object_name, spaceId, userId)->
 	if Meteor.isClient
 		if !object_name
@@ -217,29 +169,15 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	if record
 		isOwner = record.owner == userId || record.owner?._id == userId
-		if !permissions.modifyAllRecords and !isOwner
+		if !permissions.modifyAllRecords and !isOwner and !permissions.modifyCompanyRecords
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 
-		if !permissions.viewAllRecords and !isOwner
+		if !permissions.viewAllRecords and !isOwner and !permissions.viewCompanyRecords
 			permissions.allowRead = false
 
 	return permissions
 
-Creator.processPermissions = (po)->
-	if po.allowCreate
-		po.allowRead = true
-	if po.allowEdit
-		po.allowRead = true
-	if po.allowDelete
-		po.allowEdit = true
-		po.allowRead = true
-	if po.viewAllRecords
-		po.allowRead = true
-	if po.modifyAllRecords
-		po.allowRead = true
-		po.allowEdit = true
-		po.viewAllRecords = true
 
 Creator.getApp = (app_id)->
 	if !app_id
@@ -248,21 +186,33 @@ Creator.getApp = (app_id)->
 	Creator.deps?.app?.depend()
 	return app
 
-Creator.getVisibleApps = ()->
+
+Creator.getAppObjectNames = (app_id)->
+	app = Creator.getApp(app_id)
+
+	objects = []
+	if app
+		_.each app.objects, (v)->
+			obj = Creator.getObject(v)
+			if obj?.permissions.get().allowRead and !obj.hidden
+				objects.push v
+	return objects
+
+Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
-		if v.visible != false
+		if v.visible != false or (includeAdmin and v._id == "admin")
 			apps.push v
 	return apps;
 
 Creator.getVisibleAppsObjects = ()->
 	apps = Creator.getVisibleApps()
-	objects = []
-	tempObjects = []
-	#_.forEach apps, (app)->
-	tempObjects = _.filter Creator.Objects, (obj)->
-		return !obj.hidden
-	objects = objects.concat(tempObjects)
+	visibleObjectNames = _.flatten(_.pluck(apps,'objects'))
+	objects = _.filter Creator.Objects, (obj)->
+		if visibleObjectNames.indexOf(obj.name) < 0
+			return false
+		else
+			return !obj.hidden
 	objects = objects.sort(Creator.sortingMethod.bind({key:"label"}))
 	objects = _.pluck(objects,'name')
 	return _.uniq objects
@@ -387,7 +337,7 @@ options参数：
 	extend-- 是否需要把当前用户基本信息加入公式，即让公式支持Creator.USER_CONTEXT中的值，默认为true
 	userId-- 当前登录用户
 	spaceId-- 当前所在工作区
-extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
+	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
 Creator.formatFiltersToDev = (filters, options)->
 	unless filters.length
@@ -401,28 +351,30 @@ Creator.formatFiltersToDev = (filters, options)->
 	_.each filters, (filter)->
 		field = filter[0]
 		option = filter[1]
-		if Meteor.isClient
-			value = Creator.evaluateFormula(filter[2])
-		else
-			value = Creator.evaluateFormula(filter[2], null, options)
-		sub_selector = []
-		if _.isArray(value) == true
-			v_selector = []
-			if option == "="
-				_.each value, (v)->
-					sub_selector.push [field, option, v], "or"
-			else if option == "<>"
-				_.each value, (v)->
-					sub_selector.push [field, option, v], "and"
+		value = filter[2]
+		if value != undefined
+			if Meteor.isClient
+				value = Creator.evaluateFormula(value)
 			else
-				_.each value, (v)->
-					sub_selector.push [field, option, v], "or"
+				value = Creator.evaluateFormula(value, null, options)
+			sub_selector = []
+			if _.isArray(value) == true
+				v_selector = []
+				if option == "="
+					_.each value, (v)->
+						sub_selector.push [field, option, v], "or"
+				else if option == "<>"
+					_.each value, (v)->
+						sub_selector.push [field, option, v], "and"
+				else
+					_.each value, (v)->
+						sub_selector.push [field, option, v], "or"
 
-			if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
-				sub_selector.pop()
-			selector.push sub_selector, logic_symbol
-		else
-			selector.push [field, option, value], logic_symbol
+				if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
+					sub_selector.pop()
+				selector.push sub_selector, logic_symbol
+			else
+				selector.push [field, option, value], logic_symbol
 
 	if selector[selector.length - 1] == logic_symbol
 		selector.pop()
