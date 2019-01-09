@@ -84,6 +84,8 @@ if Meteor.isClient
 		filter_scope = filters_set.filter_scope
 		filters = filters_set.filters
 		selector = []
+		if _.isFunction(filters)
+			filters = filters()
 		if custom_list_view
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]

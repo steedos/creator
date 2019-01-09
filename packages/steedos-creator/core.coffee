@@ -186,6 +186,18 @@ Creator.getApp = (app_id)->
 	Creator.deps?.app?.depend()
 	return app
 
+
+Creator.getAppObjectNames = (app_id)->
+	app = Creator.getApp(app_id)
+
+	objects = []
+	if app
+		_.each app.objects, (v)->
+			obj = Creator.getObject(v)
+			if obj?.permissions.get().allowRead and !obj.hidden
+				objects.push v
+	return objects
+
 Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
@@ -325,7 +337,7 @@ options参数：
 	extend-- 是否需要把当前用户基本信息加入公式，即让公式支持Creator.USER_CONTEXT中的值，默认为true
 	userId-- 当前登录用户
 	spaceId-- 当前所在工作区
-extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
+	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
 Creator.formatFiltersToDev = (filters, options)->
 	unless filters.length

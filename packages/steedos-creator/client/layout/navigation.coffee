@@ -10,15 +10,7 @@ Template.creatorNavigation.helpers
 		return if app then t(app.name) else ""
 
 	app_objects: ()->
-		app = Creator.getApp()
-
-		objects = []
-		if app
-			_.each app.objects, (v)->
-				obj = Creator.getObject(v)
-				if obj?.permissions.get().allowRead and !obj.hidden
-					objects.push v
-		return objects
+		return Creator.getAppObjectNames()
 
 	object_i: ()->
 		return Creator.getObject(this)
