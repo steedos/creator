@@ -61,6 +61,10 @@ Template.creator_table_cell.onRendered ->
 					height: "auto"
 		
 		# 显示额外的其他字段
+		if _field.name == "created_by"
+			_field.extra_field = "created"
+		else if _field.name == "modified_by"
+			_field.extra_field = "modified"
 		extra_field = _field?.extra_field
 		if extra_field and self.data.is_detail_view
 			extraContainer = self.$(".cell-extra-field-container")
@@ -313,3 +317,7 @@ Template.creator_table_cell.helpers
 
 	isType: (type) ->
 		return this.type is type
+
+	isExtraField: () ->
+		fieldName = this.field.name
+		return fieldName == "created_by" or fieldName == "modified_by"

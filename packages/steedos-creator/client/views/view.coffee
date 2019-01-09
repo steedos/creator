@@ -93,9 +93,11 @@ Template.creator_view.helpers
 		return schema
 
 	schemaFields: ()->
-		simpleSchema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(Session.get("object_name"))))
+		object = Creator.getObject(Session.get("object_name"))
+		simpleSchema = new SimpleSchema(Creator.getObjectSchema(object))
 		schema = simpleSchema._schema
-		firstLevelKeys = simpleSchema._firstLevelSchemaKeys
+		# 不显示created/modified，因为它们显示在created_by/modified_by字段后面
+		firstLevelKeys = _.without simpleSchema._firstLevelSchemaKeys, "created", "modified"
 		permission_fields = Creator.getFields()
 
 #		_.forEach schema, (field, name)->
