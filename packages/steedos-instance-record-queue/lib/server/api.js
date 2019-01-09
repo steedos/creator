@@ -281,6 +281,7 @@ InstanceRecordQueue.Configure = function (options) {
 					// 同步新附件
 					self.syncAttach(sync_attachment, insId, record.space, record._id, objectName);
 				} catch (error) {
+					console.error(error.stack);
 					objectCollection.update({
 						_id: record._id,
 						'instances._id': insId
@@ -344,6 +345,7 @@ InstanceRecordQueue.Configure = function (options) {
 					self.syncAttach(sync_attachment, insId, spaceId, newRecordId, objectName);
 
 				} catch (error) {
+					console.error(error.stack);
 
 					objectCollection.remove({
 						_id: newRecordId,
