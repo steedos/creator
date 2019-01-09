@@ -178,7 +178,7 @@ Creator.Objects.instances =
 			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowCreate: false
 			allowDelete: false
