@@ -122,7 +122,7 @@ Creator.Objects.flows =
 			reference_to: "users"
 			readonly: true
 			omit: true
-			extra_field: 'current.modified'
+			hidden: true
 		'current.created':
 			label: "创建时间"
 			type: 'datetime'
@@ -135,7 +135,7 @@ Creator.Objects.flows =
 			reference_to: "users"
 			readonly: true
 			omit: true
-			extra_field: 'current.created'
+			hidden: true
 		'current.steps':
 			label: "步骤"
 			type: "grid"
