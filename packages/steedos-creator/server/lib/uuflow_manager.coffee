@@ -220,7 +220,7 @@ uuflowManager.initiateValues = (recordIds, flowId, spaceId) ->
 				object = Creator.getObject(recordIds.o, spaceId)
 				if object
 					objectField = object.fields[objectFieldName]
-					if (objectField.type == "lookup" || objectField.type == "master_detail") && !objectField.multiple
+					if objectField && (objectField.type == "lookup" || objectField.type == "master_detail") && !objectField.multiple
 						fieldsObj = {}
 						fieldsObj[lookupFieldName] = 1
 						lookupObject = Creator.getCollection(objectField.reference_to, spaceId).findOne(record[objectFieldName], { fields: fieldsObj })

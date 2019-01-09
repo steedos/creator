@@ -409,7 +409,7 @@ Template.steedosLookups.helpers({
 	canCreate: function () {
 		data = Template.instance().data
 
-		if(data.atts.create)
+		if(data.atts.create && !AutoForm.getFormId().startsWith("new"))
 			return true
 	}
 });

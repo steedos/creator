@@ -13,6 +13,9 @@ Template.standard_query_modal.helpers
 	value: ()->
 		return Template.instance().modalValue?.get()
 
+	object_name: ()->
+		return Session.get("object_name");
+
 	schema: ()->
 		object_name = Session.get("object_name")
 		object = Creator.getObject(object_name)
@@ -22,13 +25,18 @@ Template.standard_query_modal.helpers
 		first_level_keys = new_schema._firstLevelSchemaKeys
 		object_fields = object.fields
 		searchable_fields = []
+		canSearchFields = []
 		_.each object_fields, (field, key)->
 			if !field.hidden and !["grid", "image", "avatar"].includes(field.type)
-				searchable_fields.push(key)
+				canSearchFields.push(key)
 		schema = {}
-		searchable_fields = _.intersection(first_level_keys, searchable_fields)
-		_.each searchable_fields, (field)->
+		canSearchFields = _.intersection(first_level_keys, canSearchFields)
+		_.each canSearchFields, (field)->
 			schema[field] = obj_schema[field]
+
+			if !object_fields[field].searchable
+				schema[field].autoform.group = '高级'
+
 			if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[field].type)
 				schema[field].autoform.multiple = true
 				schema[field].type = [String]
@@ -39,11 +47,13 @@ Template.standard_query_modal.helpers
 
 			if ["date", "datetime", "currency", "number"].includes(object_fields[field].type)
 				schema[field + "_endLine"] =  _.clone(obj_schema[field])
+				obj_schema[field].autoform.is_range = true
 				if schema[field + "_endLine"].autoform
 					schema[field + "_endLine"].autoform = _.clone(obj_schema[field].autoform)
 					schema[field + "_endLine"].autoform.readonly = false
 					schema[field + "_endLine"].autoform.disabled = false
 					schema[field + "_endLine"].autoform.omit = false
+					schema[field + "_endLine"].autoform.is_range = false
 
 					if object_fields[field].type == 'date'
 						schema[field + "_endLine"].autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
@@ -116,7 +126,7 @@ Template.standard_query_modal.events
 		query = AutoForm.getFormValues("standardQueryForm").insertDoc
 		object_name = Session.get("object_name")
 
-		Session.set 'standard_query', {object_name: object_name, query: query}
+		Session.set 'standard_query', {object_name: object_name, query: query, is_mini: true}
 		$(".filter-list-wraper #grid-search").val("")
 		Modal.hide(template)
 
