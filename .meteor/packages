@@ -184,10 +184,7 @@ steedos:app-chat
 # steedos:mini-web
 
 steedos:dzgy-archive-sync
-q42:autoform-markdown
-steedos:markdown@0.0.1
 
-steedos:application-template
 # steedos:love
 # steedos:app-chat
 # steedos:app-tableau
