@@ -130,28 +130,7 @@ Creator.Objects.reports =
 			filters: ()->
 				object_names = Creator.getAppObjectNames()
 				return [["object_name","=",object_names]]
-			# filters: [["object_name", "=", ()->
-			# 	return Creator.getAppObjectNames()
-			# ]]
-			# filters: [{
-			# 	"field": "object_name"
-			# 	"operation": "="
-			# 	"value": ()->
-			# 		return Creator.getAppObjectNames()
-			# }]
-			# filters: [["object_name","=",["project_issues","tasks"]]]
 
-			# filters: ()->
-			# 	# 返回当前app中所有object对应的报表，生成的过虑条件如：
-			# 	# [[["object_name","=","project_issues"],'or',["object_name","=","tasks"]]]
-			# 	object_names = Creator.getAppObjectNames()
-			# 	results = []
-			# 	object_names.forEach (n)->
-			# 		results.push [ "object_name", "=", n ]
-			# 		results.push "or"
-			# 	results.pop()
-			# 	return [results]
-				
 		mine:
 			label: "我的报表"
 			filter_scope: "mine"
