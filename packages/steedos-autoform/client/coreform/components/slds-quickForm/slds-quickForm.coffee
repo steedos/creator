@@ -1,38 +1,4 @@
 Template.quickForm_slds.helpers
-	fieldGroupLabel: ->
-		name = @name
-		# if field group name is of the form XY_abcde where "XY" is a number, remove prefix
-		if !isNaN(parseInt(name.substr(0, 2), 10)) and name.charAt(2) == '_'
-			name = name.substr(3)
-		# if SimpleSchema.defaultLabel is defined, use it
-		if typeof SimpleSchema.defaultLabel == 'function'
-			SimpleSchema.defaultLabel name
-		else
-			name.charAt(0).toUpperCase() + name.slice(1)
-	quickFieldsAtts: ->
-		_.pick Template.instance().data.atts, 'fields', 'id-prefix', 'input-col-class', 'label-class'
-
-	quickFieldAtts: ->
-		afQuickFieldsComponentAtts = undefined
-		defaultOptions = undefined
-		atts = {}
-		afQuickFieldsComponentAtts = Template.parentData(1)
-		if !afQuickFieldsComponentAtts or afQuickFieldsComponentAtts.atts
-			afQuickFieldsComponentAtts = {}
-		defaultOptions = AutoForm._getOptionsForField(this)
-		if defaultOptions
-			atts.options = defaultOptions
-		_.extend {name: this}, atts, afQuickFieldsComponentAtts
-
-	submitButtonAtts: ->
-		qfAtts = @atts
-		atts = {}
-		if typeof qfAtts.buttonClasses == 'string'
-			atts['class'] = qfAtts.buttonClasses
-		else
-			atts['class'] = 'btn btn-primary'
-		atts
-
 	isDisabled: (key)->
 		object_name = Template.instance().data.atts.object_name
 		fields = Creator.getObject(object_name)?.fields
