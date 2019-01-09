@@ -597,19 +597,33 @@ Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 		is_wide_1 = false
 		is_wide_2 = false
 
+		is_range_1 = false
+		is_range_2 = false
+
 		_.each sc_1, (value) ->
 			if value.autoform?.is_wide || value.autoform?.type == "table"
 				is_wide_1 = true
+
+			if value.autoform?.is_range
+				is_range_1 = true
 
 		_.each sc_2, (value) ->
 			if value.autoform?.is_wide || value.autoform?.type == "table"
 				is_wide_2 = true
 
+			if value.autoform?.is_range
+				is_range_2 = true
+
 		if isSingle
 			fields.push keys.slice(i, i+1)
 			i += 1
 		else
-			if is_wide_1
+			if !is_range_1 && is_range_2
+				childKeys = keys.slice(i, i+1)
+				childKeys.push undefined
+				fields.push childKeys
+				i += 1
+			else if is_wide_1
 				fields.push keys.slice(i, i+1)
 				i += 1
 			else if !is_wide_1 and is_wide_2
