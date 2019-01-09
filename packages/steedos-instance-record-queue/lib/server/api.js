@@ -166,6 +166,8 @@ InstanceRecordQueue.Configure = function (options) {
 			tableFieldCodes = [],
 			tableFieldMap = [];
 
+		field_map_back = field_map_back || [];
+
 		field_map_back.forEach(function (fm) {
 			// 判断是否是子表字段
 			if (fm.workflow_field.indexOf('.$.') > 0 && fm.object_field.indexOf('.$.') > 0) {
