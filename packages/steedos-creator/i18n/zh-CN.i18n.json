@@ -29,7 +29,7 @@
 	"creator_list_add_filter": "添加筛选器",
 	"creator_list_remove_all_filters": "全部删除",
 	"creator_list_matching_all_filters": "匹配所有筛选器",
-	"creator_list_view_controls": "列表视图控制",
+	"creator_list_view_controls": "列表视图设置",
 	"creator_list_export_list_view": "导出Excel",
   	"creator_list_copy_list_view": "复制视图",
 	"reset_column_width": "重置列宽",
