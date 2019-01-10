@@ -46,7 +46,21 @@ Template.filter_option.helpers
 							return Creator.getFieldOperation(object_fields[schema_key].type)
 						else
 							return Creator.getFieldOperation("text")
-			value:
+		
+		filter_item_operation = template.filter_item_operation.get()
+		isBetweenOperation = Creator.isBetweenFilterOperation(filter_item_operation)
+		if isBetweenOperation
+			schema.start_value = 
+				type: ->
+					return template.schema_obj.get()?.type || String
+				label: "start_value"
+				autoform:
+					type: "text"
+			
+			schema.end_value = schema.start_value
+			schema.end_value.label = "end_value"
+		else
+			schema.value = 
 				type: ->
 					return template.schema_obj.get()?.type || String
 				label: "value"
@@ -56,19 +70,28 @@ Template.filter_option.helpers
 		if schema_key
 			new_schema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(object_name)))
 			obj_schema = new_schema._schema
-			schema.value = obj_schema[schema_key]
-			if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
-				schema.value.autoform.multiple = true
-				schema.value.type = [String]
+			if isBetweenOperation
+				schema.start_value = obj_schema[schema_key]
+				if schema.start_value.autoform
+					schema.start_value.autoform.readonly = false
+					schema.start_value.autoform.disabled = false
+					schema.start_value.autoform.omit = false
+				schema.end_value = schema.start_value
+				schema.end_value.label = "end_value"
+			else
+				schema.value = obj_schema[schema_key]
+				if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
+					schema.value.autoform.multiple = true
+					schema.value.type = [String]
 
-				if object_fields[schema_key].type == "select"
-					schema.value.autoform.type = "steedosLookups"
-					schema.value.autoform.showIcon = false
+					if object_fields[schema_key].type == "select"
+						schema.value.autoform.type = "steedosLookups"
+						schema.value.autoform.showIcon = false
 
-			if schema.value.autoform
-				schema.value.autoform.readonly = false
-				schema.value.autoform.disabled = false
-				schema.value.autoform.omit = false
+				if schema.value.autoform
+					schema.value.autoform.readonly = false
+					schema.value.autoform.disabled = false
+					schema.value.autoform.omit = false
 
 		new SimpleSchema(schema)
 
@@ -101,9 +124,16 @@ Template.filter_option.helpers
 		if scope == Session.get("filter_scope")
 			return "checked"
 
+	isBetweenOperation: ()->
+		filter_item_operation = Template.instance().filter_item_operation.get()
+		return Creator.isBetweenFilterOperation(filter_item_operation)
+
 Template.filter_option.events 
 	'click .save-filter': (event, template) ->
 		filter = AutoForm.getFormValues("filter-option").insertDoc
+		isBetweenOperation = Creator.isBetweenFilterOperation(filter.operation)
+		if isBetweenOperation
+			filter.value = [filter.start_value, filter.end_value]
 		index = this.index
 		filter_items = Session.get("filter_items")
 		filter_items[index] = filter
@@ -133,6 +163,20 @@ Template.filter_option.events
 		template.schema_obj.set(_schema[field])
 		Meteor.defer ->
 			template.show_form.set(true)
+	
+	'change select[name="operation"]': (event, template) ->
+		filter_item = template.filter_item.get()
+		operation = $(event.currentTarget).val()
+		if operation != filter_item?.operation
+			debugger
+			template.filter_item_operation.set(operation)
+			filter_item.value = ""
+			template.filter_item.set(filter_item)
+
+
+		# template.show_form.set(false)
+		# Meteor.defer ->
+		# 	template.show_form.set(true)
 
 Template.filter_option.onCreated ->
 	is_edit_scope = this.data.is_edit_scope
@@ -147,6 +191,7 @@ Template.filter_option.onCreated ->
 
 		this.schema_key = new ReactiveVar(key)
 		this.schema_obj = new ReactiveVar(key_obj)
+		this.filter_item_operation = new ReactiveVar(filter_item.operation)
 		this.filter_item = new ReactiveVar(filter_item)
 
 		this.show_form = new ReactiveVar(true)

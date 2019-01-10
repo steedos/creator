@@ -332,6 +332,9 @@ Creator.formatFiltersToMongo = (filters, options)->
 		selector.push sub_selector
 	return selector
 
+Creator.isBetweenFilterOperation = (operation)->
+	return operation == "between"
+
 ###
 options参数：
 	extend-- 是否需要把当前用户基本信息加入公式，即让公式支持Creator.USER_CONTEXT中的值，默认为true
@@ -366,7 +369,7 @@ Creator.formatFiltersToDev = (filters, options)->
 				else if option == "<>"
 					_.each value, (v)->
 						sub_selector.push [field, option, v], "and"
-				else if option == "between" and value.length = 2
+				else if Creator.isBetweenFilterOperation(option) and value.length = 2
 					sub_selector.push [field, ">=", value[0]], "and"
 					sub_selector.push [field, "<=", value[1]], "and"
 				else

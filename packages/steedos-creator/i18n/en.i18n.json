@@ -37,6 +37,8 @@
 	"creator_filter_option_field": "field",
 	"creator_filter_option_operation": "operation",
 	"creator_filter_option_value": "value",
+	"creator_filter_option_start_value": "start value",
+	"creator_filter_option_end_value": "end value",
 	"creator_filter_option_done": "Done",
 	"creator_filter_operation_equal":"equal",
 	"creator_filter_operation_unequal":"not equal",
@@ -50,6 +52,7 @@
 	"creator_app_launcher": "App Launcher",
 	"creator_app_launcher_all_apps": "App Apps",
 	"creator_app_launcher_all_items": "All Items",
+	"creator_filter_operation_between": "Range",
 
 	"creator_header_search": "Search in %s and more...",
 	"creator_header_search_recent_items": "Recent Items",
