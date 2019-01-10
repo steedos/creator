@@ -1,6 +1,6 @@
 Creator.Objects["cfs.files.filerecord"] = 
 	name: "cfs.files.filerecord"
-	label: "文件版本"
+	label: "附件版本"
 	icon: "drafts"
 	enable_search: true
 	enable_api: true
@@ -12,10 +12,11 @@ Creator.Objects["cfs.files.filerecord"] =
 			blackbox: true
 			omit: true
 		"original.name":
-			label:"名称"
+			label:"文件名"
 			type: "text"
+			is_name: true
 		"original.size":
-			label:"大小"
+			label:"文件大小"
 			type: "number"
 		metadata:
 			label:"属性"
@@ -26,6 +27,10 @@ Creator.Objects["cfs.files.filerecord"] =
 			label:"上传者"
 			type: "lookup"
 			reference_to: "users"
+			omit: true
+		"metadata.owner_name":
+			label:"上传者"
+			type: "text"
 			omit: true
 		"metadata.parent":
 			label:"所属文件"
@@ -44,7 +49,7 @@ Creator.Objects["cfs.files.filerecord"] =
 		all:
 			filter_scope: "space"
 			# columns: ["original.name","original.size","metadata.owner_name","uploadedAt"]
-			columns: ["uploadedAt"]
+			columns: ["original.name", "metadata.owner_name", "uploadedAt", "original.size"]
 	
 	permission_set:
 		user:
