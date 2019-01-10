@@ -158,8 +158,10 @@ Template.filter_option.events
 			object_name = Session.get("object_name")
 		field = $(event.currentTarget).val()
 		if field != filter_item?.field
+			filter_item.operation = null
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
+			template.filter_item_operation.set(null)
 		_schema = Creator.getSchema(object_name)._schema
 		template.show_form.set(false)
 		template.schema_key.set(field)
@@ -171,15 +173,10 @@ Template.filter_option.events
 		filter_item = template.filter_item.get()
 		operation = $(event.currentTarget).val()
 		if operation != filter_item?.operation
-			debugger
 			template.filter_item_operation.set(operation)
+			filter_item.operation = operation
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
-
-
-		# template.show_form.set(false)
-		# Meteor.defer ->
-		# 	template.show_form.set(true)
 
 Template.filter_option.onCreated ->
 	is_edit_scope = this.data.is_edit_scope
