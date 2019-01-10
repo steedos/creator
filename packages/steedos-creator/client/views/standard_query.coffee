@@ -126,7 +126,7 @@ Template.standard_query_modal.events
 		query = AutoForm.getFormValues("standardQueryForm").insertDoc
 		object_name = Session.get("object_name")
 
-		Session.set 'standard_query', {object_name: object_name, query: query, is_mini: true}
+		Session.set 'standard_query', {object_name: object_name, query: query, is_mini: false}
 		$(".filter-list-wraper #grid-search").val("")
 		Modal.hide(template)
 

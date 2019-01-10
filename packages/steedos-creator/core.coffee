@@ -352,33 +352,36 @@ Creator.formatFiltersToDev = (filters, options)->
 		field = filter[0]
 		option = filter[1]
 		value = filter[2]
-		if value != undefined
-			if Meteor.isClient
-				value = Creator.evaluateFormula(value)
-			else
-				value = Creator.evaluateFormula(value, null, options)
-			sub_selector = []
-			if _.isArray(value) == true
-				v_selector = []
-				if option == "="
-					_.each value, (v)->
-						sub_selector.push [field, option, v], "or"
-				else if option == "<>"
-					_.each value, (v)->
-						sub_selector.push [field, option, v], "and"
-				else
-					_.each value, (v)->
-						sub_selector.push [field, option, v], "or"
 
-				if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
-					sub_selector.pop()
-				selector.push sub_selector, logic_symbol
-			else
-				selector.push [field, option, value], logic_symbol
+		if _.isArray(field)
+			selector.push filter
+		else
+			if value != undefined
+				if Meteor.isClient
+					value = Creator.evaluateFormula(value)
+				else
+					value = Creator.evaluateFormula(value, null, options)
+				sub_selector = []
+				if _.isArray(value) == true
+					v_selector = []
+					if option == "="
+						_.each value, (v)->
+							sub_selector.push [field, option, v], "or"
+					else if option == "<>"
+						_.each value, (v)->
+							sub_selector.push [field, option, v], "and"
+					else
+						_.each value, (v)->
+							sub_selector.push [field, option, v], "or"
+
+					if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
+						sub_selector.pop()
+					selector.push sub_selector, logic_symbol
+				else
+					selector.push [field, option, value], logic_symbol
 
 	if selector[selector.length - 1] == logic_symbol
 		selector.pop()
-
 	return selector
 
 ###

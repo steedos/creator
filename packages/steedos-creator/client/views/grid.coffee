@@ -13,11 +13,14 @@ _standardQuery = (curObjectName, standard_query)->
 					if ["currency", "number"].includes(object_fields[key].type)
 						query_arr.push([key, "=", val])
 					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
-						vals = val.trim().split(" ")
-						vals.forEach (val_item)->
-							# 特殊字符编码
-							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
-							query_arr.push([key, "contains", val_item])
+						if _.isString(val)
+							vals = val.trim().split(" ")
+							vals.forEach (val_item)->
+								# 特殊字符编码
+								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+								query_arr.push([key, "contains", val_item])
+						else if _.isArray(val)
+							query_arr.push([key, "=", val])
 		else
 			_.each query, (val, key)->
 				if object_fields[key]
@@ -26,9 +29,18 @@ _standardQuery = (curObjectName, standard_query)->
 							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 ) # 处理grid中的datetime 偏移
 						query_arr.push([key, ">=", val])
 					else if ["text", "textarea", "html"].includes(object_fields[key].type)
-						# 特殊字符编码
-						val = encodeURIComponent(Creator.convertSpecialCharacter(val))
-						query_arr.push([key, "contains", val])
+						if _.isString(val)
+							vals = val.trim().split(" ")
+							query_or = []
+							vals.forEach (val_item)->
+								# 特殊字符编码
+								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+								query_or.push([key, "contains", val_item])
+							if query_or.length > 0
+								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: true})
+						else if _.isArray(val)
+							query_arr.push([key, "=", val])
+
 					else if ["boolean"].includes(object_fields[key].type)
 						query_arr.push([key, "=", JSON.parse(val)])
 					else
