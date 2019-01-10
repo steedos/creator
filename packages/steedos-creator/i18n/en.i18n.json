@@ -39,6 +39,7 @@
 	"creator_filter_option_value": "value",
 	"creator_filter_option_start_value": "start value",
 	"creator_filter_option_end_value": "end value",
+	"creator_filter_option_start_end_error": "The starting value cannot be greater than the ending value",
 	"creator_filter_option_done": "Done",
 	"creator_filter_operation_equal":"equal",
 	"creator_filter_operation_unequal":"not equal",

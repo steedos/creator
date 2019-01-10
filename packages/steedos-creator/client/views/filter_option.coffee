@@ -133,6 +133,9 @@ Template.filter_option.events
 		filter = AutoForm.getFormValues("filter-option").insertDoc
 		isBetweenOperation = Creator.isBetweenFilterOperation(filter.operation)
 		if isBetweenOperation
+			if filter.start_value < filter.end_value
+				toastr.error(t("creator_filter_option_start_end_error"))
+				return
 			filter.value = [filter.start_value, filter.end_value]
 		index = this.index
 		filter_items = Session.get("filter_items")
