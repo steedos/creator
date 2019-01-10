@@ -211,7 +211,7 @@ Creator.Objects.instances =
 				uobj["box"] = 'monitor'
 				uobj["X-User-Id"] = Meteor.userId()
 				uobj["X-Auth-Token"] = Accounts._storedLoginToken()
-				workflowUrl = window.location.protocol + '//' + window.location.host + '/'
+				workflowUrl = Meteor.settings.public.webservices.workflow.url
 				Steedos.openWindow(workflowUrl + "workflow/space/" + Session.get("spaceId") + "/print/" + record_id + "?" + $.param(uobj), "",'width=900,height=750,scrollbars=yes,EnableViewPortScale=yes,toolbarposition=top,transitionstyle=fliphorizontal,menubar=yes,closebuttoncaption=  x  ')
 
 if Meteor.isServer
