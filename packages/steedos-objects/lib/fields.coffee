@@ -348,6 +348,13 @@ Creator.getObjectSchema = (obj) ->
 		if field.hidden
 			fs.autoform.type = "hidden"
 
+		if (field.type == "select") or (field.type == "lookup") or (field.type == "master_detail")
+			if typeof(field.filterable) == 'undefined'
+				field.filterable = true
+		if field.name == 'name' || field.is_name
+			if typeof(field.searchable) == 'undefined'
+				field.searchable = true
+
 		if autoform_type
 			fs.autoform.type = autoform_type
 

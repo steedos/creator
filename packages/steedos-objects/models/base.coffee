@@ -39,7 +39,6 @@ Creator.baseObject =
 			type: "datetime"
 			readonly: true
 			sortable: true
-			searchable: true
 			index: true
 			omit: true
 		modified_by:
