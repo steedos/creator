@@ -101,6 +101,12 @@ Creator.baseObject =
 			type:'number'
 			omit:true
 			hidden: true
+		locked:
+			label:'已锁定'
+			type:'boolean'
+			omit:true
+			hidden: true
+
 	permission_set:
 		none:
 			allowCreate: false
