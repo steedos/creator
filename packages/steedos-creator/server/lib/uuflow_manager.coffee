@@ -131,6 +131,9 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 
 	ins_obj.record_ids = instance_from_client["record_ids"]
 
+	if space_user.company_id
+		ins_obj.company_id = space_user.company_id
+
 	# 新建Trace
 	trace_obj = {}
 	trace_obj._id = new Mongo.ObjectID()._str
