@@ -223,10 +223,13 @@ Creator.baseObject =
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
+				record = Creator.Collections[object_name].findOne record_id
+				if record && record.locked
+					return false
+
 				if record_permissions
 					return record_permissions["allowEdit"]
 				else
-					record = Creator.Collections[object_name].findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						return record_permissions["allowEdit"]
@@ -236,10 +239,13 @@ Creator.baseObject =
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
+				record = Creator.Collections[object_name].findOne record_id
+				if record && record.locked
+					return false
+
 				if record_permissions
 					return record_permissions["allowDelete"]
 				else
-					record = Creator.Collections[object_name].findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						return record_permissions["allowDelete"]

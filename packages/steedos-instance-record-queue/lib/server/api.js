@@ -261,6 +261,7 @@ InstanceRecordQueue.Configure = function (options) {
 					self.syncValues(setObj, ow.field_map_back, values, ins);
 
 					setObj['instances.$.state'] = 'completed';
+					setObj.locked = false;
 
 					objectCollection.update({
 						_id: record._id,
@@ -287,7 +288,8 @@ InstanceRecordQueue.Configure = function (options) {
 						'instances._id': insId
 					}, {
 						$set: {
-							'instances.$.state': 'pending'
+							'instances.$.state': 'pending',
+							'locked': true
 						}
 					})
 

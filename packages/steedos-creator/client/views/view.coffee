@@ -248,6 +248,10 @@ Template.creator_view.helpers
 	allowCreate: ()->
 		return Creator.getPermissions(this.object_name).allowCreate
 
+	isUnlocked: ()->
+		record = Creator.getObjectRecord()
+		return !record.locked
+
 	detail_info_visible: ()->
 		return Session.get("detail_info_visible")
 

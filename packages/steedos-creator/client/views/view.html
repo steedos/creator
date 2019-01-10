@@ -203,10 +203,12 @@
 										<div class="slds-no-flex">
 											{{#if allowCreate}}
 												{{#if this.is_file}}
+													{{#if isUnlocked}}
 													<button class="slds-button slds-button_neutral btn-upload-file">
 														{{_ "creator_actions_upload_file"}}
 														<input type="file" name="file" class="input-file-upload">
 													</button>
+													{{/if}}
 												{{else}}
 													<button class="slds-button slds-button_neutral add-related-object-record" data-object-name="{{this.object_name}}">{{_ "New"}}</button>
 												{{/if}}
