@@ -209,6 +209,8 @@ Creator.Objects.instances =
 			todo: (object_name, record_id, fields)->
 				uobj = {}
 				uobj["box"] = 'monitor'
+				uobj["print_is_show_traces"] = '1'
+				uobj["print_is_show_attachments"] = '1'
 				uobj["X-User-Id"] = Meteor.userId()
 				uobj["X-Auth-Token"] = Accounts._storedLoginToken()
 				workflowUrl = Meteor.settings.public.webservices.workflow.url
