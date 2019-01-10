@@ -366,6 +366,9 @@ Creator.formatFiltersToDev = (filters, options)->
 				else if option == "<>"
 					_.each value, (v)->
 						sub_selector.push [field, option, v], "and"
+				else if option == "between" and value.length = 2
+					sub_selector.push [field, ">=", value[0]], "and"
+					sub_selector.push [field, "<=", value[1]], "and"
 				else
 					_.each value, (v)->
 						sub_selector.push [field, option, v], "or"
