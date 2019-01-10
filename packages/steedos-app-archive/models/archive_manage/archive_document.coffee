@@ -14,6 +14,7 @@ Creator.Objects.archive_document =
 		name:
 			type: "text"
 			label: "标题"
+			sortable: true
 			default_width: 600
 		flow_name:
 			type: "text"
@@ -39,7 +40,7 @@ Creator.Objects.archive_document =
 			sortable: true
 			default_width: 180
 		outbox_users:
-			type: ["text"]
+			type: "[text]"
 			label: "处理人"
 			omit: true
 			hidden: true
@@ -56,6 +57,16 @@ Creator.Objects.archive_document =
 		recent:
 			label: "最近查看"
 			filter_scope: "space"
+		submit:
+			label:"我发起的"
+			filter_scope: "space"
+			filters: [["submitter", "=", "{userId}"]]
+			columns:["name","flow_name","submitter","submit_date","archive_date"]
+		approved:
+			label:"我审核的"
+			filter_scope: "space"
+			filters: [["outbox_users", "=", "{userId}"]]
+			columns:["name","flow_name","submitter","submit_date","archive_date"]
 		all:
 			label: "全部"
 			filter_scope: "space"
