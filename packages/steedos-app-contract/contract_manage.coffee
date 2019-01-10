@@ -3,7 +3,7 @@ Creator.Apps.contract_manage =
 	name: "合同"
 	description: "管理合同等。"
 	icon_slds: "document"
-	visible:true
+	visible:false
 	is_creator:true
 	objects: [
 		"contracts"
