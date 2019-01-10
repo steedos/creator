@@ -352,33 +352,36 @@ Creator.formatFiltersToDev = (filters, options)->
 		field = filter[0]
 		option = filter[1]
 		value = filter[2]
-		if value != undefined
-			if Meteor.isClient
-				value = Creator.evaluateFormula(value)
-			else
-				value = Creator.evaluateFormula(value, null, options)
-			sub_selector = []
-			if _.isArray(value) == true
-				v_selector = []
-				if option == "="
-					_.each value, (v)->
-						sub_selector.push [field, option, v], "or"
-				else if option == "<>"
-					_.each value, (v)->
-						sub_selector.push [field, option, v], "and"
-				else
-					_.each value, (v)->
-						sub_selector.push [field, option, v], "or"
 
-				if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
-					sub_selector.pop()
-				selector.push sub_selector, logic_symbol
-			else
-				selector.push [field, option, value], logic_symbol
+		if _.isArray(field)
+			selector.push filter
+		else
+			if value != undefined
+				if Meteor.isClient
+					value = Creator.evaluateFormula(value)
+				else
+					value = Creator.evaluateFormula(value, null, options)
+				sub_selector = []
+				if _.isArray(value) == true
+					v_selector = []
+					if option == "="
+						_.each value, (v)->
+							sub_selector.push [field, option, v], "or"
+					else if option == "<>"
+						_.each value, (v)->
+							sub_selector.push [field, option, v], "and"
+					else
+						_.each value, (v)->
+							sub_selector.push [field, option, v], "or"
+
+					if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
+						sub_selector.pop()
+					selector.push sub_selector, logic_symbol
+				else
+					selector.push [field, option, value], logic_symbol
 
 	if selector[selector.length - 1] == logic_symbol
 		selector.pop()
-
 	return selector
 
 ###
@@ -597,19 +600,33 @@ Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 		is_wide_1 = false
 		is_wide_2 = false
 
+		is_range_1 = false
+		is_range_2 = false
+
 		_.each sc_1, (value) ->
 			if value.autoform?.is_wide || value.autoform?.type == "table"
 				is_wide_1 = true
+
+			if value.autoform?.is_range
+				is_range_1 = true
 
 		_.each sc_2, (value) ->
 			if value.autoform?.is_wide || value.autoform?.type == "table"
 				is_wide_2 = true
 
+			if value.autoform?.is_range
+				is_range_2 = true
+
 		if isSingle
 			fields.push keys.slice(i, i+1)
 			i += 1
 		else
-			if is_wide_1
+			if !is_range_1 && is_range_2
+				childKeys = keys.slice(i, i+1)
+				childKeys.push undefined
+				fields.push childKeys
+				i += 1
+			else if is_wide_1
 				fields.push keys.slice(i, i+1)
 				i += 1
 			else if !is_wide_1 and is_wide_2

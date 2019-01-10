@@ -203,7 +203,7 @@ Meteor.startup ()->
 			filters: [{
 				"field": "object_name"
 				"operation": "="
-				"value": "="()->
+				"value": ()->
 					return "project_issues"
 			}]
 			###

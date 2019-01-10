@@ -48,6 +48,18 @@ Creator.Objects.contract_receipts =
 			type: "textarea"
 			is_wide: true
 
+		company_id:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			is_company_only: true
+			required: true
+			defaultValue: ()->
+				if Meteor.isClient
+					return Session.get("user_company_id")
+
 	list_views:
 		recent:
 			label: "最近查看"
@@ -64,7 +76,7 @@ Creator.Objects.contract_receipts =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true

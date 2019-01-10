@@ -131,6 +131,9 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 
 	ins_obj.record_ids = instance_from_client["record_ids"]
 
+	if space_user.company_id
+		ins_obj.company_id = space_user.company_id
+
 	# 新建Trace
 	trace_obj = {}
 	trace_obj._id = new Mongo.ObjectID()._str
@@ -220,7 +223,7 @@ uuflowManager.initiateValues = (recordIds, flowId, spaceId) ->
 				object = Creator.getObject(recordIds.o, spaceId)
 				if object
 					objectField = object.fields[objectFieldName]
-					if (objectField.type == "lookup" || objectField.type == "master_detail") && !objectField.multiple
+					if objectField && (objectField.type == "lookup" || objectField.type == "master_detail") && !objectField.multiple
 						fieldsObj = {}
 						fieldsObj[lookupFieldName] = 1
 						lookupObject = Creator.getCollection(objectField.reference_to, spaceId).findOne(record[objectFieldName], { fields: fieldsObj })

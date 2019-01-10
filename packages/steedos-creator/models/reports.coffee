@@ -128,16 +128,9 @@ Creator.Objects.reports =
 			label: "全部报表"
 			filter_scope: "space"
 			filters: ()->
-				# 返回当前app中所有object对应的报表，生成的过虑条件如：
-				# [[["object_name","=","project_issues"],'or',["object_name","=","tasks"]]]
 				object_names = Creator.getAppObjectNames()
-				results = []
-				object_names.forEach (n)->
-					results.push [ "object_name", "=", n ]
-					results.push "or"
-				results.pop()
-				return [results]
-				
+				return [["object_name","=",object_names]]
+
 		mine:
 			label: "我的报表"
 			filter_scope: "mine"

@@ -86,6 +86,14 @@ if Meteor.isClient
 		selector = []
 		if _.isFunction(filters)
 			filters = filters()
+		_.each filters, (filter)->
+			if _.isArray(filter)
+				if filter.length ==3 && _.isFunction(filter[2])
+					filter[2] = filter[2]()
+			else if _.isObject(filter)
+				if filter.value && _.isFunction(filter.value)
+					filter.value = filter.value()
+
 		if custom_list_view
 			if filter_scope == "mine"
 				selector.push ["owner", "=", Meteor.userId()]
@@ -122,12 +130,7 @@ if Meteor.isClient
 							selector.push "and"
 						_.each filters, (filter)->
 							if object_name != 'spaces' || (filter.length > 0 && filter[0] != "_id")
-								if filter.length ==3 && _.isFunction(filter[2])
-									_filter = _.clone(filter)
-									_filter[2] = filter[2]()
-									selector.push _filter
-								else
-									selector.push filter
+								selector.push filter
 
 					if filter_scope == "mine"
 						if selector.length > 0

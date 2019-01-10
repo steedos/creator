@@ -64,13 +64,15 @@ Creator.Objects.object_workflows =
 						form_id = res_flow?.form
 						res_form = Creator.odata.get("forms",form_id,"current")
 						if res_form?.current
-							fields = res_form?.current.fields
-							fields_name = _.pluck(fields,'code')
-							fields_name.forEach (field_name)->
-								form_field = {}
-								form_field['value'] = field_name
-								form_field['label'] = field_name
-								form_fields.push form_field
+							fields = res_form?.current.fields || []
+							fields.forEach (f)->
+								if f.type == 'section'
+									if f.fields
+										f.fields.forEach (ff)->
+											form_fields.push {'label': ff.name || ff.code, 'value': ff.code}
+								else
+									form_fields.push {'label': f.name || f.code, 'value': f.code}
+
 				options = _.union(instance_fields,form_fields)
 				return options
 

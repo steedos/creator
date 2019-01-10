@@ -58,6 +58,18 @@ Creator.Objects.tasks =
 			label: "描述"
 			type: "textarea"
 			is_wide: true
+		
+		company_id:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index:true
+			is_company_only: true
+			required: true
+			defaultValue: ()->
+				if Meteor.isClient
+					return Session.get("user_company_id")
 
 		# tags:
 		# 	label: "标签"
