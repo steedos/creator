@@ -7,7 +7,7 @@ Creator.Objects["cfs.files.filerecord"] =
 	hidden: true
 	fields:
 		original:
-			label:"原始信息"
+			label:"文件"
 			type: "object"
 			blackbox: true
 			omit: true
@@ -15,10 +15,10 @@ Creator.Objects["cfs.files.filerecord"] =
 			label:"名称"
 			type: "text"
 		"original.size":
-			label:"文件大小"
+			label:"大小"
 			type: "number"
 		metadata:
-			label:"文件属性"
+			label:"属性"
 			type: "object"
 			blackbox: true
 			omit: true
@@ -31,6 +31,7 @@ Creator.Objects["cfs.files.filerecord"] =
 			label:"所属文件"
 			type: "master_detail"
 			reference_to: "cms_files"
+			hidden: true
 		uploadedAt: 
 			label:"上传时间"
 			type: "datetime"
