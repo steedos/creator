@@ -370,15 +370,19 @@ Creator.formatFiltersToDev = (filters, options)->
 					_.each value, (v)->
 						sub_selector.push [field, option, v], "and"
 				else if Creator.isBetweenFilterOperation(option) and value.length = 2
-					sub_selector.push [field, ">=", value[0]], "and"
-					sub_selector.push [field, "<=", value[1]], "and"
+					if value[0] != null or value[1] != null
+						if value[0] != null
+							sub_selector.push [field, ">=", value[0]], "and"
+						if value[1] != null
+							sub_selector.push [field, "<=", value[1]], "and"
 				else
 					_.each value, (v)->
 						sub_selector.push [field, option, v], "or"
 
 				if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
 					sub_selector.pop()
-				selector.push sub_selector, logic_symbol
+				if sub_selector.length
+					selector.push sub_selector, logic_symbol
 			else
 				selector.push [field, option, value], logic_symbol
 
