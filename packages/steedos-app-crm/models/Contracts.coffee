@@ -218,7 +218,7 @@ Creator.Objects.contracts =
 			label: "所有合同"
 			columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
 			filter_scope: "space"
-			filter_fileds: ["contract_state", "signed_date", "created"]
+			filter_fields: ["contract_state", "signed_date", "created"]
 		mine:
 			label: "我的合同"
 			filter_scope: "mine"

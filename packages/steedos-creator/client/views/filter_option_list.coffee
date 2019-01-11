@@ -150,10 +150,10 @@ Template.filter_option_list.onCreated ->
 		unless filters?.length
 			# 视图新增filter_fileds，配置了filter_fields的视图，右侧自动列出过滤器 #915
 			list_view = Creator.getListView(object_name, list_view_id, true)
-			filter_fileds = list_view?.filter_fileds
-			if filter_fileds?.length
+			filter_fields = list_view?.filter_fields
+			if filter_fields?.length
 				filters = []
-				filter_fileds.forEach (n)->
+				filter_fields.forEach (n)->
 					if fields[n]
 						filters.push {
 							field: n
