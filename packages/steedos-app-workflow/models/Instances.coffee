@@ -3,7 +3,7 @@ db.instances = new Meteor.Collection('instances')
 Creator.Objects.instances =
 	name: "instances"
 	icon: "task"
-	label: "申请单"
+	label: "审批单"
 	fields:
 		name:
 			label:"文件标题"
@@ -72,7 +72,7 @@ Creator.Objects.instances =
 		values:
 			blackbox: true
 			omit: true
-			label:"申请单内容"
+			label:"审批单字段"
 			hidden: true
 		inbox_users:
 			type: "string"
@@ -107,7 +107,7 @@ Creator.Objects.instances =
 			label:"流程分类"
 			hidden: true
 		state:
-			label:"申请单状态"
+			label:"审批单状态"
 			type: "select"
 			options: [{label: "草稿",value: "draft"},{label: "进行中",value: "pending"},{label: "已完成",value: "completed"}]
 			readonly: true
@@ -129,7 +129,7 @@ Creator.Objects.instances =
 			type: "lookup"
 			multiple: true
 			reference_to: "instances"
-			label:"相关申请单"
+			label:"相关审批单"
 			is_wide: true
 
 		record_ids:
