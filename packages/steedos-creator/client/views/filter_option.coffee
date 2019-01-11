@@ -57,7 +57,7 @@ Template.filter_option.helpers
 				autoform:
 					type: "text"
 			
-			schema.end_value = schema.start_value
+			schema.end_value = _.clone schema.start_value
 			schema.end_value.label = "end_value"
 		else
 			schema.value = 
@@ -71,15 +71,15 @@ Template.filter_option.helpers
 			new_schema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(object_name)))
 			obj_schema = new_schema._schema
 			if isBetweenOperation
-				schema.start_value = obj_schema[schema_key]
+				schema.start_value = _.clone obj_schema[schema_key]
 				if schema.start_value.autoform
 					schema.start_value.autoform.readonly = false
 					schema.start_value.autoform.disabled = false
 					schema.start_value.autoform.omit = false
-				schema.end_value = schema.start_value
+				schema.end_value = _.clone schema.start_value
 				schema.end_value.label = "end_value"
 			else
-				schema.value = obj_schema[schema_key]
+				schema.value = _.clone obj_schema[schema_key]
 				if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
 					schema.value.autoform.multiple = true
 					schema.value.type = [String]
@@ -92,6 +92,17 @@ Template.filter_option.helpers
 					schema.value.autoform.readonly = false
 					schema.value.autoform.disabled = false
 					schema.value.autoform.omit = false
+
+			# 参考【查找时，按日期类型字段来查 有问题 #896】未能实现outFormat功能
+			# if object_fields[schema_key].type == "date"
+			# 	if isBetweenOperation
+			# 		if schema.start_value.autoform
+			# 			schema.start_value.autoform.outFormat = 'yyyy-MM-dd';
+			# 		if schema.end_value.autoform
+			# 			schema.end_value.autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
+			# 	else
+			# 		if schema.value.autoform
+			# 			schema.value.autoform.outFormat = 'yyyy-MM-dd';
 
 		new SimpleSchema(schema)
 
@@ -130,7 +141,9 @@ Template.filter_option.helpers
 
 Template.filter_option.events 
 	'click .save-filter': (event, template) ->
+		fields = Creator.getObject(template.data.object_name).fields
 		filter = AutoForm.getFormValues("filter-option").insertDoc
+		isDateField = fields[filter.field]?.type == "date"
 		unless filter.operation
 			toastr.error(t("creator_filter_option_start_end_error"))
 			return
@@ -139,7 +152,14 @@ Template.filter_option.events
 			if filter.start_value > filter.end_value
 				toastr.error(t("creator_filter_option_start_end_error"))
 				return
+			if isDateField
+				filter.start_value = new Date(moment.utc(filter.start_value).format("YYYY-MM-DDT00:00:00.000Z"))
+				filter.end_value = new Date(moment.utc(filter.end_value).format("YYYY-MM-DDT23:59:59.000Z"))
 			filter.value = [filter.start_value, filter.end_value]
+		else
+			if isDateField
+				# filter.value.setHours(filter.value.getHours() - filter.value.getTimezoneOffset() / 60 ) # 处理datetime 偏移
+				filter.value = new Date(moment.utc(filter.value).format("YYYY-MM-DDT00:00:00.000Z"))
 		index = this.index
 		filter_items = Session.get("filter_items")
 		filter_items[index] = filter
