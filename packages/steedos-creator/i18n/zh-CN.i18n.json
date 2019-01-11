@@ -51,7 +51,7 @@
 	"creator_filter_option_end_value": "结束值",
 	"creator_filter_option_start_end_error": "起始值不能大于结束值",
 	"creator_filter_option_done": "完成",
-	"creator_filter_operation_between": "自定义范围",
+	"creator_filter_operation_between": "范围",
 
 	"creator_app_launcher": "应用程序启动器",
 	"creator_app_launcher_all_apps": "所有应用程序",
