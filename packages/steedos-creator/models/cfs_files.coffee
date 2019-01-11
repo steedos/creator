@@ -14,7 +14,7 @@ Creator.Objects["cfs.files.filerecord"] =
 		"original.name":
 			label:"文件名"
 			type: "text"
-			is_name: true
+			# is_name: true
 		"original.size":
 			label:"文件大小"
 			type: "number"
@@ -48,7 +48,6 @@ Creator.Objects["cfs.files.filerecord"] =
 	list_views:
 		all:
 			filter_scope: "space"
-			# columns: ["original.name","original.size","metadata.owner_name","uploadedAt"]
 			columns: ["original.name", "metadata.owner_name", "uploadedAt", "original.size"]
 	
 	permission_set:
