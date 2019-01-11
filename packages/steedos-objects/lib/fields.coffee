@@ -424,6 +424,7 @@ Creator.getFieldOperation = (field_type) ->
 		contains: {label: t("creator_filter_operation_contains"), value: "contains"},
 		not_contain: {label: t("creator_filter_operation_does_not_contain"), value: "notcontains"},
 		starts_with: {label: t("creator_filter_operation_starts_with"), value: "startswith"},
+		between: {label: t("creator_filter_operation_between"), value: "between"},
 	}
 
 	if field_type == undefined
@@ -432,7 +433,7 @@ Creator.getFieldOperation = (field_type) ->
 	operations = []
 
 	if field_type == "date" or field_type == "datetime"
-		operations.push(optionals.equal, optionals.unequal, optionals.less_than, optionals.greater_than, optionals.less_or_equal, optionals.greater_or_equal)
+		operations.push(optionals.equal, optionals.unequal, optionals.less_than, optionals.greater_than, optionals.less_or_equal, optionals.greater_or_equal, optionals.between)
 	else if field_type == "text" or field_type == "textarea" or field_type == "html"
 		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
 	else if field_type == "lookup" or field_type == "master_detail" or field_type == "select"

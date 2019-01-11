@@ -84,9 +84,11 @@ if Meteor.isClient
 		filter_scope = filters_set.filter_scope
 		filters = filters_set.filters
 		selector = []
+		# 整个过虑器是函数的话解析出来
 		if _.isFunction(filters)
 			filters = filters()
 		_.each filters, (filter)->
+			# 过虑器内的value属性是函数的话解析出来
 			if _.isArray(filter)
 				if filter.length ==3 && _.isFunction(filter[2])
 					filter[2] = filter[2]()

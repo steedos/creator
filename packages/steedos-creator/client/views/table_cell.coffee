@@ -84,7 +84,7 @@ Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
 	openWindow: ()->
-		if Template.instance().data?.open_window
+		if Template.instance().data?.open_window || Template.instance().data?.is_related
 			return true
 		object_name = this.object_name
 		this_object = Creator.getObject(object_name)

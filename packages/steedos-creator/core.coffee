@@ -332,6 +332,9 @@ Creator.formatFiltersToMongo = (filters, options)->
 		selector.push sub_selector
 	return selector
 
+Creator.isBetweenFilterOperation = (operation)->
+	return operation == "between"
+
 ###
 options参数：
 	extend-- 是否需要把当前用户基本信息加入公式，即让公式支持Creator.USER_CONTEXT中的值，默认为true
@@ -352,8 +355,8 @@ Creator.formatFiltersToDev = (filters, options)->
 		field = filter[0]
 		option = filter[1]
 		value = filter[2]
-
 		if _.isArray(field)
+			# #914 弹出搜索界面，对于文本字段，应该支持多关键词空格组合搜索
 			selector.push filter
 		else
 			if value != undefined
@@ -370,13 +373,20 @@ Creator.formatFiltersToDev = (filters, options)->
 					else if option == "<>"
 						_.each value, (v)->
 							sub_selector.push [field, option, v], "and"
+					else if Creator.isBetweenFilterOperation(option) and value.length = 2
+						if value[0] != null or value[1] != null
+							if value[0] != null
+								sub_selector.push [field, ">=", value[0]], "and"
+							if value[1] != null
+								sub_selector.push [field, "<=", value[1]], "and"
 					else
 						_.each value, (v)->
 							sub_selector.push [field, option, v], "or"
 
 					if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
 						sub_selector.pop()
-					selector.push sub_selector, logic_symbol
+					if sub_selector.length
+						selector.push sub_selector, logic_symbol
 				else
 					selector.push [field, option, value], logic_symbol
 

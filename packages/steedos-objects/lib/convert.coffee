@@ -220,16 +220,27 @@ Meteor.startup ()->
 							if filter.length == 3 and _.isFunction(filter[2])
 								filter[2] = filter[2].toString()
 								filter[3] = "FUNCTION"
+							else if filter.length == 3 and _.isDate(filter[2])
+								# 如果是Date类型，则filter[2]值到前端会自动转成字符串，格式："2018-03-29T03:43:21.787Z"
+								# 包括grid列表请求的接口在内的所有OData接口，Date类型字段都会以上述格式返回
+								filter[3] = "DATE"
 						else
 							if filter.length == 4 and _.isString(filter[2]) and filter[3] == "FUNCTION"
 								filter[2] = Creator.eval("(#{filter[2]})")
+								filter.pop()
+							if filter.length == 4 and _.isString(filter[2]) and filter[3] == "DATE"
+								filter[2] = new Date(filter[2])
 								filter.pop()
 					else if _.isObject(filter)
 						if Meteor.isServer
 							if _.isFunction(filter?.value)
 								filter._value = filter.value.toString()
+							else if _.isDate(filter?.value)
+								filter._is_date = true
 						else
 							if _.isString(filter?._value)
 								filter.value = Creator.eval("(#{filter._value})")
+							else if filter._is_date == true
+								filter.value = new Date(filter.value)
 
 

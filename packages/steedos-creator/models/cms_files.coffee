@@ -73,8 +73,50 @@ Creator.Objects.cms_files =
 				collection.remove {"metadata.parent": doc._id}
 
 	actions:
+		standard_edit:
+			label: "编辑"
+			sort: 0
+			visible: (object_name, record_id, record_permissions)->
+				if object_name == Session.get('object_name')
+					fileRecord = Creator.getObjectRecord()
+					record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
+					if record && record.locked
+						return false
+				else
+					record = Creator.getObjectRecord()
+					if record && record.locked
+						return false
+
+				if record_permissions
+					return record_permissions["allowEdit"]
+				else
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						return record_permissions["allowEdit"]
+			on: "record"
+			todo: "standard_edit"
+
 		standard_delete:
 			label: "删除"
+			visible: (object_name, record_id, record_permissions)->
+				if object_name == Session.get('object_name')
+					fileRecord = Creator.getObjectRecord()
+					record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
+					if record && record.locked
+						return false
+				else
+					record = Creator.getObjectRecord()
+					if record && record.locked
+						return false
+
+				if record_permissions
+					return record_permissions["allowDelete"]
+				else
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						return record_permissions["allowDelete"]
+			on: "record_more"
+			todo: "standard_delete"
 		download:
 			label: "下载"
 			visible: true
@@ -91,7 +133,7 @@ Creator.Objects.cms_files =
 						Steedos.cordovaDownload(url, filename, rev, length)
 					else
 						window.location = Steedos.absoluteUrl("/api/files/files/#{fileId}?download=true")
-		
+
 		new_version:
 			label: "上传新版本"
 			visible: true

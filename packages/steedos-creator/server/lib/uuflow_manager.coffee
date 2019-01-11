@@ -293,6 +293,9 @@ uuflowManager.initiateRecordInstanceInfo = (recordIds, insId, spaceId) ->
 				}],
 				$position: 0
 			}
+		},
+		$set: {
+			locked: true
 		}
 	})
 

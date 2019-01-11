@@ -33,13 +33,13 @@ Template.standard_query_modal.helpers
 		canSearchFields = _.intersection(first_level_keys, canSearchFields)
 		_.each canSearchFields, (field)->
 			schema[field] = obj_schema[field]
-
-			if !object_fields[field].searchable
+			if !(object_fields[field].searchable || object_fields[field].filterable)
 				schema[field].autoform.group = '高级'
-
 			if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[field].type)
 				schema[field].autoform.multiple = true
 				schema[field].type = [String]
+				if schema[field].autoform.create
+					delete schema[field].autoform.create
 
 				if object_fields[field].type == "select"
 					schema[field].autoform.type = "steedosLookups"
@@ -60,7 +60,8 @@ Template.standard_query_modal.helpers
 			
 			if ["boolean"].includes(object_fields[field].type)
 				schema[field].type = String
-				schema[field].autoform = {}
+				group = schema[field].autoform?.group
+				schema[field].autoform = {group: group}
 				schema[field].autoform.type = "select"
 				schema[field].autoform.firstOption = ""
 				schema[field].autoform.options = [
@@ -69,7 +70,8 @@ Template.standard_query_modal.helpers
 				]
 
 			if ["code", "textarea"].includes(object_fields[field].type)
-				schema[field].autoform = {}
+				group = schema[field].autoform?.group
+				schema[field].autoform = {group: group}
 				schema[field].autoform.type = "text"
 
 			if schema[field].autoform
