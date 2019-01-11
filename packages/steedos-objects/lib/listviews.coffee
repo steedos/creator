@@ -274,10 +274,11 @@ if Meteor.isClient
 		return list
 
 
-///
+### 
 	取出list_view_id对应的视图，如果不存在或者没有权限，就返回第一个视图
-///
-Creator.getListView = (object_name, list_view_id)->
+	exac为true时，需要强制按list_view_id精确查找，不默认返回第一个视图
+###
+Creator.getListView = (object_name, list_view_id, exac)->
 	if Meteor.isClient
 		if !object_name
 			object_name = Session.get("object_name")
@@ -291,7 +292,11 @@ Creator.getListView = (object_name, list_view_id)->
 		return
 	list_view = _.findWhere(listViews,{"_id":list_view_id})
 	unless list_view
-		list_view = listViews[0]
+		# 如果不需要强制按list_view_id精确查找，则默认返回第一个视图，反之返回空
+		if exac
+			return
+		else
+			list_view = listViews[0]
 	Creator.getTable(object_name)?.options.columns = Creator.getTabularColumns(object_name, list_view.columns);
 	Creator.getTable(object_name)?.options.language?.zeroRecords = t("list_view_no_records")
 	Creator.getTable(object_name)?.options.order = Creator.getTabularOrder(object_name, list_view_id, list_view.columns)

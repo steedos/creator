@@ -144,10 +144,25 @@ Template.filter_option_list.onCreated ->
 
 	self.autorun ->
 		filters = Session.get("filter_items")
-		if filters
+		object_name = Template.instance().data?.object_name
+		list_view_id = Session.get("list_view_id")
+		fields = Creator.getObject(object_name)?.fields
+		unless filters?.length
+			# 视图新增filter_fileds，配置了filter_fields的视图，右侧自动列出过滤器 #915
+			list_view = Creator.getListView(object_name, list_view_id, true)
+			filter_fileds = list_view?.filter_fileds
+			if filter_fileds?.length
+				filters = []
+				filter_fileds.forEach (n)->
+					if fields[n]
+						filters.push {
+							field: n
+						}
+				if filters.length
+					Session.set("filter_items", filters)
+
+		if filters?.length
 			self.filterItems.set(filters)
-			object_name = Template.instance().data?.object_name
-			fields = Creator.getObject(object_name)?.fields
 			unless fields
 				return
 			filters?.forEach (filter) ->
