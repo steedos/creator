@@ -54,9 +54,6 @@ Creator.Objects.archive_document =
 			hidden: true
 
 	list_views:
-		recent:
-			label: "最近查看"
-			filter_scope: "space"
 		submit:
 			label:"我发起的"
 			filter_scope: "space"
@@ -70,6 +67,7 @@ Creator.Objects.archive_document =
 		all:
 			label: "全部"
 			filter_scope: "space"
+			filters: [["submitter", "=", "{userId}"],["outbox_users", "=", "{userId}"]]
 			columns:["name","flow_name","submitter","submit_date","archive_date"]
 	
 	permission_set:
@@ -99,7 +97,7 @@ Creator.Objects.archive_document =
 						if result 
 							if result == ""
 								toastr.error "未找到html！"							
-							
+							console.log "result",result
 							Steedos.openWindow(result)
 
 

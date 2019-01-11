@@ -57,9 +57,9 @@ Creator.Objects.cms_files =
 			modifyAllRecords: false
 			viewAllRecords: true
 		admin:
-			allowCreate: true
+			allowCreate: false
 			allowDelete: true
-			allowEdit: true
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true
@@ -134,11 +134,11 @@ Creator.Objects.cms_files =
 					else
 						window.location = Steedos.absoluteUrl("/api/files/files/#{fileId}?download=true")
 
-		new_version:
-			label: "上传新版本"
-			visible: true
-			only_detail: true
-			is_file: true
-			on: "record"
-			todo: (object_name, record_id)->
+		# new_version:
+		# 	label: "上传新版本"
+		# 	visible: true
+		# 	only_detail: true
+		# 	is_file: true
+		# 	on: "record"
+		# 	todo: (object_name, record_id)->
 				# 功能代码在文件详细界面，这里只是把按钮显示出来
