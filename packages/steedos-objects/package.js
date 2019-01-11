@@ -48,7 +48,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/steedos_icon.coffee','client');
 
 	api.addFiles('server/methods/object_options.coffee', 'server');
-	
+
 	api.addFiles('lib/listviews.coffee');
 
 	api.addFiles('lib/add_simple_schema_validation_error.coffee');
@@ -58,7 +58,7 @@ Package.onUse(function(api) {
 	api.addFiles('lib/convert.coffee');
 
 	api.addFiles('lib/formular.coffee');
-	
+
 	api.addFiles('lib/object.coffee');
 	api.addFiles('lib/fields.coffee');
 	api.addFiles('lib/triggers.coffee');
@@ -69,5 +69,7 @@ Package.onUse(function(api) {
 
 
 	api.addFiles('models/base.coffee');
+
+	api.addFiles('server/routes/api_workflow_view_instance.coffee', 'server');
 
 });
