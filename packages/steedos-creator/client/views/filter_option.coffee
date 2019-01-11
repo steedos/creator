@@ -131,6 +131,9 @@ Template.filter_option.helpers
 Template.filter_option.events 
 	'click .save-filter': (event, template) ->
 		filter = AutoForm.getFormValues("filter-option").insertDoc
+		unless filter.operation
+			toastr.error(t("creator_filter_option_start_end_error"))
+			return
 		isBetweenOperation = Creator.isBetweenFilterOperation(filter.operation)
 		if isBetweenOperation
 			if filter.start_value > filter.end_value
