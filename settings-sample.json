@@ -1,5 +1,10 @@
 {
     "public": {
+        "webservices": {
+            "workflow": {
+                "url": "http://steedos.ticp.net:8821/"
+            }
+        },
         "cfs": {
             "store": "" // 值为空或者未配置此属性表示文件存本地，OSS表示存阿里云， S3表示存AWS
         },

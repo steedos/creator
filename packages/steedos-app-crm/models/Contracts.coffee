@@ -14,6 +14,7 @@ Creator.Objects.contracts =
 			label:"合同编号"
 			required:true
 			sortable:true
+			filterable:true
 		name:
 			label: "名称"
 			type: "text"
@@ -29,6 +30,7 @@ Creator.Objects.contracts =
 			label: "签订日期"
 			type: "date"
 			sortable: true
+			filterable:true
 		owner:
 			label: "责任人"
 			omit: false
@@ -41,14 +43,17 @@ Creator.Objects.contracts =
 			label: "联系人"
 			type: "master_detail"
 			reference_to: "contacts"
+			filterable:false
 		start_date:
 			label: "开始日期"
 			type: "date"
 			sortable: true
+			filterable:true
 		end_date:
 			label: "结束日期"
 			type: "date"
 			sortable: true
+			filterable:true
 		description:
 			label: "备注"
 			type: "textarea"
@@ -61,6 +66,7 @@ Creator.Objects.contracts =
 			type: "lookup"
 			reference_to: "organizations"
 			sortable: true
+			filterable:true
 			index:true
 			is_company_only: true
 			required: true
@@ -76,6 +82,7 @@ Creator.Objects.contracts =
 		project:
 			type:'text'
 			label:"计划编号"
+			filterable:true
 
 		othercompany:
 			type:'text'
@@ -96,7 +103,7 @@ Creator.Objects.contracts =
 		# 待处理：按规则自动赋值
 		is_important:
 			type:"boolean"
-			label:"重大合同"
+			label:"是否重大合同"
 			defaultValue:false
 
 		is_bidding:

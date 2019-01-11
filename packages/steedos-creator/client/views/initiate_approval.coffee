@@ -4,7 +4,7 @@ Template.initiate_approval.helpers
 
 Template.initiate_approval.events
     'click .weui_cell' : (e, t) ->
-        workflowUrl = window.location.protocol + '//' + window.location.host + '/'
+        workflowUrl = Meteor.settings.public.webservices.workflow.url
         flowId = e.currentTarget.dataset.flow
         object_name = t.data.object_name
         record_id = t.data.record_id

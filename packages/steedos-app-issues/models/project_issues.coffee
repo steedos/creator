@@ -12,6 +12,7 @@ Creator.Objects.project_issues =
 			type: 'text'
 			is_wide: true
 			required: true
+			searchable: true
 
 		description:
 			label: '问题描述'
@@ -24,6 +25,7 @@ Creator.Objects.project_issues =
 			type: 'master_detail'
 			reference_to: 'projects'
 			required: true
+			filterable: true
 
 		level:
 			label: "级别"
@@ -37,6 +39,7 @@ Creator.Objects.project_issues =
 			]
 			sortable: true
 			required: true
+			filterable: true
 
 		state:
 			label: "进度"
@@ -50,6 +53,7 @@ Creator.Objects.project_issues =
 			]
 			sortable: true
 			required: true
+			filterable: true
 
 		priority:
 			label: '优先级'
@@ -59,6 +63,7 @@ Creator.Objects.project_issues =
 				{label:"中", value:"medium"},
 				{label:"低", value:"low"}
 			]
+			filterable: true
 
 		status:
 			label: "状态"
@@ -68,6 +73,7 @@ Creator.Objects.project_issues =
 				{label:"已关闭", value:"closed"}
 			]
 			defaultValue: "open"
+			filterable: true
 
 		solution:
 			label: '拟上措施'

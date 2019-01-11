@@ -13,11 +13,14 @@ _standardQuery = (curObjectName, standard_query)->
 					if ["currency", "number"].includes(object_fields[key].type)
 						query_arr.push([key, "=", val])
 					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
-						vals = val.trim().split(" ")
-						vals.forEach (val_item)->
-							# 特殊字符编码
-							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
-							query_arr.push([key, "contains", val_item])
+						if _.isString(val)
+							vals = val.trim().split(" ")
+							vals.forEach (val_item)->
+								# 特殊字符编码
+								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+								query_arr.push([key, "contains", val_item])
+						else if _.isArray(val)
+							query_arr.push([key, "=", val])
 		else
 			_.each query, (val, key)->
 				if object_fields[key]
@@ -26,9 +29,18 @@ _standardQuery = (curObjectName, standard_query)->
 							val.setHours(val.getHours() + val.getTimezoneOffset() / 60 ) # 处理grid中的datetime 偏移
 						query_arr.push([key, ">=", val])
 					else if ["text", "textarea", "html"].includes(object_fields[key].type)
-						# 特殊字符编码
-						val = encodeURIComponent(Creator.convertSpecialCharacter(val))
-						query_arr.push([key, "contains", val])
+						if _.isString(val)
+							vals = val.trim().split(" ")
+							query_or = []
+							vals.forEach (val_item)->
+								# 特殊字符编码
+								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+								query_or.push([key, "contains", val_item])
+							if query_or.length > 0
+								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: true})
+						else if _.isArray(val)
+							query_arr.push([key, "=", val])
+
 					else if ["boolean"].includes(object_fields[key].type)
 						query_arr.push([key, "=", JSON.parse(val)])
 					else
@@ -133,7 +145,9 @@ _fields = (object_name, list_view_id)->
 
 	fields = fields.map (n)->
 		if object.fields[n]?.type # and !object.fields[n].hidden
-			return n.split(".")[0]
+			# 对于a.b类型的字段，不应该替换字段名
+			#return n.split(".")[0]
+			return n
 		else
 			return undefined
 
@@ -230,7 +244,9 @@ _columns = (object_name, columns, list_view_id, is_related)->
 				if /\w+\.\$\.\w+/g.test(field_name)
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
-				cellOption = {_id: options.data._id, val: options.data[n], doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata"}
+				# 需要考虑field_name为 a.b.c 这种格式
+				field_val = eval("options.data." + field_name) 
+				cellOption = {_id: options.data._id, val: field_val, doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata", is_related: is_related}
 				if field.type is "markdown"
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
@@ -457,6 +473,9 @@ Template.creator_grid.onRendered ->
 				pageSize = 50
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
+			# 对于a.b的字段，发送odata请求时需要转换为a/b
+			selectColumns = selectColumns.map (n)->
+				return n.replace(".", "/");
 			dxOptions = 
 				paging: 
 					pageSize: pageSize
