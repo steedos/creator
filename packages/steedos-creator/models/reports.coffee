@@ -130,6 +130,7 @@ Creator.Objects.reports =
 			filters: ()->
 				object_names = Creator.getAppObjectNames()
 				return [["object_name","=",object_names]]
+			filter_fields: ["report_type", "created"]
 
 		mine:
 			label: "我的报表"
