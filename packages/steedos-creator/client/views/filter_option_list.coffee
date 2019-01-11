@@ -151,10 +151,12 @@ Template.filter_option_list.onCreated ->
 			unless fields
 				return
 			filters?.forEach (filter) ->
+				filterValue = filter?.value
 				filter.fieldlabel = fields[filter.field]?.label
-				filter.valuelabel = filter?.value
+				filter.valuelabel = filterValue
 				field = fields[filter.field]
-				if field?.type == 'lookup' or field?.type =='master_detail' or field?.type=='select'
+				fieldType = field?.type
+				if fieldType == 'lookup' or fieldType =='master_detail' or fieldType=='select'
 					reference_to_objects = []
 					if field?.reference_to
 						if field.reference_to.constructor == Array
@@ -175,12 +177,37 @@ Template.filter_option_list.onCreated ->
 							options = field.options
 						options_labels = []
 						_.each options,(option)->
-							if filter?.value
+							if filterValue
 								if _.indexOf(filter.value,option.value)>-1
 									options_labels.push option.label
 						filter.valuelabel = options_labels
-				else
-					self.filterItems.set(filters)
+				else if fieldType == 'datetime' or fieldType == 'date'
+					formatFun = (value, type)->
+						if type == "datetime"
+							return moment(value).format('YYYY-MM-DD HH:mm')
+						else
+							return moment.utc(value).format('YYYY-MM-DD')
+					if filterValue
+						if _.isArray(filterValue)
+							if filterValue.length
+								if filterValue[0] || filterValue[1]
+									startLabel = if filterValue[0] then formatFun(filterValue[0], fieldType) else ""
+									endLabel = if filterValue[1] then formatFun(filterValue[1], fieldType) else ""
+									if startLabel and endLabel
+										filter.valuelabel = "在#{startLabel}与#{endLabel}之间"
+									else if startLabel
+										filter.valuelabel = "在#{startLabel}之后"
+									else if endLabel
+										filter.valuelabel = "在#{endLabel}之前"
+								else
+									filter.valuelabel = ""
+						else
+							filter.valuelabel = formatFun(filterValue, fieldType)
+					else
+						filter.valuelabel = ""
+				else if fieldType == 'boolean'
+					filter.valuelabel = if filterValue then "是" else "否"
+			self.filterItems.set(filters)
 		else
 			self.filterItems.set(null)
 

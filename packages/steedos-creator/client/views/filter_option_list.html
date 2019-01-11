@@ -33,9 +33,11 @@
                             {{#if this.field}} {{this.fieldlabel}} {{else}} {{_ "creator_list_new_filter"}} {{/if}}
                         </span>
                     </div>
-                    <div class="filterCardBody">{{getOperationLabel(this.operation)}}&nbsp;
-                        <span class="uiOutputText">{{this.valuelabel}}</span>
-                    </div>
+                    {{#if this.valuelabel}}
+                        <div class="filterCardBody">{{getOperationLabel(this.operation)}}&nbsp;
+                            <span class="uiOutputText">{{this.valuelabel}}</span>
+                        </div>
+                    {{/if}}
                 </div>
             </a>
             <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-small removeFilter">

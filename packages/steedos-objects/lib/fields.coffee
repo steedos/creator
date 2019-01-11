@@ -433,7 +433,7 @@ Creator.getFieldOperation = (field_type) ->
 	operations = []
 
 	if field_type == "date" or field_type == "datetime"
-		operations.push(optionals.equal, optionals.unequal, optionals.less_than, optionals.greater_than, optionals.less_or_equal, optionals.greater_or_equal, optionals.between)
+		operations.push(optionals.between)
 	else if field_type == "text" or field_type == "textarea" or field_type == "html"
 		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
 	else if field_type == "lookup" or field_type == "master_detail" or field_type == "select"

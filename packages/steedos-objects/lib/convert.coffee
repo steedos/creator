@@ -44,7 +44,10 @@ Meteor.startup ()->
 						if _todo_from_db.startsWith("function")
 							action.todo = Creator.eval("(#{_todo_from_db})")
 						else
-							action.todo = Creator.eval("(function(){#{_todo_from_db}})")
+							if _.isFunction(Creator.actionsByName[_todo_from_db])
+								action.todo = _todo_from_db
+							else
+								action.todo = Creator.eval("(function(){#{_todo_from_db}})")
 					catch error
 						console.error "todo_from_db", _todo_from_db, error
 

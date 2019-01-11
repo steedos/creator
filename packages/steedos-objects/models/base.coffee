@@ -259,7 +259,14 @@ Creator.baseObject =
 		standard_approve:
 			label: "发起审批"
 			visible: (object_name, record_id, record_permissions) ->
-				#TODO 权限判断
+				if record_permissions && !record_permissions["allowEdit"]
+					return false
+
+				record = Creator.Collections[object_name].findOne record_id
+				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+				if record_permissions && !record_permissions["allowEdit"]
+					return false
+
 				object_workflow = _.find Creator.object_workflows, (ow) ->
 					return ow.object_name is object_name
 
