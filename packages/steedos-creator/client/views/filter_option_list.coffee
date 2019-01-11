@@ -205,6 +205,8 @@ Template.filter_option_list.onCreated ->
 							filter.valuelabel = formatFun(filterValue, fieldType)
 					else
 						filter.valuelabel = ""
+				else if fieldType == 'boolean'
+					filter.valuelabel = if filterValue then "是" else "否"
 			self.filterItems.set(filters)
 		else
 			self.filterItems.set(null)
