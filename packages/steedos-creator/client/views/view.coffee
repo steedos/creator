@@ -1,7 +1,9 @@
 Template.creator_view.onCreated ->
 	this.recordsTotal = new ReactiveVar({})
+	this.subscribeReady = new ReactiveVar(false)
 
 Template.creator_view.onRendered ->
+	self = this
 	this.autorun ->
 		record_id = Session.get("record_id")
 		if record_id
@@ -24,11 +26,18 @@ Template.creator_view.onRendered ->
 			_.each fields, (f)->
 				if f.indexOf(".")  < 0
 					ref_fields[f] = 1
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
+			self.subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId"), {
+				onReady: (a,b,c)->
+					self.subscribeReady.set(true)
+				onStop: (error)->
+					toastr.error(error.reason)
+			}
 
 Template.creator_view.helpers Creator.helpers
 
 Template.creator_view.helpers
+	subscribeReady: ()->
+		return Template.instance().subscribeReady.get()
 	form_horizontal: ()->
 		if Session.get("app_id") == "admin"
 			return window.innerWidth > (767 + 250)
@@ -252,7 +261,7 @@ Template.creator_view.helpers
 		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
 			return true
 		record = Creator.getObjectRecord()
-		return !record.locked
+		return !record?.locked
 
 	detail_info_visible: ()->
 		return Session.get("detail_info_visible")
@@ -327,7 +336,7 @@ Template.creator_view.helpers
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
 	show_chatter: ()->
-		return Creator.subs["CreatorRecord"].ready() && Creator.getObjectRecord()
+		return Template.instance().subscribeReady.get() && Creator.getObjectRecord()
 
 Template.creator_view.events
 

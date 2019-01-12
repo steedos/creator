@@ -165,7 +165,7 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
 
-	permissions = _.clone(Creator.getPermissions(object_name))
+	permissions = _.clone(Creator.getPermissions(object_name, record?.spaceId, userId))
 
 	if record
 		isOwner = record.owner == userId || record.owner?._id == userId

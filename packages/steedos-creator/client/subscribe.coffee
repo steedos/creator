@@ -57,14 +57,14 @@ Meteor.startup ->
 			object_a = [object_name, related_object_name]
 			object_a = _.compact(object_a)
 			Creator.subs["TabularSetting"].subscribe "user_tabular_settings", object_a
-			
-Meteor.startup ->
-	Tracker.autorun (c)->
-		if Session.get("object_name") and Session.get("record_id")
-			Creator.subs["CreatorRecord"].subscribe "creator_object_record", Session.get("object_name"), Session.get("record_id"), Session.get('spaceId')
-
-	Tracker.autorun (c)->
-		if Session.get("action_object_name") and Session.get("action_record_id")
-			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), Session.get('spaceId')
-
+#
+#Meteor.startup ->
+#	Tracker.autorun (c)->
+#		if Session.get("object_name") and Session.get("record_id")
+#			Creator.subs["CreatorRecord"].subscribe "creator_object_record", Session.get("object_name"), Session.get("record_id"), Session.get('spaceId')
+#
+#	Tracker.autorun (c)->
+#		if Session.get("action_object_name") and Session.get("action_record_id")
+#			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), Session.get('spaceId')
+#
 
