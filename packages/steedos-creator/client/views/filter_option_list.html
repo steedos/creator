@@ -31,7 +31,7 @@
                         </span>
                     </div>
                     {{#if this.valuelabel}}
-                        <div class="filterCardBody">{{getOperationLabel(this.operation)}}&nbsp;
+                        <div class="filterCardBody">{{#if showOperationLabel this.operation}}{{getOperationLabel(this.operation)}}&nbsp;{{/if}}
                             <span class="uiOutputText">{{this.valuelabel}}</span>
                         </div>
                     {{/if}}
