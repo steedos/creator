@@ -432,7 +432,7 @@ Creator.getFieldOperation = (field_type) ->
 
 	operations = []
 
-	if field_type == "date" or field_type == "datetime"
+	if ["date", "datetime", "currency", "number"].includes(field_type)
 		operations.push(optionals.between)
 	else if field_type == "text" or field_type == "textarea" or field_type == "html"
 		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
