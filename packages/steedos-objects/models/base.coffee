@@ -227,6 +227,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
+					record = Creator.Collections[object_name].findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -234,7 +235,9 @@ Creator.baseObject =
 				if perms["modifyAllRecords"]
 					return true
 
-				record = Creator.Collections[object_name].findOne record_id
+				if !record
+					record = Creator.Collections[object_name].findOne record_id
+
 				if record && record.locked
 					return false
 
@@ -250,6 +253,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
+					record = Creator.Collections[object_name].findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -257,7 +261,9 @@ Creator.baseObject =
 				if perms["modifyAllRecords"]
 					return true
 
-				record = Creator.Collections[object_name].findOne record_id
+				if !record
+					record = Creator.Collections[object_name].findOne record_id
+
 				if record && record.locked
 					return false
 
