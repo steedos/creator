@@ -115,15 +115,18 @@ Creator.Objects.project_issues =
 			columns: ["name", "category", "level", "state", "priority", "created"]
 			filter_scope: "space"
 			filters: [["status", "=", "open"]]
+			filter_fields: ["category", "level", "state", "priority"]
 		closed:
 			label: "已关闭"
 			columns: ["name", "category", "level", "state", "priority", "created"]
 			filter_scope: "space"
 			filters: [["status", "=", "closed"]]
+			filter_fields: ["category", "level", "state", "priority"]
 		all:
 			label: "所有"
 			columns: ["name", "category", "level", "state", "priority", "created"]
 			filter_scope: "space"
+			filter_fields: ["category", "level", "state", "priority"]
 
 
 	permission_set:
