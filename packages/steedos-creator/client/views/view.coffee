@@ -30,7 +30,8 @@ Template.creator_view.onRendered ->
 				onReady: (a,b,c)->
 					self.subscribeReady.set(true)
 				onStop: (error)->
-					toastr.error(error.reason)
+					if error
+						toastr.error(error.reason)
 			}
 
 Template.creator_view.helpers Creator.helpers
