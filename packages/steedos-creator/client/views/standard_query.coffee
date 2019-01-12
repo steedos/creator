@@ -45,7 +45,7 @@ Template.standard_query_modal.helpers
 					schema[field].autoform.type = "steedosLookups"
 					schema[field].autoform.showIcon = false
 
-			if ["date", "datetime", "currency", "number"].includes(object_fields[field].type)
+			if Creator.checkFieldTypeSupportBetweenQuery(object_fields[field].type)
 				schema[field + "_endLine"] =  _.clone(obj_schema[field])
 				obj_schema[field].autoform.is_range = true
 				if schema[field + "_endLine"].autoform

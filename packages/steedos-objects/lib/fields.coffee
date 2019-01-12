@@ -405,6 +405,8 @@ Creator.getFieldDisplayValue = (object_name, field_name, field_value)->
 
 	return html
 
+Creator.checkFieldTypeSupportBetweenQuery = (field_type)->
+	return ["date", "datetime", "currency", "number"].includes(field_type)
 
 Creator.getFieldOperation = (field_type) ->
 	# 日期类型: date, datetime  支持操作符: "=", "<>", "<", ">", "<=", ">="
@@ -432,7 +434,7 @@ Creator.getFieldOperation = (field_type) ->
 
 	operations = []
 
-	if ["date", "datetime", "currency", "number"].includes(field_type)
+	if Creator.checkFieldTypeSupportBetweenQuery(field_type)
 		operations.push(optionals.between)
 	else if field_type == "text" or field_type == "textarea" or field_type == "html"
 		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)

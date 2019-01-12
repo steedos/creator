@@ -10,7 +10,8 @@ Template.filter_option.helpers
 		schema_key = template.schema_key.get()
 		object_fields = Creator.getObject(object_name).fields
 
-		schema= 
+		filter_field_type = object_fields[schema_key]?.type
+		schema=
 			field:
 				type: String
 				label: "field"
@@ -39,7 +40,11 @@ Template.filter_option.helpers
 				autoform:
 					type: "select"
 					defaultValue: ()->
-						return "="
+						if filter_field_type && Creator.checkFieldTypeSupportBetweenQuery(filter_field_type)
+							template.filter_item_operation.set('between')
+							return 'between'
+						else
+							return "="
 					firstOption: ""
 					options: ()->
 						if object_fields[schema_key]
@@ -176,7 +181,7 @@ Template.filter_option.events
 			object_name = Session.get("object_name")
 		field = $(event.currentTarget).val()
 		if field != filter_item?.field
-			filter_item.operation = null
+			delete filter_item.operation
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
 			template.filter_item_operation.set(null)
