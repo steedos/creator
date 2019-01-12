@@ -223,32 +223,46 @@ Creator.baseObject =
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
+				perms = {}
+				if record_permissions
+					perms = record_permissions
+				else
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						perms = record_permissions
+
+				if perms["modifyAllRecords"]
+					return true
+
 				record = Creator.Collections[object_name].findOne record_id
 				if record && record.locked
 					return false
 
-				if record_permissions
-					return record_permissions["allowEdit"]
-				else
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						return record_permissions["allowEdit"]
+				return perms["allowEdit"]
+
 			on: "record"
 			todo: "standard_edit"
 
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
+				perms = {}
+				if record_permissions
+					perms = record_permissions
+				else
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						perms = record_permissions
+
+				if perms["modifyAllRecords"]
+					return true
+
 				record = Creator.Collections[object_name].findOne record_id
 				if record && record.locked
 					return false
 
-				if record_permissions
-					return record_permissions["allowDelete"]
-				else
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						return record_permissions["allowDelete"]
+				return perms["allowDelete"]
+
 			on: "record_more"
 			todo: "standard_delete"
 
