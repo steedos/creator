@@ -78,6 +78,8 @@ Template.filter_option.helpers
 					schema.start_value.autoform.omit = false
 				schema.end_value = _.clone schema.start_value
 				schema.end_value.label = "end_value"
+				if schema.start_value.autoform
+					schema.end_value.autoform = _.clone(schema.start_value.autoform)
 			else
 				schema.value = _.clone obj_schema[schema_key]
 				if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
@@ -94,15 +96,15 @@ Template.filter_option.helpers
 					schema.value.autoform.omit = false
 
 			# 参考【查找时，按日期类型字段来查 有问题 #896】未能实现outFormat功能
-			# if object_fields[schema_key].type == "date"
-			# 	if isBetweenOperation
-			# 		if schema.start_value.autoform
-			# 			schema.start_value.autoform.outFormat = 'yyyy-MM-dd';
-			# 		if schema.end_value.autoform
-			# 			schema.end_value.autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
-			# 	else
-			# 		if schema.value.autoform
-			# 			schema.value.autoform.outFormat = 'yyyy-MM-dd';
+			if object_fields[schema_key].type == "date"
+				if isBetweenOperation
+					if schema.start_value.autoform
+						schema.start_value.autoform.outFormat = 'yyyy-MM-dd';
+					if schema.end_value.autoform
+						schema.end_value.autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
+				else
+					if schema.value.autoform
+						schema.value.autoform.outFormat = 'yyyy-MM-dd';
 
 		new SimpleSchema(schema)
 

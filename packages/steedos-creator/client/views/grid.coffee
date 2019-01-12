@@ -325,7 +325,19 @@ Template.creator_grid.onRendered ->
 			else
 				filter_logic = Session.get("filter_logic")
 				filter_scope = Session.get("filter_scope")
+
 				filter_items = Session.get("filter_items")
+				_objFields = creator_obj.fields
+				_.forEach filter_items, (fi)->
+					_f = _objFields[fi.field]
+					if _f.type == 'date' && fi.operation == 'between'
+						_.forEach fi.value, (fv)->
+							if fv
+								fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+#						if fi.start_value
+#							fi.start_value.setHours(fi.start_value.getHours() + fi.start_value.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+#						if fi.end_value
+#							fi.end_value.setHours(fi.end_value.getHours() + fi.end_value.getTimezoneOffset() / 60 )
 				if filter_items
 					filters_set = 
 						filter_logic: filter_logic
