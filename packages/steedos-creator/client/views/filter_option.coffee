@@ -154,14 +154,7 @@ Template.filter_option.events
 			if filter.start_value > filter.end_value
 				toastr.error(t("creator_filter_option_start_end_error"))
 				return
-			if isDateField
-				filter.start_value = new Date(moment.utc(filter.start_value).format("YYYY-MM-DDT00:00:00.000Z"))
-				filter.end_value = new Date(moment.utc(filter.end_value).format("YYYY-MM-DDT23:59:59.000Z"))
 			filter.value = [filter.start_value, filter.end_value]
-		else
-			if isDateField
-				# filter.value.setHours(filter.value.getHours() - filter.value.getTimezoneOffset() / 60 ) # 处理datetime 偏移
-				filter.value = new Date(moment.utc(filter.value).format("YYYY-MM-DDT00:00:00.000Z"))
 		index = this.index
 		filter_items = Session.get("filter_items")
 		filter_items[index] = filter
