@@ -26,6 +26,10 @@ Package.onUse(function(api) {
 
 	api.addFiles('checkNpm.js', "server");
 
+	api.addFiles('client/main.html','client');
+	api.addFiles('client/main.coffee','client');
+	api.addFiles('client/main.less','client');
+
 	api.addFiles('lib/chat_messages.coffee','client');
 
 	// api.addFiles('app.chat.coffee','server');

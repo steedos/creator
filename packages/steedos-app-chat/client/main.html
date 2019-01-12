@@ -1,0 +1,50 @@
+<template name="steedos_chat_main">
+	<div class="steedos-brand-band slds-brand-band_medium slds-template_bottom-magnet steedos-chat_main">
+		<div class="steedos-chat_main-body">
+			<div class="slds-col slds-no-flex slds-grid slds-align-bottom chat-refresh">
+				<button class="slds-button slds-button_icon slds-m-left_xx-small slds-button_icon-border-filled btn-refresh" title="Refresh">
+					<svg class="slds-button__icon slds-icon-utility-refresh" aria-hidden="true">
+						<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#refresh"></use>
+					</svg>
+				</button>
+			</div>
+			{{!--
+			<div class="slds-grid chat-events">
+				<div class="slds-col slds-align-middle">
+
+				</div>
+				<div class="slds-col slds-no-flex slds-grid slds-align-bottom slds-shrink">
+					<div>
+						<div class="search-in-list slds-m-left_large slds-is-relative">
+							<div force-list-view-manager-search-bar_list-view-manager-search-bar="" class="slds-form-element">
+								<label for="grid-search" class="slds-form-element__label slds-no-flex slds-assistive-text">搜索此列表...</label>
+								<div class="slds-form-element__control slds-grow slds-input-has-icon slds-input-has-icon_left-right">
+									<input type="search" id="grid-search" placeholder="搜索..." name="search-input" class="slds-input">
+									<div>
+										<svg class="slds-input__icon slds-input__icon_left slds-icon-utility-search" aria-hidden="true">
+											<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#search"></use>
+										</svg>
+
+									</div>
+									<div class="slds-input__icon-group slds-input__icon-group_right"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="slds-col slds-no-flex slds-grid slds-align-bottom">
+					<button class="slds-button slds-button_icon slds-m-left_xx-small slds-button_icon-border-filled btn-refresh" title="Refresh">
+						<svg class="slds-button__icon slds-icon-utility-refresh" aria-hidden="true">
+							<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#refresh"></use>
+						</svg>
+					</button>
+				</div>
+			</div>
+			--}}
+			<ul class="slds-feed__list steedos-record_chat_messages">
+				<div class="steedos-chat_messages_list" id="chat_messages_list"></div>
+			</ul>
+		</div>
+		<div class="chat-action-sheet"></div>
+	</div>
+</template>
