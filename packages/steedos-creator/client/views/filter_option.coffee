@@ -12,6 +12,10 @@ Template.filter_option.helpers
 
 		filter_field_type = object_fields[schema_key]?.type
 		schema=
+			is_default:
+				type: Boolean
+				autoform:
+					type: "steedos-boolean-checkbox"
 			field:
 				type: String
 				label: "field"

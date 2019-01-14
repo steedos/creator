@@ -1,3 +1,17 @@
+getDefaultFilters = (object_name, list_view_id)->
+	list_view = Creator.getListView(object_name, list_view_id, true)
+	fields = Creator.getObject(object_name)?.fields
+	filter_fields = list_view?.filter_fields
+	filters = []
+	if filter_fields?.length
+		filter_fields.forEach (n)->
+			if fields[n]
+				filters.push {
+					field: n
+					is_default: true
+				}
+	return filters
+
 Template.filter_option_list.helpers Creator.helpers
 
 Template.filter_option_list.helpers 
@@ -93,7 +107,12 @@ Template.filter_option_list.events
 		if index < 0
 			index = 0
 		filter_items = Session.get("filter_items")
-		filter_items.splice(index, 1)
+		filter_item = filter_items[index]
+		if filter_item.is_default
+			delete filter_item.value
+			filter_items[index] = filter_item
+		else
+			filter_items.splice(index, 1)
 		Session.set("filter_items", filter_items)
 
 	'click .add-filter': (event, template)->
@@ -151,18 +170,9 @@ Template.filter_option_list.onCreated ->
 		list_view_id = Session.get("list_view_id")
 		fields = Creator.getObject(object_name)?.fields
 		unless filters?.length
-			# 视图新增filter_fileds，配置了filter_fields的视图，右侧自动列出过滤器 #915
-			list_view = Creator.getListView(object_name, list_view_id, true)
-			filter_fields = list_view?.filter_fields
-			if filter_fields?.length
-				filters = []
-				filter_fields.forEach (n)->
-					if fields[n]
-						filters.push {
-							field: n
-						}
-				if filters.length
-					Session.set("filter_items", filters)
+			filters = getDefaultFilters(object_name, list_view_id)
+			if filters.length
+				Session.set("filter_items", filters)
 
 		if filters?.length
 			self.filterItems.set(filters)
