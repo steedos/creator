@@ -25,19 +25,7 @@ Template.filter_option.helpers
 						return "name"
 					firstOption: ""
 					options: ()->
-						keys = Creator.getSchema(object_name)._firstLevelSchemaKeys
-						permission_fields = Creator.getFields(object_name)
-						schema = Creator.getSchema(object_name)._schema
-						keys = _.map keys, (key) ->
-							# hidden,grid 类型的字段，不需要过滤
-							if object_fields[key].hidden or object_fields[key].type == "grid"
-								return undefined
-							if _.indexOf(permission_fields, key) > -1
-								obj = _.pick(schema, key)
-								label = obj[key].label || TAPi18n.__(Creator.getObject(object_name).schema.label(key))
-								return {label: label, value: key}
-						keys = _.compact(keys)
-						return keys
+						Creator.getObjectFilterFieldOptions object_name
 			operation:
 				type: String
 				label: "operation"

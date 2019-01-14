@@ -55,7 +55,7 @@ Creator.Objects.object_listviews =
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectFilterFieldOptions values?.object_name
 		shared:
 			label: "共享视图到工作区"
 			type: "boolean"

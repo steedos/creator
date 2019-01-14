@@ -100,7 +100,7 @@ Creator.Objects.reports =
 			multiple: true
 			depend_on: ["object_name"]
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectFilterFieldOptions values?.object_name
 		options:
 			label: "操作"
 			omit: true

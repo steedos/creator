@@ -143,6 +143,19 @@ Creator.getObjectLookupFieldOptions = (object_name, is_deep)->
 							_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
 	return _options
 
+# 统一为对象object_name提供可用于过虑器过虑字段
+Creator.getObjectFilterFieldOptions = (object_name)->
+	_options = []
+	_object = Creator.getObject(object_name)
+	fields = _object?.fields
+	permission_fields = Creator.getFields(object_name)
+	icon = _object?.icon
+	_.forEach fields, (f, k)->
+		if !_.include(["grid","object"], f.type) and !f.hidden
+			if _.indexOf(permission_fields, k) > -1
+				_options.push {label: f.label || k, value: k, icon: icon}
+	return _options
+
 Creator.getObjectRecord = (object_name, record_id)->
 	if !record_id
 		record_id = Session.get("record_id")
