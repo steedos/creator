@@ -31,11 +31,9 @@ Creator.Objects.project_issues =
 			label: "级别"
 			type: "select"
 			options: [
-				{label:"厂级责任部室", value:"sub"},
-				{label:"厂领导", value:"sub_leader"},
-				{label:"机关责任处室", value:"company"},
-				{label: "公司领导", value:"company_leader"}
-				{label: "暂时不能解决", value:"paused"}
+				{label:"车间级", value:"department"},
+				{label:"厂级", value:"company"},
+				{label:"公司级", value:"group"}
 			]
 			sortable: true
 			required: true
