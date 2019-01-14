@@ -339,6 +339,7 @@ Template.creator_grid.onRendered ->
 #						if fi.end_value
 #							fi.end_value.setHours(fi.end_value.getHours() + fi.end_value.getTimezoneOffset() / 60 )
 				if filter_items
+					# 支持直接把过虑器变更的过虑条件应用到grid列表，而不是非得先保存到视图中才生效
 					filters_set = 
 						filter_logic: filter_logic
 						filter_scope: filter_scope

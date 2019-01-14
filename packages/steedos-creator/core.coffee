@@ -150,7 +150,6 @@ Creator.getObjectFilterFieldOptions = (object_name)->
 	fields = _object?.fields
 	permission_fields = Creator.getFields(object_name)
 	icon = _object?.icon
-	debugger
 	_.forEach fields, (f, k)->
 		# hidden,grid等类型的字段，不需要过滤
 		if !_.include(["grid","object", "[Object]", "[object]", "Object"], f.type) and !f.hidden
@@ -363,8 +362,10 @@ Creator.formatFiltersToDev = (filters, options)->
 	unless filters.length
 		return
 	# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
-	unless filters[0] instanceof Array
-		filters = _.map filters, (obj)->
+	filters = _.map filters, (obj)->
+		if obj instanceof Array
+			return obj
+		else
 			return [obj.field, obj.operation, obj.value]
 	selector = []
 	logic_symbol = if options?.is_logic_or then "or" else "and"

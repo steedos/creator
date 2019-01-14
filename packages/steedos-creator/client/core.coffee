@@ -62,23 +62,43 @@ if Meteor.isClient
 		$eq, $ne, $lt, $gt, $lte, $gte
 	###
 	Creator.getODataFilter = (list_view_id, object_name, filters_set)->
+		# filters_set参数是为支持直接把过虑器变更的过虑条件应用到grid列表，而不是非得先保存到视图中才生效
+		# 当filters_set存在时优先应用，反之才使用保存到视图中的过虑条件
 		userId = Meteor.userId()
 		spaceId = Session.get("spaceId")
 		custom_list_view = Creator.Collections.object_listviews.findOne(list_view_id)
-		unless filters_set
-			filters_set = {}
-			if custom_list_view
+		if custom_list_view
+			unless filters_set
+				filters_set = {}
 				filters_set.filter_logic = custom_list_view.filter_logic
 				filters_set.filter_scope = custom_list_view.filter_scope
 				filters_set.filters = custom_list_view.filters
-			else
-				if spaceId and userId
-					list_view = Creator.getListView(object_name, list_view_id)
-					unless list_view
-						return ["_id", "=", -1]
+		else
+			code_filters_set = {}
+			if spaceId and userId
+				list_view = Creator.getListView(object_name, list_view_id)
+				unless list_view
+					return ["_id", "=", -1]
 
-					filters_set.filter_scope = list_view.filter_scope
-					filters_set.filters = list_view.filters
+				code_filters_set.filter_scope = list_view.filter_scope
+				code_filters_set.filters = list_view.filters
+			# 如果过虑器存在临时变更的过虑条件(即过虑器中过虑条件未保存到视图中)，则与代码中配置的过虑条件取AND连接逻辑
+			# 反之则直接应用代码中配置的过虑条件
+			if filters_set
+				if code_filters_set.filter_scope
+					# 代码中有配置filter_scope时，以代码中的为准
+					filters_set.filter_scope = code_filters_set.filter_scope
+				console.log "Creator.getODataFilter========code_filters_set====", code_filters_set
+				console.log "Creator.getODataFilter========filters_set====", filters_set
+				if filters_set.filters?.length
+					if code_filters_set.filters?.length
+						# 取AND连接逻辑
+						filters_set.filters = _.union filters_set.filters, code_filters_set.filters
+				else
+					filters_set.filters = code_filters_set.filters
+			else
+				filters_set = code_filters_set
+			
 
 		filter_logic = filters_set.filter_logic
 		filter_scope = filters_set.filter_scope
