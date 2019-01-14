@@ -47,6 +47,8 @@ Template.filter_option.helpers
 						if filter_field_type && Creator.checkFieldTypeSupportBetweenQuery(filter_field_type)
 							template.filter_item_operation.set('between')
 							return 'between'
+						else if ["textarea", "text", "code"].includes(filter_field_type)
+							return 'contains'
 						else
 							return "="
 					firstOption: ""
@@ -103,6 +105,9 @@ Template.filter_option.helpers
 					schema.value.autoform.readonly = false
 					schema.value.autoform.disabled = false
 					schema.value.autoform.omit = false
+
+				if ["widearea", "textarea", "code"].includes(schema.value.autoform?.type)
+					schema.value.autoform.type = 'text'
 
 			# 参考【查找时，按日期类型字段来查 有问题 #896】未能实现outFormat功能
 			if object_fields[schema_key].type == "date"
