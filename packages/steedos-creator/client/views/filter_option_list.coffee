@@ -183,11 +183,12 @@ Template.filter_option_list.onCreated ->
 							reference_to_objects.push field.reference_to
 						reference_to_objects.forEach (reference_to_object)->
 							name_field = Creator.getObject(reference_to_object).NAME_FIELD_KEY
-							Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
-								(error,result)->
-									if result
-										filter.valuelabel = result
-										self.filterItems.set(filters)
+							if filter.value
+								Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
+									(error,result)->
+										if result
+											filter.valuelabel = result
+											self.filterItems.set(filters)
 					if field?.optionsFunction or field?.options
 						if field.optionsFunction
 							options = field?.optionsFunction()
