@@ -10,7 +10,18 @@ Creator.Objects.archive_document =
 		classification:
 			type: "lookup"
 			label: "流程分类"
-			reference_to: "archive_classification"
+			reference_to: "categories"
+		flow:
+			type: "lookup"
+			label: "流程"
+			reference_to: "flows"
+			depend_on: ["classification"]
+			filtersFunction: (filters, context) ->
+    			console.log('filtersFunction', filters, context);
+    			if _.isArray(context?.classification)
+     				return {category: {$in: context.classification}}
+   				else if _.isString(context?.classification) && !_.isEmpty(context?.classification)
+     				return {category: context.classification}
 		name:
 			type: "text"
 			label: "标题"
@@ -19,6 +30,7 @@ Creator.Objects.archive_document =
 		flow_name:
 			type: "text"
 			label: "流程名称"
+			hidden: true
 			default_width: 300
 		submitter:
 			type: "lookup"
@@ -38,6 +50,7 @@ Creator.Objects.archive_document =
 			type: "datetime"
 			label: "归档时间"
 			sortable: true
+			hidden: true
 			default_width: 180
 		outbox_users:
 			type: "[text]"
@@ -59,16 +72,18 @@ Creator.Objects.archive_document =
 			filter_scope: "space"
 			filters: [["submitter", "=", "{userId}"]]
 			columns:["name","flow_name","submitter","submit_date","archive_date"]
+			sort: [{field_name: "submit_date", order: "desc"}]
 		approved:
 			label:"我审核的"
 			filter_scope: "space"
 			filters: [["outbox_users", "=", "{userId}"]]
 			columns:["name","flow_name","submitter","submit_date","archive_date"]
-		all:
-			label: "全部"
-			filter_scope: "space"
-			filters: [["submitter", "=", "{userId}"],["outbox_users", "=", "{userId}"]]
-			columns:["name","flow_name","submitter","submit_date","archive_date"]
+			sort: [{field_name: "submit_date", order: "desc"}]
+		# all:
+		# 	label: "全部"
+		# 	filter_scope: "space"
+		# 	filters: [["submitter", "=", "{userId}"],["outbox_users", "=", "{userId}"]]
+		# 	columns:["name","flow_name","submitter","submit_date","archive_date"]
 	
 	permission_set:
 		user:
@@ -84,7 +99,7 @@ Creator.Objects.archive_document =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true
 
 	actions:
 		standard_view:
