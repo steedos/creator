@@ -149,7 +149,7 @@ Creator.Objects.reports =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: true 
 		admin:
 			allowCreate: true
 			allowDelete: true
