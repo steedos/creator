@@ -41,6 +41,31 @@ Creator.Objects.project_issues =
 			required: true
 			filterable: true
 
+		company_id:
+			label: '提报单位'
+			type: 'lookup'
+			reference_to: 'organizations'
+			required: true
+			filterable: true
+
+		created_by:
+			label: '提报人'
+			type: 'lookup'
+			reference_to: 'users'
+			required: true
+
+		responsible_organization:
+			label: '责任部门'
+			type: 'lookup'
+			reference_to: 'organizations'
+			required: true
+
+		responsible_user:
+			label: '责任人'
+			type: 'lookup'
+			reference_to: 'users'
+			required: true
+
 		state:
 			label: "进度"
 			type: "select"
@@ -115,15 +140,18 @@ Creator.Objects.project_issues =
 			columns: ["name", "category", "level", "state", "priority", "created"]
 			filter_scope: "space"
 			filters: [["status", "=", "open"]]
+			filter_fields: ["category", "level", "state", "priority"]
 		closed:
 			label: "已关闭"
 			columns: ["name", "category", "level", "state", "priority", "created"]
 			filter_scope: "space"
 			filters: [["status", "=", "closed"]]
+			filter_fields: ["category", "level", "state", "priority"]
 		all:
 			label: "所有"
 			columns: ["name", "category", "level", "state", "priority", "created"]
 			filter_scope: "space"
+			filter_fields: ["category", "level", "state", "priority"]
 
 
 	permission_set:

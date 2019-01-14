@@ -155,6 +155,8 @@ Meteor.methods
 		endtime = new Date()
 		Creator.Collections["queue_import"].direct.update(importObj._id,{$set:{start_time:starttime,end_time:endtime}})
 	getValueLable:(reference_to_object,name_field,value)->
+		unless value
+			return ""
 		ids = []
 		if value.constructor == Array
 			ids = value

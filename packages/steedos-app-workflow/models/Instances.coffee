@@ -203,7 +203,7 @@ Creator.Objects.instances =
 
 	actions:
 		view_instance:
-			label: "查看申请单"
+			label: "查看审批单"
 			visible: true
 			on: "record"
 			todo: (object_name, record_id, fields)->

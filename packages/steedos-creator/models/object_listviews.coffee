@@ -49,6 +49,25 @@ Creator.Objects.object_listviews =
 						label = _object.fields[f].label
 						_options.push {label:label || f, value: f, icon: icon}
 				return _options
+		filter_fields:
+			label: "默认过虑字段"
+			type: "lookup"
+			multiple: true
+			depend_on: ["object_name"]
+			optionsFunction: (values)->
+				_options = []
+				_object = Creator.getObject(values?.object_name)
+				fields = Creator.getFields(values?.object_name)
+				icon = _object.icon
+				_.forEach fields, (f)->
+					if !_object.fields[f].hidden
+						label = _object.fields[f].label
+						_options.push {label:label || f, value: f, icon: icon}
+				return _options
+		shared:
+			label: "共享视图到工作区"
+			type: "boolean"
+			# hidden: true
 		sort:
 			label: "默认排序规则"
 			type: "grid"
@@ -78,10 +97,6 @@ Creator.Objects.object_listviews =
 			type: "select"
 			defaultValue: "asc"
 			options: "正序:asc,倒序:desc"
-		shared:
-			label: "共享视图到工作区"
-			type: "boolean"
-			# hidden: true
 		filters:
 			label: "过滤器"
 			type: "grid"

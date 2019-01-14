@@ -17,5 +17,6 @@ Package.onUse(function(api) {
     // models 
     api.addFiles('models/projects.coffee');
     api.addFiles('models/project_issues.coffee');
+    api.addFiles('models/project_responsibles.coffee');
 
 })

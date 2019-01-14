@@ -10,7 +10,12 @@ Template.filter_option.helpers
 		schema_key = template.schema_key.get()
 		object_fields = Creator.getObject(object_name).fields
 
-		schema= 
+		filter_field_type = object_fields[schema_key]?.type
+		schema=
+			is_default:
+				type: Boolean
+				autoform:
+					type: "steedos-boolean-checkbox"
 			field:
 				type: String
 				label: "field"
@@ -39,7 +44,11 @@ Template.filter_option.helpers
 				autoform:
 					type: "select"
 					defaultValue: ()->
-						return "="
+						if filter_field_type && Creator.checkFieldTypeSupportBetweenQuery(filter_field_type)
+							template.filter_item_operation.set('between')
+							return 'between'
+						else
+							return "="
 					firstOption: ""
 					options: ()->
 						if object_fields[schema_key]
@@ -57,7 +66,7 @@ Template.filter_option.helpers
 				autoform:
 					type: "text"
 			
-			schema.end_value = schema.start_value
+			schema.end_value = _.clone schema.start_value
 			schema.end_value.label = "end_value"
 		else
 			schema.value = 
@@ -71,15 +80,17 @@ Template.filter_option.helpers
 			new_schema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(object_name)))
 			obj_schema = new_schema._schema
 			if isBetweenOperation
-				schema.start_value = obj_schema[schema_key]
+				schema.start_value = _.clone obj_schema[schema_key]
 				if schema.start_value.autoform
 					schema.start_value.autoform.readonly = false
 					schema.start_value.autoform.disabled = false
 					schema.start_value.autoform.omit = false
-				schema.end_value = schema.start_value
+				schema.end_value = _.clone schema.start_value
 				schema.end_value.label = "end_value"
+				if schema.start_value.autoform
+					schema.end_value.autoform = _.clone(schema.start_value.autoform)
 			else
-				schema.value = obj_schema[schema_key]
+				schema.value = _.clone obj_schema[schema_key]
 				if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
 					schema.value.autoform.multiple = true
 					schema.value.type = [String]
@@ -92,6 +103,17 @@ Template.filter_option.helpers
 					schema.value.autoform.readonly = false
 					schema.value.autoform.disabled = false
 					schema.value.autoform.omit = false
+
+			# 参考【查找时，按日期类型字段来查 有问题 #896】未能实现outFormat功能
+			if object_fields[schema_key].type == "date"
+				if isBetweenOperation
+					if schema.start_value.autoform
+						schema.start_value.autoform.outFormat = 'yyyy-MM-dd';
+					if schema.end_value.autoform
+						schema.end_value.autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
+				else
+					if schema.value.autoform
+						schema.value.autoform.outFormat = 'yyyy-MM-dd';
 
 		new SimpleSchema(schema)
 
@@ -130,7 +152,9 @@ Template.filter_option.helpers
 
 Template.filter_option.events 
 	'click .save-filter': (event, template) ->
+		fields = Creator.getObject(template.data.object_name).fields
 		filter = AutoForm.getFormValues("filter-option").insertDoc
+		isDateField = fields[filter.field]?.type == "date"
 		unless filter.operation
 			toastr.error(t("creator_filter_option_start_end_error"))
 			return
@@ -161,7 +185,7 @@ Template.filter_option.events
 			object_name = Session.get("object_name")
 		field = $(event.currentTarget).val()
 		if field != filter_item?.field
-			filter_item.operation = null
+			delete filter_item.operation
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
 			template.filter_item_operation.set(null)

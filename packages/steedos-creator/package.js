@@ -240,6 +240,7 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/view.coffee', 'client');
 	api.addFiles('client/views/view.less', 'client');
 	api.addFiles('client/views/app_home.html', 'client');
+	api.addFiles('client/views/app_home.coffee', 'client');
 	api.addFiles('client/views/grid_sidebar_organizations.html', 'client');
 	api.addFiles('client/views/grid_sidebar_organizations.coffee', 'client');
 	api.addFiles('client/views/grid_sidebar_organizations.less', 'client');

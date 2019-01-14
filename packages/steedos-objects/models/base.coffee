@@ -227,32 +227,52 @@ Creator.baseObject =
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
-				record = Creator.Collections[object_name].findOne record_id
+				perms = {}
+				if record_permissions
+					perms = record_permissions
+				else
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						perms = record_permissions
+
+				if perms["modifyAllRecords"]
+					return true
+
+				if !record
+					record = Creator.Collections[object_name].findOne record_id
+
 				if record && record.locked
 					return false
 
-				if record_permissions
-					return record_permissions["allowEdit"]
-				else
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						return record_permissions["allowEdit"]
+				return perms["allowEdit"]
+
 			on: "record"
 			todo: "standard_edit"
 
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
-				record = Creator.Collections[object_name].findOne record_id
+				perms = {}
+				if record_permissions
+					perms = record_permissions
+				else
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						perms = record_permissions
+
+				if perms["modifyAllRecords"]
+					return true
+
+				if !record
+					record = Creator.Collections[object_name].findOne record_id
+
 				if record && record.locked
 					return false
 
-				if record_permissions
-					return record_permissions["allowDelete"]
-				else
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						return record_permissions["allowDelete"]
+				return perms["allowDelete"]
+
 			on: "record_more"
 			todo: "standard_delete"
 
@@ -281,6 +301,54 @@ Creator.baseObject =
 			on: "record"
 			todo: ()->
 				Modal.show('initiate_approval', { object_name: this.object_name, record_id: this.record_id })
+
+		standard_view_instance:
+			label: "查看审批单"
+			visible: (object_name, record_id, record_permissions) ->
+				record = Creator.Collections[object_name].findOne record_id
+				if record && !_.isEmpty(record.instances)
+					return true
+
+				return false
+			on: "record"
+			todo: ()->
+				instanceId = this.record.instances[0]._id
+				if !instanceId
+					console.error 'instanceId not exists'
+					return
+
+				uobj = {}
+				uobj['X-User-Id'] = Meteor.userId()
+				uobj['X-Auth-Token'] = Accounts._storedLoginToken()
+
+				data = { object_name: this.object_name, record_id: this.record_id, space_id: Session.get("spaceId") }
+
+				url = Meteor.absoluteUrl() + "api/workflow/view/#{instanceId}?" + $.param(uobj)
+				data = JSON.stringify(data)
+				$(document.body).addClass 'loading'
+				$.ajax
+					url: url
+					type: 'POST'
+					async: true
+					data: data
+					dataType: 'json'
+					processData: false
+					contentType: 'application/json'
+					success: (responseText, status) ->
+						$(document.body).removeClass 'loading'
+						if responseText.errors
+							responseText.errors.forEach (e) ->
+								toastr.error e.errorMessage
+								return
+							return
+						else if responseText.redirect_url
+							Steedos.openWindow(responseText.redirect_url)
+
+						return
+					error: (xhr, msg, ex) ->
+						$(document.body).removeClass 'loading'
+						toastr.error msg
+						return
 
 		# "export":
 		# 	label: "Export"

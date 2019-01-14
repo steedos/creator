@@ -1,3 +1,17 @@
+getDefaultFilters = (object_name, list_view_id)->
+	list_view = Creator.getListView(object_name, list_view_id, true)
+	fields = Creator.getObject(object_name)?.fields
+	filter_fields = list_view?.filter_fields
+	filters = []
+	if filter_fields?.length
+		filter_fields.forEach (n)->
+			if fields[n]
+				filters.push {
+					field: n
+					is_default: true
+				}
+	return filters
+
 Template.filter_option_list.helpers Creator.helpers
 
 Template.filter_option_list.helpers 
@@ -20,6 +34,9 @@ Template.filter_option_list.helpers
 
 	isFilterLogicEmpty: ()->
 		return Session.get("filter_logic") == undefined or Session.get("filter_logic") == null
+
+	showOperationLabel: (operation)->
+		return !Creator.isBetweenFilterOperation(operation) && operation != '='
 
 Template.filter_option_list.events 
 	'click .btn-filter-scope': (event, template)->
@@ -90,7 +107,12 @@ Template.filter_option_list.events
 		if index < 0
 			index = 0
 		filter_items = Session.get("filter_items")
-		filter_items.splice(index, 1)
+		filter_item = filter_items[index]
+		if filter_item.is_default
+			delete filter_item.value
+			filter_items[index] = filter_item
+		else
+			filter_items.splice(index, 1)
 		Session.set("filter_items", filter_items)
 
 	'click .add-filter': (event, template)->
@@ -144,10 +166,16 @@ Template.filter_option_list.onCreated ->
 
 	self.autorun ->
 		filters = Session.get("filter_items")
-		if filters
+		object_name = Template.instance().data?.object_name
+		list_view_id = Session.get("list_view_id")
+		fields = Creator.getObject(object_name)?.fields
+		unless filters?.length
+			filters = getDefaultFilters(object_name, list_view_id)
+			if filters.length
+				Session.set("filter_items", filters)
+
+		if filters?.length
 			self.filterItems.set(filters)
-			object_name = Template.instance().data?.object_name
-			fields = Creator.getObject(object_name)?.fields
 			unless fields
 				return
 			filters?.forEach (filter) ->
@@ -165,11 +193,12 @@ Template.filter_option_list.onCreated ->
 							reference_to_objects.push field.reference_to
 						reference_to_objects.forEach (reference_to_object)->
 							name_field = Creator.getObject(reference_to_object).NAME_FIELD_KEY
-							Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
-								(error,result)->
-									if result
-										filter.valuelabel = result
-										self.filterItems.set(filters)
+							if filter.value
+								Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
+									(error,result)->
+										if result
+											filter.valuelabel = result
+											self.filterItems.set(filters)
 					if field?.optionsFunction or field?.options
 						if field.optionsFunction
 							options = field?.optionsFunction()
@@ -181,7 +210,7 @@ Template.filter_option_list.onCreated ->
 								if _.indexOf(filter.value,option.value)>-1
 									options_labels.push option.label
 						filter.valuelabel = options_labels
-				else if fieldType == 'datetime' or fieldType == 'date'
+				else if Creator.checkFieldTypeSupportBetweenQuery(fieldType)
 					formatFun = (value, type)->
 						if type == "datetime"
 							return moment(value).format('YYYY-MM-DD HH:mm')
@@ -191,14 +220,17 @@ Template.filter_option_list.onCreated ->
 						if _.isArray(filterValue)
 							if filterValue.length
 								if filterValue[0] || filterValue[1]
-									startLabel = if filterValue[0] then formatFun(filterValue[0], fieldType) else ""
-									endLabel = if filterValue[1] then formatFun(filterValue[1], fieldType) else ""
+									startLabel = if _.isNumber(filterValue[0]) then filterValue[0] else filterValue[0] || ""
+									endLabel = if _.isNumber(filterValue[1]) then filterValue[1] else filterValue[1] || ""
+									if fieldType == 'datetime' or fieldType == 'date'
+										startLabel = if filterValue[0] then formatFun(filterValue[0], fieldType) else ""
+										endLabel = if filterValue[1] then formatFun(filterValue[1], fieldType) else ""
 									if startLabel and endLabel
-										filter.valuelabel = "在#{startLabel}与#{endLabel}之间"
+										filter.valuelabel = "#{startLabel} ~ #{endLabel}"
 									else if startLabel
-										filter.valuelabel = "在#{startLabel}之后"
+										filter.valuelabel = ">= #{startLabel}"
 									else if endLabel
-										filter.valuelabel = "在#{endLabel}之前"
+										filter.valuelabel = "<= #{endLabel}"
 								else
 									filter.valuelabel = ""
 						else

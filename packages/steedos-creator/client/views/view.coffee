@@ -249,6 +249,8 @@ Template.creator_view.helpers
 		return Creator.getPermissions(this.object_name).allowCreate
 
 	isUnlocked: ()->
+		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
+			return true
 		record = Creator.getObjectRecord()
 		return !record.locked
 

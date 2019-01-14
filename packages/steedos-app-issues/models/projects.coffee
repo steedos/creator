@@ -17,7 +17,7 @@ Creator.Objects.projects =
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "created"]
+			columns: ["name", "description", "created"]
 			filter_scope: "space"
 
 

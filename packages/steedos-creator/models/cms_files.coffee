@@ -77,44 +77,64 @@ Creator.Objects.cms_files =
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
-				if object_name == Session.get('object_name')
-					fileRecord = Creator.getObjectRecord()
-					record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
-					if record && record.locked
-						return false
-				else
-					record = Creator.getObjectRecord()
-					if record && record.locked
-						return false
-
+				perms = {}
 				if record_permissions
-					return record_permissions["allowEdit"]
+					perms = record_permissions
 				else
+					record = Creator.Collections[object_name].findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
-						return record_permissions["allowEdit"]
+						perms = record_permissions
+
+				if object_name == Session.get('object_name')
+					fileRecord = Creator.getObjectRecord()
+					parent_record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
+					parent_perms = Creator.getRecordPermissions fileRecord.parent.o, parent_record, Meteor.userId()
+					if parent_perms["modifyAllRecords"]
+						return true
+					if parent_record && parent_record.locked
+						return false
+				else
+					parent_record = Creator.getObjectRecord()
+					parent_perms = Creator.getRecordPermissions Session.get('object_name'), parent_record, Meteor.userId()
+					if parent_perms["modifyAllRecords"]
+						return true
+					if parent_record && parent_record.locked
+						return false
+
+				return perms["allowEdit"]
 			on: "record"
 			todo: "standard_edit"
 
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
-				if object_name == Session.get('object_name')
-					fileRecord = Creator.getObjectRecord()
-					record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
-					if record && record.locked
-						return false
-				else
-					record = Creator.getObjectRecord()
-					if record && record.locked
-						return false
-
+				perms = {}
 				if record_permissions
-					return record_permissions["allowDelete"]
+					perms = record_permissions
 				else
+					record = Creator.Collections[object_name].findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
-						return record_permissions["allowDelete"]
+						perms = record_permissions
+
+				if object_name == Session.get('object_name')
+					fileRecord = Creator.getObjectRecord()
+					parent_record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
+					parent_perms = Creator.getRecordPermissions fileRecord.parent.o, parent_record, Meteor.userId()
+					if parent_perms["modifyAllRecords"]
+						return true
+					if parent_record && parent_record.locked
+						return false
+				else
+					parent_record = Creator.getObjectRecord()
+					parent_perms = Creator.getRecordPermissions Session.get('object_name'), parent_record, Meteor.userId()
+					if parent_perms["modifyAllRecords"]
+						return true
+					if parent_record && parent_record.locked
+						return false
+
+				return perms["allowDelete"]
 			on: "record_more"
 			todo: "standard_delete"
 		download:
@@ -134,11 +154,38 @@ Creator.Objects.cms_files =
 					else
 						window.location = Steedos.absoluteUrl("/api/files/files/#{fileId}?download=true")
 
-		# new_version:
-		# 	label: "上传新版本"
-		# 	visible: true
-		# 	only_detail: true
-		# 	is_file: true
-		# 	on: "record"
-		# 	todo: (object_name, record_id)->
+		new_version:
+			label: "上传新版本"
+			visible: true
+			only_detail: true
+			is_file: true
+			on: "record"
+			visible: (object_name, record_id, record_permissions)->
+				perms = {}
+				if record_permissions
+					perms = record_permissions
+				else
+					record = Creator.Collections[object_name].findOne record_id
+					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
+					if record_permissions
+						perms = record_permissions
+
+				if object_name == Session.get('object_name')
+					fileRecord = Creator.getObjectRecord()
+					parent_record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
+					parent_perms = Creator.getRecordPermissions fileRecord.parent.o, parent_record, Meteor.userId()
+					if parent_perms["modifyAllRecords"]
+						return true
+					if parent_record && parent_record.locked
+						return false
+				else
+					parent_record = Creator.getObjectRecord()
+					parent_perms = Creator.getRecordPermissions Session.get('object_name'), parent_record, Meteor.userId()
+					if parent_perms["modifyAllRecords"]
+						return true
+					if parent_record && parent_record.locked
+						return false
+
+				return perms["allowEdit"]
+			todo: (object_name, record_id)->
 				# 功能代码在文件详细界面，这里只是把按钮显示出来
