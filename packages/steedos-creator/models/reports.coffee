@@ -94,6 +94,13 @@ Creator.Objects.reports =
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
 				return Creator.getObjectLookupFieldOptions values?.object_name, true
+		filter_fields:
+			label: "默认过虑字段"
+			type: "lookup"
+			multiple: true
+			depend_on: ["object_name"]
+			optionsFunction: (values)->
+				return Creator.getObjectLookupFieldOptions values?.object_name, true
 		options:
 			label: "操作"
 			omit: true
