@@ -41,6 +41,31 @@ Creator.Objects.project_issues =
 			required: true
 			filterable: true
 
+		company_id:
+			label: '提报单位'
+			type: 'lookup'
+			reference_to: 'organizations'
+			required: true
+			filterable: true
+
+		created_by:
+			label: '提报人'
+			type: 'lookup'
+			reference_to: 'users'
+			required: true
+
+		responsible_organization:
+			label: '责任部门'
+			type: 'lookup'
+			reference_to: 'organizations'
+			required: true
+
+		responsible_user:
+			label: '责任人'
+			type: 'lookup'
+			reference_to: 'users'
+			required: true
+
 		state:
 			label: "进度"
 			type: "select"
