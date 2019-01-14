@@ -299,7 +299,7 @@ Creator.baseObject =
 				Modal.show('initiate_approval', { object_name: this.object_name, record_id: this.record_id })
 
 		standard_view_instance:
-			label: "查看申请单"
+			label: "查看审批单"
 			visible: (object_name, record_id, record_permissions) ->
 				record = Creator.Collections[object_name].findOne record_id
 				if record && !_.isEmpty(record.instances)
