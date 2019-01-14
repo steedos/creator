@@ -150,10 +150,14 @@ Creator.getObjectFilterFieldOptions = (object_name)->
 	fields = _object?.fields
 	permission_fields = Creator.getFields(object_name)
 	icon = _object?.icon
+	debugger
 	_.forEach fields, (f, k)->
-		if !_.include(["grid","object"], f.type) and !f.hidden
-			if _.indexOf(permission_fields, k) > -1
+		# hidden,grid等类型的字段，不需要过滤
+		if !_.include(["grid","object", "[Object]", "[object]", "Object"], f.type) and !f.hidden
+			# filters.$.field及flow.current等子字段也不需要过滤
+			if !/\w+\./.test(k) and _.indexOf(permission_fields, k) > -1
 				_options.push {label: f.label || k, value: k, icon: icon}
+
 	return _options
 
 Creator.getObjectRecord = (object_name, record_id)->
