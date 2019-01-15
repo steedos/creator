@@ -131,10 +131,13 @@ if Meteor.isClient
 					if selector.length > 0
 						selector.push "and"
 					filters = _.map filters, (obj)->
-						if Meteor.isClient
-							if _.isString(obj?._value)
-								return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
-						return [obj.field, obj.operation, obj.value]
+						if _.isArray(obj)
+							return obj
+						else
+							if Meteor.isClient
+								if _.isString(obj?._value)
+									return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
+							return [obj.field, obj.operation, obj.value]
 
 					filters = Creator.formatFiltersToDev(filters)
 					_.each filters, (filter)->

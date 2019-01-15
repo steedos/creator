@@ -72,6 +72,7 @@ Template.filter_option.helpers
 			if isBetweenOperation
 				schema.start_value = _.clone obj_schema[schema_key]
 				if schema.start_value.autoform
+					schema.start_value.autoform = _.clone obj_schema[schema_key].autoform
 					schema.start_value.autoform.readonly = false
 					schema.start_value.autoform.disabled = false
 					schema.start_value.autoform.omit = false
@@ -90,9 +91,12 @@ Template.filter_option.helpers
 						schema.value.autoform.showIcon = false
 
 				if schema.value.autoform
+					schema.value.autoform =  _.clone obj_schema[schema_key].autoform
 					schema.value.autoform.readonly = false
 					schema.value.autoform.disabled = false
 					schema.value.autoform.omit = false
+					delete schema.value.autoform.defaultValue
+				delete schema.value.defaultValue
 
 				if ["widearea", "textarea", "code"].includes(schema.value.autoform?.type)
 					schema.value.autoform.type = 'text'
@@ -107,7 +111,6 @@ Template.filter_option.helpers
 				else
 					if schema.value.autoform
 						schema.value.autoform.outFormat = 'yyyy-MM-dd';
-
 		new SimpleSchema(schema)
 
 	filter_item: ()->
@@ -192,7 +195,7 @@ Template.filter_option.events
 	'change select[name="operation"]': (event, template) ->
 		filter_item = template.filter_item.get()
 		operation = $(event.currentTarget).val()
-		if operation != filter_item?.operation
+		if Creator.isBetweenFilterOperation(operation) || Creator.isBetweenFilterOperation(filter_item?.operation)
 			template.filter_item_operation.set(operation)
 			filter_item.operation = operation
 			filter_item.value = ""

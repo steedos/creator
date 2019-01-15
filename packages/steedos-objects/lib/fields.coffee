@@ -436,8 +436,9 @@ Creator.getFieldOperation = (field_type) ->
 
 	if Creator.checkFieldTypeSupportBetweenQuery(field_type)
 		operations.push(optionals.between)
-	else if field_type == "text" or field_type == "textarea" or field_type == "html"
-		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
+	else if field_type == "text" or field_type == "textarea" or field_type == "html" or field_type == "code"
+#		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
+		operations.push(optionals.contains)
 	else if field_type == "lookup" or field_type == "master_detail" or field_type == "select"
 		operations.push(optionals.equal, optionals.unequal)
 	else if field_type == "currency" or field_type == "number"

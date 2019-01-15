@@ -7,6 +7,6 @@ Creator.Apps.issue =
 	visible:true 
 	is_creator:true
 	objects: [
-		"project_issues", "tasks", "projects", "project_responsibles", "reports"
+		"project_issues", "projects", "project_tags", "reports"
 	]
 
