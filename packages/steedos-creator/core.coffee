@@ -423,7 +423,15 @@ Creator.formatFiltersToDev = (filters, options)->
 	console.log "Creator.formatFiltersToDev======filters===", filters
 	unless filters.length
 		return
-	# selector = filters
+	if options?.is_logic_or
+		# 如果is_logic_or为true，为filters第一层元素增加or间隔
+		logicTempFilters = []
+		filters.forEach (n)->
+			logicTempFilters.push(n)
+			logicTempFilters.push("or")
+		logicTempFilters.pop()
+		filters = logicTempFilters
+
 	selector = []
 	filtersLooper = (filters_loop)->
 		tempFilters = []
@@ -512,8 +520,6 @@ Creator.formatFiltersToDev = (filters, options)->
 			return tempFilters
 		else
 			return null
-
-
 
 	selector = filtersLooper(filters)
 
