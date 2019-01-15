@@ -367,7 +367,7 @@ options参数：
 	spaceId-- 当前所在工作区
 	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
-Creator.formatFiltersToDev = (filters, options)->
+Creator.formatFiltersToDev_OLD = (filters, options)->
 	unless filters.length
 		return
 	# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
@@ -419,6 +419,120 @@ Creator.formatFiltersToDev = (filters, options)->
 
 	if selector[selector.length - 1] == logic_symbol
 		selector.pop()
+	return selector
+
+###
+options参数：
+	extend-- 是否需要把当前用户基本信息加入公式，即让公式支持Creator.USER_CONTEXT中的值，默认为true
+	userId-- 当前登录用户
+	spaceId-- 当前所在工作区
+	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
+###
+Creator.formatFiltersToDev = (filters, options)->
+	unless filters.length
+		return
+	if options?.is_logic_or
+		# 如果is_logic_or为true，为filters第一层元素增加or间隔
+		logicTempFilters = []
+		filters.forEach (n)->
+			logicTempFilters.push(n)
+			logicTempFilters.push("or")
+		logicTempFilters.pop()
+		filters = logicTempFilters
+
+	selector = []
+	filtersLooper = (filters_loop)->
+		tempFilters = []
+		tempLooperResult = null
+		if !_.isArray(filters_loop)
+			if _.isObject(filters_loop)
+				# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
+				if filters_loop.operation
+					filters_loop = [filters_loop.field, filters_loop.operation, filters_loop.value]
+				else
+					return null
+			else
+				return null
+		
+		if filters_loop.length == 1
+			# 只有一个元素，进一步解析其内容
+			tempLooperResult = filtersLooper(filters_loop[0])
+			if tempLooperResult
+				tempFilters.push tempLooperResult
+		else if filters_loop.length == 2
+			# 只有两个元素，进一步解析其内容，省略"and"连接符，但是有"and"效果
+			filters_loop.forEach (n,i)->
+				tempLooperResult = filtersLooper(n)
+				if tempLooperResult
+					tempFilters.push tempLooperResult
+		else if filters_loop.length == 3
+			# 只有三个元素，可能中间是"or","and"连接符也可能是普通数组，区别对待解析
+			if _.include(["or","and"], filters_loop[1])
+				# 因要判断filtersLooper(filters_loop[0])及filtersLooper(filters_loop[2])是否为空
+				# 所以不能直接写：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2])]
+				tempFilters = []
+				tempLooperResult = filtersLooper(filters_loop[0])
+				if tempLooperResult
+					tempFilters.push tempLooperResult
+				tempLooperResult = filtersLooper(filters_loop[2])
+				if tempLooperResult
+					if tempFilters.length
+						tempFilters.push filters_loop[1]
+					tempFilters.push tempLooperResult
+			else
+				if _.isString filters_loop[1]
+					# 第二个元素为字符串，则认为是某一个具体的过虑条件
+					field = filters_loop[0]
+					option = filters_loop[1]
+					value = filters_loop[2]
+					if value != undefined
+						if Meteor.isClient
+							value = Creator.evaluateFormula(value)
+						else
+							value = Creator.evaluateFormula(value, null, options)
+						sub_selector = []
+						if _.isArray(value) == true
+							v_selector = []
+							if option == "="
+								_.each value, (v)->
+									sub_selector.push [field, option, v], "or"
+							else if option == "<>"
+								_.each value, (v)->
+									sub_selector.push [field, option, v], "and"
+							else if Creator.isBetweenFilterOperation(option) and value.length = 2
+								if value[0] != null or value[1] != null
+									if value[0] != null
+										sub_selector.push [field, ">=", value[0]], "and"
+									if value[1] != null
+										sub_selector.push [field, "<=", value[1]], "and"
+							else
+								_.each value, (v)->
+									sub_selector.push [field, option, v], "or"
+
+							if sub_selector[sub_selector.length - 1] == "and" || sub_selector[sub_selector.length - 1] == "or"
+								sub_selector.pop()
+							if sub_selector.length
+								tempFilters = sub_selector
+						else
+							tempFilters = [field, option, value]
+				else
+					# 普通数组，当成完整过虑条件进一步循环解析每个条件
+					filters_loop.forEach (n,i)->
+						tempLooperResult = filtersLooper(n)
+						if tempLooperResult
+							tempFilters.push tempLooperResult
+		else
+			# 超过3个元素的数组，则认为是普通过虑条件，当成完整过虑条件进一步循环解析每个条件
+			filters_loop.forEach (n,i)->
+				tempLooperResult = filtersLooper(n)
+				if tempLooperResult
+					tempFilters.push tempLooperResult
+		if tempFilters.length
+			return tempFilters
+		else
+			return null
+
+	selector = filtersLooper(filters)
 	return selector
 
 ###

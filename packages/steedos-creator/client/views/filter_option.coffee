@@ -152,7 +152,7 @@ Template.filter_option.events
 		filter = AutoForm.getFormValues("filter-option").insertDoc
 		isDateField = fields[filter.field]?.type == "date"
 		unless filter.operation
-			toastr.error(t("creator_filter_option_start_end_error"))
+			toastr.error(t("creator_filter_operation_required_error"))
 			return
 		isBetweenOperation = Creator.isBetweenFilterOperation(filter.operation)
 		if isBetweenOperation
