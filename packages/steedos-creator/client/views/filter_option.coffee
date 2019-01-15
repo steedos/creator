@@ -195,7 +195,7 @@ Template.filter_option.events
 	'change select[name="operation"]': (event, template) ->
 		filter_item = template.filter_item.get()
 		operation = $(event.currentTarget).val()
-		if operation != filter_item?.operation
+		if Creator.isBetweenFilterOperation(operation) || Creator.isBetweenFilterOperation(filter_item?.operation)
 			template.filter_item_operation.set(operation)
 			filter_item.operation = operation
 			filter_item.value = ""
