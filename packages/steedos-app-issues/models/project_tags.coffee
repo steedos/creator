@@ -1,32 +1,25 @@
-Creator.Objects.projects =
-	name: "projects"
-	label: "问题分类"
+Creator.Objects.project_tags =
+	name: "project_tags"
+	label: "标签"
 	icon: "location"
-	enable_search: true
+	enable_search: false
 	fields:
 		name:
-			label:'名称'
-			type:'text'
-			is_wide:true
-
-		description: 
-			label: '描述'
-			type: 'textarea'
+			label: '标题'
+			type: 'text'
 			is_wide: true
-
-		flow_role:
-			label: '审批岗位'
-			type: 'lookup'
-			reference_to: 'flow_roles'
 			required: true
-			filterable: true
+			searchable: true
+		color:
+			label: '颜色'
+			type: 'text'
+		
 
 	list_views:
 		all:
 			label: "所有"
-			columns: ["name", "flow_roles", "created"]
+			columns: ["name", "color"]
 			filter_scope: "space"
-
 
 	permission_set:
 		user:
