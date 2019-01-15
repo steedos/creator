@@ -33,6 +33,7 @@ Creator.bootstrap = (spaceId, callback)->
 			Creator.Objects = result.objects
 			object_listviews = result.object_listviews
 			Creator.object_workflows = result.object_workflows
+			isSpaceAdmin = Steedos.isSpaceAdmin()
 
 			_.each Creator.Objects, (object, object_name)->
 				_.extend object.list_views, object_listviews[object_name]
@@ -41,7 +42,12 @@ Creator.bootstrap = (spaceId, callback)->
 			_.each result.apps, (app, key) ->
 				if !app._id
 					app._id = key
-				unless app.is_creator
+				if app.is_creator
+					if isSpaceAdmin
+						# 如果是工作区管理员应该强制把is_creator的应该显示出来
+						app.visible = true
+				else
+					# 非creator应该一律不显示
 					app.visible = false
 			
 			sortedApps = _.sortBy _.values(result.apps), 'sort'

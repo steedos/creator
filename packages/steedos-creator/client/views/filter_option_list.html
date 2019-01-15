@@ -31,7 +31,7 @@
                         </span>
                     </div>
                     {{#if this.valuelabel}}
-                        <div class="filterCardBody">{{getOperationLabel(this.operation)}}&nbsp;
+                        <div class="filterCardBody">{{#if showOperationLabel this.operation}}{{getOperationLabel(this.operation)}}&nbsp;{{/if}}
                             <span class="uiOutputText">{{this.valuelabel}}</span>
                         </div>
                     {{/if}}
@@ -48,7 +48,7 @@
         <button class="slds-button_reset slds-text-link slds-col_bump-left remove-all-filters" href="javascript:void(0);">{{_ "creator_list_remove_all_filters"}}</button>
     </div>
     {{#if filterItems.length}}
-        <div class="filter-logic-container slds-p-around--small" style="background: #f3f2f2">
+        <div class="filter-logic-container slds-p-around--small hide" style="background: #f3f2f2">
             <div class="filter-logic-title slds-p-bottom--x-small">
                 {{#unless isFilterLogicEmpty}}
                     <span class="title">

@@ -89,6 +89,15 @@ Creator.getTable = (object_name)->
 Creator.getSchema = (object_name)->
 	return Creator.getObject(object_name)?.schema
 
+Creator.getObjectFirstListViewUrl = (object_name)->
+	list_view = Creator.getObjectFirstListView(object_name)
+	list_view_id = list_view?._id
+	app_id = Session.get("app_id")
+	if object_name is "meeting"
+		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
+	else
+		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
+
 Creator.getObjectUrl = (object_name, record_id, app_id) ->
 	if !app_id
 		app_id = Session.get("app_id")
@@ -141,6 +150,22 @@ Creator.getObjectLookupFieldOptions = (object_name, is_deep)->
 					if r_object
 						_.forEach r_object.fields, (f2, k2)->
 							_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
+	return _options
+
+# 统一为对象object_name提供可用于过虑器过虑字段
+Creator.getObjectFilterFieldOptions = (object_name)->
+	_options = []
+	_object = Creator.getObject(object_name)
+	fields = _object?.fields
+	permission_fields = Creator.getFields(object_name)
+	icon = _object?.icon
+	_.forEach fields, (f, k)->
+		# hidden,grid等类型的字段，不需要过滤
+		if !_.include(["grid","object", "[Object]", "[object]", "Object"], f.type) and !f.hidden
+			# filters.$.field及flow.current等子字段也不需要过滤
+			if !/\w+\./.test(k) and _.indexOf(permission_fields, k) > -1
+				_options.push {label: f.label || k, value: k, icon: icon}
+
 	return _options
 
 Creator.getObjectRecord = (object_name, record_id)->
@@ -346,8 +371,10 @@ Creator.formatFiltersToDev = (filters, options)->
 	unless filters.length
 		return
 	# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
-	unless filters[0] instanceof Array
-		filters = _.map filters, (obj)->
+	filters = _.map filters, (obj)->
+		if obj instanceof Array
+			return obj
+		else
 			return [obj.field, obj.operation, obj.value]
 	selector = []
 	logic_symbol = if options?.is_logic_or then "or" else "and"

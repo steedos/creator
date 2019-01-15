@@ -273,6 +273,8 @@ if Meteor.isClient
 
 		return list
 
+Creator.getObjectFirstListView = (object_name)->
+	return _.first(Creator.getListViews(object_name))
 
 ### 
 	取出list_view_id对应的视图，如果不存在或者没有权限，就返回第一个视图
@@ -354,7 +356,11 @@ Creator.getObjectDefaultExtraColumns = (object_name)->
 ###
 Creator.getObjectDefaultSort = (object_name)->
 	defaultView = Creator.getObjectDefaultView(object_name)
-	return defaultView?.sort
+	if defaultView
+		if defaultView.sort
+			return defaultView.sort
+		else
+			return [["created", "desc"]]
 
 
 ###

@@ -182,5 +182,4 @@ steedos:users-import
 steedos:app-base
 
 
-# 正式发布时开启
-# steedos:version
+steedos:version
