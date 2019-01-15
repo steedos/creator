@@ -89,6 +89,7 @@ Creator.Objects.archive_document =
 			filter_scope: "space"
 			filters: [["submitter", "=", "{userId}"],'or',["outbox_users", "=", "{userId}"]]
 			columns:["name","flow_name","submitter","submit_date"]
+			sort: [{field_name: "submit_date", order: "desc"}]
 	
 	permission_set:
 		user:
