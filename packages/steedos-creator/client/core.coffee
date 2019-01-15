@@ -93,7 +93,7 @@ if Meteor.isClient
 				if filters_set.filters?.length
 					if code_filters_set.filters?.length
 						# 取AND连接逻辑
-						filters_set.filters = _.union filters_set.filters, code_filters_set.filters
+						filters_set.filters = [filters_set.filters, "and", code_filters_set.filters]
 				else
 					filters_set.filters = code_filters_set.filters
 			else
