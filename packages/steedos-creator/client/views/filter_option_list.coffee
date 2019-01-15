@@ -1,7 +1,10 @@
-getDefaultFilters = (object_name, list_view_id)->
-	list_view = Creator.getListView(object_name, list_view_id, true)
+# 视图新增filter_fileds，配置了filter_fields的视图，右侧自动列出过滤器 #915
+getDefaultFilters = (object_name, filter_fields)->
+	unless filter_fields
+		list_view_id = list_view_id = Session.get("list_view_id")
+		list_view = Creator.getListView(object_name, list_view_id, true)
+		filter_fields = list_view?.filter_fields
 	fields = Creator.getObject(object_name)?.fields
-	filter_fields = list_view?.filter_fields
 	filters = []
 	if filter_fields?.length
 		filter_fields.forEach (n)->
@@ -167,10 +170,11 @@ Template.filter_option_list.onCreated ->
 	self.autorun ->
 		filters = Session.get("filter_items")
 		object_name = Template.instance().data?.object_name
-		list_view_id = Session.get("list_view_id")
 		fields = Creator.getObject(object_name)?.fields
 		unless filters?.length
-			filters = getDefaultFilters(object_name, list_view_id)
+			# 报表过虑器会传入报表的filter_fields属性，否则默认取当前视图的filter_fields属性
+			filter_fields = Template.instance().data?.filter_fields
+			filters = getDefaultFilters(object_name, filter_fields)
 			if filters.length
 				Session.set("filter_items", filters)
 

@@ -355,15 +355,30 @@ Template.creator_grid.onRendered ->
 						_.forEach fi.value, (fv)->
 							if fv
 								fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
-#						if fi.start_value
-#							fi.start_value.setHours(fi.start_value.getHours() + fi.start_value.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
-#						if fi.end_value
-#							fi.end_value.setHours(fi.end_value.getHours() + fi.end_value.getTimezoneOffset() / 60 )
-				if filter_items
+				_filters = []
+				_.forEach filter_items, (fi)->
+					_f = _objFields[fi?.field]
+					if ["text", "textarea", "html", "code"].includes(_f?.type)
+						if _.isString(fi.value)
+							vals = fi.value.trim().split(" ")
+							query_or = []
+							vals.forEach (val_item)->
+								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+								query_or.push([fi.field, fi.operation, val_item])
+							if query_or.length > 0
+								is_logic_or = true
+								if ['<>','notcontains'].includes(fi.operation)
+									is_logic_or = false
+								_filters.push Creator.formatFiltersToDev(query_or, {is_logic_or: is_logic_or})
+					else
+						_filters.push fi
+
+				if _filters.length > 0
+					# 支持直接把过虑器变更的过虑条件应用到grid列表，而不是非得先保存到视图中才生效
 					filters_set = 
 						filter_logic: filter_logic
 						filter_scope: filter_scope
-						filters: filter_items
+						filters: _filters
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
 					if filters_set

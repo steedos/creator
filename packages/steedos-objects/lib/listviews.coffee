@@ -354,7 +354,11 @@ Creator.getObjectDefaultExtraColumns = (object_name)->
 ###
 Creator.getObjectDefaultSort = (object_name)->
 	defaultView = Creator.getObjectDefaultView(object_name)
-	return defaultView?.sort
+	if defaultView
+		if defaultView.sort
+			return defaultView.sort
+		else
+			return [["created", "desc"]]
 
 
 ###

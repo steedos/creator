@@ -25,19 +25,7 @@ Template.filter_option.helpers
 						return "name"
 					firstOption: ""
 					options: ()->
-						keys = Creator.getSchema(object_name)._firstLevelSchemaKeys
-						permission_fields = Creator.getFields(object_name)
-						schema = Creator.getSchema(object_name)._schema
-						keys = _.map keys, (key) ->
-							# hidden,grid 类型的字段，不需要过滤
-							if object_fields[key].hidden or object_fields[key].type == "grid"
-								return undefined
-							if _.indexOf(permission_fields, key) > -1
-								obj = _.pick(schema, key)
-								label = obj[key].label || TAPi18n.__(Creator.getObject(object_name).schema.label(key))
-								return {label: label, value: key}
-						keys = _.compact(keys)
-						return keys
+						Creator.getObjectFilterFieldOptions object_name
 			operation:
 				type: String
 				label: "operation"
@@ -47,6 +35,8 @@ Template.filter_option.helpers
 						if filter_field_type && Creator.checkFieldTypeSupportBetweenQuery(filter_field_type)
 							template.filter_item_operation.set('between')
 							return 'between'
+						else if ["textarea", "text", "code"].includes(filter_field_type)
+							return 'contains'
 						else
 							return "="
 					firstOption: ""
@@ -82,6 +72,7 @@ Template.filter_option.helpers
 			if isBetweenOperation
 				schema.start_value = _.clone obj_schema[schema_key]
 				if schema.start_value.autoform
+					schema.start_value.autoform = _.clone obj_schema[schema_key].autoform
 					schema.start_value.autoform.readonly = false
 					schema.start_value.autoform.disabled = false
 					schema.start_value.autoform.omit = false
@@ -100,9 +91,15 @@ Template.filter_option.helpers
 						schema.value.autoform.showIcon = false
 
 				if schema.value.autoform
+					schema.value.autoform =  _.clone obj_schema[schema_key].autoform
 					schema.value.autoform.readonly = false
 					schema.value.autoform.disabled = false
 					schema.value.autoform.omit = false
+					delete schema.value.autoform.defaultValue
+				delete schema.value.defaultValue
+
+				if ["widearea", "textarea", "code"].includes(schema.value.autoform?.type)
+					schema.value.autoform.type = 'text'
 
 			# 参考【查找时，按日期类型字段来查 有问题 #896】未能实现outFormat功能
 			if object_fields[schema_key].type == "date"
@@ -114,7 +111,6 @@ Template.filter_option.helpers
 				else
 					if schema.value.autoform
 						schema.value.autoform.outFormat = 'yyyy-MM-dd';
-
 		new SimpleSchema(schema)
 
 	filter_item: ()->
@@ -199,7 +195,7 @@ Template.filter_option.events
 	'change select[name="operation"]': (event, template) ->
 		filter_item = template.filter_item.get()
 		operation = $(event.currentTarget).val()
-		if operation != filter_item?.operation
+		if Creator.isBetweenFilterOperation(operation) || Creator.isBetweenFilterOperation(filter_item?.operation)
 			template.filter_item_operation.set(operation)
 			filter_item.operation = operation
 			filter_item.value = ""

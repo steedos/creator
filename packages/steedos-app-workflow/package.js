@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:app-workflow',
-	version: '0.0.5',
+	version: '0.0.6',
 	summary: 'Creator workflow',
 	git: '',
 	documentation: null
@@ -39,7 +39,7 @@ Package.onUse(function(api) {
 
 	api.use('steedos:base@0.0.90');
 
-	api.use('universe:i18n');
+	api.use('universe:i18n@1.13.0');
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json'];
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
