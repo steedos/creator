@@ -110,6 +110,8 @@ Template.steedos_chat_main.onRendered ()->
 
 		if !ownerAvatarUrl
 			ownerAvatarUrl = Creator.getRelativeUrl("/packages/steedos_lightning-design-system/client/images/themes/oneSalesforce/lightning_lite_profile_avatar_96.png")
+		else
+			ownerAvatarUrl = Steedos.absoluteUrl ownerAvatarUrl
 
 		ownerName = data.owner.name
 
