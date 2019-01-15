@@ -273,6 +273,8 @@ if Meteor.isClient
 
 		return list
 
+Creator.getObjectFirstListView = (object_name)->
+	return _.first(Creator.getListViews(object_name))
 
 ### 
 	取出list_view_id对应的视图，如果不存在或者没有权限，就返回第一个视图
