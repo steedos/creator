@@ -153,18 +153,18 @@ Creator.Objects.project_issues =
 			columns: ["name", "category", "level", "tags", "created"]
 			filter_scope: "space"
 			filters: [["status", "=", "open"]]
-			filter_fields: ["category", "level", "tags", "company_id", "owner", "created_by"]
+			filter_fields: ["category", "level", "tags", "company_id", "owner"]
 		closed:
 			label: "已关闭"
 			columns: ["name", "category", "level", "tags", "created"]
 			filter_scope: "space"
 			filters: [["status", "=", "closed"]]
-			filter_fields: ["category", "level", "tags", "company_id", "owner", "created_by"]
+			filter_fields: ["category", "level", "tags", "company_id", "owner"]
 		all:
 			label: "所有"
 			columns: ["name", "category", "level", "status", "tags", "created"]
 			filter_scope: "space"
-			filter_fields: ["category", "level", "status", "tags", "company_id", "owner", "created_by"]
+			filter_fields: ["category", "level", "status", "tags", "company_id", "owner"]
 
 
 	permission_set:
