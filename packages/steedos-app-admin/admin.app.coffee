@@ -5,7 +5,7 @@ Creator.Apps.admin =
 	icon: "ion-ios-people-outline"
 	icon_slds: "custom"
 	is_creator:true
-	objects: ["space_users"]
+	objects: []
 
 	# Menu 支持两种类型的参数
 	# - template_name 指向 Meteor Template, url=/app/admin/page/{template_name}/
