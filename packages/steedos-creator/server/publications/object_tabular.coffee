@@ -16,12 +16,9 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields, space
 
 	if ids.length == 1
 		_record = object_colleciton.findOne({_id: ids[0]}, {fields: {_id:1, owner: 1}})
-		console.log('_record', _record);
 		if _record?.owner
 			_record.spaceId = spaceId
-			console.log 'Creator.getPermissions', _object_name, _record?.space, this.userId, Creator.getPermissions(_object_name, _record?.spaceId, this.userId)
 			_rp = Creator.getRecordPermissions(_object_name, _record, this.userId)
-			console.log('_rp', _object_name, _rp)
 			if !_rp?.allowRead
 				this.error(new Meteor.Error('401', '无查看权限'))
 				this.stop()
