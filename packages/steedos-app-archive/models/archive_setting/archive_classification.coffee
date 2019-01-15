@@ -1,23 +1,25 @@
-Creator.Objects.archive_classification = 
+Creator.Objects.archive_classification =
 	name: "archive_classification"
-	icon: "drafts"
+	icon: "cms"
 	label: "公文分类"
-	enable_search: true
 	fields:
 		_id:
 			type: "text"
 			label: "分类ID"
 			hidden: true
-		parent:
-			type: "lookup"
-			label: "上级"
-			reference_to: "archive_classification"
-			sortable: true
-		name:
+		name: 
 			type: "text"
 			label: "名称"
+			required: true
+
 	list_views:
 		all:
 			label: "全部"
+			columns: ["name"]
 			filter_scope: "space"
-			columns:["name","parent"]
+	actions:
+		standard_query:
+			label: "查找"
+			visible: false
+			on: "list"
+			todo: "standard_query"

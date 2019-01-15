@@ -9,13 +9,17 @@ Creator.Objects.archive_document =
 	fields:
 		classification:
 			type: "lookup"
+			label: "公文分类"
+			reference_to: "archive_classification"
+		flow_category:
+			type: "lookup"
 			label: "流程分类"
 			reference_to: "categories"
 		flow:
 			type: "lookup"
 			label: "流程"
 			reference_to: "flows"
-			depend_on: ["classification"]
+			depend_on: ["flow_category"]
 			filtersFunction: (filters, context) ->
     			console.log('filtersFunction', filters, context);
     			if _.isArray(context?.classification)
@@ -38,13 +42,14 @@ Creator.Objects.archive_document =
 			reference_to: "users"
 			default_width: 150
 		organization:
-			type: "text"
+			type: "lookup"
 			label: "部门"
-			hidden: true
+			reference_to: "organizations"
 		submit_date:
 			type: "datetime"
 			label: "提交时间"
 			sortable: true
+			searchable: true
 			default_width: 180
 		archive_date:
 			type: "datetime"
@@ -71,19 +76,19 @@ Creator.Objects.archive_document =
 			label:"我发起的"
 			filter_scope: "space"
 			filters: [["submitter", "=", "{userId}"]]
-			columns:["name","flow_name","submitter","submit_date","archive_date"]
+			columns:["name","flow_name","submitter","submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
 		approved:
 			label:"我审核的"
 			filter_scope: "space"
 			filters: [["outbox_users", "=", "{userId}"]]
-			columns:["name","flow_name","submitter","submit_date","archive_date"]
+			columns:["name","flow_name","submitter","submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
-		# all:
-		# 	label: "全部"
-		# 	filter_scope: "space"
-		# 	filters: [["submitter", "=", "{userId}"],["outbox_users", "=", "{userId}"]]
-		# 	columns:["name","flow_name","submitter","submit_date","archive_date"]
+		all:
+			label: "全部"
+			filter_scope: "space"
+			filters: [["submitter", "=", "{userId}"],'or',["outbox_users", "=", "{userId}"]]
+			columns:["name","flow_name","submitter","submit_date"]
 	
 	permission_set:
 		user:
