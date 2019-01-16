@@ -550,7 +550,11 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 	}
 
 	// self.loading.set(true);
-	if (this.template.data.filter_by_company && !Steedos.isSpaceAdmin()){
+	var permissions = {};
+	if (params && params.space && params.reference_to && Meteor.userId()) {
+		permissions = Creator.getPermissions(params.reference_to, params.space, Meteor.userId());
+	}
+	if (this.template.data.filter_by_company && !permissions['viewAllRecords']){
 		var companyId = Creator.getUserCompanyId();
 		if (companyId) {
 			searchVal.filterQuery.company_id = companyId;
