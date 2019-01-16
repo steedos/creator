@@ -88,8 +88,6 @@ if Meteor.isClient
 				if code_filters_set.filter_scope
 					# 代码中有配置filter_scope时，以代码中的为准
 					filters_set.filter_scope = code_filters_set.filter_scope
-				console.log "Creator.getODataFilter========code_filters_set====", code_filters_set
-				console.log "Creator.getODataFilter========filters_set====", filters_set
 				if filters_set.filters?.length
 					if code_filters_set.filters?.length
 						# 取AND连接逻辑
