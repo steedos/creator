@@ -13,10 +13,10 @@ Creator.Objects.project_responsibles =
 
 		company_id:
 			label: '单位'
-			type: 'lookup'
-			reference_to: 'organizations'
 			required: true
 			filterable: true
+			omit: false
+			hidden: false
 
 		responsible_organization:
 			label: '责任部门'

@@ -70,16 +70,9 @@ Creator.Objects.flows =
 			type: "textarea"
 			is_wide: true
 		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			is_company_only: true
 			required: Meteor.settings?.public?.is_group_company
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
+			omit: false
+			hidden: false
 		created_by:
 			label:"创建人"
 		modified_by:

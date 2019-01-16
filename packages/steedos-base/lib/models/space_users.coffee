@@ -70,13 +70,6 @@ Creator.Objects.space_users =
 			type: "lookup"
 			reference_to: "organizations"
 			omit: true
-		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			omit:true
 		user_accepted:
 			type: "boolean"
 			label:'有效'

@@ -1,9 +1,9 @@
-Creator.Objects.contract_receipts = 
+Creator.Objects.contract_receipts =
 	name: "contract_receipts"
 	label: "收款"
 	icon: "orders"
 	fields:
-		name: 
+		name:
 			label: "名称"
 			type: "text"
 			required: true
@@ -43,22 +43,15 @@ Creator.Objects.contract_receipts =
 		billing_no:
 			label: "发票号"
 			type: "text"
-		description: 
+		description:
 			label: "备注"
 			type: "textarea"
 			is_wide: true
 
 		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			is_company_only: true
 			required: true
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
+			omit: false
+			hidden: false
 
 	list_views:
 		recent:
@@ -68,7 +61,7 @@ Creator.Objects.contract_receipts =
 			label: "所有"
 			columns: ["name", "amount", "contract", "close_date", "due_date"]
 			filter_scope: "space"
-			
+
 	permission_set:
 		user:
 			allowCreate: true

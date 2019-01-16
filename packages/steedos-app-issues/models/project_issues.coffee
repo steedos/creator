@@ -39,9 +39,9 @@ Creator.Objects.project_issues =
 
 		company_id:
 			label: '提报单位'
-			type: 'lookup'
-			reference_to: 'organizations'
 			filterable: true
+			omit: false
+			hidden: false
 
 		organization:
 			label: '提报部门'

@@ -70,11 +70,6 @@ Creator.Objects.organizations =
 
 		company_id:
 			label: "所属公司"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			omit: true
 			group: "系统"
 
 		is_company:

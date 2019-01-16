@@ -1,9 +1,9 @@
-Creator.Objects.tasks = 
+Creator.Objects.tasks =
 	name: "tasks"
 	label: "任务"
 	icon: "task"
 	fields:
-		name: 
+		name:
 			label: "主题"
 			type: "text"
 			required: true
@@ -17,7 +17,7 @@ Creator.Objects.tasks =
 			reference_to: "users"
 			multiple: true
 
-		due_date: 
+		due_date:
 			label: "截止时间"
 			type: "datetime"
 			sortable: true
@@ -27,19 +27,19 @@ Creator.Objects.tasks =
 		# 	type: "datetime"
 		# 	hidden: true
 
-		# end_date: 
+		# end_date:
 		# 	label: "完成时间"
 		# 	type: "datetime"
 		# 	hidden: true
 
-		state: 
+		state:
 			label: "状态"
 			type: "select"
 			options: [
-				{label:"未开始", value:"not_started"}, 
-				{label:"进行中", value:"in_progress"}, 
+				{label:"未开始", value:"not_started"},
+				{label:"进行中", value:"in_progress"},
 				{label: "已完成", value:"completed"}
-				{label:"暂停", value:"paused"}, 
+				{label:"暂停", value:"paused"},
 			]
 			sortable: true
 			required: true
@@ -52,24 +52,17 @@ Creator.Objects.tasks =
 				_.each Creator.Objects, (object, object_name)->
 					if object.enable_tasks
 						o.push object_name
-				return o 
+				return o
 
-		description: 
+		description:
 			label: "描述"
 			type: "textarea"
 			is_wide: true
-		
+
 		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			is_company_only: true
 			required: true
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
+			omit: false
+			hidden: false
 
 		# tags:
 		# 	label: "标签"
@@ -143,11 +136,11 @@ Creator.Objects.tasks =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false 
+			viewAllRecords: false
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true
