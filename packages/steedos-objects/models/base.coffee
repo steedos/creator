@@ -241,7 +241,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -250,7 +250,7 @@ Creator.baseObject =
 					return true
 
 				if !record
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 
 				if record && record.locked
 					return false
@@ -267,7 +267,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -276,7 +276,7 @@ Creator.baseObject =
 					return true
 
 				if !record
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 
 				if record && record.locked
 					return false
@@ -292,7 +292,7 @@ Creator.baseObject =
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
 
-				record = Creator.Collections[object_name].findOne record_id
+				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
@@ -315,7 +315,7 @@ Creator.baseObject =
 		standard_view_instance:
 			label: "查看审批单"
 			visible: (object_name, record_id, record_permissions) ->
-				record = Creator.Collections[object_name].findOne record_id
+				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 				if record && !_.isEmpty(record.instances)
 					return true
 
