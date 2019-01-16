@@ -115,9 +115,6 @@ if Meteor.isClient
 					filter.value = filter.value()
 
 		if custom_list_view
-			if filter_scope == "mine"
-				selector.push ["owner", "=", Meteor.userId()]
-
 			if filter_logic
 				format_logic = Creator.formatLogicFiltersToDev(filters, filter_logic)
 				if selector.length
@@ -142,10 +139,8 @@ if Meteor.isClient
 						selector.push filter
 		else
 			if spaceId and userId
-
 				if object_name == "users"
 					selector.push ["_id", "=", userId]
-
 				if filters
 					filters = Creator.formatFiltersToDev(filters)
 					if filters and filters.length > 0
@@ -154,26 +149,31 @@ if Meteor.isClient
 						_.each filters, (filter)->
 							if object_name != 'spaces' || (filter.length > 0 && filter[0] != "_id")
 								selector.push filter
-
-					if filter_scope == "mine"
-						if selector.length > 0
-							selector.push "and"
-						selector.push ["owner", "=", userId]
-				else
-					permissions = Creator.getPermissions(object_name)
-					if permissions.viewAllRecords
-						if filter_scope == "mine"
-							if selector.length > 0
-								selector.push "and"
-							selector.push ["owner", "=", userId]
-					else if permissions.viewCompanyRecords
-						if selector.length > 0
-							selector.push "and"
-						selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
-					else if permissions.allowRead
-						if selector.length > 0
-							selector.push "and"
-						selector.push ["owner", "=", userId]
+		
+		# 指定过虑条件为mine时要额外加上相关过虑条件
+		if filter_scope == "mine"
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["owner", "=", userId]
+		
+		permissions = Creator.getPermissions(object_name)
+		if permissions.viewAllRecords
+			# 有所有权限则不另外加过虑条件
+		else if permissions.viewCompanyRecords
+			# 限制查看本单位时另外加过虑条件
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
+		else if permissions.allowRead
+			# 只是时allowRead另外加过虑条件，限制为只能看自己的记录
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["owner", "=", userId]
+		else
+			# 没有权限时不应该显示任何记录
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["id", "=", "-1"]
 
 		if selector.length == 0
 			return undefined
