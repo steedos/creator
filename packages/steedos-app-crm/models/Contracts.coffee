@@ -63,17 +63,9 @@ Creator.Objects.contracts =
 		# 待处理：comapany拆分、分级权限。
 		company_id:
 			label: "承办单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			filterable:true
-			index:true
-			is_company_only: true
 			required: true
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
-
+			omit: false
+			hidden: false
 
 		subject:
 			type: "textarea"
