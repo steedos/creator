@@ -196,12 +196,6 @@ if Meteor.isClient
 				filter_logic = custom_list_view.filter_logic
 				filter_scope = custom_list_view.filter_scope
 				filters = custom_list_view.filters
-				if filter_scope == "mine"
-					selector.push ["owner", "=", Meteor.userId()]
-				else if filter_scope == "company"
-					if selector.length > 0
-						selector.push "and"
-					selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
 
 				if filter_logic
 					format_logic = Creator.formatLogicFiltersToDev(filters, filter_logic)
@@ -262,9 +256,33 @@ if Meteor.isClient
 			else
 				selector.push("and", [related_field_name, "=", record_id])
 
+		# 指定过虑条件为mine时要额外加上相关过虑条件
+		if filter_scope == "mine"
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["owner", "=", userId]
+			
 		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
-		if !permissions.viewAllRecords and permissions.allowRead
-			selector.push("and", ["owner", "=", userId])
+		if permissions.viewAllRecords
+			# 有所有权限则不另外加过虑条件
+		else if permissions.viewCompanyRecords
+			# 限制查看本单位时另外加过虑条件
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["company_id", "=", Creator.getUserCompanyId() || -1]
+		else if permissions.allowRead
+			# 只是时allowRead另外加过虑条件，限制为只能看自己的记录
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["owner", "=", userId]
+		else
+			# 没有权限时不应该显示任何记录
+			if selector.length > 0
+				selector.push "and"
+			selector.push ["id", "=", "-1"]
+
+		if selector.length == 0
+			return undefined
 		return selector
 
 # 切换工作区时，重置下拉框的选项
