@@ -318,7 +318,8 @@ Template.creator_grid.onRendered ->
 			if is_related
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
-					filter = undefined
+					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
+					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
@@ -360,10 +361,8 @@ Template.creator_grid.onRendered ->
 						filters: _filters
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
-					if filters_set
-						filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
-					else
-						filter = undefined
+					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
+					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 				else
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
