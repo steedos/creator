@@ -130,9 +130,7 @@ Template.steedos_chat_main.onRendered ()->
 			actionTemplate = """
 				<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_las chat-actions" data-id="#{data._id}">
 					<button class="slds-button slds-button_icon-border slds-button_icon-x-small chat-message-actions" data-toggle="dropdown" aria-haspopup="true">
-						<svg class="slds-button__icon slds-icon-utility-down" aria-hidden="true">
-							<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/packages/steedos_lightning-design-system/client/icons/utility-sprite/symbols.svg#down"></use>
-						</svg>
+						#{Blaze.toHTMLWithData Template.steedos_button_icon, {class: "slds-button__icon slds-icon-utility-down", source: "utility-sprite", name:"down"}}
 						<span class="slds-assistive-text">More Options</span>
 					</button>
 				</div>
