@@ -15,10 +15,13 @@ _standardQuery = (curObjectName, standard_query)->
 					else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
 						if _.isString(val)
 							vals = val.trim().split(" ")
+							query_or = []
 							vals.forEach (val_item)->
 								# 特殊字符编码
 								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
-								query_arr.push([key, "contains", val_item])
+								query_or.push([key, "contains", val_item])
+							if query_or.length > 0
+								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: false})
 						else if _.isArray(val)
 							query_arr.push([key, "=", val])
 		else
@@ -37,7 +40,7 @@ _standardQuery = (curObjectName, standard_query)->
 								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
 								query_or.push([key, "contains", val_item])
 							if query_or.length > 0
-								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: true})
+								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: false})
 						else if _.isArray(val)
 							query_arr.push([key, "=", val])
 
@@ -346,7 +349,7 @@ Template.creator_grid.onRendered ->
 								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
 								query_or.push([fi.field, fi.operation, val_item])
 							if query_or.length > 0
-								is_logic_or = true
+								is_logic_or = false
 								if ['<>','notcontains'].includes(fi.operation)
 									is_logic_or = false
 								_filters.push Creator.formatFiltersToDev(query_or, {is_logic_or: is_logic_or})
