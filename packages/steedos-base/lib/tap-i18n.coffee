@@ -23,6 +23,7 @@ sprintf = require('sprintf-js').sprintf;
 
 # 重写tap:i18n函数，向后兼容
 Meteor.startup ->
+	i18n.setOptions({purify: null})
 	if TAPi18n
 		TAPi18n.__rollback = TAPi18n.__
 		TAPi18n.__ = (key, options, lang)->
