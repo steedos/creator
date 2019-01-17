@@ -153,8 +153,10 @@ Meteor.startup ->
 				return $1.replace('tolower(', '').replace(')', '')
 			queryParams.$filter = queryParams.$filter.replace(/tolower\(([^\)]+)\)/g, removeMethod)
 
-	isSameCompany = (spaceId, userId, companyId)->
+	isSameCompany = (spaceId, userId, companyId, query)->
 		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1 } })
+		if !companyId && query
+			companyId = query.company_id = su.company_id
 		return su.company_id == companyId
 
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
@@ -179,7 +181,7 @@ Meteor.startup ->
 				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
-				if permissions.viewAllRecords or (permissions.allowRead and @userId) or (permissions.viewCompanyRecords && isSameCompany(spaceId, @userId, createQuery.query.company_id))
+				if permissions.viewAllRecords or (permissions.viewCompanyRecords && isSameCompany(spaceId, @userId, createQuery.query.company_id, createQuery.query)) or (permissions.allowRead and @userId)
 
 					if key is 'cfs.files.filerecord'
 						createQuery.query['metadata.space'] = spaceId
