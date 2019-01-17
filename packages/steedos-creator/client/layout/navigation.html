@@ -32,11 +32,38 @@
 						<span class="slds-truncate" title="Home">Home</span>
 					</a>
 				</li> -->
-				{{#each app_objects}}
-					<li class="slds-context-bar__item {{object_class_name this}}">
-						<a href="{{object_url}}" class="slds-context-bar__label-action">
-							<span class="slds-truncate">{{_ object_i.label}}</span>
+
+				{{#if app_tabs}}
+					{{#each app_tabs}}
+						<li class="slds-context-bar__item {{page_class_name this}}">
+							<a href="{{page_url}}" class="slds-context-bar__label-action">
+								<span class="slds-truncate">{{_ name}}</span>
+							</a>
+						</li>
+					{{/each}}
+				{{else}}
+					{{#each app_objects}}
+						<li class="slds-context-bar__item {{object_class_name this}}">
+							<a href="{{object_url}}" class="slds-context-bar__label-action">
+								<span class="slds-truncate">{{_ object_i.label}}</span>
+							</a>
+						</li>
+					{{/each}}
+				{{/if}}
+
+
+
+				{{#each otherPages}}
+					<li class="slds-context-bar__item {{page_class_name}}">
+						<a href="{{page_url}}" class="slds-context-bar__label-action">
+							<span class="slds-truncate">{{_ page_i.label}}</span>
 						</a>
+						<div class="slds-col_bump-left slds-p-left_none slds-p-right_none">
+							<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-x-small nav-close">
+								{{> steedos_button_icon class="slds-button__icon" source="utility-sprite" name="close"}}
+								<span class="slds-assistive-text">关闭</span>
+							</button>
+						</div>
 					</li>
 				{{/each}}
 			</ul>

@@ -32,6 +32,8 @@ Package.onUse(function(api) {
 
 	api.addFiles('lib/chat_messages.coffee','client');
 
+	api.addFiles('core.coffee', ['client', 'server']);
+
 	// api.addFiles('app.chat.coffee','server');
 	api.addFiles('models/chat_subscriptions.coffee','server');
 	api.addFiles('models/chat_messages.coffee','server');
