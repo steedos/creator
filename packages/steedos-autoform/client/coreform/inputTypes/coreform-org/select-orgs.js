@@ -109,6 +109,9 @@ Template.afSelectOrg.events({
 		if(template.data.atts.is_company_only){
 			options.showCompanyOnly = true
 		}
+		if (template.data.atts.is_company_limited) {
+			options.showLimitedCompanyOnly = true
+		}
 		
 		Modal.allowMultiple = true;
 		Modal.show("cf_organization_modal", options);
