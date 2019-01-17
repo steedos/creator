@@ -291,6 +291,7 @@ if Meteor.isServer
 				space: spaceId
 				organization: root_org._id
 				organizations: [root_org._id]
+				organizations_parents: [root_org._id]
 				user: userObj._id
 				user_accepted: user_accepted
 				invite_state: "accepted"
