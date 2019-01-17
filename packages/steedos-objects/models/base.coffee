@@ -107,6 +107,10 @@ Creator.baseObject =
 			omit:true
 			hidden: true
 
+		# 新增基本字段，类似子管理员作分级权限
+		# omit及hidden去掉后，才会默认执行is_company_limited函数，根据权限返回是否要限制所属单位列表查看权限
+		# is_company_limited为true时，is_company_only会被强制设置为true
+		# is_company_limited可以被改写覆盖成true/false或其他function
 		company_id:
 			label: "所属单位"
 			type: "lookup"

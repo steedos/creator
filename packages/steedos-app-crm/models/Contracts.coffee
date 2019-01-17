@@ -60,8 +60,6 @@ Creator.Objects.contracts =
 			type: "textarea"
 			is_wide: true
 
-		# 新增字段：所属单位，类似子管理员作分级权限。
-		# 待处理：comapany拆分、分级权限。
 		company_id:
 			label: "承办单位"
 			required: true
