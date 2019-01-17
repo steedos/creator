@@ -251,7 +251,7 @@ if Meteor.isServer
 			rootOrg = db.organizations.findOne({space: doc._id,is_company: true, parent: null})
 			children = db.organizations.find({parents: rootOrg._id});
 			children.forEach (child) ->
-			db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
+				db.organizations.direct.update(child._id, {$set: {fullname: child.calculateFullname()}})
 
 
 	db.spaces.before.remove (userId, doc) ->
