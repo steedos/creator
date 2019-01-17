@@ -290,7 +290,7 @@ Meteor.startup ()->
 				if repeatNumberUser and repeatNumberUser._id != doc.user
 					throw new Meteor.Error(400, "space_users_error_phone_already_existed")
 
-			if modifier.$set?.hasOwnProperty('username') or modifier.$unset?.hasOwnProperty('username')
+			if modifier.$set?.hasOwnProperty('username') or (modifier.$unset?.hasOwnProperty('username') && doc.username)
 				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
 					throw new Meteor.Error(400, "space_paid_info_title")
 
