@@ -223,6 +223,23 @@ Creator.getAppObjectNames = (app_id)->
 				objects.push v
 	return objects
 
+Creator.getAppTabs = (app_id)->
+	app = Creator.getApp(app_id)
+	tabs = []
+	if app && app.tabs
+		_.each app.tabs, (tab)->
+			if tab.object_name
+				obj = Creator.getObject(tab.object_name)
+				if obj?.permissions.get().allowRead and !obj.hidden
+					tabs.push tab
+			else
+				tabs.push tab
+		if tabs.length >0
+			return tabs
+	else
+		return
+
+
 Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
