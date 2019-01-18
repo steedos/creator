@@ -108,11 +108,6 @@ Creator.baseObject =
 			hidden: true
 
 		# 新增基本字段，类似子管理员作分级权限
-		# omit及hidden去掉后，才会默认执行is_company_limited函数，根据权限返回是否要限制所属单位列表查看权限
-		# is_company_only表示是否只显示公司级组织
-		# is_company_limited表示过滤数据时是否只显示本单位下的数据
-		# is_company_limited为true时，is_company_only不会被强制设置为true，它们是两个独立的功能属性
-		# is_company_limited可以被改写覆盖成true/false或其他function
 		company_id:
 			label: "所属单位"
 			type: "lookup"
@@ -120,14 +115,6 @@ Creator.baseObject =
 			sortable: true
 			index: true
 			is_company_only: true
-			is_company_limited: (permissions)->
-				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
-				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
-				permissions = permissions?.get()
-				if permissions?.viewAllRecords
-					return false
-				else
-					return true
 			defaultValue: ()->
 				if Meteor.isClient
 					return Session.get("user_company_id")
