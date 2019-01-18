@@ -36,6 +36,9 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			multiple: true
 			omit: true
+		company_id:
+			hidden: false
+			readonly: true
 		manager:
 			type: "lookup"
 			label:'上级主管'
