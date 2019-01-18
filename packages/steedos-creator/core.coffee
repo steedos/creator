@@ -444,6 +444,8 @@ Creator.formatFiltersToDev = (filters, options)->
 	filtersLooper = (filters_loop)->
 		tempFilters = []
 		tempLooperResult = null
+		if _.isFunction(filters_loop)
+			filters_loop = filters_loop()
 		if !_.isArray(filters_loop)
 			if _.isObject(filters_loop)
 				# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
@@ -486,6 +488,8 @@ Creator.formatFiltersToDev = (filters, options)->
 					option = filters_loop[1]
 					value = filters_loop[2]
 					if value != undefined
+						if _.isFunction(value)
+							value = value()
 						if Meteor.isClient
 							value = Creator.evaluateFormula(value)
 						else

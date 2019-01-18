@@ -88,10 +88,10 @@ if Meteor.isClient
 				if code_filters_set.filter_scope
 					# 代码中有配置filter_scope时，以代码中的为准
 					filters_set.filter_scope = code_filters_set.filter_scope
-				if filters_set.filters?.length
-					if code_filters_set.filters?.length
+				if _.isFunction(filters_set.filters) or filters_set.filters?.length
+					if _.isFunction(code_filters_set.filters) or code_filters_set.filters?.length
 						# 取AND连接逻辑
-						filters_set.filters = [filters_set.filters, "and", code_filters_set.filters]
+						filters_set.filters = [[filters_set.filters, "and", code_filters_set.filters]]
 				else
 					filters_set.filters = code_filters_set.filters
 			else
@@ -103,16 +103,11 @@ if Meteor.isClient
 		filters = filters_set.filters
 		selector = []
 		# 整个过虑器是函数的话解析出来
+		# filters内部任意层支持value为function
+		# 也支持任意层的and或or连接的子filter为function的情况，比如[function(){...},"or",function(){}]
+		# filters内部任意层支持function已经有地方在用了，由Creator.formatFiltersToDev函数负责解析
 		if _.isFunction(filters)
 			filters = filters()
-		_.each filters, (filter)->
-			# 过虑器内的value属性是函数的话解析出来
-			if _.isArray(filter)
-				if filter.length ==3 && _.isFunction(filter[2])
-					filter[2] = filter[2]()
-			else if _.isObject(filter)
-				if filter.value && _.isFunction(filter.value)
-					filter.value = filter.value()
 
 		if custom_list_view
 			if filter_logic
@@ -125,14 +120,6 @@ if Meteor.isClient
 				if filters and filters.length > 0
 					if selector.length > 0
 						selector.push "and"
-					filters = _.map filters, (obj)->
-						if _.isArray(obj)
-							return obj
-						else
-							if Meteor.isClient
-								if _.isString(obj?._value)
-									return [obj.field, obj.operation, Creator.eval("(#{obj._value})")()]
-							return [obj.field, obj.operation, obj.value]
 
 					filters = Creator.formatFiltersToDev(filters)
 					_.each filters, (filter)->
@@ -149,7 +136,6 @@ if Meteor.isClient
 						_.each filters, (filter)->
 							if object_name != 'spaces' || (filter.length > 0 && filter[0] != "_id")
 								selector.push filter
-		
 		# 指定过虑条件为mine时要额外加上相关过虑条件
 		if filter_scope == "mine"
 			if selector.length > 0
