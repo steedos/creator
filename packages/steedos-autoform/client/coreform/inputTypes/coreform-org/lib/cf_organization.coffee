@@ -72,7 +72,8 @@ Template.cf_organization.conditionalselect = (node)->
 Template.cf_organization.onRendered ->
 	templateData = Template.instance().data
 	showCompanyOnly = templateData.showCompanyOnly
-	unless showCompanyOnly
+	showLimitedCompanyOnly = templateData.showLimitedCompanyOnly
+	if !showCompanyOnly and !showLimitedCompanyOnly
 		renderTree "#cf_organizations_tree_self", true
 	renderTree "#cf_organizations_tree", false
 

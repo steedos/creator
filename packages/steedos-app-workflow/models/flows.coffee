@@ -196,45 +196,87 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 		"perms.orgs_can_add":
 			label:"授权部门: 新建申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 
 		"perms.users_can_monitor":
 			label:"授权用户: 查看所有申请单"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 		"perms.orgs_can_monitor":
 			label:"授权部门: 查看所有申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 
 		"perms.users_can_admin":
 			label:"授权用户: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 		"perms.orgs_can_admin":
 			label:"授权部门: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 
 		app:
 			label:"所属应用"
@@ -275,8 +317,15 @@ Creator.Objects.flows =
 			multiple: true
 			is_wide: true
 			group: "分发"
-			filter_by_company: true
 			blackbox: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 		distribute_to_self:
 			label:"分发给自己"
 			type: "boolean"

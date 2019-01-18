@@ -16,7 +16,6 @@ Creator.Objects.flow_positions =
 			# 	if companyId
 			# 		selector['company_id'] = companyId
 			# 	return selector
-			filter_by_company: true
 
 		users:
 			type: "lookup"
@@ -24,14 +23,28 @@ Creator.Objects.flow_positions =
 			reference_to: "users"
 			multiple: true
 			required: true
-			filter_by_company: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 
 		org:
 			type: "lookup"
 			label: "管辖范围"
 			reference_to: "organizations"
 			required: true
-			filter_by_company: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 
 		company_id:
 			required: Meteor.settings?.public?.is_group_company

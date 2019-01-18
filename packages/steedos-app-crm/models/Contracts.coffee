@@ -39,7 +39,6 @@ Creator.Objects.contracts =
 			label: "对方单位"
 			type: "master_detail"
 			reference_to: "accounts"
-			filter_by_company: true
 		customer_contact:
 			label: "联系人"
 			type: "master_detail"

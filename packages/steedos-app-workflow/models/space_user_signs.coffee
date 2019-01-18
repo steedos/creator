@@ -11,7 +11,14 @@ Creator.Objects.space_user_signs =
 			reference_to: "users"
 			required: true
 			is_name: true
-			filter_by_company: true
+			is_company_limited: (permissions)->
+				# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+				# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+				permissions = permissions?.get()
+				if permissions?.viewAllRecords
+					return false
+				else
+					return true
 
 		sign:
 			type: "avatar"

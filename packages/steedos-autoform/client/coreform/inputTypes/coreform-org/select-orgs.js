@@ -56,11 +56,6 @@ Template.afSelectOrg.events({
 		if ("disabled" in template.data.atts)
 			return;
 
-		if(template.data.atts.filter_by_company && !Steedos.isSpaceAdmin() && !Steedos.isCloudAdmin()){
-			company_id = db.space_users.findOne({space: Session.get('spaceId'), user: Meteor.userId()}, {fields: {company_id:1}}).company_id
-			event.currentTarget.dataset.rootOrg = company_id
-		}
-
 		try{
 			if (AutoForm.getCurrentDataForForm()){
 				var fieldSchema = AutoForm.getSchemaForField(template.data.name);

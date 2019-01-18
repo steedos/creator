@@ -101,8 +101,6 @@ Creator.getObjectSchema = (obj) ->
 
 				fs.autoform.filters = field.filters
 
-				fs.autoform.filter_by_company = field.filter_by_company
-
 				fs.autoform.dependOn = field.depend_on
 
 				if field.beforeOpenFunction
@@ -150,6 +148,16 @@ Creator.getObjectSchema = (obj) ->
 
 					if field.reference_to == "users"
 						fs.autoform.type = "selectuser"
+						fs.autoform.is_company_only = field.is_company_only
+						if !field.hidden && !field.omit && _.isFunction field.is_company_limited
+							if Meteor.isClient
+								# 传入当前对象的权限，在函数中根据权限计算是否要限制只查看本单位
+								fs.autoform.is_company_limited = field.is_company_limited(obj.permissions)
+							else
+								# 服务端用不到is_company_limited
+								fs.autoform.is_company_limited = true
+						else
+							fs.autoform.is_company_limited = field.is_company_limited
 					else if field.reference_to == "organizations"
 						fs.autoform.type = "selectorg"
 						fs.autoform.is_company_only = field.is_company_only
