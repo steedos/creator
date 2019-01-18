@@ -75,10 +75,9 @@ Creator.Objects.spaces =
 		balance:
 			label:'账户余额'
 			type:"number"
-			group: "账务"
 			scale:2
 			omit: true
-			readonly: true
+			hidden:true
 		services:
 			type: "object"
 			blackbox: true
