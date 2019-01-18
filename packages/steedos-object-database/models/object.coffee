@@ -36,6 +36,8 @@ Creator.Objects.objects =
 			type: "boolean"
 		enable_notes:
 			type: "boolean"
+		enable_events:
+			type: "boolean"
 		enable_api:
 			type: "boolean"
 			defaultValue: true

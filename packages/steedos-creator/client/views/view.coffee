@@ -412,7 +412,7 @@ Template.creator_view.events
 			recordObjectName = Creator.getObjectRecord().name
 			Session.set 'cmDoc', {"#{relatedKey}": recordObjectName}
 		else if relatedKey
-			Session.set 'cmDoc', {"#{relatedKey}": {o: Session.get("object_name"), ids: [relatedValue]}}
+			Session.set 'cmDoc', {"#{relatedKey}": {o: Creator.getObject(Session.get("object_name"))._collection_name, ids: [relatedValue]}}
 
 		Session.set("action_fields", undefined)
 		Session.set("action_collection", collection)

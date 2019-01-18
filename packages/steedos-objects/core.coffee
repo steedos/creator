@@ -188,6 +188,8 @@ Creator.getObjectRelateds = (object_name)->
 		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
 	if _object.enable_notes
 		related_objects.push {object_name:"notes", foreign_key: "related_to"}
+	if _object.enable_events
+		related_objects.push {object_name:"events", foreign_key: "related_to"}
 	if _object.enable_instances
 		related_objects.push {object_name:"instances", foreign_key: "record_ids"}
 

@@ -48,7 +48,7 @@ Creator.Objects.events =
 			reference_to: ()->
 				o = []
 				_.each Creator.Objects, (object, object_name)->
-					if object.enable_tasks
+					if object.enable_events
 						o.push object_name
 				return o 
 
