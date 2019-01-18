@@ -170,7 +170,6 @@ if Meteor.isClient
 
 		if selector.length == 0
 			return undefined
-		# selector = [[[["object_name", "=", "tasks"]], "and", [["object_name", "=", "project_issues"]]]]
 		return selector
 
 	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id, list_view_id)->
