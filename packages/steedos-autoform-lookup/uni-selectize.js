@@ -551,10 +551,6 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 	}
 
 	// self.loading.set(true);
-	var permissions = {};
-	if (params && params.space && params.reference_to && Meteor.userId()) {
-		permissions = Creator.getPermissions(params.reference_to, params.space, Meteor.userId());
-	}
 
 	if(self.dataSourceType != 'method'){
 		var options = DataSource.Odata.lookup_options(searchVal);
