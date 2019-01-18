@@ -34,6 +34,7 @@ UniSelectize = function (options, template, filtersFunction, optionsFunction, cr
 	this.optionsSort = options.optionsSort
 	this.filtersFunction = filtersFunction;
 	this.createFunction = createFunction;
+	this.dataSourceType = options.dataSourceType
 
 	this.optionsLimit = options.optionsLimit
 
@@ -561,7 +562,7 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 		}
 	}
 
-	if(Session.get('lookupDataSourceType') != 'method'){
+	if(self.dataSourceType != 'method'){
 		var options = DataSource.Odata.lookup_options(searchVal);
 		if (params) {
 			self.removeUnusedItems(options);
