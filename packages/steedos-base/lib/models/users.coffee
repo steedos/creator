@@ -416,10 +416,13 @@ if Meteor.isServer
 			space_name = doc.company || doc.profile?.company
 			unless space_name
 				space_name = doc.name + " " + trl("space")
+			newId = db.spaces._makeNewID()
 			db.spaces.insert
+				_id: newId
 				name: space_name
 				owner: doc._id
 				admins: [doc._id]
+				space: newId
 
 		try
 			if !doc.services || !doc.services.password || !doc.services.password.bcrypt

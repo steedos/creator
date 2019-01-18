@@ -297,6 +297,7 @@ if Meteor.isServer
 				invite_state: "accepted"
 				created: now
 				created_by: userId
+				owner: userId
 			root_org.updateUsers()
 
 	db.spaces.createTemplateOrganizations = (space_id)->
