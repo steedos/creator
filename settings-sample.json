@@ -122,5 +122,8 @@
         "app_id2": {
             "enabled": true
         }
+    },
+    "email": {
+        "from": "Steedos <noreply@message.steedos.com>"
     }
 }
