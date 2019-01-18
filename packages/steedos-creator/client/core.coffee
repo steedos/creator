@@ -90,7 +90,7 @@ if Meteor.isClient
 					filters_set.filter_scope = code_filters_set.filter_scope
 				if _.isFunction(filters_set.filters) or filters_set.filters?.length
 					if _.isFunction(code_filters_set.filters) or code_filters_set.filters?.length
-						# 取AND连接逻辑
+						# 取AND连接逻辑，这里依赖了Creator.formatFiltersToDev函数中支持任意层的and或or连接的子filter为function的功能
 						filters_set.filters = [[filters_set.filters, "and", code_filters_set.filters]]
 				else
 					filters_set.filters = code_filters_set.filters
@@ -103,9 +103,16 @@ if Meteor.isClient
 		filters = filters_set.filters
 		selector = []
 		# 整个过虑器是函数的话解析出来
-		# filters内部任意层支持value为function
-		# 也支持任意层的and或or连接的子filter为function的情况，比如[function(){...},"or",function(){}]
-		# filters内部任意层支持function已经有地方在用了，由Creator.formatFiltersToDev函数负责解析
+		# filters内部子filter为function时也是支持的，由Creator.formatFiltersToDev函数负责解析
+		# 理论上支持两种功能：
+		# 1.filters内部任意层支持value为function
+		# 2.支持任意层的and或or连接的子filter为function的情况，比如[function(){...},"or",function(){}]
+		# 实现上由于后台bootstrap接口返回的function对象需要额外解析转换，见Creator.convertObject函数视图转换部分
+		# 否则function部分返回的是null，所以实际上代码中编辑的视图过虑条件只支持：
+		# 1.filters内部支持value为function，但是不支持多层，只支持一层
+		# 2.and或or连接的子filter为function的情况不支持
+		# 要注意的是对于不需要后台接口转换的情况，是完全能支持以上两种任意层function方案的，
+		# 比如上面取AND连接逻辑把代码中配置的过虑条件与过滤器中设置的过滤条件合并的代码就使用了第二种功能
 		if _.isFunction(filters)
 			filters = filters()
 
@@ -163,6 +170,7 @@ if Meteor.isClient
 
 		if selector.length == 0
 			return undefined
+		# selector = [[[["object_name", "=", "tasks"]], "and", [["object_name", "=", "project_issues"]]]]
 		return selector
 
 	Creator.getODataRelatedFilter = (object_name, related_object_name, record_id, list_view_id)->
