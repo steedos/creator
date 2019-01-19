@@ -52,6 +52,7 @@ Meteor.startup ->
 					queryOptions = visitorParser(include)
 					if _.isString field.reference_to
 						referenceToCollection = Creator.getCollection(field.reference_to, spaceId)
+						_ro_NAME_FIELD_KEY = Creator.getObject(field.reference_to, spaceId)?.NAME_FIELD_KEY
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]
 								if field.multiple
@@ -62,16 +63,27 @@ Meteor.startup ->
 										entities[idx][navigationProperty] = originalData
 									#排序
 									entities[idx][navigationProperty] = Creator.getOrderlySetByIds(entities[idx][navigationProperty], originalData)
+									entities[idx][navigationProperty] = _.map entities[idx][navigationProperty], (o)->
+										o['reference_to.o'] = referenceToCollection._name
+										o['reference_to._o'] = field.reference_to
+										o['_NAME_FIELD_VALUE'] = o[_ro_NAME_FIELD_KEY]
+										return o
 								else
 									singleQuery = _.extend {_id: entity[navigationProperty]}, include.query
 
 									# 特殊处理在相关表中没有找到数据的情况，返回原数据
 									entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions) || entities[idx][navigationProperty]
-
+									if entities[idx][navigationProperty]
+										entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
+										entities[idx][navigationProperty]['reference_to._o'] = field.reference_to
+										entities[idx][navigationProperty]['_NAME_FIELD_VALUE'] = entities[idx][navigationProperty][_ro_NAME_FIELD_KEY]
 					if _.isArray field.reference_to
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]?.ids
 								_o = entity[navigationProperty].o
+								_ro_NAME_FIELD_KEY = Creator.getObject(_o, spaceId)?.NAME_FIELD_KEY
+								if queryOptions?.fields && _ro_NAME_FIELD_KEY
+									queryOptions.fields[_ro_NAME_FIELD_KEY] = 1
 								referenceToCollection = Creator.getCollection(entity[navigationProperty].o, spaceId)
 								if referenceToCollection
 									if field.multiple
@@ -79,6 +91,8 @@ Meteor.startup ->
 										multiQuery = _.extend {_id: {$in: entity[navigationProperty].ids}}, include.query
 										entities[idx][navigationProperty] = _.map referenceToCollection.find(multiQuery, queryOptions).fetch(), (o)->
 											o['reference_to.o'] = referenceToCollection._name
+											o['reference_to._o'] = _o
+											o['_NAME_FIELD_VALUE'] = o[_ro_NAME_FIELD_KEY]
 											return o
 										#排序
 										entities[idx][navigationProperty] = Creator.getOrderlySetByIds(entities[idx][navigationProperty], _ids)
@@ -88,6 +102,7 @@ Meteor.startup ->
 										if entities[idx][navigationProperty]
 											entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
 											entities[idx][navigationProperty]['reference_to._o'] = _o
+											entities[idx][navigationProperty]['_NAME_FIELD_VALUE'] = entities[idx][navigationProperty][_ro_NAME_FIELD_KEY]
 
 				else
 				# TODO

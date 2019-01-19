@@ -327,7 +327,7 @@ Template.creator_view.helpers
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
 	show_chatter: ()->
-		return Creator.subs["CreatorRecord"].ready() && Creator.getObjectRecord()
+		return Creator.subs["Creator"].ready() && Creator.getObjectRecord()
 
 Template.creator_view.events
 
