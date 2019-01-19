@@ -31,8 +31,8 @@ Template.steedos_record_chat_messages.helpers
 	ownerAvatarUrl: (owner)->
 		avatarUrl = Creator.getCollection("users").findOne(owner)?.avatarUrl
 		if !avatarUrl
-			avatarUrl = Creator.getRelativeUrl("/packages/steedos_lightning-design-system/client/images/themes/oneSalesforce/lightning_lite_profile_avatar_96.png")
-		return avatarUrl
+			return Creator.getRelativeUrl("/packages/steedos_lightning-design-system/client/images/themes/oneSalesforce/lightning_lite_profile_avatar_96.png")
+		return Steedos.absoluteUrl avatarUrl
 
 	permissions: ()->
 		permissions = Creator.getRecordPermissions('chat_messages', this, Meteor.userId())
