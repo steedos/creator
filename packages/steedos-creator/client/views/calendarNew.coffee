@@ -346,10 +346,17 @@ showCurrentDate = (e) ->
 	scheduler.option("currentDate", new Date());
 
 getCellContextMenuItems = (options)->
-	menuItems = [
-		{ text: '分组/取消分组', beginGroup: true, onItemClick: groupCell },
-		{ text: '去今天', onItemClick: showCurrentDate }
-	]
+	if options.groups
+		menuItems = [
+			{ text: '分组/取消分组', beginGroup: true, onItemClick: groupCell },
+			{ text: '去今天', onItemClick: showCurrentDate }
+		]
+	else
+		menuItems = [
+			{ text: '去今天', beginGroup: true, onItemClick: showCurrentDate }
+		]
+
+
 	permission = getPermission()
 	if permission.allowCreate
 		menuItems.unshift { text: '新建', onItemClick: _newData }
