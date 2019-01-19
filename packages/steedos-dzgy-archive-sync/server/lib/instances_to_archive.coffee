@@ -49,9 +49,10 @@ _minxiInstanceData = (formData, instance) ->
 		formData.flow_category = flow?.category
  	
 	# 公文分类
+	# if flow?.field_map["gongwenfenlei"]
+	# 	gongwenfenlei = flow?.field_map["gongwenfenlei"]
+	# else
 	gongwenfenlei = "大众公用"
-	if flow?.field_map["gongwenfenlei"]
-		gongwenfenlei = flow?.field_map["gongwenfenlei"]
 		
 	classification = Creator.Collections["archive_classification"].findOne({name:gongwenfenlei},{fields:{_id:1}})
 	formData.classification = classification?._id
@@ -125,6 +126,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 	object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
 	parents = []
 	spaceId = instance?.space
+	apps_url = RecordsSync?.settings_records_sync?.to_archive?.apps_url
 
 	# 查找最新版本的文件(包括正文附件)
 	currentFiles = cfs.instances.find({
@@ -137,6 +139,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 	currentFiles.forEach (cf)->
 		try
 			instance_file_path = RecordsSync?.settings_records_sync?.instance_file_path
+			
 			versions = []
 			# 根据当前的文件,生成一个cms_files记录
 			cmsFileId = collection._makeNewID()
@@ -171,7 +174,12 @@ _minxiAttachmentInfo = (instance, record_id) ->
 			historyFiles.push(cf)
 			# 历史版本文件+当前文件 上传到creator
 			historyFiles.forEach (hf) ->
-				instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
+				# 文件存本地还是存云服务器
+				if instance_file_key
+					instance_file_key = path.join(instance_file_path, hf?.copies?.instances?.key)
+				else
+					instance_file_key = apps_url + "api/files/instances/" + hf._id;
+				
 				if fs.existsSync(instance_file_key)
 					newFile = new FS.File()
 					if fs.createReadStream(instance_file_key)
@@ -362,7 +370,7 @@ _minxiInstanceTraces = (auditList, instance, record_id) ->
 # ins_ids: Array 需要同步的表单ID
 InstancesToArchive = (spaces, flows, ins_ids) ->
 	@spaces = spaces
-	@flows = flows
+	# @flows = flows 默认归档全部流程
 	@ins_ids = ins_ids
 	return
 
@@ -409,7 +417,7 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 InstancesToArchive::getInstances = ()->
 	query = {
 		space: {$in: @spaces},
-		flow: {$in: @flows},
+		# flow: {$in: @flows},默认归档全部流程
 		# is_archived 字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
 		# 正常情况下，未归档的表单无 is_recorded 字段
 		$or: [
@@ -425,8 +433,6 @@ InstancesToArchive::getInstances = ()->
 	return Creator.Collections["instances"].find(query, {fields: {_id: 1}}).fetch()
 
 InstancesToArchive::syncInstances = () ->
-	console.time("syncInstances")
-
 	instances = @getInstances()
 	that = @
 	instances.forEach (mini_ins)->

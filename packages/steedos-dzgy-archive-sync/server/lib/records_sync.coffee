@@ -37,9 +37,9 @@ RecordsSync.instanceToArchive = (ins_ids)->
 		logger.error "缺少settings配置: records-sync.spaces"
 		return
 	
-	if !need_recorded_flows
-		logger.error "缺少settings配置: records-sync.need_recorded_flows"
-		return
+	# if !need_recorded_flows
+	# 	logger.error "缺少settings配置: records-sync.need_recorded_flows"
+	# 	return
 
 	instancesToArchive = new InstancesToArchive(spaces, need_recorded_flows, ins_ids)
 
