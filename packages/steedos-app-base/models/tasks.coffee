@@ -51,7 +51,7 @@ Creator.Objects.tasks =
 				o = []
 				_.each Creator.Objects, (object, object_name)->
 					if object.enable_tasks
-						o.push object_name
+						o.push object.name
 				return o
 
 		description:

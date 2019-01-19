@@ -49,7 +49,7 @@ Creator.Objects.events =
 				o = []
 				_.each Creator.Objects, (object, object_name)->
 					if object.enable_events
-						o.push object_name
+						o.push object.name
 				return o 
 
 		is_all_day:

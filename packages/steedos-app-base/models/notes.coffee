@@ -23,7 +23,7 @@ Creator.Objects.notes =
 				o = []
 				_.each Creator.Objects, (object, object_name)->
 					if object.enable_notes
-						o.push object_name
+						o.push object.name
 				return o 
 
 	list_views:
