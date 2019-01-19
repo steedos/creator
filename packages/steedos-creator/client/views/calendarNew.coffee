@@ -79,7 +79,6 @@ _dataSource = (options) ->
 
 _getAppointmentTemplate = (options)->
 	appointmentTemplate = (data)->
-		console.log('data', data);
 		title = data[options.textExpr || 'name'];
 		if options.title && _.isArray(options.title) && options.title.length > 0
 			title = ''
@@ -175,9 +174,6 @@ _getTooltipTemplate = (data, options) ->
 				<span class="dx-button-text">编辑</span>
 			</div>
 		"""
-
-	console.log('options', options);
-
 	titleView = ""
 	fields = Creator.getObject().fields;
 	_.each options.title, (key)->
@@ -292,7 +288,6 @@ setResource = (data, fieldName, value)->
 		dxSchedulerInstance.repaint()
 
 getAppointmentContextMenuItems = (e, options)->
-	console.log('getAppointmentContextMenuItems', e);
 	menuItems = []
 
 	permission = getPermission(e.targetedAppointmentData)
