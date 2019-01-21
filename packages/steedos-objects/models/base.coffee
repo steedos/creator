@@ -54,6 +54,20 @@ Creator.baseObject =
 			omit: true
 			index: true
 			hidden: true
+		deleted:
+			label:"删除时间"
+			type: "datetime"
+			readonly: true
+			sortable: true
+			index: true
+			omit: true
+		deleted_by:
+			label:"删除人"
+			type: "lookup"
+			readonly: true
+			reference_to: "users"
+			disabled: true
+			omit: true
 		instances:
 			label:"申请单"
 			type: "grid"
