@@ -6,6 +6,8 @@ Creator.Objects.contracts =
 	enable_search: true
 	enable_tasks: true
 	enable_notes: true
+	enable_events: true
+#	enable_audit: true
 	enable_api: true
 	enable_instances: true
 	fields:
@@ -170,7 +172,7 @@ Creator.Objects.contracts =
 				{label:"已验收",value: "已验收"},
 				{label:"完毕",value: "完毕"},
 				{label:"违约但继续履行",value: "违约但继续履行"}],
-			allowedValues:["未签订","进行中","解除","异常","完毕","违约但继续履行"]
+			allowedValues:["未签订","进行中","解除","异常","已验收", "完毕","违约但继续履行"]
 			required:true
 
 		fileid:
