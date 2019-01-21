@@ -37,8 +37,18 @@ Creator.Objects.space_users =
 			multiple: true
 			omit: true
 		company_id:
+			label: "主单位"
 			hidden: false
 			readonly: true
+		company_ids:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			multiple: true
+			index: true
+			is_company_only: true
+			omit: true
+			hidden: true
 		manager:
 			type: "lookup"
 			label:'上级主管'
