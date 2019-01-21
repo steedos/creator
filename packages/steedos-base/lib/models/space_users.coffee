@@ -48,7 +48,8 @@ Creator.Objects.space_users =
 			index: true
 			is_company_only: true
 			omit: true
-			hidden: true
+			hidden: false
+			readonly: true
 		manager:
 			type: "lookup"
 			label:'上级主管'
@@ -442,16 +443,15 @@ Meteor.startup ()->
 
 			if doc.organizations
 				db.space_users.update_organizations_parents(doc._id, doc.organizations)
+				db.space_users.update_company_ids(doc._id)
 
 		db.space_users.before.update (userId, doc, fieldNames, modifier, options) ->
 			modifier.$set = modifier.$set || {};
 
 			db.space_users.updatevaildate(userId, doc, modifier)
 			if modifier.$set.organizations && modifier.$set.organizations.length > 0
-				# 修改所有组织且修改后的组织不包含原主组织，则把主组织自动设置为第一个组织
-				unless modifier.$set.organizations.includes doc.organization
-					modifier.$set.organization = modifier.$set.organizations[0]
-
+				# 修改所有组织后，强制把主组织自动设置为第一个组织
+				modifier.$set.organization = modifier.$set.organizations[0]
 			if modifier.$set.organization
 				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1, parent:1, is_company:1})
 				if organization
@@ -610,6 +610,7 @@ Meteor.startup ()->
 
 			if modifier.$set.organizations
 				db.space_users.update_organizations_parents(doc._id, modifier.$set.organizations)
+				db.space_users.update_company_ids(doc._id)
 
 
 		db.space_users.before.remove (userId, doc) ->
@@ -670,6 +671,24 @@ Meteor.startup ()->
 			orgs = db.organizations.find({_id: {$in: organizations}}, {fields: {parents: 1}}).fetch()
 			organizations_parents = _.compact(_.uniq(_.flatten([organizations, _.pluck(orgs, 'parents')])))
 			db.space_users.direct.update({_id: _id}, {$set: {organizations_parents: organizations_parents}})
+		
+		db.space_users.update_company_ids = (_id, rootOrgId)->
+			su = db.space_users.findOne({_id: _id}, {fields: {organizations: 1, company_id: 1, space: 1}})
+			unless su
+				console.error "db.space_users.update_company_ids,can't find space_users by _id of:", _id
+				return
+			unless rootOrgId
+				rootOrgId = db.organizations.findOne({space: su.space, parent: null, is_company: true},fields:{_id:1})?._id
+			orgs = db.organizations.find({_id: {$in: su.organizations}}, {fields: {company_id: 1}}).fetch()
+			company_ids = _.pluck(orgs, 'company_id')
+			# company_ids中的空值表示根组织，需要转换成真实的根组织ID值
+			company_ids = company_ids.map((n)->
+				return if n then n else rootOrgId
+			)
+			company_ids = _.uniq(company_ids)
+			# 如果company_id为空则设置为根组织ID值
+			company_id = if su.company_id then su.company_id else rootOrgId
+			db.space_users.direct.update({_id: _id}, {$set: {company_ids: company_ids, company_id: company_id}})
 
 
 		Meteor.publish 'space_users', (spaceId)->
