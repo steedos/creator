@@ -5,4 +5,4 @@ Creator.Apps.crm =
 	icon: "ion-ios-people-outline" 
 	icon_slds: "account" 
 	is_creator:true
-	objects: ["contracts", "accounts", "contract_types", "contract_payments", "contract_receipts", "contacts", "tasks", "reports", "events"]
+	objects: ["contracts", "accounts", "contract_types", "contract_payments", "contract_receipts", "contacts", "tasks", "events", "reports"]
