@@ -174,6 +174,10 @@ Meteor.startup ->
 			companyId = query.company_id = su.company_id
 		return su.company_id == companyId
 
+	# 不返回已假删除的数据
+	excludeDeleted = (query)->
+		query.is_deleted = { $ne: true }
+
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
 			try
@@ -270,6 +274,9 @@ Meteor.startup ->
 						else
 							createQuery.query.owner = @userId
 					entities = []
+
+					excludeDeleted(createQuery.query)
+
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
@@ -700,26 +707,47 @@ Meteor.startup ->
 				recordData = collection.findOne({_id: @urlParams._id}, { fields: { owner: 1, company_id: 1 } })
 				record_owner = recordData?.owner
 				companyId = recordData?.company_id
-				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.allowDelete and record_owner==@userId ) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId))
+				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId)) or (permissions.allowDelete and record_owner==@userId )
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest'
 						delete selector.space
-					if collection.remove selector
-						headers = {}
-						body = {}
-						# entities.push entity
-						# body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
-						# entity_OdataProperties = setOdataProperty(entities,spaceId, key)
-						# _.extend body,entity_OdataProperties[0]
-						headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
-						headers['OData-Version'] = SteedosOData.VERSION
-						{headers: headers,body:body}
+
+					if object?.enable_trash
+						entityIsUpdated = collection.update(selector, {
+							$set: {
+								is_deleted: true,
+								deleted: new Date(),
+								deleted_by: @userId
+							}
+						})
+						if entityIsUpdated
+							headers = {}
+							body = {}
+							headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
+							headers['OData-Version'] = SteedosOData.VERSION
+							{headers: headers,body:body}
+						else
+							return{
+								statusCode: 404
+								body: setErrorMessage(404,collection,key)
+							}
 					else
-						return{
-							statusCode: 404
-							body: setErrorMessage(404,collection,key)
-						}
+						if collection.remove selector
+							headers = {}
+							body = {}
+							# entities.push entity
+							# body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
+							# entity_OdataProperties = setOdataProperty(entities,spaceId, key)
+							# _.extend body,entity_OdataProperties[0]
+							headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
+							headers['OData-Version'] = SteedosOData.VERSION
+							{headers: headers,body:body}
+						else
+							return{
+								statusCode: 404
+								body: setErrorMessage(404,collection,key)
+							}
 				else
 					return {
 						statusCode: 403

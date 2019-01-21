@@ -49,6 +49,8 @@ Creator.Objects.objects =
 			type: "boolean"
 		enable_chatter:
 			type: "boolean"
+		enable_trash:
+			type: "boolean"
 		is_view:
 			type: 'boolean'
 			defaultValue: false

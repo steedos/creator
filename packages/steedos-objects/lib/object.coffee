@@ -39,6 +39,7 @@ Creator.Object = (options)->
 	self.calendar = _.clone(options.calendar)
 	self.sidebar = _.clone(options.sidebar)
 	self.enable_chatter = options.enable_chatter
+	self.enable_trash = options.enable_trash
 	if (!options.fields)
 		throw new Error('Creator.Object options must specify name');
 
