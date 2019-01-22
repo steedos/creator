@@ -189,16 +189,19 @@ Template.filter_option_list.onCreated ->
 				field = fields[filter.field]
 				fieldType = field?.type
 				if fieldType == 'lookup' or fieldType =='master_detail' or fieldType=='select'
-					reference_to_objects = []
-					if field?.reference_to
-						if field.reference_to.constructor == Array
-							reference_to_objects = field.reference_to
-						else
-							reference_to_objects.push field.reference_to
-						reference_to_objects.forEach (reference_to_object)->
+					if field?.reference_to && filter.value
+						reference_to_object = field?.reference_to
+						reference_to_value = filter.value
+						if !_.isString(reference_to_object)
+							reference_to_object = filter.value?.o
+							reference_to_value = filter.value?.ids
+							if reference_to_object && !reference_to_value
+								filter.valuelabel = Creator.getObject(reference_to_object)?.label || ''
+
+						if reference_to_object && reference_to_value
 							name_field = Creator.getObject(reference_to_object).NAME_FIELD_KEY
 							if filter.value
-								Meteor.call 'getValueLable',reference_to_object,name_field,filter.value,
+								Meteor.call 'getValueLable',reference_to_object,name_field,reference_to_value, Session.get("spaceId"),
 									(error,result)->
 										if result
 											filter.valuelabel = result

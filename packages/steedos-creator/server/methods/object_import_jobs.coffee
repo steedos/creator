@@ -154,7 +154,7 @@ Meteor.methods
 		importObject importObj,space
 		endtime = new Date()
 		Creator.Collections["queue_import"].direct.update(importObj._id,{$set:{start_time:starttime,end_time:endtime}})
-	getValueLable:(reference_to_object,name_field,value)->
+	getValueLable:(reference_to_object,name_field,value,space_id)->
 		unless value
 			return ""
 		ids = []
@@ -164,7 +164,7 @@ Meteor.methods
 			ids.push value
 		fields = {_id: 1}
 		fields[name_field] = 1
-		results =  Creator.getCollection(reference_to_object).find({_id:{$in:value}},{fields: fields}).fetch()
+		results =  Creator.getCollection(reference_to_object,space_id).find({_id:{$in:value}},{fields: fields}).fetch()
 		data = []
 		_.each results ,(result)->
 			data.push result[name_field]

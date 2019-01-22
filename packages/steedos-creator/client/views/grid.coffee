@@ -46,6 +46,28 @@ _standardQuery = (curObjectName, standard_query)->
 
 					else if ["boolean"].includes(object_fields[key].type)
 						query_arr.push([key, "=", JSON.parse(val)])
+
+					else if ["lookup", "master_detail"].includes(object_fields[key].type)
+						_f = object_fields[key]
+						_reference_to = _f?.reference_to
+						if _.isFunction(_reference_to)
+							_reference_to = _reference_to()
+						if _.isArray(_reference_to)
+							if val?.ids
+								query_arr.push {
+									field: key+".ids"
+									operation: '='
+									value: val?.ids
+								}
+							if val?.o
+								_ro = Creator.getObject(val?.o)
+								query_arr.push {
+									field: key+".o"
+									operation: '='
+									value: _ro._collection_name
+								}
+						else
+							query_arr.push([key, "=", val])
 					else
 						query_arr.push([key, "=", val])
 				else
@@ -353,6 +375,26 @@ Template.creator_grid.onRendered ->
 								if ['<>','notcontains'].includes(fi.operation)
 									is_logic_or = false
 								_filters.push Creator.formatFiltersToDev(query_or, {is_logic_or: is_logic_or})
+					if ["lookup", "master_detail"].includes(_f?.type)
+						_reference_to = _f?.reference_to
+						if _.isFunction(_reference_to)
+							_reference_to = _reference_to()
+						if _.isArray(_reference_to)
+							if fi.value?.ids
+								_filters.push {
+									field: fi.field+".ids"
+									operation: fi.operation
+									value: fi.value?.ids
+								}
+							if fi.value?.o
+								_ro = Creator.getObject(fi.value?.o)
+								_filters.push {
+									field: fi.field+".o"
+									operation: fi.operation
+									value: _ro._collection_name
+								}
+						else
+							_filters.push fi
 					else
 						_filters.push fi
 
