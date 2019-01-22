@@ -94,7 +94,7 @@ insertRecord = (userId, object_name, new_doc)->
 	doc = {
 		_id: collection._makeNewID()
 		space: space_id
-		name: "已创建。"
+		field_name: "已创建。"
 		related_to: {
 			o: object_name
 			ids: [record_id]
@@ -204,7 +204,7 @@ updateRecord = (userId, object_name, new_doc, previous_doc, modifier)->
 			doc = {
 				_id: collection._makeNewID()
 				space: space_id
-				name: field.label || field.name
+				field_name: field.label || field.name
 				previous_value: db_previous_value
 				new_value: db_new_value
 				related_to: {
@@ -223,7 +223,7 @@ updateRecord = (userId, object_name, new_doc, previous_doc, modifier)->
 			doc = {
 				_id: collection._makeNewID()
 				space: space_id
-				name: field.label || field.name
+				field_name: field.label || field.name
 				previous_value: db_previous_value
 				related_to: {
 					o: object_name
