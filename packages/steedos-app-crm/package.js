@@ -23,6 +23,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/Contacts.coffee','server');
 	api.addFiles('models/Contracts.coffee','server');
 	api.addFiles('models/contract_type.coffee','server');
+	api.addFiles('models/contract_acceptance.coffee','server');
 	api.addFiles('models/Payments.coffee','server');
 	api.addFiles('models/Receipts.coffee','server');
 	api.addFiles('reports/company.coffee','server');
