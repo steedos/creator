@@ -170,6 +170,8 @@ Creator.getObjectSchema = (obj) ->
 								else
 									# 服务端用不到is_company_limited
 									fs.autoform.is_company_limited = true
+							else
+								fs.autoform.is_company_limited = field.is_company_limited
 						else
 							fs.autoform.is_company_limited = field.is_company_limited
 					else if field.reference_to == "organizations"
@@ -196,6 +198,8 @@ Creator.getObjectSchema = (obj) ->
 								else
 									# 服务端用不到is_company_limited
 									fs.autoform.is_company_limited = true
+							else
+								fs.autoform.is_company_limited = field.is_company_limited
 						else
 							fs.autoform.is_company_limited = field.is_company_limited
 					else
