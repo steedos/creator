@@ -161,12 +161,25 @@ InstanceRecordQueue.Configure = function (options) {
 	self.syncInsFields = ['name', 'submitter_name', 'applicant_name', 'applicant_organization_name', 'applicant_organization_fullname', 'state',
 		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision'
 	];
-	self.syncValues = function (obj, field_map_back, values, ins) {
+	self.syncValues = function (obj, field_map_back, values, ins, objectInfo) {
 		var
 			tableFieldCodes = [],
 			tableFieldMap = [];
 
 		field_map_back = field_map_back || [];
+
+		var form = Creator.getCollection("forms").findOne(ins.form);
+		var formFields = null;
+		if (form.current._id === ins.form_version) {
+			formFields = form.current.fields || [];
+		} else {
+			var formVersion = _.find(ins.historys, function (h) {
+				return h._id === ins.form_version;
+			})
+			formFields = formVersion ? formVersion.fields : [];
+		}
+
+		var objectFields = objectInfo.fields;
 
 		field_map_back.forEach(function (fm) {
 			// 判断是否是子表字段
@@ -182,14 +195,26 @@ InstanceRecordQueue.Configure = function (options) {
 				}
 
 			} else if (values.hasOwnProperty(fm.workflow_field)) {
-				obj[fm.object_field] = values[fm.workflow_field];
-			} else{
+				var wField = _.find(formFields, function (ff) {
+					return ff.code === fm.workflow_field;
+				});
+
+				var oField = objectFields[fm.object_field];
+
+				// 表单选人选组字段 至 对象 lookup master_detail类型字段同步
+				if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to) ) {
+					obj[fm.object_field] = values[fm.workflow_field]['id'];
+				} else {
+					obj[fm.object_field] = values[fm.workflow_field];
+				}
+
+			} else {
 				if (fm.workflow_field.startsWith('instance.')) {
 					var insField = fm.workflow_field.split('instance.')[1];
 					if (self.syncInsFields.includes(insField))
 						obj[fm.object_field] = ins[insField];
-				}else{
-					if(ins[fm.workflow_field]){
+				} else {
+					if (ins[fm.workflow_field]) {
 						obj[fm.object_field] = ins[fm.workflow_field];
 					}
 				}
@@ -229,7 +254,9 @@ InstanceRecordQueue.Configure = function (options) {
 			flow: 1,
 			values: 1,
 			applicant: 1,
-			space: 1
+			space: 1,
+			form: 1,
+			form_version: 1
 		};
 		self.syncInsFields.forEach(function (f) {
 			fields[f] = 1;
@@ -237,7 +264,8 @@ InstanceRecordQueue.Configure = function (options) {
 		var ins = Creator.getCollection('instances').findOne(insId, {
 			fields: fields
 		});
-		var values = ins.values, spaceId = ins.space;
+		var values = ins.values,
+			spaceId = ins.space;
 
 		if (records) {
 			// 此情况属于从creator中发起审批
@@ -249,6 +277,7 @@ InstanceRecordQueue.Configure = function (options) {
 			var
 				objectCollection = Creator.getCollection(objectName, spaceId),
 				sync_attachment = ow.sync_attachment;
+			var objectInfo = Creator.getObject(objectName, spaceId);
 			objectCollection.find({
 				_id: {
 					$in: records[0].ids
@@ -258,7 +287,7 @@ InstanceRecordQueue.Configure = function (options) {
 				try {
 					var setObj = {};
 
-					self.syncValues(setObj, ow.field_map_back, values, ins);
+					self.syncValues(setObj, ow.field_map_back, values, ins, objectInfo);
 
 					setObj['instances.$.state'] = 'completed';
 					setObj.locked = false;
@@ -319,7 +348,9 @@ InstanceRecordQueue.Configure = function (options) {
 						newRecordId = objectCollection._makeNewID(),
 						objectName = ow.object_name;
 
-					self.syncValues(newObj, ow.field_map_back, values, ins);
+					var objectInfo = Creator.getObject(ow.object_name, spaceId);
+
+					self.syncValues(newObj, ow.field_map_back, values, ins, objectInfo);
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
