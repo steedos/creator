@@ -151,24 +151,24 @@ updateRecord = (userId, object_name, new_doc, previous_doc, modifier)->
 						db_previous_value = transformFieldValue(field, previous_value, options)
 			when 'textarea'
 				if previous_value != new_value
-					db_previous_value = nsformFieldValue(field, previous_value, options)
-					db_new_value = nsformFieldValue(field, new_value, options)
+					db_previous_value = transformFieldValue(field, previous_value, options)
+					db_new_value = transformFieldValue(field, new_value, options)
 			when 'code'
 				if previous_value != new_value
-					db_previous_value = nsformFieldValue(field, previous_value, options)
-					db_new_value = nsformFieldValue(field, new_value, options)
+					db_previous_value = transformFieldValue(field, previous_value, options)
+					db_new_value = transformFieldValue(field, new_value, options)
 			when 'html'
 				if previous_value != new_value
-					db_previous_value = nsformFieldValue(field, previous_value, options)
-					db_new_value = nsformFieldValue(field, new_value, options)
+					db_previous_value = transformFieldValue(field, previous_value, options)
+					db_new_value = transformFieldValue(field, new_value, options)
 			when 'markdown'
 				if previous_value != new_value
-					db_previous_value = nsformFieldValue(field, previous_value, options)
-					db_new_value = nsformFieldValue(field, new_value, options)
+					db_previous_value = transformFieldValue(field, previous_value, options)
+					db_new_value = transformFieldValue(field, new_value, options)
 			when 'grid'
 				if JSON.stringify(previous_value) != JSON.stringify(new_value)
-					db_previous_value = nsformFieldValue(field, previous_value, options)
-					db_new_value = nsformFieldValue(field, new_value, options)
+					db_previous_value = transformFieldValue(field, previous_value, options)
+					db_new_value = transformFieldValue(field, new_value, options)
 			when 'boolean'
 				if previous_value != new_value
 					db_previous_value = transformFieldValue(field, previous_value, options)
