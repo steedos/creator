@@ -50,6 +50,7 @@ CFDataManager.getNode = function (spaceId, node, options) {
 						orgs[0].open = true;
 						orgs[0].select = true;
 						if (selfCompanys) {
+							orgs[0].open = false;
 							orgs[0].select = false;
 						}
 					}
@@ -100,8 +101,9 @@ CFDataManager.getNode = function (spaceId, node, options) {
 					if(orgs.length){
 						orgs[0].open = true;
 						orgs[0].select = true;
-						// 顶部有所属单位树时不应该再选中根节点
+						// 顶部有所属单位树时不应该再选中根节点，且所属单位可能自动展开，所以根节点也不应该再自动展开
 						if (selfCompanys) {
+							orgs[0].open = false;
 							orgs[0].select = false;
 						}
 					}
