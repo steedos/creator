@@ -229,7 +229,22 @@ Creator.baseObject =
 							# 如果当前修改的记录有满足条件的共享规则存在，则把共享规则配置保存起来
 							push = { sharing: { "u": ps.users, "o": ps.organizations, "r": ps._id } }
 							collection.direct.update({ _id: doc._id }, {$push: push})
-
+		"after.update.server.audit":
+			"on": "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				object_name = this.object_name
+				obj = Creator.getObject(object_name)
+				if obj.enable_audit
+					Creator.AuditRecords?.add('update', userId, this.object_name, doc, this.previous, modifier)
+		"after.insert.server.audit":
+			"on": "server"
+			when: "after.insert"
+			todo: (userId, doc)->
+				object_name = this.object_name
+				obj = Creator.getObject(object_name)
+				if obj.enable_audit
+					Creator.AuditRecords?.add('insert', userId, this.object_name, doc)
 	actions:
 
 		standard_query:

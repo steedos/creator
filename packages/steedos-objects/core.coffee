@@ -192,6 +192,11 @@ Creator.getObjectRelateds = (object_name)->
 		related_objects.push {object_name:"events", foreign_key: "related_to"}
 	if _object.enable_instances
 		related_objects.push {object_name:"instances", foreign_key: "record_ids"}
+	#record 详细下的audit_records仅modifyAllRecords权限可见
+	if Meteor.isClient
+		permissions = Creator.getPermissions(object_name)
+		if _object.enable_audit && permissions?.modifyAllRecords
+			related_objects.push {object_name:"audit_records", foreign_key: "related_to"}
 
 	return related_objects
 
