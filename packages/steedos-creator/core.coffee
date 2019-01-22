@@ -481,11 +481,35 @@ Creator.formatFiltersToDev = (filters, options)->
 						if tempLooperResult
 							tempFilters.push tempLooperResult
 		else
-			# 超过3个元素的数组，则认为是普通过虑条件，当成完整过虑条件进一步循环解析每个条件
-			filters_loop.forEach (n,i)->
-				tempLooperResult = filtersLooper(n)
-				if tempLooperResult
+			# 超过3个元素的数组，可能中间是"or","and"连接符也可能是普通数组，区别对待解析
+			if _.intersection(["or","and"], filters_loop)
+				# 中间有"or","and"连接符，则循环filters_loop，依次用filtersLooper解析其过虑条件
+				# 最后生成的结果格式：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2]), ...]
+				# 因要判断filtersLooper(filters_loop[0])及filtersLooper(filters_loop[2])是否为空
+				# 所以不能直接写：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2])]
+				tempFilters = []
+				i = 0
+				while i < filters_loop.length
+					if _.include(["or","and"], filters_loop[i])
+						i++
+						continue
+					tempLooperResult = filtersLooper(filters_loop[i])
+					unless tempLooperResult
+						i++
+						continue
+					if i > 0
+						tempFilters.push filters_loop[i - 1]
 					tempFilters.push tempLooperResult
+					i++
+				if _.include(["or","and"], tempFilters[0])
+					tempFilters.shift()
+			else
+				# 普通过虑条件，当成完整过虑条件进一步循环解析每个条件
+				filters_loop.forEach (n,i)->
+					tempLooperResult = filtersLooper(n)
+					if tempLooperResult
+						tempFilters.push tempLooperResult
+
 		if tempFilters.length
 			return tempFilters
 		else
