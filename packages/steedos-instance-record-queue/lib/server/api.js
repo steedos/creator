@@ -168,6 +168,8 @@ InstanceRecordQueue.Configure = function (options) {
 
 		field_map_back = field_map_back || [];
 
+		var spaceId = ins.space;
+
 		var form = Creator.getCollection("forms").findOne(ins.form);
 		var formFields = null;
 		if (form.current._id === ins.form_version) {
@@ -202,8 +204,18 @@ InstanceRecordQueue.Configure = function (options) {
 				var oField = objectFields[fm.object_field];
 
 				// 表单选人选组字段 至 对象 lookup master_detail类型字段同步
-				if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to) ) {
+				if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to)) {
 					obj[fm.object_field] = values[fm.workflow_field]['id'];
+				} else if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to) && _.isString(values[fm.workflow_field])) {
+					var oCollection = Creator.getCollection(oField.reference_to, spaceId)
+					if (oCollection) {
+						var referData = oCollection.findOne({
+							name: values[fm.workflow_field]
+						});
+						if (referData) {
+							obj[fm.object_field] = referData._id;
+						}
+					}
 				} else {
 					obj[fm.object_field] = values[fm.workflow_field];
 				}
