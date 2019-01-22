@@ -202,7 +202,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 		if !(userId and spaceId)
 			throw new Meteor.Error 500, "the params userId and spaceId is required for the function Creator.getUserContext"
 			return null
-		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1}
+		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1, company_id: 1}
 		# check if user in the space
 		su = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: suFields})
 		if !su
@@ -228,6 +228,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 			position: su.position,
 			email: su.email
 			company: su.company
+			company_id: su.company_id
 		}
 		space_user_org = Creator.getCollection("organizations")?.findOne(su.organization)
 		if space_user_org

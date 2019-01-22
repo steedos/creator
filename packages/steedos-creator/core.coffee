@@ -38,51 +38,6 @@ Creator.loadObjects = (obj, object_name)->
 	# if Meteor.isServer
 	# 	Creator.initPermissions(object_name)
 
-Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
-	if Meteor.isClient
-		return Creator.USER_CONTEXT
-	else
-		if !(userId and spaceId)
-			throw new Meteor.Error 500, "the params userId and spaceId is required for the function Creator.getUserContext"
-			return null
-		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1, company_id: 1}
-		# check if user in the space
-		su = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: suFields})
-		if !su
-			spaceId = null
-
-		# if spaceId not exists, get the first one.
-		if !spaceId
-			if isUnSafeMode
-				su = Creator.Collections["space_users"].findOne({user: userId}, {fields: suFields})
-				if !su
-					return null
-				spaceId = su.space
-			else
-				return null
-
-		USER_CONTEXT = {}
-		USER_CONTEXT.userId = userId
-		USER_CONTEXT.spaceId = spaceId
-		USER_CONTEXT.user = {
-			_id: userId
-			name: su.name,
-			mobile: su.mobile,
-			position: su.position,
-			email: su.email
-			company: su.company
-			company_id: su.company_id
-		}
-		space_user_org = Creator.getCollection("organizations")?.findOne(su.organization)
-		if space_user_org
-			USER_CONTEXT.user.organization = {
-				_id: space_user_org._id,
-				name: space_user_org.name,
-				fullname: space_user_org.fullname,
-				is_company: space_user_org.is_company
-			}
-		return USER_CONTEXT
-
 Creator.getTable = (object_name)->
 	return Tabular.tablesByName["creator_" + object_name]
 
