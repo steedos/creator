@@ -15,7 +15,7 @@ checkUserSigned = (context, redirect) ->
 			Session.set('listTreeCompany', s_user?.company);
 		else
 			Session.set('listTreeCompany', "-1");
-	
+
 	if !Meteor.userId()
 		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
 	else
@@ -240,7 +240,7 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 
 		Tracker.afterFlush ()->
 			Session.set("list_view_visible", true)
-		
+
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_list_wrapper"
 
@@ -260,7 +260,7 @@ FlowRouter.route '/app/:app_id/:object_name/calendar/',
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_calendar"
 
-FlowRouter.route '/app/admin/page/:template_name', 
+FlowRouter.route '/app/admin/page/:template_name',
 	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		if Meteor.userId()
@@ -269,4 +269,16 @@ FlowRouter.route '/app/admin/page/:template_name',
 			Session.set("admin_template_name", template_name)
 			BlazeLayout.render Creator.getLayout(),
 				main: template_name
+
+FlowRouter.route '/app/:app_id/page/:template_name',
+	triggersEnter: [ checkUserSigned ],
+	action: (params, queryParams)->
+		if Meteor.userId()
+			Session.set("app_id", FlowRouter.getParam("app_id"))
+			template_name = params?.template_name
+			Session.set('template_name', template_name)
+			BlazeLayout.render Creator.getLayout(),
+				main: template_name
+	triggersExit: ()->
+		Session.set('template_name', null)
 
