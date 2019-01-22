@@ -425,17 +425,26 @@ Creator.formatFiltersToDev = (filters, options)->
 		else if filters_loop.length == 3
 			# 只有三个元素，可能中间是"or","and"连接符也可能是普通数组，区别对待解析
 			if _.include(["or","and"], filters_loop[1])
+				# 中间有"or","and"连接符，则循环filters_loop，依次用filtersLooper解析其过虑条件
+				# 最后生成的结果格式：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2]), ...]
 				# 因要判断filtersLooper(filters_loop[0])及filtersLooper(filters_loop[2])是否为空
 				# 所以不能直接写：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2])]
 				tempFilters = []
-				tempLooperResult = filtersLooper(filters_loop[0])
-				if tempLooperResult
+				i = 0
+				while i < filters_loop.length
+					if _.include(["or","and"], filters_loop[i])
+						i++
+						continue
+					tempLooperResult = filtersLooper(filters_loop[i])
+					unless tempLooperResult
+						i++
+						continue
+					if i > 0
+						tempFilters.push filters_loop[i - 1]
 					tempFilters.push tempLooperResult
-				tempLooperResult = filtersLooper(filters_loop[2])
-				if tempLooperResult
-					if tempFilters.length
-						tempFilters.push filters_loop[1]
-					tempFilters.push tempLooperResult
+					i++
+				if _.include(["or","and"], tempFilters[0])
+					tempFilters.shift()
 			else
 				if _.isString filters_loop[1]
 					# 第二个元素为字符串，则认为是某一个具体的过虑条件
