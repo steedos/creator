@@ -422,9 +422,11 @@ CFDataManager.getRoot = function (spaceId, options) {
 
 	var showLimitedCompanyOnly = options && options.showLimitedCompanyOnly;
 	if(showLimitedCompanyOnly){
-		user_company_id = Session.get("user_company_id");
-		if(user_company_id){
-			query._id = user_company_id;
+		user_company_ids = Session.get("user_company_ids");
+		if (user_company_ids && user_company_ids.length) {
+			query._id = {
+				$in: user_company_ids
+			};
 			delete query.parent;
 		}
 		else{
@@ -487,12 +489,14 @@ CFDataManager.getChild = function (spaceId, parentId, options) {
 	}
 	var showLimitedCompanyOnly = options && options.showLimitedCompanyOnly
 	if (showLimitedCompanyOnly) {
-		user_company_id = Session.get("user_company_id");
-		if (user_company_id) {
-			// 限制本单位范围时，如果要显示普通组织，而不是只显示公司级，则不能加query._id = user_company_id过滤
-			// 因为query._id = user_company_id条件只需要在根组织过滤一次就行了，这里显示根组织下的子组织只需要默认的parent过滤条件
+		user_company_ids = Session.get("user_company_ids");
+		if (user_company_ids && user_company_ids.length) {
+			// 限制本单位范围时，如果要显示普通组织，而不是只显示公司级，则不能加query._id = user_company_ids过滤
+			// 因为query._id = user_company_ids条件只需要在根组织过滤一次就行了，这里显示根组织下的子组织只需要默认的parent过滤条件
 			if (showCompanyOnly) {
-				query._id = user_company_id;
+				query._id = {
+					$in: user_company_ids
+				};
 			}
 		} else {
 			query._id = "-1";
