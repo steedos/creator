@@ -169,10 +169,11 @@ Meteor.startup ->
 			queryParams.$filter = queryParams.$filter.replace(/tolower\(([^\)]+)\)/g, removeMethod)
 
 	isSameCompany = (spaceId, userId, companyId, query)->
-		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1 } })
+		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1, company_ids: 1 } })
 		if !companyId && query
-			companyId = query.company_id = su.company_id
-		return su.company_id == companyId
+			companyId = su.company_id
+			query.company_id = { $in: su.company_ids }
+		return su.company_ids.includes(companyId)
 
 	# 不返回已假删除的数据
 	excludeDeleted = (query)->
