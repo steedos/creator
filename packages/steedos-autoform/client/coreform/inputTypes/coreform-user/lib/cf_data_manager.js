@@ -5,8 +5,8 @@ CFDataManager = {};
 // DataManager.flowRoleRemote = new AjaxCollection("flow_roles");
 /*
 * options: {
-* isSelf: 用于生成另外一个树, 用户主部门
-* isNeedtoSelDefault: 是否默认选中展开的节点， 因为有两棵树， 用户主部门那棵树不应该默认选中
+* isSelf: 用于生成另外一个树, 用户所属单位
+* isNeedtoSelDefault: 是否默认选中展开的节点， 因为有两棵树， 用户所属单位那棵树不应该默认选中
 * rootOrg: 允许支持组织树上的根节点, 值为organization _id
 * showCompanyOnly: 是否只显示公司级别的部门
 * showLimitedCompanyOnly: 是否只显示本单位公司级别的部门
@@ -24,23 +24,24 @@ CFDataManager.getNode = function (spaceId, node, options) {
 		myContactsLimit = null;
 	}
 	if (node.id == '#') {
-		// 只显示单位或限制显示本单位数据时，本部门不显示
-		var selfOrganization = (showCompanyOnly || showLimitedCompanyOnly) ? null : Steedos.selfOrganization();
-		//第一棵树: 只显示本部
+		// 只显示单位或限制显示本单位数据时，第一棵树不显示
+		var selfCompanys = (showCompanyOnly || showLimitedCompanyOnly) ? null : Steedos.selfCompanys();
+		//第一棵树: 只显示顶部所属单位，可能是多个单位，之前是显示主部门
 		if(options.isSelf){
 			if (showCompanyOnly || showLimitedCompanyOnly) {
-				console.error("只显示单位或限制显示本单位数据时，不应该加载本部组织")
+				console.error("只显示单位或限制显示本单位数据时，不应该加载顶部所属单位树")
 				return
 			}
-			if(selfOrganization){
-				orgs = [selfOrganization];
+			if (selfCompanys) {
+				orgs = selfCompanys;
 				orgs[0].open = true;
 				orgs[0].select = true;
 			}
 		}else{  //第二棵树: 组织机构
 
 			if(options.rootOrg){
-				if(selfOrganization && selfOrganization._id == options.rootOrg){
+				// selfCompanys中已经显示了rootOrg时，不再显示第二次
+				if (selfCompanys && _.findWhere(selfCompanys, {_id: options.rootOrg})) {
 					orgs = []
 				}else{
 					orgs = CFDataManager.getOrganizationsByIds([options.rootOrg])
@@ -48,7 +49,7 @@ CFDataManager.getNode = function (spaceId, node, options) {
 					if(orgs.length > 0 ){
 						orgs[0].open = true;
 						orgs[0].select = true;
-						if (selfOrganization) {
+						if (selfCompanys) {
 							orgs[0].select = false;
 						}
 					}
@@ -73,34 +74,34 @@ CFDataManager.getNode = function (spaceId, node, options) {
 				if(outsideOrganizations.length){
 					_ids = _.union(outsideOrganizations, _ids);
 				}
-				//主部门在第一个jstree(即selfOrganization)中已有显示，第二个jstree就应该过滤掉不显示
-				var selfIndex = selfOrganization ? _ids.indexOf(selfOrganization._id) : -1;
-				if(selfIndex > -1){
-					_ids.splice(selfIndex, 1);
-				}
+				//主部门在第一个jstree(即selfCompanys)中已有显示，第二个jstree就应该过滤掉不显示
+				_ids = _.difference(_ids, _.pluck(selfCompanys, "_id"));
 				// 这里故意重新抓取后台数据，因为前台无法正确排序
 				orgs = CFDataManager.getOrganizationsByIds(_ids);
 				if (orgs.length > 0) {
 					orgs[0].open = true;
 					orgs[0].select = true;
 					// 有主要部门的时候不应该再选中根节点
-					if (selfOrganization){
+					if (selfCompanys) {
 						orgs[0].select = false;
 					}
 				}
 			} else {
 				orgs = CFDataManager.getRoot(spaceId, options);
 				if(orgs.length){
-					// 当没有限制查看本部门的时候，主部门与根节点相同时只显示主部门而不显示根组织
-					// 只显示单位或限制显示本单位数据时，不加载selfOrganization
-					if ((!showCompanyOnly && !showLimitedCompanyOnly) && selfOrganization && selfOrganization._id == orgs[0]._id) {
-						orgs = []
+					// 当没有限制查看本部门的时候，顶部有所属单位树时，根节点中应该排除掉所属单位树中已存在的组织Id
+					// 只显示单位或限制显示本单位数据时，不加载selfCompanys
+					if ((!showCompanyOnly && !showLimitedCompanyOnly) && selfCompanys){
+						var selfCompanysIds = _.pluck(selfCompanys, "_id");
+						orgs = _.filter(orgs, function(n){
+							return selfCompanysIds.indexOf(n._id) < 0;
+						});
 					}
-					else{
+					if(orgs.length){
 						orgs[0].open = true;
 						orgs[0].select = true;
-						// 有主要部门的时候不应该再选中根节点
-						if (selfOrganization) {
+						// 顶部有所属单位树时不应该再选中根节点
+						if (selfCompanys) {
 							orgs[0].select = false;
 						}
 					}
@@ -118,7 +119,6 @@ CFDataManager.getNode = function (spaceId, node, options) {
 
 function handerOrg(orgs, parentId, options) {
 	var isNeedtoSelDefault = options.isNeedtoSelDefault;
-	var selfOrganization = Steedos.selfOrganization();
 	var nodes = new Array();
 	orgs.forEach(function (org) {
 
