@@ -2,6 +2,8 @@ Creator.Objects.contract_acceptances =
 	name: "contract_acceptances"
 	label: "验收"
 	icon: "orders"
+	enable_files: true
+	enable_instances: true
 	fields:
 		name:
 			label: "名称"
