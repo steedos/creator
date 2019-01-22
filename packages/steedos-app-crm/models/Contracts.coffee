@@ -7,7 +7,7 @@ Creator.Objects.contracts =
 	enable_tasks: true
 	enable_notes: true
 	enable_events: true
-#	enable_audit: true
+	enable_audit: true
 	enable_api: true
 	enable_instances: true
 	fields:
