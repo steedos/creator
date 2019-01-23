@@ -85,8 +85,8 @@ transformFieldValue = (field, value, options)->
 
 # 新建时, 不记录明细
 insertRecord = (userId, object_name, new_doc)->
-	if !userId
-		return
+#	if !userId
+#		return
 
 	collection = Creator.getCollection("audit_records")
 	space_id = new_doc.space
@@ -104,8 +104,8 @@ insertRecord = (userId, object_name, new_doc)->
 
 # 修改时, 记录字段变更明细
 updateRecord = (userId, object_name, new_doc, previous_doc, modifier)->
-	if !userId
-		return
+#	if !userId
+#		return
 
 	space_id = new_doc.space
 	record_id = new_doc._id
