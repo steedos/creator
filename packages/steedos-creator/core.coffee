@@ -384,6 +384,8 @@ options参数：
 	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
 Creator.formatFiltersToDev = (filters, options)->
+	# console.log "Creator.formatFiltersToDev======filters==", filters
+	# console.log "Creator.formatFiltersToDev======options==", options
 	unless filters.length
 		return
 	if options?.is_logic_or
@@ -491,7 +493,7 @@ Creator.formatFiltersToDev = (filters, options)->
 							tempFilters.push tempLooperResult
 		else
 			# 超过3个元素的数组，可能中间是"or","and"连接符也可能是普通数组，区别对待解析
-			if _.intersection(["or","and"], filters_loop)
+			if _.intersection(["or","and"], filters_loop)?.length
 				# 中间有"or","and"连接符，则循环filters_loop，依次用filtersLooper解析其过虑条件
 				# 最后生成的结果格式：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2]), ...]
 				# 因要判断filtersLooper(filters_loop[0])及filtersLooper(filters_loop[2])是否为空
@@ -525,6 +527,7 @@ Creator.formatFiltersToDev = (filters, options)->
 			return null
 
 	selector = filtersLooper(filters)
+	# console.log "Creator.formatFiltersToDev======selector==", selector
 	return selector
 
 ###
