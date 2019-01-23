@@ -21,7 +21,7 @@ Meteor.methods
 
             perms = fl.perms
             if perms
-                if perms.users_can_add && perms.users_can_add.includes(Meteor.userId())
+                if perms.users_can_add && perms.users_can_add.includes(userId)
                     o.can_add = true
                 else if perms.orgs_can_add && perms.orgs_can_add.length > 0
                     if curSpaceUser && curSpaceUser.organizations && _.intersection(curSpaceUser.organizations, perms.orgs_can_add).length > 0
