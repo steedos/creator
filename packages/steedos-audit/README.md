@@ -13,7 +13,7 @@
 - 设置-高级-字段历史： `permission_sets = admin` 可见
 
 ## 补充说明
-- 相关对象的新增，修改不记录
+- 不记录相关对象的新增，修改
 
 ## TODO
 [【字段历史】可以指定记录对象的那些字段](https://github.com/steedos/creator/issues/998)
