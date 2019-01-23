@@ -6,6 +6,7 @@ Template.creator_report.helpers
 		return Creator.Reports[record_id] or Creator.getObjectRecord()
 	
 	reportFilterFields: ->
+		# 报表本身未配置过滤器默认过虑字段的情况下，取all视图默认过虑字段
 		record_id = Session.get "record_id"
 		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
 		filter_fields = reportObject.filter_fields
