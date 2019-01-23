@@ -1,7 +1,7 @@
 # 视图新增filter_fileds，配置了filter_fields的视图，右侧自动列出过滤器 #915
 getDefaultFilters = (object_name, filter_fields)->
 	unless filter_fields
-		list_view_id = list_view_id = Session.get("list_view_id")
+		list_view_id = Session.get("list_view_id")
 		list_view = Creator.getListView(object_name, list_view_id, true)
 		filter_fields = list_view?.filter_fields
 	fields = Creator.getObject(object_name)?.fields

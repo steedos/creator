@@ -4,6 +4,17 @@ Template.creator_report.helpers
 	reportObject: ->
 		record_id = Session.get "record_id"
 		return Creator.Reports[record_id] or Creator.getObjectRecord()
+	
+	reportFilterFields: ->
+		record_id = Session.get "record_id"
+		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+		filter_fields = reportObject.filter_fields
+		unless filter_fields
+			list_view = Creator.getListView(reportObject.object_name, "all", true)
+			filter_fields = list_view?.filter_fields
+		unless filter_fields
+			filter_fields = []
+		return filter_fields
 
 	actions: ()->
 		obj = Creator.getObject()
