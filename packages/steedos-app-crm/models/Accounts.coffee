@@ -45,7 +45,7 @@ Creator.Objects.accounts =
 			label:"是否关联单位"
 			defaultValue: false
 		website:
-			type: "text"
+			type: "url"
 			label: "网址"
 		phone:
 			type: "text"
