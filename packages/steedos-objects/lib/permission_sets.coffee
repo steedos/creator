@@ -4,16 +4,45 @@ if Meteor.isServer
 		permissions =
 			objects: {}
 			assigned_apps: []
-		psetsAdmin = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1, assigned_apps:1}})
-		psetsUser = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1, assigned_apps:1}})
-		psetsMember = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1, assigned_apps:1}})
-		psetsGuest = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1, assigned_apps:1}})
-		psetsWorkflowAdmin = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'workflow_admin'}, {fields:{_id:1, assigned_apps:1, users:1}})
+		psetsAdmin = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1, assigned_apps:1}}) || null
+		psetsUser = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1, assigned_apps:1}}) || null
+		psetsMember = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1, assigned_apps:1}}) || null
+		psetsGuest = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1, assigned_apps:1}}) || null
+		psetsWorkflowAdmin = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'workflow_admin'}, {fields:{_id:1, assigned_apps:1, users:1}}) || null
 		psetsCurrent = Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1, name:1}}).fetch()
-		psets = { psetsAdmin, psetsUser, psetsCurrent, psetsMember, psetsGuest, psetsWorkflowAdmin }
+
+		psetsAdmin_pos = null
+		psetsUser_pos = null
+		psetsMember_pos = null
+		psetsGuest_pos = null
+		psetsWorkflowAdmin_pos = null
+		psetsCurrent_pos = null
+
+		if psetsAdmin?._id
+			psetsAdmin_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsAdmin._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
+		if psetsUser?._id
+			psetsUser_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsUser._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
+		if psetsMember?._id
+			psetsMember_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsMember._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
+		if psetsGuest?._id
+			psetsGuest_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsGuest._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
+		if psetsWorkflowAdmin?._id
+			psetsWorkflowAdmin_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsWorkflowAdmin._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
+		if psetsCurrent.length > 0
+			set_ids = _.pluck psetsCurrent, "_id"
+			psetsCurrent_pos = Creator.getCollection("permission_objects").find({permission_set_id: {$in: set_ids}}).fetch()
+		isSpaceAdmin = false
+		spaceUser = null
+		if userId
+			isSpaceAdmin = Creator.isSpaceAdmin(spaceId, userId)
+			spaceUser = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { profile: 1 } })
+
+		psets = { psetsAdmin, psetsUser, psetsCurrent, psetsMember, psetsGuest, psetsWorkflowAdmin, isSpaceAdmin, spaceUser, psetsAdmin_pos, psetsUser_pos, psetsMember_pos, psetsGuest_pos, psetsWorkflowAdmin_pos, psetsCurrent_pos}
 		permissions.assigned_apps = Creator.getAssignedApps.bind(psets)(spaceId, userId)
 		permissions.assigned_menus = Creator.getAssignedMenus.bind(psets)(spaceId, userId)
+		_i = 0
 		_.each Creator.objectsByName, (object, object_name)->
+			_i++
 			if !_.has(object, 'space') || !object.space || object.space == spaceId
 				permissions.objects[object_name] = _.clone Creator.Objects[object_name]
 				permissions.objects[object_name]["permissions"] = Creator.getObjectPermissions.bind(psets)(spaceId, userId, object_name)
@@ -77,6 +106,23 @@ if Meteor.isServer
 				return _.intersection(currentPsetNames, psetsMenu).length
 			return menus
 
+	findOne_permission_object = (permission_objects, object_name, permission_set_id)->
+
+		if _.isNull(permission_objects)
+			return null
+		if _.isArray(permission_objects)
+			return _.find permission_objects, (po)->
+					return po.object_name == object_name
+		return Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: permission_set_id})
+
+	find_permission_object = (permission_objects, object_name, permission_set_ids)->
+		if _.isNull(permission_objects)
+			return null
+		if _.isArray(permission_objects)
+			return _.filter permission_objects, (po)->
+				return po.object_name == object_name
+		Creator.getCollection("permission_objects").find({object_name: object_name, permission_set_id: {$in: permission_set_ids}}).fetch()
+
 	Creator.getObjectPermissions = (spaceId, userId, object_name)->
 		permissions = {}
 		object = Creator.getObject(object_name, spaceId)
@@ -85,20 +131,26 @@ if Meteor.isServer
 			permissions = _.clone(object.permission_set.guest) || {}
 			Creator.processPermissions permissions
 			return permissions
-
-		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1}})
-		psetsUser = this.psetsUser || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1}})
-		psetsMember = this.psetsMember || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1}})
-		psetsGuest = this.psetsGuest || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1}})
-		psetsWorkflowAdmin = this.psetsWorkflowAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'workflow_admin'}, {fields:{_id:1, users:1}})
+		psetsAdmin = if _.isNull(this.psetsAdmin) or this.psetsAdmin then this.psetsAdmin else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1}})
+		psetsUser = if _.isNull(this.psetsUser) or this.psetsUser then this.psetsUser else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'user'}, {fields:{_id:1}})
+		psetsMember = if _.isNull(this.psetsMember) or this.psetsMember then this.psetsMember else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1}})
+		psetsGuest = if _.isNull(this.psetsGuest) or this.psetsGuest then this.psetsGuest else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1}})
+		psetsWorkflowAdmin = if _.isNull(this.psetsWorkflowAdmin) or this.psetsWorkflowAdmin then this.psetsWorkflowAdmin else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'workflow_admin'}, {fields:{_id:1, users:1}})
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1}}).fetch()
+		isSpaceAdmin = if _.isBoolean(this.isSpaceAdmin) then this.isSpaceAdmin else Creator.isSpaceAdmin(spaceId, userId)
+
+		psetsAdmin_pos = this.psetsAdmin_pos
+		psetsUser_pos = this.psetsUser_pos
+		psetsMember_pos = this.psetsMember_pos
+		psetsGuest_pos = this.psetsGuest_pos
+		psetsWorkflowAdmin_pos = this.psetsWorkflowAdmin_pos
+		psetsCurrent_pos = this.psetsCurrent_pos
 
 		opsetAdmin = _.clone(object.permission_set.admin) || {}
 		opsetUser = _.clone(object.permission_set.user) || {}
 		opsetMember = _.clone(object.permission_set.member) || {}
 		opsetGuest = _.clone(object.permission_set.guest) || {}
 		opsetWorkflowAdmin = _.clone(object.permission_set.workflow_admin) || {}
-
 		# sharedListViews = Creator.getCollection('object_listviews').find({space: spaceId, object_name: object_name, shared: true}, {fields:{_id:1}}).fetch()
 		# sharedListViews = _.pluck(sharedListViews,"_id")
 		# if sharedListViews.length
@@ -108,10 +160,9 @@ if Meteor.isServer
 		# 	unless opsetUser.list_views
 		# 		opsetUser.list_views = []
 		# 	opsetUser.list_views = _.union opsetUser.list_views, sharedListViews
-
 		# 数据库中如果配置了默认的admin/user权限集设置，应该覆盖代码中admin/user的权限集设置
 		if psetsAdmin
-			posAdmin = Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: psetsAdmin._id})
+			posAdmin = findOne_permission_object(psetsAdmin_pos, object_name, psetsAdmin._id)
 			if posAdmin
 				opsetAdmin.allowCreate = posAdmin.allowCreate
 				opsetAdmin.allowDelete = posAdmin.allowDelete
@@ -127,7 +178,7 @@ if Meteor.isServer
 				opsetAdmin.uneditable_fields = posAdmin.uneditable_fields
 				opsetAdmin.unrelated_objects = posAdmin.unrelated_objects
 		if psetsUser
-			posUser = Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: psetsUser._id})
+			posUser = findOne_permission_object(psetsUser_pos, object_name, psetsUser._id)
 			if posUser
 				opsetUser.allowCreate = posUser.allowCreate
 				opsetUser.allowDelete = posUser.allowDelete
@@ -143,7 +194,7 @@ if Meteor.isServer
 				opsetUser.uneditable_fields = posUser.uneditable_fields
 				opsetUser.unrelated_objects = posUser.unrelated_objects
 		if psetsMember
-			posMember = Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: psetsMember._id})
+			posMember = findOne_permission_object(psetsMember_pos, object_name, psetsMember._id)
 			if posMember
 				opsetMember.allowCreate = posMember.allowCreate
 				opsetMember.allowDelete = posMember.allowDelete
@@ -159,7 +210,7 @@ if Meteor.isServer
 				opsetMember.uneditable_fields = posMember.uneditable_fields
 				opsetMember.unrelated_objects = posMember.unrelated_objects
 		if psetsGuest
-			posGuest = Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: psetsGuest._id})
+			posGuest = findOne_permission_object(psetsGuest_pos, object_name, psetsGuest._id)
 			if posGuest
 				opsetGuest.allowCreate = posGuest.allowCreate
 				opsetGuest.allowDelete = posGuest.allowDelete
@@ -175,7 +226,7 @@ if Meteor.isServer
 				opsetGuest.uneditable_fields = posGuest.uneditable_fields
 				opsetGuest.unrelated_objects = posGuest.unrelated_objects
 		if psetsWorkflowAdmin
-			posWorkflowAdmin = Creator.getCollection("permission_objects").findOne({object_name: object_name, permission_set_id: psetsWorkflowAdmin._id})
+			posWorkflowAdmin = findOne_permission_object(psetsWorkflowAdmin_pos, object_name, psetsWorkflowAdmin._id)
 			if posWorkflowAdmin
 				opsetWorkflowAdmin.allowCreate = posWorkflowAdmin.allowCreate
 				opsetWorkflowAdmin.allowDelete = posWorkflowAdmin.allowDelete
@@ -190,17 +241,16 @@ if Meteor.isServer
 				opsetWorkflowAdmin.unreadable_fields = posWorkflowAdmin.unreadable_fields
 				opsetWorkflowAdmin.uneditable_fields = posWorkflowAdmin.uneditable_fields
 				opsetWorkflowAdmin.unrelated_objects = posWorkflowAdmin.unrelated_objects
-
 		if !userId
 			permissions = opsetAdmin
 		else
-			if Creator.isSpaceAdmin(spaceId, userId)
+			if isSpaceAdmin
 				permissions = opsetAdmin
 			else
 				if spaceId is 'common'
 					permissions = opsetUser
 				else
-					spaceUser = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { profile: 1 } })
+					spaceUser = if _.isNull(this.spaceUser) or this.spaceUser then this.spaceUser else Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { profile: 1 } })
 					if spaceUser
 						prof = spaceUser.profile
 						if prof
@@ -217,7 +267,7 @@ if Meteor.isServer
 
 		if psets.length > 0
 			set_ids = _.pluck psets, "_id"
-			pos = Creator.getCollection("permission_objects").find({object_name: object_name, permission_set_id: {$in: set_ids}}).fetch()
+			pos = find_permission_object(psetsCurrent_pos, object_name, set_ids)
 			_.each pos, (po)->
 				if po.permission_set_id == psetsAdmin?._id or po.permission_set_id == psetsUser?._id or po.permission_set_id == psetsMember?._id or po.permission_set_id == psetsGuest?._id or po.permission_set_id == psetsWorkflowAdmin?._id
 					# 默认的admin/user权限值只实行上面的默认值覆盖，不做算法判断
@@ -268,7 +318,6 @@ if Meteor.isServer
 				permissions.unreadable_fields = unionPlus(permissions.unreadable_fields, opsetWorkflowAdmin.unreadable_fields)
 				permissions.uneditable_fields = unionPlus(permissions.uneditable_fields, opsetWorkflowAdmin.uneditable_fields)
 				permissions.unrelated_objects = unionPlus(permissions.unrelated_objects, opsetWorkflowAdmin.unrelated_objects)
-
 		if object.is_view
 			permissions.allowCreate = false
 			permissions.allowEdit = false
@@ -276,7 +325,6 @@ if Meteor.isServer
 			permissions.modifyAllRecords = false
 			permissions.modifyCompanyRecords = false
 			permissions.disabled_actions = []
-
 		Creator.processPermissions permissions
 		return permissions
 

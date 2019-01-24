@@ -3,7 +3,7 @@ Meteor.methods
         check spaceId, String
         check userId, String
 
-        curSpaceUser = Creator.Collections["space_users"].findOne({space: spaceId, user: userId})
+        curSpaceUser = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: {organizations: 1}})
         if !curSpaceUser
             throw new Meteor.Error 'not-authorized'
 
@@ -11,7 +11,7 @@ Meteor.methods
             _id: {
                 $in: curSpaceUser.organizations
             }
-        }).fetch()
+        }, {fields: {parents: 1}}).fetch()
 
         ows = Creator.getCollection('object_workflows').find({ space: spaceId }, { fields: { object_name: 1, flow_id: 1, space: 1 } }).fetch()
         _.each ows,(o) ->
