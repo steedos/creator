@@ -25,7 +25,7 @@ sprintf = require('sprintf-js').sprintf;
 Meteor.startup ->
 	i18n.setOptions({purify: null})
 	if TAPi18n
-		TAPi18n.__rollback = TAPi18n.__
+		TAPi18n.__original = TAPi18n.__
 		TAPi18n.__ = (key, options, lang)->
 			if lang
 				t2 = i18n.createTranslator('', lang);
@@ -33,7 +33,9 @@ Meteor.startup ->
 			else
 				translated = i18n.__ key, options;
 			if translated == key
-				return TAPi18n.__rollback key, options, lang
+				if lang == "zh-cn"
+					lang = "zh-CN"
+				return TAPi18n.__original key, options, lang
 			else
 				return translated
 
