@@ -225,6 +225,13 @@ Template.creator_table_cell.helpers
 			else
 				val = ''
 			data.push {value: val, id: this._id}
+		else if _field.type == "url"
+			href = val
+			if !href?.startsWith("http")
+				href = "http://" + encodeURI(href)
+			data.push({value: val, href: href, id: this._id, isUrl: true})
+		else if _field.type == "email"
+			data.push({value: val, href: href, id: this._id, isEmail: true})
 		else if _field.type == "textarea"
 			if val
 				val = val.replace(/\n/g, '\n<br>');

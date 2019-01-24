@@ -84,6 +84,8 @@ Creator.Objects.object_fields =
 				lookup: "相关表"
 				master_detail: "主表/子表"
 				grid: "表格"
+				url: "网址"
+				email: "邮件地址"
 		sort_no:
 			label: "排序号"
 			type: "number"
