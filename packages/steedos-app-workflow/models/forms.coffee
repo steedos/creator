@@ -63,11 +63,50 @@ Creator.Objects.forms =
 
 		'current.form_script':
 			label: "表单脚本"
-			type: 'textarea'
+			type: 'code'
 			readonly: true
 		'current.name_forumla':
 			label: "标题公式"
-			type: 'textarea'
+			type: 'code'
+			readonly: true
+
+		'current.fields':
+			label: "字段"
+			type: 'grid'
+			is_wide: true
+			readonly: true
+		'current.fields.$.code':
+			label: "名称"
+			type: 'text'
+			readonly: true
+		'current.fields.$.name':
+			label: "显示名"
+			type: 'text'
+			readonly: true
+		'current.fields.$.type':
+			label: "类型"
+			type: 'select'
+			options: "勾选框:checkbox,日期-时间:dateTime,日期:date,邮件:email,选择部门:group,文本:input,多选:multiSelect,数值:number,密码:password,单选:radio,分组:section,下拉框:select,表格:table,网址:url,选择用户:user,地理位置:geolocation"
+			readonly: true
+		'current.fields.$.is_required':
+			label: '必填'
+			type: 'boolean'
+			readonly: true
+		'current.fields.$.is_wide':
+			label: "宽字段"
+			type: 'boolean'
+			readonly: true
+		'current.fields.$.is_list_display':
+			label: "列表显示"
+			type: 'boolean'
+			readonly: true
+		'current.fields.$.is_searchable':
+			label: "可搜索"
+			type: 'boolean'
+			readonly: true
+		'current.fields.$.is_multiselect':
+			label: "多选"
+			type: 'boolean'
 			readonly: true
 
 		company_id:
