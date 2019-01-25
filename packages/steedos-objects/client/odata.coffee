@@ -64,9 +64,10 @@ Creator.odata.get = (object_name, record_id, select_fields, callback)->
 		toastr.error("未找到记录")
 	return result
 
-Creator.odata.query = (object_name, options,is_async)->
+Creator.odata.query = (object_name, options, is_ajax, callback)->
 	result = null
-	if is_async
+	is_async = callback and _.isFunction(callback)
+	if is_ajax
 		if object_name
 			url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 			$.ajax
@@ -74,7 +75,7 @@ Creator.odata.query = (object_name, options,is_async)->
 				url: url
 				data:options
 				dataType: "json"
-				async: false
+				async: !!is_async
 				contentType: "application/json"
 				beforeSend: (request) ->
 					request.setRequestHeader('X-User-Id', Meteor.userId())
@@ -88,8 +89,12 @@ Creator.odata.query = (object_name, options,is_async)->
 						toastr?.error?(TAPi18n.__(error.message))
 					else
 						toastr?.error?(error)
+					if is_async
+						callback(jqXHR, textStatus, errorThrown)
 				success:(data) ->
 					result = data.value
+					if is_async
+						callback(result)
 		return result
 	else
 		if object_name
