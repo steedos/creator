@@ -31,14 +31,6 @@ Creator.Objects.object_workflows =
 			is_wide: true
 			depend_on: ["object_name", "flow_id"]
 
-		"field_map.$.object_field":
-			label: "对象字段"
-			type: "lookup"
-			depend_on: ["object_name"]
-			defaultIcon: "service_contract"
-			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
-
 		"field_map.$.workflow_field":
 			label: "表单字段"
 			type: "lookup"
@@ -76,11 +68,29 @@ Creator.Objects.object_workflows =
 				options = _.union(instance_fields,form_fields)
 				return options
 
+		"field_map.$.object_field":
+			label: "对象字段"
+			type: "lookup"
+			depend_on: ["object_name"]
+			defaultIcon: "service_contract"
+			optionsFunction: (values)->
+				return Creator.getObjectLookupFieldOptions values?.object_name, true
+
+
+
 		field_map_back:
 			label: "字段映射关系（表单至对象）"
 			type: "grid"
 			is_wide: true
 			depend_on: ["object_name", "flow_id"]
+
+		"field_map_back.$.object_field":
+			label: "对象字段"
+			type: "lookup"
+			depend_on: ["object_name"]
+			defaultIcon: "service_contract"
+			optionsFunction: (values)->
+				return Creator.getObjectLookupFieldOptions values?.object_name, true
 
 		"field_map_back.$.workflow_field":
 			label: "表单字段"
@@ -119,14 +129,17 @@ Creator.Objects.object_workflows =
 				options = _.union(instance_fields,form_fields)
 				return options
 
-		"field_map_back.$.object_field":
-			label: "对象字段"
-			type: "lookup"
-			depend_on: ["object_name"]
-			defaultIcon: "service_contract"
-			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+		"field_map_script":
+			label: "对象至表单"
+			type: "textarea"
+			is_wide: true
+			group: "脚本"
 
+		"field_map_back_script":
+			label: "表单至对象"
+			type: "textarea"
+			is_wide: true
+			group: "脚本"
 
 		sync_attachment:
 			label: "附件同步方式"

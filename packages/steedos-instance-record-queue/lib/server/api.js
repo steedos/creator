@@ -1,3 +1,4 @@
+var _eval = require('eval');
 var isConfigured = false;
 var sendWorker = function (task, interval) {
 
@@ -161,8 +162,9 @@ InstanceRecordQueue.Configure = function (options) {
 	self.syncInsFields = ['name', 'submitter_name', 'applicant_name', 'applicant_organization_name', 'applicant_organization_fullname', 'state',
 		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision'
 	];
-	self.syncValues = function (obj, field_map_back, values, ins, objectInfo) {
+	self.syncValues = function (field_map_back, values, ins, objectInfo, field_map_back_script) {
 		var
+			obj = {},
 			tableFieldCodes = [],
 			tableFieldMap = [];
 
@@ -182,6 +184,7 @@ InstanceRecordQueue.Configure = function (options) {
 		}
 
 		var objectFields = objectInfo.fields;
+		var objectFieldKeys = _.keys(objectFields);
 
 		field_map_back.forEach(function (fm) {
 			// 判断是否是子表字段
@@ -252,6 +255,33 @@ InstanceRecordQueue.Configure = function (options) {
 			})
 		})
 
+
+
+		if (field_map_back_script) {
+			_.extend(obj, self.evalFieldMapBackScript(field_map_back_script, ins));
+		}
+
+		// 过滤掉非法的key
+		var filterObj = {};
+		_.each(_.keys(obj), function (k) {
+			if (objectFieldKeys.includes(k)) {
+				filterObj[k] = obj[k];
+			}
+		})
+
+		return filterObj;
+	}
+
+	self.evalFieldMapBackScript = function (field_map_back_script, ins) {
+		var script = "module.exports = function (instance) { " + field_map_back_script + " }";
+		var func = _eval(script, "field_map_script");
+		var values = func(ins);
+		if (_.isObject(values)) {
+			return values;
+		} else {
+			console.error("evalFieldMapBackScript: 脚本返回值类型不是对象");
+		}
+		return {}
 	}
 
 	self.sendDoc = function (doc) {
@@ -297,9 +327,7 @@ InstanceRecordQueue.Configure = function (options) {
 			}).forEach(function (record) {
 				// 附件同步
 				try {
-					var setObj = {};
-
-					self.syncValues(setObj, ow.field_map_back, values, ins, objectInfo);
+					var setObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
 
 					setObj['instances.$.state'] = 'completed';
 					setObj.locked = false;
@@ -354,7 +382,7 @@ InstanceRecordQueue.Configure = function (options) {
 				flow_id: ins.flow
 			}).forEach(function (ow) {
 				try {
-					var newObj = {},
+					var
 						objectCollection = Creator.getCollection(ow.object_name, spaceId),
 						sync_attachment = ow.sync_attachment,
 						newRecordId = objectCollection._makeNewID(),
@@ -362,14 +390,14 @@ InstanceRecordQueue.Configure = function (options) {
 
 					var objectInfo = Creator.getObject(ow.object_name, spaceId);
 
-					self.syncValues(newObj, ow.field_map_back, values, ins, objectInfo);
+					var newObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
 					newObj.name = ins.name;
 					newObj.instances = [{
 						_id: insId,
-						state: 'completed'
+						state: ins.state
 					}];
 					newObj.owner = ins.applicant;
 					newObj.created_by = ins.applicant;
