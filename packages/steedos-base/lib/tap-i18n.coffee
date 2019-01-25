@@ -28,13 +28,13 @@ Meteor.startup ->
 		TAPi18n.__original = TAPi18n.__
 		TAPi18n.__ = (key, options, lang)->
 			if lang
+				if lang == "zh-cn"
+					lang = "zh-CN"
 				t2 = i18n.createTranslator('', lang);
 				translated = t2(key, options);
 			else
 				translated = i18n.__ key, options;
 			if translated == key
-				if lang == "zh-cn"
-					lang = "zh-CN"
 				return TAPi18n.__original key, options, lang
 			else
 				return translated
