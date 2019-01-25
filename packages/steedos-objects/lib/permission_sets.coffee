@@ -1,3 +1,31 @@
+Creator.getPermissions = (object_name, spaceId, userId)->
+	if Meteor.isClient
+		if !object_name
+			object_name = Session.get("object_name")
+		obj = Creator.getObject(object_name)
+		if !obj
+			return
+		return obj.permissions.get()
+	else if Meteor.isServer
+		Creator.getObjectPermissions(spaceId, userId, object_name)
+
+Creator.getRecordPermissions = (object_name, record, userId)->
+	if !object_name and Meteor.isClient
+		object_name = Session.get("object_name")
+
+	permissions = _.clone(Creator.getPermissions(object_name))
+
+	if record
+		isOwner = record.owner == userId || record.owner?._id == userId
+		if !permissions.modifyAllRecords and !isOwner and !permissions.modifyCompanyRecords
+			permissions.allowEdit = false
+			permissions.allowDelete = false
+
+		if !permissions.viewAllRecords and !isOwner and !permissions.viewCompanyRecords
+			permissions.allowRead = false
+
+	return permissions
+
 if Meteor.isServer
 
 	Creator.getAllPermissions = (spaceId, userId) ->
