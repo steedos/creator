@@ -211,9 +211,15 @@ InstanceRecordQueue.Configure = function (options) {
 					obj[fm.object_field] = values[fm.workflow_field]['id'];
 				} else if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to) && _.isString(values[fm.workflow_field])) {
 					var oCollection = Creator.getCollection(oField.reference_to, spaceId)
-					if (oCollection) {
-						var referData = oCollection.findOne({
-							name: values[fm.workflow_field]
+					var referObject = Creator.getObject(oField.reference_to, spaceId)
+					if (oCollection && referObject) {
+						var nameFieldKey = referObject.NAME_FIELD_KEY;
+						var selector = {};
+						selector[nameFieldKey] = values[fm.workflow_field];
+						var referData = oCollection.findOne(selector, {
+							fields: {
+								_id: 1
+							}
 						});
 						if (referData) {
 							obj[fm.object_field] = referData._id;
