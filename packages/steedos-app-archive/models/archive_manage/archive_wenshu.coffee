@@ -925,12 +925,14 @@ Creator.Objects.archive_wenshu =
 					swal("请先选择要接收的档案")
 					return
 				init_num = prompt("输入初始件号值")
-				Meteor.call("archive_item_number",object_name,Creator.TabularSelectedIds?[object_name],init_num,
-					(error, result)->
-						if result
-							text = "编号已更新到" + result + "号"
-							swal(text)
-						)
+				if init_num
+					Meteor.call("archive_item_number",object_name,Creator.TabularSelectedIds?[object_name],init_num,
+						(error, result)->
+							if result
+								# text = "编号已更新到" + result + "号"
+								text = "编号已更新"
+								swal(text)
+							)
 
 		
 		receive:
