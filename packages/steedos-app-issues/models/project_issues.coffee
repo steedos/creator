@@ -121,13 +121,16 @@ Creator.Objects.project_issues =
 			rows: 4
 
 		result:
-			label: "办结结果"
+			label: "问题状态"
 			type: "select"
 			options: [
-				{label:"已解决", value:"Solve"},
-				{label:"未解决", value:"Unsolved"}
+				{label:"已提交，未确认", value:"submit"},
+				{label:"已确认，未处理", value:"Confirmed"}
+                {label:"已处理，未完成", value:"Processed"}
+                {label:"已完成，已办结", value:"solved"}   
+                {label:"已办结，未解决", value:"Unsolved"} 
 			]
-			defaultValue: "Unsolved"
+			defaultValue: "submit"
 			filterable: true
    
 		status:
