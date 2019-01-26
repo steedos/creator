@@ -106,9 +106,6 @@ Package.onUse(function (api) {
 
 	api.addFiles('models/object_recent_viewed.coffee');
 	api.addFiles('models/object_listviews.coffee');
-	api.addFiles('models/permission_set.coffee');
-	api.addFiles('models/permission_objects.coffee');
-	api.addFiles('models/permission_share.coffee');
 
 	api.addFiles('models/cms_files.coffee');
 	api.addFiles('models/cms_files_cfs.coffee');

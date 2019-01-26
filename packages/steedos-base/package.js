@@ -93,6 +93,9 @@ Package.onUse(function(api) {
 	api.addFiles('lib/models/modules_changelogs.coffee');
 	api.addFiles('lib/models/billing_pay_records.coffee');
 	api.addFiles('lib/models/space_settings.coffee');
+	api.addFiles('lib/models/permission_set.coffee');
+	api.addFiles('lib/models/permission_objects.coffee');
+	api.addFiles('lib/models/permission_share.coffee');
 
 	api.addFiles('routes/api_get_apps.coffee', 'server');
 
