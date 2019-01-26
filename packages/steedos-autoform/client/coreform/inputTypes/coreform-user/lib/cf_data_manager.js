@@ -33,15 +33,18 @@ CFDataManager.getNode = function (spaceId, node, options) {
 				return
 			}
 			if (selfCompanys) {
-				orgs = selfCompanys;
-				orgs[0].open = true;
-				orgs[0].select = true;
+				// 只显示顶部所属单位，强制showLimitedCompanyOnly为true调用getRoot，即可得到本单位组织
+				orgs = CFDataManager.getRoot(spaceId, { showLimitedCompanyOnly: true });
+				if (orgs.length) {
+					orgs[0].open = true;
+					orgs[0].select = true;
+				}
 			}
 		}else{  //第二棵树: 组织机构
 
 			if(options.rootOrg){
 				// selfCompanys中已经显示了rootOrg时，不再显示第二次
-				if (selfCompanys && _.findWhere(selfCompanys, {_id: options.rootOrg})) {
+				if (selfCompanys && selfCompanys.indexOf(options.rootOrg) > -1) {
 					orgs = []
 				}else{
 					orgs = CFDataManager.getOrganizationsByIds([options.rootOrg])
@@ -76,13 +79,13 @@ CFDataManager.getNode = function (spaceId, node, options) {
 					_ids = _.union(outsideOrganizations, _ids);
 				}
 				//主部门在第一个jstree(即selfCompanys)中已有显示，第二个jstree就应该过滤掉不显示
-				_ids = _.difference(_ids, _.pluck(selfCompanys, "_id"));
+				_ids = _.difference(_ids, selfCompanys);
 				// 这里故意重新抓取后台数据，因为前台无法正确排序
 				orgs = CFDataManager.getOrganizationsByIds(_ids);
 				if (orgs.length > 0) {
 					orgs[0].open = true;
 					orgs[0].select = true;
-					// 有主要部门的时候不应该再选中根节点
+					// 有所属单位的时候不应该再选中根节点
 					if (selfCompanys) {
 						orgs[0].select = false;
 					}
@@ -93,9 +96,8 @@ CFDataManager.getNode = function (spaceId, node, options) {
 					// 当没有限制查看本部门的时候，顶部有所属单位树时，根节点中应该排除掉所属单位树中已存在的组织Id
 					// 只显示单位或限制显示本单位数据时，不加载selfCompanys
 					if ((!showCompanyOnly && !showLimitedCompanyOnly) && selfCompanys){
-						var selfCompanysIds = _.pluck(selfCompanys, "_id");
 						orgs = _.filter(orgs, function(n){
-							return selfCompanysIds.indexOf(n._id) < 0;
+							return selfCompanys.indexOf(n._id) < 0;
 						});
 					}
 					if(orgs.length){
