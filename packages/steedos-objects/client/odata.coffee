@@ -23,7 +23,7 @@ Creator.odata = {}
 # 		toastr.error("未找到记录")
 Creator.odata.get = (object_name, record_id, select_fields, callback)->
 	result = null
-	isAsync = if typeof callback == "function" then true else false
+	isAsync = callback and _.isFunction(callback)
 	if object_name and record_id
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
 		request_data = {}
@@ -36,14 +36,14 @@ Creator.odata.get = (object_name, record_id, select_fields, callback)->
 			data: request_data
 			dataType: "json"
 			contentType: "application/json"
-			async: isAsync
+			async: !!isAsync
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
 			success: (data) ->
-				if callback and typeof callback == "function"
-					callback(data)
 				result = data
+				if isAsync
+					callback(result)
 			error: (jqXHR, textStatus, errorThrown) ->
 				error = jqXHR.responseJSON.error
 				# if error.httpStatus == 400 or error.httpStatus == 401
@@ -60,13 +60,16 @@ Creator.odata.get = (object_name, record_id, select_fields, callback)->
 					toastr.error(t(error?.message))
 				else
 					toastr?.error?("未找到记录")
+				if isAsync
+					callback(false, error)
+				
 	else
 		toastr.error("未找到记录")
 	return result
 
 Creator.odata.query = (object_name, options, is_ajax, callback)->
 	result = null
-	is_async = callback and _.isFunction(callback)
+	isAsync = callback and _.isFunction(callback)
 	if is_ajax
 		if object_name
 			url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
@@ -75,7 +78,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 				url: url
 				data:options
 				dataType: "json"
-				async: !!is_async
+				async: !!isAsync
 				contentType: "application/json"
 				beforeSend: (request) ->
 					request.setRequestHeader('X-User-Id', Meteor.userId())
@@ -89,11 +92,11 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 						toastr?.error?(TAPi18n.__(error.message))
 					else
 						toastr?.error?(error)
-					if is_async
-						callback(jqXHR, textStatus, errorThrown)
+					if isAsync
+						callback(false, error)
 				success:(data) ->
 					result = data.value
-					if is_async
+					if isAsync
 						callback(result)
 		return result
 	else
