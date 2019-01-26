@@ -1,4 +1,12 @@
-Creator.formBuilder = {}
+getFormFieldOptions = (field)->
+	options = field.options.split('\n');
+	values = []
+	_.each options, (option)->
+		if option == field.default_value
+			values.push {label: option, value: option, selected: true}
+		else
+			values.push {label: option, value: option}
+	return values
 
 Creator.formBuilder.transformFormFieldsIn = (formFields)->
 	fields = []
@@ -9,6 +17,8 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 		switch f.type
 			when 'input'
 				field.type = 'text'
+				if f.is_textarea
+					field.type = 'textarea'
 				fields.push field
 			when 'number'
 				field.type = 'number'
@@ -17,21 +27,49 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 				field.type = 'date'
 				fields.push field
 			when 'dateTime'
-				console.log('TODO dateTime');
+				field.type = 'dateTime'
+				fields.push field
 			when 'checkbox'
-				console.log('TODO checkbox');
-#				field.type = 'checkbox'
-#				fields.push field
+				#TODO 默认值 boolean
+				field.type = 'checkboxBoolean'
+				delete field.className
+				fields.push field
 			when 'email'
-				console.log('TODO email');
+				field.type = 'email'
+				fields.push field
 			when 'url'
-				console.log('TODO url');
+				field.type = 'url'
+				fields.push field
 			when 'password'
-				console.log('TODO password');
+				field.type = 'password'
+				fields.push field
 			when 'select'
 				field.type = 'select'
+				field.values = getFormFieldOptions(f)
+				delete field.options
 				fields.push field
-				console.log('TODO select');
+			when 'user'
+				field.type = 'user'
+				fields.push field
+			when 'group'
+				field.type = 'group'
+				fields.push field
+			when 'radio'
+				field.type = 'radio-group'
+				field.values = getFormFieldOptions(f)
+				delete field.options
+				delete field.className
+				fields.push field
+			when 'multiSelect'
+				field.type = 'checkbox-group'
+				field.values = getFormFieldOptions(f)
+				delete field.options
+				delete field.className
+				fields.push field
+			when 'table'
+				field.type = 'table'
+				delete field.className
+				fields.push field
 			else
 				console.log(f.code, f.name, f.type)
 
