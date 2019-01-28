@@ -10,8 +10,6 @@ getFormFieldOptions = (field)->
 
 Creator.formBuilder.transformFormFieldsIn = (formFields)->
 	fields = []
-	console.log('formFields', formFields)
-
 	_.each formFields, (f)->
 		field = _.extend({label: f.name || f.code, name: f.code, className: "form-control", value: f.default_value}, f)
 		switch f.type
@@ -68,6 +66,12 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 				fields.push field
 			when 'table'
 				field.type = 'table'
+				field.fields = JSON.stringify(field.fields)
+				delete field.className
+				fields.push field
+			when 'section'
+				field.type = 'section'
+				field.fields = JSON.stringify(field.fields)
 				delete field.className
 				fields.push field
 			else

@@ -3,16 +3,16 @@ FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 	"checkbox-group", "radio-group", "checkbox", "text", "file",
 	"date", "number", "textarea",
 	"dateTime", "checkboxBoolean", "email", "url", "password", "user", "group",
-	"table"]
+	"table", "section"]
 
 # 定义 禁用 的字段类型
 DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden']
 
 # 定义 禁用 的字段属性
-DISABLEDATTRS = ['description','maxlength','placeholder',"access","value",'min', 'max', 'step', 'inline', 'other', 'toggle', 'rows', 'subtype']
+DISABLEDATTRS = ['description','maxlength','placeholder',"access","value",'min', 'max', 'step', 'inline', 'other', 'toggle', 'rows', 'subtype', 'multiple']
 
 # 定义字段类型排序
-CONTROLORDER = ['table','text','textarea','number','date','dateTime','date','checkboxBoolean','email','url','password','select','user','group',"radio-group","checkbox-group"]
+CONTROLORDER = ['table', 'section', 'text','textarea','number','date','dateTime','date','checkboxBoolean','email','url','password','select','user','group',"radio-group","checkbox-group"]
 
 # 获取各字段类型禁用的字段属性
 #TYPEUSERDISABLEDATTRS = (()->
@@ -125,11 +125,27 @@ getTypeUserAttrs = ()->
 					description: {
 						label: '描述',
 						type: 'textarea'
+					},
+					fields: {
+						label: '字段'
+					}
+				}
+			when 'section'
+				typeUserAttrs[item] =  {
+					_id: {
+						label: '唯一键'
+						readonly: 'readonly'
+					},
+					description: {
+						label: '描述',
+						type: 'textarea'
+					},
+					fields: {
+						label: '字段'
 					}
 				}
 			else
 				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS, FORMULAUSERATTRS
-	console.log('typeUserAttrs', typeUserAttrs);
 	return typeUserAttrs
 
 # 定义字段的事件
@@ -212,6 +228,13 @@ getFields = ()->
 				type: "table"
 			}
 			icon: "😃"
+		},
+		{
+			label: "分组"
+			attrs: {
+				type: "section"
+			}
+			icon: "😃"
 		}
 	]
 
@@ -219,6 +242,8 @@ getFields = ()->
 getFieldTemplates  = ()->
 	{
 		dateTime: (fieldData) ->
+			if !fieldData.className
+				fieldData.className = 'form-control'
 			return {
 				field: "<input id='#{fieldData.name}' type='datetime-local' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
@@ -227,30 +252,72 @@ getFieldTemplates  = ()->
 				field: "<input id='#{fieldData.name}' type='checkbox' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		email: (fieldData)->
+			if !fieldData.className
+				fieldData.className = 'form-control'
 			return {
 				field: "<input id='#{fieldData.name}' type='email' autocomplete='off' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		url: (fieldData)->
+			if !fieldData.className
+				fieldData.className = 'form-control'
 			return {
 				field: "<input id='#{fieldData.name}' type='url' autocomplete='off' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		password: (fieldData)->
+			if !fieldData.className
+				fieldData.className = 'form-control'
 			return {
 				field: "<input id='#{fieldData.name}' type='password' autocomplete='new-password' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		user: (fieldData)->
+			if !fieldData.className
+				fieldData.className = 'form-control'
 			return {
 				field: "<input id='#{fieldData.name}' type='text' readonly #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		group: (fieldData)->
+			if !fieldData.className
+				fieldData.className = 'form-control'
 			return {
 				field: "<input id='#{fieldData.name}' type='text' readonly #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		table: (fieldData)->
+			console.log('fieldData', fieldData);
+			delete fieldData.className
 			return {
 				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",
 				onRender: ()->
-					$("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
+					Meteor.setTimeout ()->
+						tableFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
+						if fieldData.fields
+							tableFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
+							tableFB.promise.then (tableFormBuilder)->
+								console.log('tableFields', tableFields)
+								tableFormBuilder.actions.setData(tableFields)
+								# fix bug: 第一个字段的typeUserAttrs不生效
+								Meteor.setTimeout ()->
+									tableFormBuilder.actions.setData(tableFields)
+								, 100
+					, 100
+			};
+		section: (fieldData)->
+			console.log('fieldData', fieldData);
+			delete fieldData.className
+			return {
+				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",
+				onRender: ()->
+					Meteor.setTimeout ()->
+						sectionFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
+						if fieldData.fields
+							sectionFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
+							sectionFB.promise.then (sectionFormBuilder)->
+								console.log('sectionFields', sectionFields)
+								sectionFormBuilder.actions.setData(sectionFields)
+								# fix bug: 第一个字段的typeUserAttrs不生效
+								Meteor.setTimeout ()->
+									sectionFormBuilder.actions.setData(sectionFields)
+								, 100
+				, 100
 			};
 	}
 
@@ -276,6 +343,7 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 
 	if is_sub
 		disableFields.push 'table'
+		disableFields.push 'section'
 
 	options.disableFields = DISABLEFIELDS
 

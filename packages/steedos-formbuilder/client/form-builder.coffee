@@ -14,7 +14,6 @@ Template.formBuilder.onRendered ()->
 
 	options = Creator.formBuilder.optionsForFormFields()
 
-
 	fb = $("#fb-editor").formBuilder(options)
 	fb.promise.then (formBuilder)->
 		formBuilder.actions.setData(fields)
