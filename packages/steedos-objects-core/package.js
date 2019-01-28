@@ -39,14 +39,8 @@ Package.onUse(function(api) {
 	api.addFiles('models/spaces.coffee');
 	api.addFiles('models/space_users.coffee');
 	api.addFiles('models/organizations.coffee');
-	api.addFiles('models/users_changelogs.coffee');
 	api.addFiles('models/steedos_keyvalue.coffee');
-	api.addFiles('models/steedos_statistics.coffee');
 	api.addFiles('models/audit_logs.coffee');
-	api.addFiles('models/billings.coffee');
-	api.addFiles('models/modules.coffee');
-	api.addFiles('models/modules_changelogs.coffee');
-	api.addFiles('models/billing_pay_records.coffee');
 	api.addFiles('models/space_settings.coffee');
 	api.addFiles('models/permission_set.coffee');
 	api.addFiles('models/permission_objects.coffee');

@@ -68,6 +68,7 @@ Package.onUse(function(api) {
 	api.use('steedos:i18n-iso-countries@3.3.0');
 	api.use('steedos:objects@0.0.9');
 	api.use('steedos:objects-core');
+	api.use('steedos:objects-billing');
 
 	api.addFiles('checkNpm.js', "server");
 
