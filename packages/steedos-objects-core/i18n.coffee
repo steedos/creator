@@ -11,7 +11,10 @@ sprintf = require('sprintf-js').sprintf;
 	else
 		translator = i18n.__;
 
-	if parameters and !(_.isObject parameters)
+	if parameters?.context
+		key = key + "_" + parameters.context;
+			
+	if parameters? and !(_.isObject parameters)
 		# 兼容老格式 key中包含 %s，只支持一个参数。
 		return sprintf(translator(key), parameters)
 
@@ -31,8 +34,7 @@ if TAPi18n?
 	TAPi18n.__ = (key, options, locale)->
 
 		translated = t(key, options, locale);		
-		if translated != key
-			return translated
+		return translated
 
 		# i18n 翻译不出来，尝试用 tap:i18n 翻译
 		return TAPi18n.__original key, options, locale
