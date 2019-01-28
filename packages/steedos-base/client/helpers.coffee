@@ -155,17 +155,9 @@ Steedos.Helpers =
 		return Steedos.numberToString number, locale
 
 	selfCompanys: ()->
-		# 返回当前用户所属公司
-		su = db.space_users.findOne({user:Meteor.userId()})
-		selfOrgIds = if su.company_ids?.length then su.company_ids else null
-		if selfOrgIds
-			query = {_id: {$in: selfOrgIds}}
-			if !Steedos.isSpaceAdmin()
-				query.hidden = $ne: true
-			result = db.organizations.find(query).fetch()
-			return if result.length then result else null
-		else
-			return null
+		# 返回当前用户所属公司Id集合
+		company_ids = Session.get("user_company_ids")
+		return if company_ids?.length then company_ids else null
 
 _.extend Steedos, Steedos.Helpers
 

@@ -1,5 +1,3 @@
-db = {}
-
 Steedos =
 	settings: {}
 	db: db

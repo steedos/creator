@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:odata',
-	version: '0.0.3',
+	version: '0.0.4',
 	summary: 'Steedos odata libraries',
 	git: '',
 	documentation: null
@@ -18,7 +18,7 @@ Package.onUse(function(api) {
 	api.use('ddp-common');
 	api.use(['webapp'], 'server');
 
-	api.use('steedos:objects@0.0.7');
+	api.use('steedos:objects@0.0.9');
 
 	api.addFiles('checkNpm.js', 'server');
 

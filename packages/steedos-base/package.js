@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:base',
-	version: '0.1.3',
+	version: '0.1.4',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/creator/tree/master/packages/steedos-base'
 });
@@ -57,6 +57,7 @@ Package.onUse(function(api) {
 	api.use('aldeed:tabular@1.6.1');
 	// api.use('momentjs:moment');
 	api.use('simple:json-routes@2.1.0');
+	api.use('tap:i18n');
 	api.use('universe:i18n@1.13.0');
 
 	api.use('steedos:ionicons@0.1.7');
@@ -65,7 +66,8 @@ Package.onUse(function(api) {
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:e164-phones-countries@1.0.3');
 	api.use('steedos:i18n-iso-countries@3.3.0');
-	api.use('steedos:objects@0.0.7');
+	api.use('steedos:objects@0.0.9');
+	api.use('steedos:objects-core');
 
 	api.addFiles('checkNpm.js', "server");
 
@@ -73,26 +75,10 @@ Package.onUse(function(api) {
 	api.addFiles('lib/steedos_util.js', ['client', 'server']);
 
 	api.addFiles([
-		'lib/core.coffee',
-		'lib/tap-i18n.coffee'
+		'lib/core.coffee'
 	]);
 
 	api.addFiles('lib/simple_schema_extend.js');
-
-	api.addFiles('lib/models/apps.coffee');
-	api.addFiles('lib/models/users.coffee');
-	api.addFiles('lib/models/spaces.coffee');
-	api.addFiles('lib/models/space_users.coffee');
-	api.addFiles('lib/models/organizations.coffee');
-	api.addFiles('lib/models/users_changelogs.coffee');
-	api.addFiles('lib/models/steedos_keyvalue.coffee');
-	api.addFiles('lib/models/steedos_statistics.coffee');
-	api.addFiles('lib/models/audit_logs.coffee');
-	api.addFiles('lib/models/billings.coffee');
-	api.addFiles('lib/models/modules.coffee');
-	api.addFiles('lib/models/modules_changelogs.coffee');
-	api.addFiles('lib/models/billing_pay_records.coffee');
-	api.addFiles('lib/models/space_settings.coffee');
 
 	api.addFiles('routes/api_get_apps.coffee', 'server');
 
@@ -130,9 +116,6 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/lib/printThis/printThis.js', 'client');
 
-	api.addFiles('lib/cfs/core.coffee');
-	api.addFiles('lib/cfs/avatars.coffee');
-
 	api.addFiles('lib/methods/apps_init.coffee', 'server');
 	api.addFiles('lib/methods/utc_offset.coffee');
 	api.addFiles('lib/methods/last_logon.coffee');
@@ -146,8 +129,6 @@ Package.onUse(function(api) {
 
 	api.addFiles('lib/admin.coffee');
 	api.addFiles('lib/array_includes.js');
-	api.addFiles('lib/cfs.coffee', ['client', 'server']);
-	api.addFiles('lib/cfs_fix.coffee', ['client', 'server']);
 	api.addFiles('lib/settings.coffee', ['client', 'server']);
 
 	api.addFiles('lib/server_session.js');
@@ -200,7 +181,8 @@ Package.onUse(function(api) {
 		'client/views/sidebar_user_panel.coffee',
 		'client/views/sidebar_user_panel.less',
 		'client/dataTables_bootstrap.less',
-		'client/my_contacts_limit.coffee'
+		'client/my_contacts_limit.coffee',
+		'client/my_company_ids.coffee'
 	], "client");
 
 	api.addFiles([
@@ -321,7 +303,6 @@ Package.onUse(function(api) {
 
 	api.export('Selector');
 	api.export('Steedos');
-	api.export('db');
 
 	api.export('AjaxCollection');
 	api.export("SteedosDataManager");
