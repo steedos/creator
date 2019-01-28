@@ -83,7 +83,7 @@ Creator.Objects.project_issues =
 
 		deadline:
 			label: '截止时间'
-			type: 'datetime'
+			type: 'date'
 
 		end_organization:
 			label: '办结部门'
@@ -92,7 +92,7 @@ Creator.Objects.project_issues =
 
 		enddate:
 			label: '办结时间'
-			type: 'datetime'
+			type: 'date'
 
 		# state:
 		# 	label: "进度"
