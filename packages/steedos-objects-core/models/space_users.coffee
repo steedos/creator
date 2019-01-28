@@ -402,7 +402,7 @@ Meteor.startup ()->
 
 			if doc.organization
 				organization = db.organizations.findOne(doc.organization,fields:{company_id:1})
-				if organization
+				if organization and organization.company_id
 					doc.company_id = organization.company_id
 
 		db.space_users.after.insert (userId, doc) ->
@@ -458,15 +458,9 @@ Meteor.startup ()->
 					if organization.company_id
 						modifier.$set.company_id = organization.company_id
 					else
-						if !organization.parent and organization.is_company
-							modifier.$set.company_id = organization._id
-						else
-							rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
-							if rootOrg
-								modifier.$set.company_id = rootOrg._id
-							else
-								modifier.$unset = modifier.$unset || {}
-								modifier.$unset.company_id = 1
+						# 如果所属主部门的company_id不存在，则清除当前用户company_id值，而不是查找并设置为根组织Id
+						modifier.$unset = modifier.$unset || {}
+						modifier.$unset.company_id = 1
 
 			newMobile = modifier.$set.mobile
 			# 当把手机号设置为空值时，newMobile为undefined，modifier.$unset.mobile为空字符串
@@ -672,23 +666,16 @@ Meteor.startup ()->
 			organizations_parents = _.compact(_.uniq(_.flatten([organizations, _.pluck(orgs, 'parents')])))
 			db.space_users.direct.update({_id: _id}, {$set: {organizations_parents: organizations_parents}})
 		
-		db.space_users.update_company_ids = (_id, rootOrgId)->
+		db.space_users.update_company_ids = (_id)->
 			su = db.space_users.findOne({_id: _id}, {fields: {organizations: 1, company_id: 1, space: 1}})
 			unless su
 				console.error "db.space_users.update_company_ids,can't find space_users by _id of:", _id
 				return
-			unless rootOrgId
-				rootOrgId = db.organizations.findOne({space: su.space, parent: null, is_company: true},fields:{_id:1})?._id
 			orgs = db.organizations.find({_id: {$in: su.organizations}}, {fields: {company_id: 1}}).fetch()
 			company_ids = _.pluck(orgs, 'company_id')
-			# company_ids中的空值表示根组织，需要转换成真实的根组织ID值
-			company_ids = company_ids.map((n)->
-				return if n then n else rootOrgId
-			)
-			company_ids = _.uniq(company_ids)
-			# 如果company_id为空则设置为根组织ID值
-			company_id = if su.company_id then su.company_id else rootOrgId
-			db.space_users.direct.update({_id: _id}, {$set: {company_ids: company_ids, company_id: company_id}})
+			# company_ids中的空值就空着，不需要转换成根组织ID值
+			company_ids = _.uniq(_.compact(company_ids))
+			db.space_users.direct.update({_id: _id}, {$set: {company_ids: company_ids}})
 
 
 		Meteor.publish 'space_users', (spaceId)->
