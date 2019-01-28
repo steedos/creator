@@ -8,6 +8,9 @@ FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 # 定义 禁用 的字段类型
 DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden']
 
+# 定义 禁用 的按钮
+DISABLEDACTIONBUTTONS = ['clear','data','save']
+
 # 定义 禁用 的字段属性
 DISABLEDATTRS = ['description','maxlength','placeholder',"access","value",'min', 'max', 'step', 'inline', 'other', 'toggle', 'rows', 'subtype', 'multiple']
 
@@ -346,6 +349,7 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 		disableFields.push 'section'
 
 	options.disableFields = DISABLEFIELDS
+	options.disabledActionButtons = DISABLEDACTIONBUTTONS
 
 	options.fields = getFields()
 

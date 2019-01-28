@@ -84,4 +84,35 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 
 
 Creator.formBuilder.transformFormFieldsOut = (fields)->
-	console.log('');
+	console.log('Creator.formBuilder.transformFormFieldsOut', fields);
+	formFields = []
+	_.each fields, (field)->
+		field.code = field.name
+		field.name = field.label
+		delete field.label
+		delete field.className
+
+		if field.values
+			field.options = _.pluck(field.values, 'label').join('\n')
+			delete field.values
+
+		switch field.type
+			when 'table'
+				console.log(field)
+				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{field.name}-preview").data('formBuilder').actions.getData())
+			when 'section'
+				console.log(field)
+				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{field.name}-preview").data('formBuilder').actions.getData())
+			when 'textarea'
+				field.type = 'input'
+				field.is_textarea = true
+			when 'text'
+				field.type = 'input'
+			when 'checkboxBoolean'
+				field.type = 'checkbox'
+			when 'checkbox-group'
+				field.type = 'multiSelect'
+			when 'radio-group'
+				field.type = 'radio'
+		formFields.push field
+	return formFields

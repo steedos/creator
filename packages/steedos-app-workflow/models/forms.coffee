@@ -31,6 +31,10 @@ Creator.Objects.forms =
 			type: "boolean"
 			label:"是否有效"
 			readonly: true
+		instance_style:
+			type: 'select'
+			label: "样式"
+			options: "表格:table,默认:default"
 
 		historys:
 			label:"历史版本"
