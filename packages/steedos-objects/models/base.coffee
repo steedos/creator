@@ -61,6 +61,7 @@ Creator.baseObject =
 			sortable: true
 			index: true
 			omit: true
+			hidden: true
 		deleted_by:
 			label:"删除人"
 			type: "lookup"
@@ -68,6 +69,7 @@ Creator.baseObject =
 			reference_to: "users"
 			disabled: true
 			omit: true
+			hidden: true
 		instances:
 			label:"申请单"
 			type: "grid"
