@@ -1,3 +1,5 @@
+@db = {}
+
 if !Creator?
 	@Creator = {}
 Creator.Objects = {}
@@ -283,3 +285,6 @@ Creator.processPermissions = (po)->
 		po.allowRead = true
 		po.allowEdit = true
 		po.viewCompanyRecords = true
+	return po
+
+

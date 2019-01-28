@@ -152,6 +152,7 @@ steedos:mailqueue
 # steedos:vip-card
 # steedos:vip-post
 steedos:objects
+steedos:objects-core
 steedos:sso
 
 

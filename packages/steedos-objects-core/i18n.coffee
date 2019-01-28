@@ -118,3 +118,6 @@ if Meteor.isClient
 					if !table.options.language
 						table.options.language = {}
 					table.options.language.zeroRecords = t("dataTables.zero") + t(table.collection._name)
+					return 
+
+
