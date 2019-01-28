@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:base',
-	version: '0.1.3',
+	version: '0.1.4',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/creator/tree/master/packages/steedos-base'
 });
@@ -66,7 +66,7 @@ Package.onUse(function(api) {
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:e164-phones-countries@1.0.3');
 	api.use('steedos:i18n-iso-countries@3.3.0');
-	api.use('steedos:objects@0.0.7');
+	api.use('steedos:objects@0.0.9');
 
 	api.addFiles('checkNpm.js', "server");
 

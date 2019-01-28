@@ -1,31 +1,12 @@
 Creator.odata = {}
-# Creator.odata.get = (object_name, record_id)->
-# 	if object_name and record_id
-# 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
-# 		$.ajax
-# 			type: "get"
-# 			url: url
-# 			dataType: "json"
-# 			contentType: "application/json"
-# 			beforeSend: (request) ->
-# 				request.setRequestHeader('X-User-Id', Meteor.userId())
-# 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
-# 			error: (jqXHR, textStatus, errorThrown) ->
-# 				error = jqXHR.responseJSON
-# 				console.error error
-# 				if error.reason
-# 					toastr?.error?(TAPi18n.__(error.reason))
-# 				else if error.message
-# 					toastr?.error?(TAPi18n.__(error.message))
-# 				else
-# 					toastr?.error?(error)
-# 	else
-# 		toastr.error("未找到记录")
 Creator.odata.get = (object_name, record_id, select_fields, callback)->
 	result = null
 	isAsync = callback and _.isFunction(callback)
+	spaceId = Steedos.spaceId()
+	unless spaceId
+		return
 	if object_name and record_id
-		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
+		url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}/#{record_id}"
 		request_data = {}
 		if select_fields
 			request_data = 
@@ -69,10 +50,13 @@ Creator.odata.get = (object_name, record_id, select_fields, callback)->
 
 Creator.odata.query = (object_name, options, is_ajax, callback)->
 	result = null
+	spaceId = Steedos.spaceId()
+	unless spaceId
+		return
 	isAsync = callback and _.isFunction(callback)
 	if is_ajax
 		if object_name
-			url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+			url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}"
 			$.ajax
 				type: "get"
 				url: url
@@ -101,7 +85,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 		return result
 	else
 		if object_name
-			url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+			url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}"
 			store = new DevExpress.data.ODataStore({
 				type: "odata"
 				version: 4
@@ -149,8 +133,11 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 	# 	toastr.error("未找到记录")				
 
 Creator.odata.delete = (object_name,record_id,callback)->
+	spaceId = Steedos.spaceId()
+	unless spaceId
+		return
 	if object_name and record_id
-		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
+		url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}/#{record_id}"
 		$.ajax
 			type: "delete"
 			url: url
@@ -180,8 +167,11 @@ Creator.odata.delete = (object_name,record_id,callback)->
 					toastr?.error?(error)
 
 Creator.odata.update = (object_name,record_id,doc,callback)->
+	spaceId = Steedos.spaceId()
+	unless spaceId
+		return
 	if object_name and record_id
-		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{record_id}"
+		url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}/#{record_id}"
 		data = {}
 		data['$set'] = doc
 		$.ajax
@@ -211,8 +201,11 @@ Creator.odata.update = (object_name,record_id,doc,callback)->
 				else
 					toastr?.error?(error)
 Creator.odata.insert = (object_name,doc)->
+	spaceId = Steedos.spaceId()
+	unless spaceId
+		return
 	if object_name
-		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+		url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}"
 		$.ajax
 			type: "post"
 			url: url

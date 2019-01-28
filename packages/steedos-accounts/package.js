@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:accounts',
-	version: '0.0.34',
+	version: '0.0.35',
 	summary: 'Steedos Accounts',
 	git: '',
 	documentation: null
@@ -39,12 +39,12 @@ Package.onUse(function(api) {
 	api.use('steedos:useraccounts-flow-routing@1.14.2_4');
 	api.use('steedos:accounts-phone@0.0.5');
 
-	api.use('steedos:base@0.0.80');
+	api.use('steedos:base@0.1.4');
 
 
 
 	//api.add_files("package-tap.i18n", ["client", "server"]);
-	api.use('universe:i18n');
+	api.use('universe:i18n@1.13.0');
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json'];
 	api.addFiles(tapi18nFiles, ['client', 'server']);
 
