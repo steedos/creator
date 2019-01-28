@@ -2,40 +2,46 @@ import i18n from 'meteor/universe:i18n';
 sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
-@t = (key, replaces...) ->
-	if _.isObject replaces[0]
-		return TAPi18n.__ key, replaces
-	else
-		return sprintf(TAPi18n.__(key), replaces)
+@t = (key, parameters, locale) ->
+	if locale == "zh-cn"
+		locale = "zh-CN"
 
-
-@tr = (key, options, replaces...) ->
-	if _.isObject replaces[0]
-		return TAPi18n.__ key, options, replaces
+	if locale
+		translator = i18n.createTranslator('', locale);
 	else
-		return sprintf(TAPi18n.__(key, options), replaces)
+		translator = i18n.__;
+
+	if !(_.isObject parameters)
+		# 兼容老格式 key中包含 %s
+		return sprintf(translator(key), _.rest(arguments))
+
+	return translator(key, parameters)
+
+@tr = t
+
+@trl = t
 
 # 重写tap:i18n函数，向后兼容
 i18n.setOptions
 	purify: null
 	defaultLocale: 'zh-CN'
 
-if TAPi18n?
-	TAPi18n.__original = TAPi18n.__
-	TAPi18n.__ = (key, options, lang)->
-		if lang == "zh-cn"
-			lang = "zh-CN"
-		translated = TAPi18n.__original key, options, lang
-		if translated != key
-			return translated
+# if TAPi18n?
+# 	TAPi18n.__original = TAPi18n.__
+# 	TAPi18n.__ = (key, options, lang)->
+# 		if lang == "zh-cn"
+# 			lang = "zh-CN"
+# 		translated = TAPi18n.__original key, options, lang
+# 		if translated != key
+# 			return translated
 
-		# TAP 翻译不出来，用 i18n 翻译	
-		if lang?
-			t2 = i18n.createTranslator('', lang);
-			translated = t2(key, options);
-		else
-			translated = i18n.__ key, options;		
-		return translated
+# 		# TAP 翻译不出来，用 i18n 翻译	
+# 		if lang?
+# 			t2 = i18n.createTranslator('', lang);
+# 			translated = t2(key, options);
+# 		else
+# 			translated = i18n.__ key, options;		
+# 		return translated
 
 
 if Meteor.isClient
