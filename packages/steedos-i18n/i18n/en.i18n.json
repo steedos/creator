@@ -6,7 +6,7 @@
 	"accounts-sign-up": "Sign Up",
 
 	"dataTables": {
-		"emptyTable": "",
+		"emptyTable": "&nbsp;",
 		"info": "Showing _START_ to _END_ of _TOTAL_ entries",
 		"infoEmpty": "Showing 0 to 0 of 0 entries",
 		"infoFiltered": "(filtered from _MAX_ total entries)",
@@ -111,6 +111,7 @@
 
 	"Account Settings": "Account Settings",
 	"Account": "Account",
+	"Settings": "Settings",
 	"Select Space": "Select Space",
 	"Add space": "Add space",
 
@@ -122,6 +123,7 @@
 	"OK": "OK",
 	"Cancel": "Cancel",
 	"About": "About Steedos",
+	"Password": "Password",
 	"Accountzoom": "Font size",
 	"Backgroundimage": "Background image",
 	"binding_mailbox": "Binding mailbox",
@@ -283,11 +285,17 @@
 	"delete_confirm": "Are you sure?",
 	"get_secret_successfully": "New success",
 	"Secret": "API Token",
-	"meteor_status_waiting": "Network failure...",
-	"meteor_status_reconnect_in": "",
-	"meteor_status_reconnect_in_plural": "",
-	"meteor_status_connecting": "Connecting...",
-	"meteor_status_try_now_waiting": "Retry",
+	
+	"meteor_status_connected":"Connected",
+	"meteor_status_connecting":"Connecting...",
+	"meteor_status_failed":"The server connection failed",
+	"meteor_status_waiting":"Waiting for server connection,",
+	"meteor_status_offline":"Offline mode.",
+	"meteor_status_reconnect_in":"trying again in one second...",
+	"meteor_status_reconnect_in_plural":"trying again in {$count} seconds...",
+	"meteor_status_try_now_waiting":"Try now",
+	"meteor_status_try_now_offline":"Connect again",
+
 	"btn_back_title": "Back",
 	"space_users_remove_mail_subject": "Your account has been deleted from the workspace by the administrator",
 	"space_users_remove_mail_content": "Hello, <br/><br/>Your account \"{$steedos_id}\" has been removed from the workspace \"{$space_name}\" by the administrator. <br/><br/>Thank you!",
@@ -325,6 +333,7 @@
 	"billing_pay_records_end_date": "Expiration date",
 	"billing_pay_records_order_total_fee()": "Amount ￥",
 	"billing_pay_records_order_paid()": "Status",
+	"loading_reload_button_title": "Reload",
 	"loading_reload_button_title": "Reload",
 	"apps_members": "Authorized object",
 	"apps_members_users": "Authorized personnel",
@@ -383,5 +392,11 @@
     "creator_odata_user_access_fail": "User does not have privileges to access the entity",
     "creator_odata_user_create_fail": "User does not have privileges to create the entity",
     "creator_odata_user_update_fail": "User does not have privileges to update the entity",
-    "creator_odata_user_remove_fail": "User does not have privileges to remove the entity"
+    "creator_odata_user_remove_fail": "User does not have privileges to remove the entity",	
+	"Steedos Sogo": "Hot Mail",
+	"sogo_mail_account": "Hot mail account",
+
+	"downloading": "Downloading",
+	"download_progress": "Download progress"
+
 }

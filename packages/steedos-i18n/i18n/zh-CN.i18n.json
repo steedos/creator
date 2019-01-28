@@ -7,7 +7,7 @@
 
 	"dataTables": {
 		"none": "None",
-		"emptyTable": "",
+		"emptyTable": "&nbsp;",
 		"info": "显示第 _START_ 至 _END_ 项记录，共 _TOTAL_ 项",
 		"infoEmpty": "显示第 0 至 0 项记录，共 0 项",
 		"infoFiltered": "(由 _MAX_ 项记录过滤)",
@@ -96,6 +96,7 @@
 	"Link your LinkedIn account": "Link your LinkedIn account",
 	"Link your Instagram account": "Link your Instagram account",
 	"Contact Form": "联系我们",
+	"Full Name": "姓名",
 	"Body": "内容",
 	"Send": "发送",
 	"Chat with us": "在线交谈",
@@ -120,8 +121,10 @@
 
 	"Account Settings": "账户设置",
 	"Account": "账户",
+	"Settings": "设置",
 	"Select Space": "选择工作区",
 	"Add space": "新增工作区",
+	"Password": "密码",
 	"Accountzoom": "字体",
 	"Backgroundimage": "背景",
 	"binding_mailbox": "绑定邮箱",
@@ -195,7 +198,6 @@
 	"Edit": "编辑",
 	"Delete": "删除",
 	"Spaces_isPaid": "已付费",
-
 
 
 	"users_error": {
@@ -300,11 +302,17 @@
 	"delete_confirm": "确定删除吗?",
 	"get_secret_successfully": "新建成功",
 	"Secret": "API Token",
-	"meteor_status_waiting": "网络故障,",
-	"meteor_status_reconnect_in": "一分钟后重连...",
-	"meteor_status_reconnect_in_plural": "{$count}秒后重连...",
-	"meteor_status_connecting": "连接中...",
-	"meteor_status_try_now_waiting": "重试",
+
+	"meteor_status_connected":"已连接",
+	"meteor_status_connecting":"连接中...",
+	"meteor_status_failed":"无法连接服务器",
+	"meteor_status_waiting":"等待连接,",
+	"meteor_status_offline":"离线状态。",
+	"meteor_status_reconnect_in":"{$count}秒后重试...",
+	"meteor_status_reconnect_in_plural":"{$count}秒后重试...",
+	"meteor_status_try_now_waiting":"立即连接",
+	"meteor_status_try_now_offline":"重新连接",
+
 	"btn_back_title": "返回",
 	"space_users_remove_mail_subject": "您的帐户已被管理员从工作区中删除",
 	"space_users_remove_mail_content": "您好,<br/><br/>您的帐户\"{$steedos_id}\"已被管理员从工作区\"{$space_name}\"中删除。<br/><br/>谢谢！",
@@ -343,6 +351,7 @@
 	"billing_pay_records_order_total_fee()": "金额 ￥",
 	"billing_pay_records_order_paid()": "状态",
 	"loading_reload_button_title": "重新加载",
+	"loading_reload_button_title": "重新加载",
 	"apps_members": "授权对象",
 	"apps_members_users": "授权人员",
 	"apps_members_organizations": "授权部门",
@@ -365,6 +374,7 @@
 
 	"space_users_error_roles_used": "已有角色指定该用户：{$names}",
 	"space_users_error_flows_used": "已有流程指定该用户为处理人：{$names}",
+
 	"contact_need_phone_or_email": "手机和邮箱不能同时为空",
 
 	"organizations_error_is_company_false_in_root": "根部门“公司级”属性不能为否",
@@ -401,5 +411,10 @@
     "creator_odata_user_access_fail": "用户无访问该对象的权限",
     "creator_odata_user_create_fail": "用户无创建该对象的权限",
     "creator_odata_user_update_fail": "用户无更新该对象的权限",
-    "creator_odata_user_remove_fail": "用户无删除该对象的权限"
+    "creator_odata_user_remove_fail": "用户无删除该对象的权限",	
+	"Steedos Sogo": "华邮",
+	"sogo_mail_account": "邮件账户",
+	
+	"downloading": "正在下载",
+	"download_progress": "进度"
 }
