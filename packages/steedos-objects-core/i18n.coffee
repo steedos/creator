@@ -63,7 +63,7 @@ if Meteor.isClient
 	Session.set("steedos-locale", getBrowserLocale())
 
 	Tracker.autorun ()->
-		if Session.get("steedos-locale") == "zh-cn"
+		if Session.get("steedos-locale") != "en-us"
 			if TAPi18n?
 				TAPi18n.setLanguage("zh-CN")
 			T9n.setLanguage("zh-CN")
@@ -76,15 +76,16 @@ if Meteor.isClient
 			i18n.setLocale("en")
 			moment.locale("en")
 
+	Tracker.autorun ()->
+		if Meteor.user()
+			if Meteor.user().locale
+				Session.set("steedos-locale",Meteor.user().locale)
+
 	Meteor.startup ->
 
 		Template.registerHelper '_', (key, args)->
 			return t(key, args);
 		
-		Tracker.autorun ()->
-			if Meteor.user()
-				if Meteor.user().locale
-					Session.set("steedos-locale",Meteor.user().locale)
 
 
 		Tracker.autorun ->
