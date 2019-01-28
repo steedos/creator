@@ -160,7 +160,7 @@ InstanceRecordQueue.Configure = function (options) {
 	}
 
 	self.syncInsFields = ['name', 'submitter_name', 'applicant_name', 'applicant_organization_name', 'applicant_organization_fullname', 'state',
-		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision'
+		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision', 'applicant_organization', 'applicant_company'
 	];
 	self.syncValues = function (field_map_back, values, ins, objectInfo, field_map_back_script) {
 		var
