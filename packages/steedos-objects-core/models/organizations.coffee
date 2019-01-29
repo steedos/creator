@@ -89,7 +89,7 @@ Creator.Objects.organizations =
 	list_views:
 
 		all:
-			columns: ["name", "sort_no", "is_company", "admins", "hidden"]
+			columns: ["name", "sort_no", "is_company", "is_group", "admins", "hidden"]
 			label: "所有"
 			filter_scope: "space"
 			sort : [
