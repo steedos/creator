@@ -34,7 +34,8 @@ if TAPi18n?
 	TAPi18n.__ = (key, options, locale)->
 
 		translated = t(key, options, locale);		
-		return translated
+		if translated != key
+			return translated
 
 		# i18n 翻译不出来，尝试用 tap:i18n 翻译
 		return TAPi18n.__original key, options, locale
@@ -60,7 +61,7 @@ if Meteor.isClient
 		)
 
 	Template.registerHelper '_', (key, args)->
-		return t(key, args);
+		return TAPi18n.__(key, args);
 
 	Session.set("steedos-locale", getBrowserLocale())
 
@@ -86,7 +87,7 @@ if Meteor.isClient
 	Meteor.startup ->
 
 		Template.registerHelper '_', (key, args)->
-			return t(key, args);
+			return TAPi18n.__(key, args);
 		
 
 
