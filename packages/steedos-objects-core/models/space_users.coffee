@@ -27,6 +27,7 @@ Creator.Objects.space_users =
 			label:'所属部门'
 			reference_to: "organizations"
 			multiple: true
+			index: true
 			defaultValue: ()->
 				return Session.get("grid_sidebar_selected")
 			required: true
@@ -443,7 +444,7 @@ Meteor.startup ()->
 
 			if doc.organizations
 				db.space_users.update_organizations_parents(doc._id, doc.organizations)
-				db.space_users.update_company_ids(doc._id)
+				db.space_users.update_company_ids(doc._id, doc)
 
 		db.space_users.before.update (userId, doc, fieldNames, modifier, options) ->
 			modifier.$set = modifier.$set || {};
@@ -604,7 +605,7 @@ Meteor.startup ()->
 
 			if modifier.$set.organizations
 				db.space_users.update_organizations_parents(doc._id, modifier.$set.organizations)
-				db.space_users.update_company_ids(doc._id)
+				db.space_users.update_company_ids(doc._id, doc)
 
 
 		db.space_users.before.remove (userId, doc) ->
@@ -666,8 +667,9 @@ Meteor.startup ()->
 			organizations_parents = _.compact(_.uniq(_.flatten([organizations, _.pluck(orgs, 'parents')])))
 			db.space_users.direct.update({_id: _id}, {$set: {organizations_parents: organizations_parents}})
 		
-		db.space_users.update_company_ids = (_id)->
-			su = db.space_users.findOne({_id: _id}, {fields: {organizations: 1, company_id: 1, space: 1}})
+		db.space_users.update_company_ids = (_id, su)->
+			unless su
+				su = db.space_users.findOne({_id: _id}, {fields: {organizations: 1, company_id: 1, space: 1}})
 			unless su
 				console.error "db.space_users.update_company_ids,can't find space_users by _id of:", _id
 				return
