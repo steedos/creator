@@ -98,6 +98,11 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 		delete field.required
 		delete field.value
 
+		field.is_multiselect = field.is_multiselect || false
+		field.is_searchable = field.is_searchable || false
+		field.is_list_display = field.is_list_display || false
+		field.is_wide = field.is_wide || false
+
 		if _.isArray(field.values) && field.values.length > 0
 			field.options = _.pluck(field.values, 'label').join('\n')
 		delete field.values
