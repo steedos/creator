@@ -40,17 +40,14 @@ BASEUSERATTRS = {
 	},
 	is_wide: {
 		label: '宽字段',
-		value: false
 		type: 'checkbox'
 	},
 	is_list_display: {
 		label: '列表显示',
-		value: false
 		type: 'checkbox'
 	},
 	is_searchable: {
 		label: '内容可搜',
-		value: false
 		type: 'checkbox'
 	}
 }
@@ -77,6 +74,12 @@ getTypeUserAttrs = ()->
 	typeUserAttrs = {}
 	_.each FORMBUILDERFIELDTYPES, (item)->
 		switch item
+			when 'select'
+				typeUserAttrs[item] = _.extend {}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
+			when 'radio-group'
+				typeUserAttrs[item] = _.extend {}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
+			when 'checkbox-group'
+				typeUserAttrs[item] = _.extend {}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
 			when 'text'
 				typeUserAttrs[item] = _.extend {
 					options: {
@@ -165,6 +168,9 @@ BASEUSEREVENTS = {
 			textarea = $("<textarea id='#{_id}' name='#{_name}' class='#{_class}' title='#{_title}' placeholder='#{_placeholder}' rows='#{_rows}'>#{_value}</textarea>")
 			$(_element).parent().append(textarea)
 			$(_element).remove()
+		$("input[type='checkbox']",fid).each (_i, _element)->
+			if $(_element).val() == 'true'
+				$(_element).attr('checked',true)
 }
 # 获取各字段类型的事件
 getTypeUserEvents = ()->
@@ -285,7 +291,6 @@ getFieldTemplates  = ()->
 				field: "<input id='#{fieldData.name}' type='text' readonly #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 		table: (fieldData)->
-			console.log('fieldData', fieldData);
 			delete fieldData.className
 			return {
 				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",
@@ -304,7 +309,6 @@ getFieldTemplates  = ()->
 					, 100
 			};
 		section: (fieldData)->
-			console.log('fieldData', fieldData);
 			delete fieldData.className
 			return {
 				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",

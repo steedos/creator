@@ -11,7 +11,7 @@ getFormFieldOptions = (field)->
 Creator.formBuilder.transformFormFieldsIn = (formFields)->
 	fields = []
 	_.each formFields, (f)->
-		field = _.extend({label: f.name || f.code, name: f.code, className: "form-control", value: f.default_value}, f)
+		field = _.extend({label: f.name || f.code, name: f.code, className: "form-control", value: f.default_value, required: f.is_required}, f)
 		switch f.type
 			when 'input'
 				field.type = 'text'
@@ -89,8 +89,10 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 	_.each fields, (field)->
 		field.code = field.name
 		field.name = field.label
+		field.is_required = field.required
 		delete field.label
 		delete field.className
+		delete field.required
 
 		if field.values
 			field.options = _.pluck(field.values, 'label').join('\n')
@@ -98,10 +100,10 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 
 		switch field.type
 			when 'table'
-				console.log(field)
+				field.is_wide = true
 				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{field.name}-preview").data('formBuilder').actions.getData())
 			when 'section'
-				console.log(field)
+				field.is_wide = true
 				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{field.name}-preview").data('formBuilder').actions.getData())
 			when 'textarea'
 				field.type = 'input'
