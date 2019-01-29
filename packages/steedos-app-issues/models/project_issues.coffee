@@ -24,18 +24,19 @@ Creator.Objects.project_issues =
 			type: 'master_detail'
 			reference_to: 'projects'
 			filterable: true
+			is_wide: true
 
-		level:
-			label: "级别"
-			type: "select"
-			options: [
-				{label:"车间级", value:"department"},
-				{label:"厂级", value:"company"},
-				{label:"公司级", value:"group"}
-			]
-			sortable: true
-			defaultValue: "department"
-			filterable: true
+		# level:
+		# 	label: "级别"
+		# 	type: "select"
+		# 	options: [
+		# 		{label:"车间级", value:"department"},
+		# 		{label:"厂级", value:"company"},
+		# # 		{label:"公司级", value:"group"}
+		# 	]
+		# 	sortable: true
+		# 	defaultValue: "department"
+		# 	filterable: true
 
 		company_id:
 			label: '提报单位'
