@@ -111,17 +111,7 @@ getTypeUserAttrs = ()->
 					}
 				}, BASEUSERATTRS, FORMULAUSERATTRS
 			when 'password'
-				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
-					_id: {
-						label: '唯一键'
-						readonly: 'readonly'
-					},
-					is_wide: {
-						label: '宽字段',
-						value: false
-						type: 'checkbox'
-					}
-				}
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'value', 'is_wide')
 			when 'dateNew'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'dateTime'
