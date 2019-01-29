@@ -207,20 +207,20 @@ Meteor.startup ()->
 
 			# 检验当前工作区下有没有邮件或手机号重复的成员，禁止重复添加
 			if doc.email and doc.mobile
-				spaceUserExisted = db.space_users.find({space: doc.space, $or: [{email: doc.email}, {mobile: doc.mobile}]})
+				spaceUserExisted = db.space_users.find({space: doc.space, $or: [{email: doc.email}, {mobile: doc.mobile}]},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "邮箱或手机号已存在")
 			else if doc.email
-				spaceUserExisted = db.space_users.find({space: doc.space, email: doc.email})
+				spaceUserExisted = db.space_users.find({space: doc.space, email: doc.email},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该邮箱已存在")
 			else if doc.mobile
-				spaceUserExisted = db.space_users.find({space: doc.space, mobile: doc.mobile})
+				spaceUserExisted = db.space_users.find({space: doc.space, mobile: doc.mobile},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该手机号已存在")
 
 			if user
-				spaceUserExisted = db.space_users.find({space: doc.space, user: user})
+				spaceUserExisted = db.space_users.find({space: doc.space, user: user},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该用户已在此工作区")
 
@@ -440,7 +440,7 @@ Meteor.startup ()->
 				space: doc.space
 				operation: "add"
 				user: doc.user
-				user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+				user_count: db.space_users.find({space: doc.space, user_accepted: true},{fields: {_id: 1}}).count()
 
 			if doc.organizations
 				db.space_users.update_organizations_parents(doc._id, doc.organizations)
@@ -601,7 +601,7 @@ Meteor.startup ()->
 						space: doc.space
 						operation: modifier.$set.user_accepted ? "enable" : "disable"
 						user: doc.user
-						user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+						user_count: db.space_users.find({space: doc.space, user_accepted: true},{fields: {_id: 1}}).count()
 
 			if modifier.$set.organizations
 				db.space_users.update_organizations_parents(doc._id, modifier.$set.organizations)
@@ -641,7 +641,7 @@ Meteor.startup ()->
 				space: doc.space
 				operation: "delete"
 				user: doc.user
-				user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+				user_count: db.space_users.find({space: doc.space, user_accepted: true},{fields: {_id: 1}}).count()
 
 			try
 				user = db.users.findOne(doc.user,{fields: {email: 1,name: 1,steedos_id:1}})

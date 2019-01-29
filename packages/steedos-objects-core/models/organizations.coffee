@@ -339,8 +339,10 @@ if (Meteor.isServer)
 		unless rootOrg
 			rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
 		if doc.users
-			space_users = db.space_users.find({space: doc.space, user: {$in: doc.users}}).fetch()
-			_.each space_users, (su)->
+			space_users = db.space_users.find(
+				{space: doc.space, user: {$in: doc.users}}, 
+				{fields: {organizations: 1, company_id: 1, space: 1}})
+			space_users.forEach (su)->
 				orgs = su.organizations
 				orgs.push(doc._id)
 				db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
@@ -525,16 +527,20 @@ if (Meteor.isServer)
 			added_users = _.difference(new_users, old_users)
 			removed_users = _.difference(old_users, new_users)
 			if added_users.length > 0
-				added_space_users = db.space_users.find({space: doc.space, user: {$in: added_users}}).fetch()
-				_.each added_space_users, (su)->
+				added_space_users = db.space_users.find(
+					{space: doc.space, user: {$in: added_users}}, 
+					{fields: {organizations: 1, company_id: 1, space: 1}})
+				added_space_users.forEach (su)->
 					orgs = su.organizations
 					orgs.push(doc._id)
 					db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
 					db.space_users.update_organizations_parents(su._id, orgs)
 					db.space_users.update_company_ids(su._id, su)
 			if removed_users.length > 0
-				removed_space_users = db.space_users.find({space: doc.space, user: {$in: removed_users}}).fetch()
-				_.each removed_space_users, (su)->
+				removed_space_users = db.space_users.find(
+					{space: doc.space, user: {$in: removed_users}},
+					{fields: {organization: 1,organizations: 1, company_id: 1, space: 1}})
+				removed_space_users.forEach (su)->
 					# 删除部门成员时，如果修改了其organization，则其company_id值应该同步改为其对应的organization.company_id值
 					orgs = su.organizations
 					if orgs.length is 1
@@ -591,7 +597,7 @@ if (Meteor.isServer)
 					{organizations: doc._id}
 				]
 			}
-			db.space_users.find(queryOptions).forEach (su)->
+			db.space_users.find(queryOptions,{fields: {organizations: 1, company_id: 1, space: 1}}).forEach (su)->
 				db.space_users.update_company_ids(su._id, su)
 
 		#修改部门的parent时, 需要其space_user的organizations_parents
