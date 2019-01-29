@@ -1,6 +1,5 @@
 ###TODO###
 # 1 国际化文件
-# 2 分组
 
 Template.formBuilder.onRendered ()->
 	console.log('formBuilder onRendered');
@@ -9,6 +8,8 @@ Template.formBuilder.onRendered ()->
 	form = Creator.odata.get("forms", "ecc83b9a82b6182e44f18681")
 
 	formFields = form.current.fields
+
+	console.log('formFields', formFields)
 
 	fields = Creator.formBuilder.transformFormFieldsIn(formFields)
 
