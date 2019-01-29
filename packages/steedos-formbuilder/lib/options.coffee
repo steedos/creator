@@ -187,7 +187,7 @@ getFields = ()->
 			attrs: {
 				type: 'dateTime'
 			}
-			icon: "⏲️"
+			icon: "🕛"
 		},
 		{
 			label: "勾选框"
@@ -201,21 +201,21 @@ getFields = ()->
 			attrs: {
 				type: "email"
 			}
-			icon: "☑️"
+			icon: "📧"
 		},
 		{
 			label: "网址"
 			attrs: {
 				type: "url"
 			}
-			icon: "☑️"
+			icon: "🌏"
 		},
 		{
 			label: "密码"
 			attrs: {
 				type: "password"
 			}
-			icon: "☑️"
+			icon: "🔑"
 		},
 		{
 			label: "选择用户"
@@ -229,21 +229,21 @@ getFields = ()->
 			attrs: {
 				type: "group"
 			}
-			icon: "👥"
+			icon: "👬"
 		},
 		{
 			label: "表格"
 			attrs: {
 				type: "table"
 			}
-			icon: "😃"
+			icon: "T"
 		},
 		{
 			label: "分组"
 			attrs: {
 				type: "section"
 			}
-			icon: "😃"
+			icon: "S"
 		}
 	]
 
