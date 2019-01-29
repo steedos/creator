@@ -2,20 +2,20 @@
 FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 	"checkbox-group", "radio-group", "checkbox", "text", "file",
 	"date", "number", "textarea",
-	"dateTime", "checkboxBoolean", "email", "url", "password", "user", "group",
+	"dateTime", "dateNew", "checkboxBoolean", "email", "url", "password", "user", "group",
 	"table", "section"]
 
 # 定义 禁用 的字段类型
-DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden']
+DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden', 'date']
 
 # 定义 禁用 的按钮
 DISABLEDACTIONBUTTONS = ['clear','data','save']
 
 # 定义 禁用 的字段属性
-DISABLEDATTRS = ['description','maxlength','placeholder',"access","value",'min', 'max', 'step', 'inline', 'other', 'toggle', 'rows', 'subtype', 'multiple']
+DISABLEDATTRS = ['description','maxlength','placeholder',"access","value",'min', 'max', 'step', 'inline', 'other', 'toggle', 'rows', 'subtype', 'multiple', 'name']
 
 # 定义字段类型排序
-CONTROLORDER = ['table', 'section', 'text','textarea','number','date','dateTime','date','checkboxBoolean','email','url','password','select','user','group',"radio-group","checkbox-group"]
+CONTROLORDER = ['table', 'section', 'text','textarea','number','dateNew','dateTime','date','checkboxBoolean','email','url','password','select','user','group',"radio-group","checkbox-group"]
 
 # 获取各字段类型禁用的字段属性
 #TYPEUSERDISABLEDATTRS = (()->
@@ -52,6 +52,15 @@ BASEUSERATTRS = {
 	}
 }
 
+# 定义字段属性：code
+CODEUSERATTRS = {
+	code: {
+		label: '字段名'
+		type: 'text'
+		required: 'true'
+	}
+}
+
 # 定义字段属性: 公式格式
 FORMULAUSERATTRS = {
 	formula: {
@@ -69,35 +78,40 @@ MULTISELECTUSERATTRS = {
 	}
 }
 
+# 定义字段属性: 文本字段options
+OPTIONSUSERATTRS = {
+	options: {
+		label: "选项"
+		type: 'textarea'
+		placeholder: '选项1\r选项2\r选项3'
+	}
+}
+
 # 获取各字段类型的属性
 getTypeUserAttrs = ()->
 	typeUserAttrs = {}
 	_.each FORMBUILDERFIELDTYPES, (item)->
 		switch item
 			when 'select'
-				typeUserAttrs[item] = _.extend {}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
 			when 'radio-group'
-				typeUserAttrs[item] = _.extend {}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
 			when 'checkbox-group'
-				typeUserAttrs[item] = _.extend {}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display', 'is_searchable')
 			when 'text'
-				typeUserAttrs[item] = _.extend {
-					options: {
-						label: "选项"
-						type: 'textarea'
-						placeholder: '选项1\r选项2\r选项3'
-					}
-				}, BASEUSERATTRS, FORMULAUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, OPTIONSUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
+			when 'textarea'
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, OPTIONSUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 			when 'number'
-				typeUserAttrs[item] = _.extend {
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
 					digits: {
 						label: "小数位数"
 						type: 'number'
-						min: 0
+						min: '0'
 					}
 				}, BASEUSERATTRS, FORMULAUSERATTRS
 			when 'password'
-				typeUserAttrs[item] = {
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
 					_id: {
 						label: '唯一键'
 						readonly: 'readonly'
@@ -108,22 +122,27 @@ getTypeUserAttrs = ()->
 						type: 'checkbox'
 					}
 				}
-			when 'date'
-				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS
+			when 'dateNew'
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'dateTime'
-				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'checkboxBoolean'
-				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, {
+					value: {
+						label: '默认值'
+						type: 'checkbox'
+					}
+				}
 			when 'email'
-				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'url'
-				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'user'
-				typeUserAttrs[item] = _.extend MULTISELECTUSERATTRS, BASEUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, MULTISELECTUSERATTRS, BASEUSERATTRS
 			when 'group'
-				typeUserAttrs[item] = _.extend MULTISELECTUSERATTRS, BASEUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, MULTISELECTUSERATTRS, BASEUSERATTRS
 			when 'table'
-				typeUserAttrs[item] =  {
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
 					_id: {
 						label: '唯一键'
 						readonly: 'readonly'
@@ -137,7 +156,7 @@ getTypeUserAttrs = ()->
 					}
 				}
 			when 'section'
-				typeUserAttrs[item] =  {
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
 					_id: {
 						label: '唯一键'
 						readonly: 'readonly'
@@ -151,7 +170,7 @@ getTypeUserAttrs = ()->
 					}
 				}
 			else
-				typeUserAttrs[item] = _.extend {}, BASEUSERATTRS, FORMULAUSERATTRS
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs
 
 # 定义字段的事件
@@ -182,6 +201,13 @@ getTypeUserEvents = ()->
 # 定义扩展的字段类型
 getFields = ()->
 	[
+		{
+			label: "日期",
+			attrs: {
+				type: 'dateNew'
+			}
+			icon: "📆"
+		},
 		{
 			label: "日期-时间",
 			attrs: {
@@ -250,15 +276,23 @@ getFields = ()->
 # 定义扩展的字段显示模板
 getFieldTemplates  = ()->
 	{
+		dateNew: (fieldData) ->
+			if !fieldData.className
+				fieldData.className = 'form-control'
+			return {
+				field: "<input id='#{fieldData.name}' placeholder='yyyy-MM-dd HH:mm' type='text' #{Creator.formBuilder.utils.attrString(fieldData)} readonly>",
+			};
 		dateTime: (fieldData) ->
 			if !fieldData.className
 				fieldData.className = 'form-control'
 			return {
-				field: "<input id='#{fieldData.name}' type='datetime-local' #{Creator.formBuilder.utils.attrString(fieldData)}>",
+				field: "<input id='#{fieldData.name}' placeholder='yyyy-MM-dd' type='text' #{Creator.formBuilder.utils.attrString(fieldData)} readonly>",
 			};
 		checkboxBoolean: (fieldData)->
+			if fieldData.value
+				fieldData.checked =  fieldData.value
 			return {
-				field: "<input id='#{fieldData.name}' type='checkbox' #{Creator.formBuilder.utils.attrString(fieldData)}>",
+				field: "<input id='#{fieldData.name}' type='checkbox' #{Creator.formBuilder.utils.attrString(fieldData)} disabled>",
 			};
 		email: (fieldData)->
 			if !fieldData.className

@@ -11,7 +11,7 @@ getFormFieldOptions = (field)->
 Creator.formBuilder.transformFormFieldsIn = (formFields)->
 	fields = []
 	_.each formFields, (f)->
-		field = _.extend({label: f.name || f.code, name: f.code, className: "form-control", value: f.default_value, required: f.is_required}, f)
+		field = _.extend({label: f.name || f.code, className: "form-control", value: f.default_value, required: f.is_required}, f)
 		switch f.type
 			when 'input'
 				field.type = 'text'
@@ -19,10 +19,12 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 					field.type = 'textarea'
 				fields.push field
 			when 'number'
+				if _.isNumber(field.digits)
+					field.digits = field.digits.toString()
 				field.type = 'number'
 				fields.push field
 			when 'date'
-				field.type = 'date'
+				field.type = 'dateNew'
 				fields.push field
 			when 'dateTime'
 				field.type = 'dateTime'
@@ -87,24 +89,26 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 	console.log('Creator.formBuilder.transformFormFieldsOut', fields);
 	formFields = []
 	_.each fields, (field)->
-		field.code = field.name
+		_fieldName = field.name
 		field.name = field.label
 		field.is_required = field.required
+		field.default_value = field.value
 		delete field.label
 		delete field.className
 		delete field.required
+		delete field.value
 
-		if field.values
+		if _.isArray(field.values) && field.values.length > 0
 			field.options = _.pluck(field.values, 'label').join('\n')
-			delete field.values
+		delete field.values
 
 		switch field.type
 			when 'table'
 				field.is_wide = true
-				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{field.name}-preview").data('formBuilder').actions.getData())
+				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{_fieldName}-preview").data('formBuilder').actions.getData())
 			when 'section'
 				field.is_wide = true
-				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{field.name}-preview").data('formBuilder').actions.getData())
+				field.fields = Creator.formBuilder.transformFormFieldsOut($("##{_fieldName}-preview").data('formBuilder').actions.getData())
 			when 'textarea'
 				field.type = 'input'
 				field.is_textarea = true
@@ -116,5 +120,9 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 				field.type = 'multiSelect'
 			when 'radio-group'
 				field.type = 'radio'
+			when 'number'
+				field.digits = parseInt(field.digits)
+			when 'dateNew'
+				field.type = 'date'
 		formFields.push field
 	return formFields
