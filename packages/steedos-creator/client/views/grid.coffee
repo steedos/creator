@@ -454,7 +454,7 @@ Template.creator_grid.onRendered ->
 				else
 					return 0
 
-			extra_columns = ["owner"]
+			extra_columns = ["owner", "company_id", "locked"]
 			if !is_related and curObject.enable_tree
 				extra_columns.push("parent")
 				extra_columns.push("children")

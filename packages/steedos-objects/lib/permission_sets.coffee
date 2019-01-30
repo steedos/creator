@@ -17,12 +17,41 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	if record
 		isOwner = record.owner == userId || record.owner?._id == userId
+		user_company_ids = Session.get("user_company_ids")
+		record_company_id = record?.company_id
+		if record_company_id and _.isObject(record_company_id) and record_company_id._id
+			# 因record_company_id是lookup类型，有可能dx控件会把它映射转为对应的object，所以这里取出其_id值
+			record_company_id = record_company_id._id
 		if !permissions.modifyAllRecords and !isOwner and !permissions.modifyCompanyRecords
+			permissions.allowEdit = false
+			permissions.allowDelete = false
+		else if permissions.modifyCompanyRecords
+			if record_company_id and _.isString(record_company_id)
+				if user_company_ids and user_company_ids.length
+					if !_.include(user_company_ids, record_company_id)
+						# 记录的company_id属性不在当前用户user_company_ids范围内时，认为无权修改
+						permissions.allowEdit = false
+						permissions.allowDelete = false
+				else
+					# 记录有company_id属性，但是当前用户user_company_ids为空时，认为无权修改
+					permissions.allowEdit = false
+					permissions.allowDelete = false
+		
+		if record.locked and !permissions.modifyAllRecords
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 
 		if !permissions.viewAllRecords and !isOwner and !permissions.viewCompanyRecords
 			permissions.allowRead = false
+		else if permissions.viewCompanyRecords
+			if record_company_id and _.isString(record_company_id)
+				if user_company_ids and user_company_ids.length
+					if !_.include(user_company_ids, record_company_id)
+						# 记录的company_id属性不在当前用户user_company_ids范围内时，认为无权查看
+						permissions.allowRead = false
+				else
+					# 记录有company_id属性，但是当前用户user_company_ids为空时，认为无权查看
+					permissions.allowRead = false
 
 	return permissions
 

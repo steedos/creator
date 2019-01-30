@@ -268,6 +268,7 @@ Creator.baseObject =
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
 				if record_permissions
 					perms = record_permissions
@@ -276,15 +277,6 @@ Creator.baseObject =
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
-
-				if perms["modifyAllRecords"]
-					return true
-
-				if !record
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
-
-				if record && record.locked
-					return false
 
 				return perms["allowEdit"]
 
@@ -294,6 +286,7 @@ Creator.baseObject =
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
 				if record_permissions
 					perms = record_permissions
@@ -302,15 +295,6 @@ Creator.baseObject =
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
-
-				if perms["modifyAllRecords"]
-					return true
-
-				if !record
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
-
-				if record && record.locked
-					return false
 
 				return perms["allowDelete"]
 
