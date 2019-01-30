@@ -101,8 +101,6 @@ Creator.getObjectSchema = (obj) ->
 
 				fs.autoform.filters = field.filters
 
-				fs.autoform.filter_by_company = field.filter_by_company
-
 				fs.autoform.dependOn = field.depend_on
 
 				if field.beforeOpenFunction
@@ -150,9 +148,60 @@ Creator.getObjectSchema = (obj) ->
 
 					if field.reference_to == "users"
 						fs.autoform.type = "selectuser"
+						fs.autoform.is_company_only = field.is_company_only
+						if !field.hidden && !field.omit
+							# is_company_limited表示过滤数据时是否只显示本单位下的数据
+							# is_company_limited为true时，is_company_only不会被强制设置为true，它们是两个独立的功能属性
+							# is_company_limited可以被改写覆盖成true/false或其他function
+							if field.is_company_limited == undefined
+								# 未定义is_company_limited属性时默认处理逻辑：
+								# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+								# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+								if Meteor.isClient
+									permissions = obj.permissions?.get()
+									if permissions?.viewAllRecords
+										fs.autoform.is_company_limited = false
+									else
+										fs.autoform.is_company_limited = true
+							else if _.isFunction field.is_company_limited
+								if Meteor.isClient
+									# 传入当前对象的权限，在函数中根据权限计算是否要限制只查看本单位
+									fs.autoform.is_company_limited = field.is_company_limited(obj.permissions)
+								else
+									# 服务端用不到is_company_limited
+									fs.autoform.is_company_limited = true
+							else
+								fs.autoform.is_company_limited = field.is_company_limited
+						else
+							fs.autoform.is_company_limited = field.is_company_limited
 					else if field.reference_to == "organizations"
 						fs.autoform.type = "selectorg"
 						fs.autoform.is_company_only = field.is_company_only
+						if !field.hidden && !field.omit
+							# is_company_limited表示过滤数据时是否只显示本单位下的数据
+							# is_company_limited为true时，is_company_only不会被强制设置为true，它们是两个独立的功能属性
+							# is_company_limited可以被改写覆盖成true/false或其他function
+							if field.is_company_limited == undefined
+								# 未定义is_company_limited属性时默认处理逻辑：
+								# 对当前对象有viewAllRecords权限则不限制所属单位列表查看权限，否则只显示当前所属单位
+								# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
+								if Meteor.isClient
+									permissions = obj.permissions?.get()
+									if permissions?.viewAllRecords
+										fs.autoform.is_company_limited = false
+									else
+										fs.autoform.is_company_limited = true
+							else if _.isFunction field.is_company_limited
+								if Meteor.isClient
+									# 传入当前对象的权限，在函数中根据权限计算是否要限制只查看本单位
+									fs.autoform.is_company_limited = field.is_company_limited(obj.permissions)
+								else
+									# 服务端用不到is_company_limited
+									fs.autoform.is_company_limited = true
+							else
+								fs.autoform.is_company_limited = field.is_company_limited
+						else
+							fs.autoform.is_company_limited = field.is_company_limited
 					else
 						if typeof(field.reference_to) == "function"
 							_reference_to = field.reference_to()
@@ -321,6 +370,14 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "markdown"
 			fs.type = String
 			fs.autoform.type = "steedos-markdown"
+		else if field.type == 'url'
+			fs.type = String
+			fs.regEx = SimpleSchema.RegEx.Url
+			fs.autoform.type = 'steedosUrl'
+		else if field.type == 'email'
+			fs.type = String
+			fs.regEx = SimpleSchema.RegEx.Email
+			fs.autoform.type = 'steedosEmail'
 		else
 			fs.type = field.type
 

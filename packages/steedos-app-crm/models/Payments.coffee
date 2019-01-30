@@ -1,9 +1,9 @@
-Creator.Objects.contract_payments = 
+Creator.Objects.contract_payments =
 	name: "contract_payments"
 	label: "付款"
 	icon: "orders"
 	fields:
-		name: 
+		name:
 			label: "名称"
 			type: "text"
 			required: true
@@ -43,22 +43,15 @@ Creator.Objects.contract_payments =
 		billing_no:
 			label: "发票号"
 			type: "text"
-		description: 
+		description:
 			label: "备注"
 			type: "textarea"
 			is_wide: true
-		
+
 		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			is_company_only: true
 			required: true
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
+			omit: false
+			hidden: false
 
 	list_views:
 		recent:

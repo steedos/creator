@@ -14,12 +14,12 @@ Creator.Objects.projects =
 			type: 'textarea'
 			is_wide: true
 
-		flow_role:
-			label: '审批岗位'
-			type: 'lookup'
-			reference_to: 'flow_roles'
-			required: true
-			filterable: true
+		# flow_role:
+		# 	label: '审批岗位'
+		# 	type: 'lookup'
+		# 	reference_to: 'flow_roles'
+		# 	required: true
+		# 	filterable: true
 
 	list_views:
 		all:

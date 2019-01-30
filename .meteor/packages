@@ -152,6 +152,8 @@ steedos:app-archive
 # steedos:vip-card
 # steedos:vip-post
 steedos:objects
+steedos:objects-core
+steedos:objects-billing
 steedos:sso
 
 
@@ -197,3 +199,4 @@ steedos:app-base
 
 # 正式发布时开启
 # steedos:version
+steedos:audit

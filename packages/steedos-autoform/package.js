@@ -3,7 +3,7 @@
  */
 Package.describe({
 	name: 'steedos:autoform',
-	version: '0.0.17',
+	version: '0.0.19',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/apps/tree/master/packages/steedos-autoform',
 	documentation: null
@@ -36,10 +36,10 @@ Package.onUse(function(api) {
 	api.use('momentjs:moment@2.14.1');
 	api.use('simple:json-routes@2.1.0');
 
-	api.use('steedos:jstree@3.3.2')
-	api.use('universe:i18n');
+	api.use('steedos:jstree@3.3.2');
+	api.use('universe:i18n@1.13.0');
 
-	api.use('steedos:base@0.0.66');
+	api.use('steedos:base@0.1.4');
 	api.use('rubaxa:sortable@1.3.0');
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
 	api.addFiles(tapi18nFiles, ['client', 'server']);

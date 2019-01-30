@@ -14,9 +14,11 @@ Creator.Objects.permission_objects =
 			type: "master_detail"
 			required: true
 			reference_to: "permission_set"
+			index:true
 		object_name:
 			label: "对象",
 			type: "master_detail"
+			index:true
 			reference_to: "objects"
 			required: true
 			optionsFunction: ()->

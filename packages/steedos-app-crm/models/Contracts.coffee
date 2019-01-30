@@ -6,6 +6,8 @@ Creator.Objects.contracts =
 	enable_search: true
 	enable_tasks: true
 	enable_notes: true
+	enable_events: true
+	enable_audit: true
 	enable_api: true
 	enable_instances: true
 	fields:
@@ -23,7 +25,8 @@ Creator.Objects.contracts =
 			index: true
 		amount:
 			label: "金额"
-			type: "currency"
+			type: "number"
+			scale: 2
 			required: true
 			sortable: true
 		signed_date:
@@ -59,21 +62,11 @@ Creator.Objects.contracts =
 			type: "textarea"
 			is_wide: true
 
-		# 新增字段：所属单位，类似子管理员作分级权限。
-		# 待处理：comapany拆分、分级权限。
 		company_id:
 			label: "承办单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			filterable:true
-			index:true
-			is_company_only: true
 			required: true
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
-
+			omit: false
+			hidden: false
 
 		subject:
 			type: "textarea"
@@ -90,7 +83,7 @@ Creator.Objects.contracts =
 
 		# 待处理：选择对方单位后，自动赋值registered_capital
 		registered_capital:
-			type: "currency"
+			type: "number"
 			label: "注册资金"
 			scale: 2
 			hidden: true
@@ -127,28 +120,28 @@ Creator.Objects.contracts =
 		# 按要求新增字段：合同税前金额。
 		# 待处理：前后统一计，导入时，拟统一赋值为 合同金额。
 		pretax_amount:
-			type:'currency'
+			type:'number'
 			label:"合同税前金额"
 			scale: 2
 		# 按要求新增字段：合同税。
 		# 待处理：前后统一计，导入时，拟统一赋值为 0。
 		tax:
-			type:'currency'
+			type:'number'
 			label:"合同税"
 			scale: 2
 		advance_amount:
-			type:'currency'
+			type:'number'
 			label:"预付款金额"
 			scale: 2
 
 		outstanding_amount:
-			type:'currency'
+			type:'number'
 			label:"未结金额"
 			scale: 2
 
 		# 待处理：修改质保比例，则自动赋值质量保证金；修改质量保证金，则自动赋值质保比例
 		quality_bond:
-			type:'currency'
+			type:'number'
 			label:"质量保证金"
 			scale: 2
 		quality_proportion:
@@ -165,7 +158,7 @@ Creator.Objects.contracts =
 			scale: 4
 		# 待处理:合同类型、合同税前金额复制后，自动赋值stamp_duty=pretax_amount*yinhuashuilv
 		stamp_duty:
-			type:'currency'
+			type:'number'
 			label:"印花税额"
 			scale: 2
 
@@ -180,7 +173,8 @@ Creator.Objects.contracts =
 				{label:"已验收",value: "已验收"},
 				{label:"完毕",value: "完毕"},
 				{label:"违约但继续履行",value: "违约但继续履行"}],
-			allowedValues:["未签订","进行中","解除","异常","完毕","违约但继续履行"]
+			allowedValues:["未签订","进行中","解除","异常","已验收", "完毕","违约但继续履行"]
+			defaultValue:"未签订"
 			required:true
 
 		fileid:

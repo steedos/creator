@@ -24,7 +24,7 @@ Creator.Objects.object_listviews =
 					_options.push {label: o.label, value: k, icon: o.icon}
 				return _options
 		filter_scope:
-			label: "过滤条件"
+			label: "过滤范围"
 			type: "lookup"
 			defaultValue: "space"
 			required: true
@@ -35,7 +35,7 @@ Creator.Objects.object_listviews =
 				]
 				return _options
 		columns:
-			label: "选择要显示的字段"
+			label: "需要显示的列"
 			type: "lookup"
 			multiple: true
 			depend_on: ["object_name"]

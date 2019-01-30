@@ -38,51 +38,6 @@ Creator.loadObjects = (obj, object_name)->
 	# if Meteor.isServer
 	# 	Creator.initPermissions(object_name)
 
-Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
-	if Meteor.isClient
-		return Creator.USER_CONTEXT
-	else
-		if !(userId and spaceId)
-			throw new Meteor.Error 500, "the params userId and spaceId is required for the function Creator.getUserContext"
-			return null
-		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1, company_id: 1}
-		# check if user in the space
-		su = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: suFields})
-		if !su
-			spaceId = null
-
-		# if spaceId not exists, get the first one.
-		if !spaceId
-			if isUnSafeMode
-				su = Creator.Collections["space_users"].findOne({user: userId}, {fields: suFields})
-				if !su
-					return null
-				spaceId = su.space
-			else
-				return null
-
-		USER_CONTEXT = {}
-		USER_CONTEXT.userId = userId
-		USER_CONTEXT.spaceId = spaceId
-		USER_CONTEXT.user = {
-			_id: userId
-			name: su.name,
-			mobile: su.mobile,
-			position: su.position,
-			email: su.email
-			company: su.company
-			company_id: su.company_id
-		}
-		space_user_org = Creator.getCollection("organizations")?.findOne(su.organization)
-		if space_user_org
-			USER_CONTEXT.user.organization = {
-				_id: space_user_org._id,
-				name: space_user_org.name,
-				fullname: space_user_org.fullname,
-				is_company: space_user_org.is_company
-			}
-		return USER_CONTEXT
-
 Creator.getTable = (object_name)->
 	return Tabular.tablesByName["creator_" + object_name]
 
@@ -174,35 +129,6 @@ Creator.getObjectRecord = (object_name, record_id)->
 	collection = Creator.getCollection(object_name)
 	if collection
 		return collection.findOne(record_id)
-
-Creator.getPermissions = (object_name, spaceId, userId)->
-	if Meteor.isClient
-		if !object_name
-			object_name = Session.get("object_name")
-		obj = Creator.getObject(object_name)
-		if !obj
-			return
-		return obj.permissions.get()
-	else if Meteor.isServer
-		Creator.getObjectPermissions(spaceId, userId, object_name)
-
-Creator.getRecordPermissions = (object_name, record, userId)->
-	if !object_name and Meteor.isClient
-		object_name = Session.get("object_name")
-
-	permissions = _.clone(Creator.getPermissions(object_name))
-
-	if record
-		isOwner = record.owner == userId || record.owner?._id == userId
-		if !permissions.modifyAllRecords and !isOwner and !permissions.modifyCompanyRecords
-			permissions.allowEdit = false
-			permissions.allowDelete = false
-
-		if !permissions.viewAllRecords and !isOwner and !permissions.viewCompanyRecords
-			permissions.allowRead = false
-
-	return permissions
-
 
 Creator.getApp = (app_id)->
 	if !app_id
@@ -429,6 +355,8 @@ options参数：
 	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
 Creator.formatFiltersToDev = (filters, options)->
+	# console.log "Creator.formatFiltersToDev======filters==", filters
+	# console.log "Creator.formatFiltersToDev======options==", options
 	unless filters.length
 		return
 	if options?.is_logic_or
@@ -444,6 +372,8 @@ Creator.formatFiltersToDev = (filters, options)->
 	filtersLooper = (filters_loop)->
 		tempFilters = []
 		tempLooperResult = null
+		if _.isFunction(filters_loop)
+			filters_loop = filters_loop()
 		if !_.isArray(filters_loop)
 			if _.isObject(filters_loop)
 				# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
@@ -468,17 +398,26 @@ Creator.formatFiltersToDev = (filters, options)->
 		else if filters_loop.length == 3
 			# 只有三个元素，可能中间是"or","and"连接符也可能是普通数组，区别对待解析
 			if _.include(["or","and"], filters_loop[1])
+				# 中间有"or","and"连接符，则循环filters_loop，依次用filtersLooper解析其过虑条件
+				# 最后生成的结果格式：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2]), ...]
 				# 因要判断filtersLooper(filters_loop[0])及filtersLooper(filters_loop[2])是否为空
 				# 所以不能直接写：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2])]
 				tempFilters = []
-				tempLooperResult = filtersLooper(filters_loop[0])
-				if tempLooperResult
+				i = 0
+				while i < filters_loop.length
+					if _.include(["or","and"], filters_loop[i])
+						i++
+						continue
+					tempLooperResult = filtersLooper(filters_loop[i])
+					unless tempLooperResult
+						i++
+						continue
+					if i > 0
+						tempFilters.push filters_loop[i - 1]
 					tempFilters.push tempLooperResult
-				tempLooperResult = filtersLooper(filters_loop[2])
-				if tempLooperResult
-					if tempFilters.length
-						tempFilters.push filters_loop[1]
-					tempFilters.push tempLooperResult
+					i++
+				if _.include(["or","and"], tempFilters[0])
+					tempFilters.shift()
 			else
 				if _.isString filters_loop[1]
 					# 第二个元素为字符串，则认为是某一个具体的过虑条件
@@ -486,6 +425,8 @@ Creator.formatFiltersToDev = (filters, options)->
 					option = filters_loop[1]
 					value = filters_loop[2]
 					if value != undefined
+						if _.isFunction(value)
+							value = value()
 						if Meteor.isClient
 							value = Creator.evaluateFormula(value)
 						else
@@ -522,17 +463,42 @@ Creator.formatFiltersToDev = (filters, options)->
 						if tempLooperResult
 							tempFilters.push tempLooperResult
 		else
-			# 超过3个元素的数组，则认为是普通过虑条件，当成完整过虑条件进一步循环解析每个条件
-			filters_loop.forEach (n,i)->
-				tempLooperResult = filtersLooper(n)
-				if tempLooperResult
+			# 超过3个元素的数组，可能中间是"or","and"连接符也可能是普通数组，区别对待解析
+			if _.intersection(["or","and"], filters_loop)?.length
+				# 中间有"or","and"连接符，则循环filters_loop，依次用filtersLooper解析其过虑条件
+				# 最后生成的结果格式：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2]), ...]
+				# 因要判断filtersLooper(filters_loop[0])及filtersLooper(filters_loop[2])是否为空
+				# 所以不能直接写：tempFilters = [filtersLooper(filters_loop[0]), filters_loop[1], filtersLooper(filters_loop[2])]
+				tempFilters = []
+				i = 0
+				while i < filters_loop.length
+					if _.include(["or","and"], filters_loop[i])
+						i++
+						continue
+					tempLooperResult = filtersLooper(filters_loop[i])
+					unless tempLooperResult
+						i++
+						continue
+					if i > 0
+						tempFilters.push filters_loop[i - 1]
 					tempFilters.push tempLooperResult
+					i++
+				if _.include(["or","and"], tempFilters[0])
+					tempFilters.shift()
+			else
+				# 普通过虑条件，当成完整过虑条件进一步循环解析每个条件
+				filters_loop.forEach (n,i)->
+					tempLooperResult = filtersLooper(n)
+					if tempLooperResult
+						tempFilters.push tempLooperResult
+
 		if tempFilters.length
 			return tempFilters
 		else
 			return null
 
 	selector = filtersLooper(filters)
+	# console.log "Creator.formatFiltersToDev======selector==", selector
 	return selector
 
 ###
@@ -590,7 +556,7 @@ Creator.getRelatedObjects = (object_name, spaceId, userId)->
 
 #	related_object_names = _.pluck(_object.related_objects,"object_name")
 
-	related_objects = Creator.getObjectRelateds(object_name)
+	related_objects = Creator.getObjectRelateds(_object._collection_name)
 
 	related_object_names = _.pluck(related_objects,"object_name")
 	if related_object_names?.length == 0

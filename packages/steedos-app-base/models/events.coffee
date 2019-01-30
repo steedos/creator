@@ -48,8 +48,8 @@ Creator.Objects.events =
 			reference_to: ()->
 				o = []
 				_.each Creator.Objects, (object, object_name)->
-					if object.enable_tasks
-						o.push object_name
+					if object.enable_events
+						o.push object.name
 				return o 
 
 		is_all_day:

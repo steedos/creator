@@ -36,6 +36,8 @@ Creator.Objects.objects =
 			type: "boolean"
 		enable_notes:
 			type: "boolean"
+		enable_events:
+			type: "boolean"
 		enable_api:
 			type: "boolean"
 			defaultValue: true
@@ -46,6 +48,10 @@ Creator.Objects.objects =
 		enable_instances:
 			type: "boolean"
 		enable_chatter:
+			type: "boolean"
+		enable_audit:
+			type: "boolean"
+		enable_trash:
 			type: "boolean"
 		is_view:
 			type: 'boolean'

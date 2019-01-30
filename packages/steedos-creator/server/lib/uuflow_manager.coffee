@@ -1,3 +1,4 @@
+_eval = require('eval')
 uuflowManager = {}
 
 uuflowManager.check_authorization = (req) ->
@@ -119,6 +120,7 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 	ins_obj.applicant_organization = if instance_from_client["applicant_organization"] then instance_from_client["applicant_organization"] else space_user.organization
 	ins_obj.applicant_organization_name = if instance_from_client["applicant_organization_name"] then instance_from_client["applicant_organization_name"] else space_user_org_info.organization_name
 	ins_obj.applicant_organization_fullname = if instance_from_client["applicant_organization_fullname"] then instance_from_client["applicant_organization_fullname"] else  space_user_org_info.organization_fullname
+	ins_obj.applicant_company = if instance_from_client["applicant_company"] then instance_from_client["applicant_company"] else space_user.company_id
 	ins_obj.state = 'draft'
 	ins_obj.code = ''
 	ins_obj.is_archived = false
@@ -166,7 +168,7 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 	appr_obj.is_read = true
 	appr_obj.is_error = false
 	appr_obj.description = ''
-	appr_obj.values = uuflowManager.initiateValues(ins_obj.record_ids[0], flow_id, space_id)
+	appr_obj.values = uuflowManager.initiateValues(ins_obj.record_ids[0], flow_id, space_id, form.current.fields)
 
 	trace_obj.approves = [appr_obj]
 	ins_obj.traces = [trace_obj]
@@ -193,7 +195,8 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 
 	return new_ins_id
 
-uuflowManager.initiateValues = (recordIds, flowId, spaceId) ->
+uuflowManager.initiateValues = (recordIds, flowId, spaceId, fields) ->
+	fieldCodes = _.pluck fields, 'code'
 	values = {}
 	ow = Creator.Collections.object_workflows.findOne({
 		object_name: recordIds.o,
@@ -246,7 +249,30 @@ uuflowManager.initiateValues = (recordIds, flowId, spaceId) ->
 				if not _.isEmpty(newTr)
 					values[c.workflow_table_field_code].push(newTr)
 
-	return values
+		# 如果配置了脚本则执行脚本
+		if ow.field_map_script
+			_.extend(values, uuflowManager.evalFieldMapScript(ow.field_map_script, recordIds.o, spaceId, recordIds.ids[0]))
+
+	# 过滤掉values中的非法key
+	filterValues = {}
+	_.each _.keys(values), (k)->
+		if fieldCodes.includes(k)
+			filterValues[k] = values[k]
+
+	return filterValues
+
+uuflowManager.evalFieldMapScript = (field_map_script, objectName, spaceId, objectId)->
+	record = Creator.getCollection(objectName, spaceId).findOne(objectId)
+	script = "module.exports = function (record) { " + field_map_script + " }"
+	func = _eval(script, "field_map_script")
+	values = func(record)
+	if _.isObject values
+		return values
+	else
+		console.error "evalFieldMapScript: 脚本返回值类型不是对象"
+	return {}
+
+
 
 uuflowManager.initiateAttach = (recordIds, spaceId, insId, approveId) ->
 

@@ -86,9 +86,19 @@ Template.filter_option.helpers
 					schema.value.autoform.multiple = true
 					schema.value.type = [String]
 
-					if object_fields[schema_key].type == "select"
+					_field = object_fields[schema_key]
+
+					if _field.type == "select"
 						schema.value.autoform.type = "steedosLookups"
 						schema.value.autoform.showIcon = false
+
+					if _field.type == 'lookup' || _field.type == 'master_detail'
+						_reference_to = _field.reference_to
+						if _.isFunction(_reference_to)
+							_reference_to = _reference_to()
+						if _.isArray(_reference_to)
+							schema.value.type = Object
+							schema.value.blackbox = true
 
 				if schema.value.autoform
 					schema.value.autoform =  _.clone obj_schema[schema_key].autoform
@@ -184,7 +194,7 @@ Template.filter_option.events
 			delete filter_item.operation
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
-			template.filter_item_operation.set(null)
+		template.filter_item_operation.set(null)
 		_schema = Creator.getSchema(object_name)._schema
 		template.show_form.set(false)
 		template.schema_key.set(field)

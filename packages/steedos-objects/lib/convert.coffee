@@ -188,6 +188,18 @@ Meteor.startup ()->
 						field.defaultValue = Creator.eval("(#{defaultValue})")
 					catch error
 						console.error "convert error #{object.name} -> #{field.name}", error
+			
+			if Meteor.isServer
+				is_company_limited = field.is_company_limited
+				if is_company_limited && _.isFunction(is_company_limited)
+					field._is_company_limited = field.is_company_limited.toString()
+			else
+				is_company_limited = field._is_company_limited
+				if is_company_limited && _.isString(is_company_limited)
+					try
+						field.is_company_limited = Creator.eval("(#{is_company_limited})")
+					catch error
+						console.error "convert error #{object.name} -> #{field.name}", error
 
 		_.forEach object.list_views, (list_view, key) ->
 			###

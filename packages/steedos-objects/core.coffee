@@ -1,3 +1,5 @@
+@db = {}
+
 if !Creator?
 	@Creator = {}
 Creator.Objects = {}
@@ -188,8 +190,15 @@ Creator.getObjectRelateds = (object_name)->
 		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
 	if _object.enable_notes
 		related_objects.push {object_name:"notes", foreign_key: "related_to"}
+	if _object.enable_events
+		related_objects.push {object_name:"events", foreign_key: "related_to"}
 	if _object.enable_instances
 		related_objects.push {object_name:"instances", foreign_key: "record_ids"}
+	#record 详细下的audit_records仅modifyAllRecords权限可见
+	if Meteor.isClient
+		permissions = Creator.getPermissions(object_name)
+		if _object.enable_audit && permissions?.modifyAllRecords
+			related_objects.push {object_name:"audit_records", foreign_key: "related_to"}
 
 	return related_objects
 
@@ -200,7 +209,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 		if !(userId and spaceId)
 			throw new Meteor.Error 500, "the params userId and spaceId is required for the function Creator.getUserContext"
 			return null
-		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1}
+		suFields = {name: 1, mobile: 1, position: 1, email: 1, company: 1, organization: 1, space: 1, company_id: 1, company_ids: 1}
 		# check if user in the space
 		su = Creator.Collections["space_users"].findOne({space: spaceId, user: userId}, {fields: suFields})
 		if !su
@@ -226,6 +235,8 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 			position: su.position,
 			email: su.email
 			company: su.company
+			company_id: su.company_id
+			company_ids: su.company_ids
 		}
 		space_user_org = Creator.getCollection("organizations")?.findOne(su.organization)
 		if space_user_org
@@ -274,3 +285,6 @@ Creator.processPermissions = (po)->
 		po.allowRead = true
 		po.allowEdit = true
 		po.viewCompanyRecords = true
+	return po
+
+

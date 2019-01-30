@@ -154,15 +154,10 @@ Steedos.Helpers =
 	coreformNumberToString: (number, locale)->
 		return Steedos.numberToString number, locale
 
-	selfOrganization: ()->
-		selfOrgId = db.space_users.findOne({user:Meteor.userId()}).organization
-		if selfOrgId
-			query = {_id: selfOrgId}
-			if !Steedos.isSpaceAdmin()
-				query.hidden = $ne: true
-			return db.organizations.findOne(query)
-		else
-			return null
+	selfCompanys: ()->
+		# 返回当前用户所属公司Id集合
+		company_ids = Session.get("user_company_ids")
+		return if company_ids?.length then company_ids else null
 
 _.extend Steedos, Steedos.Helpers
 

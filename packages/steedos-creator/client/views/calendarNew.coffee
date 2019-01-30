@@ -79,7 +79,6 @@ _dataSource = (options) ->
 
 _getAppointmentTemplate = (options)->
 	appointmentTemplate = (data)->
-		console.log('data', data);
 		title = data[options.textExpr || 'name'];
 		if options.title && _.isArray(options.title) && options.title.length > 0
 			title = ''
@@ -89,15 +88,10 @@ _getAppointmentTemplate = (options)->
 				fvalue = data[t]
 				if fvalue
 					if (f.type == 'lookup' || f.type == 'master_detail')
-						reference_to = f.reference_to
-						re_object_name_field = "name"
-						if _.isString(reference_to)
-							re_object_name_field = Creator.getObject(reference_to)?.NAME_FIELD_KEY
-
 						if _.isArray(fvalue)
-							fvalue = _.pluck(fvalue, re_object_name_field).join(',')
+							fvalue = _.pluck(fvalue, '_NAME_FIELD_VALUE').join(',')
 						else
-							fvalue = fvalue?[re_object_name_field]
+							fvalue = fvalue?['_NAME_FIELD_VALUE']
 					else if f.type == 'select'
 						f_options = f.options
 
@@ -180,6 +174,38 @@ _getTooltipTemplate = (data, options) ->
 				<span class="dx-button-text">编辑</span>
 			</div>
 		"""
+	titleView = ""
+	fields = Creator.getObject().fields;
+	_.each options.title, (key)->
+		if key != options.textExpr && key != options.startDateExpr && key != options.endDateExpr
+			f = fields[key]
+			fvalue = data[key]
+			if fvalue
+				if (f.type == 'lookup' || f.type == 'master_detail')
+					if _.isArray(fvalue)
+						fvalueHtml = [];
+						_.each fvalue, (item)->
+							fvalueHtml.push "<a onclick=\"window.open('#{Creator.getObjectUrl(item['reference_to._o'], item._id)}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false\" href='#'>#{item['_NAME_FIELD_VALUE']}</a>"
+						fvalue = fvalueHtml.join(',')
+					else
+						if !_.isEmpty(fvalue)
+							fvalue = "<a onclick=\"window.open('#{Creator.getObjectUrl(fvalue['reference_to._o'], fvalue._id)}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false\" href='#'>#{fvalue['_NAME_FIELD_VALUE']}</a>"
+				else if f.type == 'select'
+					f_options = f.options
+
+					if _.isFunction(f_options)
+						f_options = f_options()
+
+					f_option = _.find f_options, (o)->
+						return o.value == fvalue
+
+					fvalue = f_option?.label || ''
+
+				else if f.type == 'datetime'
+					fvalue = DevExpress.localization.formatDate(new Date(fvalue), 'yyyy-MM-dd hh:mm a')
+			else
+				fvalue = ''
+			titleView += "<div class='dx-scheduler-appointment-tooltip-title'>#{f.label || t}: #{fvalue}</div>"
 
 #	if !permission.allowEdit
 #		return false
@@ -197,6 +223,9 @@ _getTooltipTemplate = (data, options) ->
 			<div class="dx-scheduler-appointment-tooltip-title">#{data[options.textExpr || 'name']}</div>
 			<div class='dx-scheduler-appointment-tooltip-date'>
 				#{moment(data[options.startDateExpr]).tz("Asia/Shanghai").format("MMM D, h:mm A")} - #{moment(data[options.endDateExpr]).tz("Asia/Shanghai").format("MMM D, h:mm A")}
+			</div>
+			<div class="dx-scheduler-appointment-tooltip-titles">
+				#{titleView}
 			</div>
 			#{action}
 		</div>
@@ -259,7 +288,6 @@ setResource = (data, fieldName, value)->
 		dxSchedulerInstance.repaint()
 
 getAppointmentContextMenuItems = (e, options)->
-	console.log('getAppointmentContextMenuItems', e);
 	menuItems = []
 
 	permission = getPermission(e.targetedAppointmentData)
@@ -313,10 +341,17 @@ showCurrentDate = (e) ->
 	scheduler.option("currentDate", new Date());
 
 getCellContextMenuItems = (options)->
-	menuItems = [
-		{ text: '分组/取消分组', beginGroup: true, onItemClick: groupCell },
-		{ text: '去今天', onItemClick: showCurrentDate }
-	]
+	if options.groups
+		menuItems = [
+			{ text: '分组/取消分组', beginGroup: true, onItemClick: groupCell },
+			{ text: '去今天', onItemClick: showCurrentDate }
+		]
+	else
+		menuItems = [
+			{ text: '去今天', beginGroup: true, onItemClick: showCurrentDate }
+		]
+
+
 	permission = getPermission()
 	if permission.allowCreate
 		menuItems.unshift { text: '新建', onItemClick: _newData }

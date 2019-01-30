@@ -5,7 +5,7 @@ Creator.Apps.admin =
 	icon: "ion-ios-people-outline"
 	icon_slds: "custom"
 	is_creator:true
-	objects: ["space_users"]
+	objects: []
 
 	# Menu 支持两种类型的参数
 	# - template_name 指向 Meteor Template, url=/app/admin/page/{template_name}/
@@ -18,9 +18,9 @@ Creator.Apps.admin =
 		{ _id: 'account_password', name: '密码', permission_sets: ["user"], template_name: "account_password", parent: 'account' },
 		{ _id: 'account_background', name: '背景图', permission_sets: ["user"], template_name: "account_background", parent: 'account' }
 
-		{ _id: 'menu_users', name: '用户', permission_sets: ["admin"], expanded: false },
-		{ _id: 'organizations', name: '部门', permission_sets: ["admin"], object_name: "organizations", parent: 'menu_users' },
-		{ _id: 'space_users', name: '用户', permission_sets: ["admin"], object_name: "space_users", parent: 'menu_users' },
+		{ _id: 'menu_users', name: '用户', permission_sets: ["admin", "organization_admin"], expanded: false },
+		{ _id: 'organizations', name: '部门', permission_sets: ["admin", "organization_admin"], object_name: "organizations", parent: 'menu_users' },
+		{ _id: 'space_users', name: '用户', permission_sets: ["admin", "organization_admin"], object_name: "space_users", parent: 'menu_users' },
 		{ _id: 'permission_set', name: '权限组', permission_sets: ["admin"], object_name: "permission_set", parent: 'menu_users' },
 		{ _id: 'spaces', name: '公司信息', permission_sets: ["admin"], object_name: "spaces", parent: 'menu_users' },
 		{ _id: 'contacts_limit', name: '通讯录权限', permission_sets: ["admin"], template_name: "contacts_settings", parent: 'menu_users' },
@@ -31,6 +31,9 @@ Creator.Apps.admin =
 		{ _id: 'permission_objects', name: '对象权限', permission_sets: ["admin"], object_name: "permission_objects", parent: 'menu_objects' },
 		{ _id: 'permission_shares', name: '共享规则', permission_sets: ["admin"], object_name: "permission_shares", parent: 'menu_objects' },
 		{ _id: 'object_workflows', name: '对象流程', permission_sets: ["admin"], object_name: "object_workflows", parent: 'menu_objects' },
+
+		{ _id: 'menu_advanced', name: '高级', permission_sets: ["admin"], expanded: false },
+		{ _id: 'audit_records', name: '字段历史', permission_sets: ["admin"], object_name: "audit_records", parent: 'menu_advanced' },
 
 		{ _id: 'menu_development', name: '开发', permission_sets: ["admin"], expanded: false },
 		{ _id: 'application_package', name: '软件包', permission_sets: ["admin"], object_name: "application_package", parent: 'menu_development' },

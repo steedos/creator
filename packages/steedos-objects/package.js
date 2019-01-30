@@ -1,7 +1,7 @@
 Package.describe({
 
 	name: 'steedos:objects',
-	version: '0.0.7',
+	version: '0.0.10',
 	summary: 'Steedos Creator',
 	git: ''
 });
@@ -34,7 +34,7 @@ Package.onUse(function(api) {
 	api.use(['webapp@1.3.11'], 'server');
 
 	api.use('raix:push@3.0.2');
-	api.use('universe:i18n');
+	api.use('universe:i18n@1.13.0');
 
 	api.use('steedos:logger@0.0.2');
 

@@ -52,6 +52,7 @@ Meteor.startup ->
 					queryOptions = visitorParser(include)
 					if _.isString field.reference_to
 						referenceToCollection = Creator.getCollection(field.reference_to, spaceId)
+						_ro_NAME_FIELD_KEY = Creator.getObject(field.reference_to, spaceId)?.NAME_FIELD_KEY
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]
 								if field.multiple
@@ -62,16 +63,27 @@ Meteor.startup ->
 										entities[idx][navigationProperty] = originalData
 									#排序
 									entities[idx][navigationProperty] = Creator.getOrderlySetByIds(entities[idx][navigationProperty], originalData)
+									entities[idx][navigationProperty] = _.map entities[idx][navigationProperty], (o)->
+										o['reference_to.o'] = referenceToCollection._name
+										o['reference_to._o'] = field.reference_to
+										o['_NAME_FIELD_VALUE'] = o[_ro_NAME_FIELD_KEY]
+										return o
 								else
 									singleQuery = _.extend {_id: entity[navigationProperty]}, include.query
 
 									# 特殊处理在相关表中没有找到数据的情况，返回原数据
 									entities[idx][navigationProperty] = referenceToCollection.findOne(singleQuery, queryOptions) || entities[idx][navigationProperty]
-
+									if entities[idx][navigationProperty]
+										entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
+										entities[idx][navigationProperty]['reference_to._o'] = field.reference_to
+										entities[idx][navigationProperty]['_NAME_FIELD_VALUE'] = entities[idx][navigationProperty][_ro_NAME_FIELD_KEY]
 					if _.isArray field.reference_to
 						_.each entities, (entity, idx)->
 							if entity[navigationProperty]?.ids
 								_o = entity[navigationProperty].o
+								_ro_NAME_FIELD_KEY = Creator.getObject(_o, spaceId)?.NAME_FIELD_KEY
+								if queryOptions?.fields && _ro_NAME_FIELD_KEY
+									queryOptions.fields[_ro_NAME_FIELD_KEY] = 1
 								referenceToCollection = Creator.getCollection(entity[navigationProperty].o, spaceId)
 								if referenceToCollection
 									if field.multiple
@@ -79,6 +91,8 @@ Meteor.startup ->
 										multiQuery = _.extend {_id: {$in: entity[navigationProperty].ids}}, include.query
 										entities[idx][navigationProperty] = _.map referenceToCollection.find(multiQuery, queryOptions).fetch(), (o)->
 											o['reference_to.o'] = referenceToCollection._name
+											o['reference_to._o'] = _o
+											o['_NAME_FIELD_VALUE'] = o[_ro_NAME_FIELD_KEY]
 											return o
 										#排序
 										entities[idx][navigationProperty] = Creator.getOrderlySetByIds(entities[idx][navigationProperty], _ids)
@@ -88,6 +102,7 @@ Meteor.startup ->
 										if entities[idx][navigationProperty]
 											entities[idx][navigationProperty]['reference_to.o'] = referenceToCollection._name
 											entities[idx][navigationProperty]['reference_to._o'] = _o
+											entities[idx][navigationProperty]['_NAME_FIELD_VALUE'] = entities[idx][navigationProperty][_ro_NAME_FIELD_KEY]
 
 				else
 				# TODO
@@ -153,9 +168,16 @@ Meteor.startup ->
 				return $1.replace('tolower(', '').replace(')', '')
 			queryParams.$filter = queryParams.$filter.replace(/tolower\(([^\)]+)\)/g, removeMethod)
 
-	isSameCompany = (spaceId, userId, companyId)->
-		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1 } })
-		return su.company_id == companyId
+	isSameCompany = (spaceId, userId, companyId, query)->
+		su = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { company_id: 1, company_ids: 1 } })
+		if !companyId && query
+			companyId = su.company_id
+			query.company_id = { $in: su.company_ids }
+		return su.company_ids.includes(companyId)
+
+	# 不返回已假删除的数据
+	excludeDeleted = (query)->
+		query.is_deleted = { $ne: true }
 
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
@@ -179,7 +201,7 @@ Meteor.startup ->
 				qs = decodeURIComponent(querystring.stringify(@queryParams))
 				createQuery = if qs then odataV4Mongodb.createQuery(qs) else odataV4Mongodb.createQuery()
 				permissions = Creator.getObjectPermissions(spaceId, @userId, key)
-				if permissions.viewAllRecords or (permissions.allowRead and @userId) or (permissions.viewCompanyRecords && isSameCompany(spaceId, @userId, createQuery.query.company_id))
+				if permissions.viewAllRecords or (permissions.viewCompanyRecords && isSameCompany(spaceId, @userId, createQuery.query.company_id, createQuery.query)) or (permissions.allowRead and @userId)
 
 					if key is 'cfs.files.filerecord'
 						createQuery.query['metadata.space'] = spaceId
@@ -253,6 +275,9 @@ Meteor.startup ->
 						else
 							createQuery.query.owner = @userId
 					entities = []
+
+					excludeDeleted(createQuery.query)
+
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					scannedCount = collection.find(createQuery.query,{fields:{_id: 1}}).count()
@@ -683,26 +708,47 @@ Meteor.startup ->
 				recordData = collection.findOne({_id: @urlParams._id}, { fields: { owner: 1, company_id: 1 } })
 				record_owner = recordData?.owner
 				companyId = recordData?.company_id
-				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.allowDelete and record_owner==@userId ) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId))
+				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId)) or (permissions.allowDelete and record_owner==@userId )
 				if isAllowed
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest'
 						delete selector.space
-					if collection.remove selector
-						headers = {}
-						body = {}
-						# entities.push entity
-						# body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
-						# entity_OdataProperties = setOdataProperty(entities,spaceId, key)
-						# _.extend body,entity_OdataProperties[0]
-						headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
-						headers['OData-Version'] = SteedosOData.VERSION
-						{headers: headers,body:body}
+
+					if object?.enable_trash
+						entityIsUpdated = collection.update(selector, {
+							$set: {
+								is_deleted: true,
+								deleted: new Date(),
+								deleted_by: @userId
+							}
+						})
+						if entityIsUpdated
+							headers = {}
+							body = {}
+							headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
+							headers['OData-Version'] = SteedosOData.VERSION
+							{headers: headers,body:body}
+						else
+							return{
+								statusCode: 404
+								body: setErrorMessage(404,collection,key)
+							}
 					else
-						return{
-							statusCode: 404
-							body: setErrorMessage(404,collection,key)
-						}
+						if collection.remove selector
+							headers = {}
+							body = {}
+							# entities.push entity
+							# body['@odata.context'] = SteedosOData.getODataContextPath(spaceId, key) + '/$entity'
+							# entity_OdataProperties = setOdataProperty(entities,spaceId, key)
+							# _.extend body,entity_OdataProperties[0]
+							headers['Content-type'] = 'application/json;odata.metadata=minimal;charset=utf-8'
+							headers['OData-Version'] = SteedosOData.VERSION
+							{headers: headers,body:body}
+						else
+							return{
+								statusCode: 404
+								body: setErrorMessage(404,collection,key)
+							}
 				else
 					return {
 						statusCode: 403

@@ -13,3 +13,4 @@
 /settings.json
 .idea/**
 start.bat
+.vscode/*

@@ -41,9 +41,19 @@ Template.standard_query_modal.helpers
 				if schema[field].autoform.create
 					delete schema[field].autoform.create
 
-				if object_fields[field].type == "select"
+				_field = object_fields[field]
+
+				if _field.type == "select"
 					schema[field].autoform.type = "steedosLookups"
 					schema[field].autoform.showIcon = false
+
+				if _field.type == 'lookup' || _field.type == 'master_detail'
+					_reference_to = _field.reference_to
+					if _.isFunction(_reference_to)
+						_reference_to = _reference_to()
+					if _.isArray(_reference_to)
+						schema[field].type = Object
+						schema[field].blackbox = true
 
 			if Creator.checkFieldTypeSupportBetweenQuery(object_fields[field].type)
 				schema[field + "_endLine"] =  _.clone(obj_schema[field])

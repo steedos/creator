@@ -415,11 +415,14 @@ if Meteor.isServer
 			# 即普通的注册用户，则为其新建一个自己的工作区
 			space_name = doc.company || doc.profile?.company
 			unless space_name
-				space_name = doc.name + " " + trl("space")
+				space_name = doc.name + " " + t("space")
+			newId = db.spaces._makeNewID()
 			db.spaces.insert
+				_id: newId
 				name: space_name
 				owner: doc._id
 				admins: [doc._id]
+				space: newId
 
 		try
 			if !doc.services || !doc.services.password || !doc.services.password.bcrypt

@@ -546,9 +546,13 @@ Template.steedosLookups.events({
 			return
 		}
 
-        var value = $el.val();
-        template.uniSelectize.searchText.set(value);
-        template.uniSelectize.getOptionsFromMethod();
+		Meteor.clearTimeout(template.searchTimeoutId);
+
+		template.searchTimeoutId = Meteor.setTimeout(function(){
+			var value = $el.val();
+			template.uniSelectize.searchText.set(value);
+			template.uniSelectize.getOptionsFromMethod();
+		}, 500);
     },
     'focus input.steedos-lookups-input': function (e, template) {
         template.uniSelectize.checkDisabled();

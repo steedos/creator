@@ -1,3 +1,4 @@
+var _eval = require('eval');
 var isConfigured = false;
 var sendWorker = function (task, interval) {
 
@@ -159,14 +160,31 @@ InstanceRecordQueue.Configure = function (options) {
 	}
 
 	self.syncInsFields = ['name', 'submitter_name', 'applicant_name', 'applicant_organization_name', 'applicant_organization_fullname', 'state',
-		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision'
+		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision', 'applicant_organization', 'applicant_company'
 	];
-	self.syncValues = function (obj, field_map_back, values, ins) {
+	self.syncValues = function (field_map_back, values, ins, objectInfo, field_map_back_script) {
 		var
+			obj = {},
 			tableFieldCodes = [],
 			tableFieldMap = [];
 
 		field_map_back = field_map_back || [];
+
+		var spaceId = ins.space;
+
+		var form = Creator.getCollection("forms").findOne(ins.form);
+		var formFields = null;
+		if (form.current._id === ins.form_version) {
+			formFields = form.current.fields || [];
+		} else {
+			var formVersion = _.find(ins.historys, function (h) {
+				return h._id === ins.form_version;
+			})
+			formFields = formVersion ? formVersion.fields : [];
+		}
+
+		var objectFields = objectInfo.fields;
+		var objectFieldKeys = _.keys(objectFields);
 
 		field_map_back.forEach(function (fm) {
 			// 判断是否是子表字段
@@ -182,14 +200,53 @@ InstanceRecordQueue.Configure = function (options) {
 				}
 
 			} else if (values.hasOwnProperty(fm.workflow_field)) {
-				obj[fm.object_field] = values[fm.workflow_field];
-			} else{
+				var wField = _.find(formFields, function (ff) {
+					return ff.code === fm.workflow_field;
+				});
+
+				var oField = objectFields[fm.object_field];
+
+				// 表单选人选组字段 至 对象 lookup master_detail类型字段同步
+				if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to)) {
+					obj[fm.object_field] = values[fm.workflow_field]['id'];
+				} else if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to) && _.isString(values[fm.workflow_field])) {
+					var oCollection = Creator.getCollection(oField.reference_to, spaceId)
+					var referObject = Creator.getObject(oField.reference_to, spaceId)
+					if (oCollection && referObject) {
+						var nameFieldKey = referObject.NAME_FIELD_KEY;
+						var selector = {};
+						selector[nameFieldKey] = values[fm.workflow_field];
+						var referData = oCollection.findOne(selector, {
+							fields: {
+								_id: 1
+							}
+						});
+						if (referData) {
+							obj[fm.object_field] = referData._id;
+						}
+					}
+				} else {
+					if (oField.type === "boolean") {
+						var tmp_field_value = values[fm.workflow_field];
+						if (['true', '是'].includes(tmp_field_value)) {
+							obj[fm.object_field] = true;
+						} else if (['false', '否'].includes(tmp_field_value)) {
+							obj[fm.object_field] = false;
+						} else {
+							obj[fm.object_field] = tmp_field_value;
+						}
+					} else {
+						obj[fm.object_field] = values[fm.workflow_field];
+					}
+				}
+
+			} else {
 				if (fm.workflow_field.startsWith('instance.')) {
 					var insField = fm.workflow_field.split('instance.')[1];
 					if (self.syncInsFields.includes(insField))
 						obj[fm.object_field] = ins[insField];
-				}else{
-					if(ins[fm.workflow_field]){
+				} else {
+					if (ins[fm.workflow_field]) {
 						obj[fm.object_field] = ins[fm.workflow_field];
 					}
 				}
@@ -215,6 +272,33 @@ InstanceRecordQueue.Configure = function (options) {
 			})
 		})
 
+
+
+		if (field_map_back_script) {
+			_.extend(obj, self.evalFieldMapBackScript(field_map_back_script, ins));
+		}
+
+		// 过滤掉非法的key
+		var filterObj = {};
+		_.each(_.keys(obj), function (k) {
+			if (objectFieldKeys.includes(k)) {
+				filterObj[k] = obj[k];
+			}
+		})
+
+		return filterObj;
+	}
+
+	self.evalFieldMapBackScript = function (field_map_back_script, ins) {
+		var script = "module.exports = function (instance) { " + field_map_back_script + " }";
+		var func = _eval(script, "field_map_script");
+		var values = func(ins);
+		if (_.isObject(values)) {
+			return values;
+		} else {
+			console.error("evalFieldMapBackScript: 脚本返回值类型不是对象");
+		}
+		return {}
 	}
 
 	self.sendDoc = function (doc) {
@@ -229,7 +313,9 @@ InstanceRecordQueue.Configure = function (options) {
 			flow: 1,
 			values: 1,
 			applicant: 1,
-			space: 1
+			space: 1,
+			form: 1,
+			form_version: 1
 		};
 		self.syncInsFields.forEach(function (f) {
 			fields[f] = 1;
@@ -237,7 +323,8 @@ InstanceRecordQueue.Configure = function (options) {
 		var ins = Creator.getCollection('instances').findOne(insId, {
 			fields: fields
 		});
-		var values = ins.values, spaceId = ins.space;
+		var values = ins.values,
+			spaceId = ins.space;
 
 		if (records) {
 			// 此情况属于从creator中发起审批
@@ -249,6 +336,7 @@ InstanceRecordQueue.Configure = function (options) {
 			var
 				objectCollection = Creator.getCollection(objectName, spaceId),
 				sync_attachment = ow.sync_attachment;
+			var objectInfo = Creator.getObject(objectName, spaceId);
 			objectCollection.find({
 				_id: {
 					$in: records[0].ids
@@ -256,9 +344,7 @@ InstanceRecordQueue.Configure = function (options) {
 			}).forEach(function (record) {
 				// 附件同步
 				try {
-					var setObj = {};
-
-					self.syncValues(setObj, ow.field_map_back, values, ins);
+					var setObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
 
 					setObj['instances.$.state'] = 'completed';
 					setObj.locked = false;
@@ -313,20 +399,22 @@ InstanceRecordQueue.Configure = function (options) {
 				flow_id: ins.flow
 			}).forEach(function (ow) {
 				try {
-					var newObj = {},
+					var
 						objectCollection = Creator.getCollection(ow.object_name, spaceId),
 						sync_attachment = ow.sync_attachment,
 						newRecordId = objectCollection._makeNewID(),
 						objectName = ow.object_name;
 
-					self.syncValues(newObj, ow.field_map_back, values, ins);
+					var objectInfo = Creator.getObject(ow.object_name, spaceId);
+
+					var newObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
 					newObj.name = ins.name;
 					newObj.instances = [{
 						_id: insId,
-						state: 'completed'
+						state: ins.state
 					}];
 					newObj.owner = ins.applicant;
 					newObj.created_by = ins.applicant;

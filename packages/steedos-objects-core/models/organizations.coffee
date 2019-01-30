@@ -69,16 +69,16 @@ Creator.Objects.organizations =
 			is_wide: true
 
 		company_id:
-			label: "所属公司"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			omit: true
+			label: "所属单位"
 			group: "系统"
 
 		is_company:
 			label: "公司级"
+			type: "boolean"
+			index:true
+
+		is_group:
+			label: "群组级"
 			type: "boolean"
 			index:true
 
@@ -89,7 +89,7 @@ Creator.Objects.organizations =
 	list_views:
 
 		all:
-			columns: ["name", "sort_no", "is_company", "admins", "hidden"]
+			columns: ["name", "sort_no", "is_company", "is_group", "admins", "hidden"]
 			label: "所有"
 			filter_scope: "space"
 			sort : [
@@ -138,6 +138,13 @@ Creator.Objects.organizations =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
+			viewAllRecords: true
+		organization_admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyCompanyRecords: true
 			viewAllRecords: true
 
 if Meteor.isServer
@@ -296,9 +303,10 @@ if (Meteor.isServer)
 				throw new Meteor.Error(400, "organizations_error_parent_is_company_false_for_current_company");
 
 			# 如果是新建组织不是根组织，则应该设置其company_id值为其最近一个父组织的company_id值，除非其is_company为true
-			if doc.is_company
+			if doc.is_company and !doc.is_group
 				doc.company_id = doc._id
 			else
+				# parentOrg正好是根组织的情况通过脚本修正，保证默认情况下每个根组织company_id有正确的值
 				doc.company_id = parentOrg.company_id
 		else
 			# 新增部门时不允许创建根部门
@@ -312,7 +320,7 @@ if (Meteor.isServer)
 
 			# 根组织的is_company值必须是true
 			doc.is_company = true
-			# 如果是新建根组织则应该设置其company_id值为根组织本身的_id值
+			# 如果是新建根组织则应该设置其company_id值为根组织本身的_id值，因默认is_group也是false
 			doc.company_id = doc._id
 
 
@@ -335,13 +343,18 @@ if (Meteor.isServer)
 		if doc.parent
 			parent = db.organizations.findOne(doc.parent)
 			db.organizations.direct.update(parent._id, {$set: {children: parent.calculateChildren()}});
+		unless rootOrg
+			rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
 		if doc.users
-			space_users = db.space_users.find({space: doc.space, user: {$in: doc.users}}).fetch()
-			_.each space_users, (su)->
+			space_users = db.space_users.find(
+				{space: doc.space, user: {$in: doc.users}}, 
+				{fields: {organizations: 1, company_id: 1, space: 1}})
+			space_users.forEach (su)->
 				orgs = su.organizations
 				orgs.push(doc._id)
 				db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
 				db.space_users.update_organizations_parents(su._id, orgs)
+				db.space_users.update_company_ids(su._id, su)
 
 		# 新增部门后在audit_logs表中添加一条记录
 		insertedDoc = db.organizations.findOne({_id: doc._id})
@@ -419,24 +432,20 @@ if (Meteor.isServer)
 					if childrenCompany
 						throw new Meteor.Error(400, "organizations_error_children_is_company_true_for_current_company");
 
-			# 当变更parent或is_company属性时，重新计算其company_id值
-			if modifier.$set.parent or modifier.$set.is_company != undefined
-				if is_company
+			is_group = if modifier.$set.is_group == undefined then doc.is_group else modifier.$set.is_group
+			# 当变更parent、is_company或is_group属性时，重新计算其company_id值
+			if modifier.$set.parent or modifier.$set.is_company != undefined or modifier.$set.is_group != undefined
+				if is_company and !is_group
 					company_id = doc._id
 				else
 					company_id = parentOrg.company_id
 				if company_id
 					modifier.$set.company_id = company_id
 				else
-					if !parentOrg.parent and parentOrg.is_company
-						modifier.$set.company_id = parentOrg._id
-					else
-						rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
-						if rootOrg
-							modifier.$set.company_id = rootOrg._id
-						else
-							modifier.$unset = modifier.$unset || {}
-							modifier.$unset.company_id = 1
+					# 需求上是需要向上一层一层查找，直到找到 is_group=false and is_company = true 的节点，并设置company_id为其_id的
+					# 但实际上parentOrg本身的company_id值是一层一层算下来的，有值就有值，没值就没值，所以技术上不需要一层一层去找。
+					modifier.$unset = modifier.$unset || {}
+					modifier.$unset.company_id = 1
 
 		else
 			# 根组织的is_company不能为false
@@ -446,6 +455,13 @@ if (Meteor.isServer)
 			# 不能修改根组织的父组织属性
 			if modifier.$set.parent
 				throw new Meteor.Error(400, "organizations_error_root_parent_can_not_set");
+			
+			if modifier.$set.is_group != undefined
+				if modifier.$set.is_group
+					modifier.$unset = modifier.$unset || {}
+					modifier.$unset.company_id = 1
+				else
+					modifier.$set.company_id = doc._id
 
 		modifier.$set.modified_by = userId;
 		modifier.$set.modified = new Date();
@@ -512,25 +528,32 @@ if (Meteor.isServer)
 		new_users = modifier.$set.users || []
 
 		# 只修改单个字段时，modifier.$set.users可能是undefined
+		unless rootOrg
+			rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
 		if modifier.$set.users or modifier.$unset.users != undefined
 			added_users = _.difference(new_users, old_users)
 			removed_users = _.difference(old_users, new_users)
 			if added_users.length > 0
-				added_space_users = db.space_users.find({space: doc.space, user: {$in: added_users}}).fetch()
-				_.each added_space_users, (su)->
+				added_space_users = db.space_users.find(
+					{space: doc.space, user: {$in: added_users}}, 
+					{fields: {organizations: 1, company_id: 1, space: 1}})
+				added_space_users.forEach (su)->
 					orgs = su.organizations
 					orgs.push(doc._id)
 					db.space_users.direct.update({_id: su._id}, {$set: {organizations: orgs}})
 					db.space_users.update_organizations_parents(su._id, orgs)
+					db.space_users.update_company_ids(su._id, su)
 			if removed_users.length > 0
-				removed_space_users = db.space_users.find({space: doc.space, user: {$in: removed_users}}).fetch()
-				root_org = db.organizations.findOne({space: doc.space, is_company: true, parent: null}, {fields: {_id: 1}})
-				_.each removed_space_users, (su)->
+				removed_space_users = db.space_users.find(
+					{space: doc.space, user: {$in: removed_users}},
+					{fields: {organization: 1,organizations: 1, company_id: 1, space: 1}})
+				removed_space_users.forEach (su)->
 					# 删除部门成员时，如果修改了其organization，则其company_id值应该同步改为其对应的organization.company_id值
 					orgs = su.organizations
 					if orgs.length is 1
-						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [root_org._id], organization: root_org._id, company_id: root_org._id}})
-						db.space_users.update_organizations_parents(su._id, [root_org._id])
+						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [rootOrg._id], organization: rootOrg._id, company_id: rootOrg._id}})
+						db.space_users.update_organizations_parents(su._id, [rootOrg._id])
+						db.space_users.update_company_ids(su._id, su)
 					else if orgs.length > 1
 						new_orgs = _.filter(orgs, (org_id)->
 							return org_id isnt doc._id
@@ -541,16 +564,48 @@ if (Meteor.isServer)
 						else
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs}})
 						db.space_users.update_organizations_parents(su._id, new_orgs)
+						db.space_users.update_company_ids(su._id, su)
 
 		old_company_id = this.previous.company_id
-		new_company_id = modifier.$set.company_id or doc.company_id
-		if new_company_id and (new_company_id != old_company_id)
+		new_company_id = doc.company_id
+		# unset_company_id不可以通过modifier.$unset?.company_id来获取，因为before.update中给$unset赋值这里拿不到
+		unset_company_id = !new_company_id and old_company_id
+		if unset_company_id or (new_company_id and (new_company_id != old_company_id))
 			# 当前部门的company_id值变化时，把其子部门全部设置为相同的company_id值
+			setOptions = {}
+			if unset_company_id
+				setOptions = {$unset: {company_id: 1}}
+			else
+				setOptions = {$set: {company_id: new_company_id}}
 			if doc.children and doc.children.length
 				# 这里不能用direct.update，因为要触发级联操作
-				db.organizations.update({_id: {$in: doc.children}}, {$set: {company_id: new_company_id}},{multi: true})
+				# 设置子部门company_id时，只能设置非公司级的部门，或者虽然是公司级，但是设置了is_group忽略公司级的部门
+				queryOptions = {
+					_id: {$in: doc.children}, 
+					$or: [{is_company: {$ne: true}},{is_company: true, is_group: true}]
+				}
+				db.organizations.update(queryOptions, 
+					setOptions,
+					{multi: true}
+				)
 			# 当前部门的company_id值变化时，同步主部门为当前部门的space_users的company_id值
-			db.space_users.direct.update({space: doc.space, organization: doc._id }, {$set: {company_id: new_company_id}},{multi: true})
+			queryOptions = {}
+			if unset_company_id
+				queryOptions = {space: doc.space, company_id: doc._id }
+			else
+				queryOptions = {space: doc.space, organization: doc._id }
+			db.space_users.direct.update(queryOptions, setOptions, {multi: true})
+			# 当前部门的company_id值变化时，同步company_ids包含当前部门的space_users，
+			# 以及organizations包含当前部门的space_users的company_ids值
+			queryOptions = {
+				space: doc.space, 
+				$or:[
+					{company_ids: doc._id},
+					{organizations: doc._id}
+				]
+			}
+			db.space_users.find(queryOptions,{fields: {organizations: 1, company_id: 1, space: 1}}).forEach (su)->
+				db.space_users.update_company_ids(su._id, su)
 
 		#修改部门的parent时, 需要其space_user的organizations_parents
 		if modifier.$set.parent

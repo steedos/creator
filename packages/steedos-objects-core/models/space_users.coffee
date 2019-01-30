@@ -27,6 +27,7 @@ Creator.Objects.space_users =
 			label:'所属部门'
 			reference_to: "organizations"
 			multiple: true
+			index: true
 			defaultValue: ()->
 				return Session.get("grid_sidebar_selected")
 			required: true
@@ -36,6 +37,20 @@ Creator.Objects.space_users =
 			reference_to: "organizations"
 			multiple: true
 			omit: true
+		company_id:
+			label: "主单位"
+			hidden: false
+			readonly: true
+		company_ids:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			multiple: true
+			index: true
+			is_company_only: true
+			omit: true
+			hidden: false
+			readonly: true
 		manager:
 			type: "lookup"
 			label:'上级主管'
@@ -70,13 +85,6 @@ Creator.Objects.space_users =
 			type: "lookup"
 			reference_to: "organizations"
 			omit: true
-		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			omit:true
 		user_accepted:
 			type: "boolean"
 			label:'有效'
@@ -123,6 +131,13 @@ Creator.Objects.space_users =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
+			viewAllRecords: true
+		organization_admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyCompanyRecords: true
 			viewAllRecords: true
 
 
@@ -199,20 +214,20 @@ Meteor.startup ()->
 
 			# 检验当前工作区下有没有邮件或手机号重复的成员，禁止重复添加
 			if doc.email and doc.mobile
-				spaceUserExisted = db.space_users.find({space: doc.space, $or: [{email: doc.email}, {mobile: doc.mobile}]})
+				spaceUserExisted = db.space_users.find({space: doc.space, $or: [{email: doc.email}, {mobile: doc.mobile}]},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "邮箱或手机号已存在")
 			else if doc.email
-				spaceUserExisted = db.space_users.find({space: doc.space, email: doc.email})
+				spaceUserExisted = db.space_users.find({space: doc.space, email: doc.email},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该邮箱已存在")
 			else if doc.mobile
-				spaceUserExisted = db.space_users.find({space: doc.space, mobile: doc.mobile})
+				spaceUserExisted = db.space_users.find({space: doc.space, mobile: doc.mobile},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该手机号已存在")
 
 			if user
-				spaceUserExisted = db.space_users.find({space: doc.space, user: user})
+				spaceUserExisted = db.space_users.find({space: doc.space, user: user},{fields: {_id: 1}})
 				if spaceUserExisted.count() > 0
 					throw new Meteor.Error(400, "该用户已在此工作区")
 
@@ -297,7 +312,7 @@ Meteor.startup ()->
 				if repeatNumberUser and repeatNumberUser._id != doc.user
 					throw new Meteor.Error(400, "space_users_error_phone_already_existed")
 
-			if modifier.$set?.hasOwnProperty('username') or modifier.$unset?.hasOwnProperty('username')
+			if modifier.$set?.hasOwnProperty('username') or (modifier.$unset?.hasOwnProperty('username') && doc.username)
 				if (!Steedos.isLegalVersion(doc.space,"workflow.professional"))
 					throw new Meteor.Error(400, "space_paid_info_title")
 
@@ -395,7 +410,7 @@ Meteor.startup ()->
 
 			if doc.organization
 				organization = db.organizations.findOne(doc.organization,fields:{company_id:1})
-				if organization
+				if organization and organization.company_id
 					doc.company_id = organization.company_id
 
 		db.space_users.after.insert (userId, doc) ->
@@ -432,35 +447,28 @@ Meteor.startup ()->
 				space: doc.space
 				operation: "add"
 				user: doc.user
-				user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+				user_count: db.space_users.find({space: doc.space, user_accepted: true},{fields: {_id: 1}}).count()
 
 			if doc.organizations
 				db.space_users.update_organizations_parents(doc._id, doc.organizations)
+				db.space_users.update_company_ids(doc._id, doc)
 
 		db.space_users.before.update (userId, doc, fieldNames, modifier, options) ->
 			modifier.$set = modifier.$set || {};
 
 			db.space_users.updatevaildate(userId, doc, modifier)
 			if modifier.$set.organizations && modifier.$set.organizations.length > 0
-				# 修改所有组织且修改后的组织不包含原主组织，则把主组织自动设置为第一个组织
-				unless modifier.$set.organizations.includes doc.organization
-					modifier.$set.organization = modifier.$set.organizations[0]
-
+				# 修改所有组织后，强制把主组织自动设置为第一个组织
+				modifier.$set.organization = modifier.$set.organizations[0]
 			if modifier.$set.organization
 				organization = db.organizations.findOne(modifier.$set.organization,fields:{company_id:1, parent:1, is_company:1})
 				if organization
 					if organization.company_id
 						modifier.$set.company_id = organization.company_id
 					else
-						if !organization.parent and organization.is_company
-							modifier.$set.company_id = organization._id
-						else
-							rootOrg = db.organizations.findOne({space: doc.space, parent: null, is_company: true},fields:{_id:1})
-							if rootOrg
-								modifier.$set.company_id = rootOrg._id
-							else
-								modifier.$unset = modifier.$unset || {}
-								modifier.$unset.company_id = 1
+						# 如果所属主部门的company_id不存在，则清除当前用户company_id值，而不是查找并设置为根组织Id
+						modifier.$unset = modifier.$unset || {}
+						modifier.$unset.company_id = 1
 
 			newMobile = modifier.$set.mobile
 			# 当把手机号设置为空值时，newMobile为undefined，modifier.$unset.mobile为空字符串
@@ -600,10 +608,11 @@ Meteor.startup ()->
 						space: doc.space
 						operation: modifier.$set.user_accepted ? "enable" : "disable"
 						user: doc.user
-						user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+						user_count: db.space_users.find({space: doc.space, user_accepted: true},{fields: {_id: 1}}).count()
 
 			if modifier.$set.organizations
 				db.space_users.update_organizations_parents(doc._id, modifier.$set.organizations)
+				db.space_users.update_company_ids(doc._id, doc)
 
 
 		db.space_users.before.remove (userId, doc) ->
@@ -639,7 +648,7 @@ Meteor.startup ()->
 				space: doc.space
 				operation: "delete"
 				user: doc.user
-				user_count: db.space_users.find({space: doc.space, user_accepted: true}).count()
+				user_count: db.space_users.find({space: doc.space, user_accepted: true},{fields: {_id: 1}}).count()
 
 			try
 				user = db.users.findOne(doc.user,{fields: {email: 1,name: 1,steedos_id:1}})
@@ -664,6 +673,18 @@ Meteor.startup ()->
 			orgs = db.organizations.find({_id: {$in: organizations}}, {fields: {parents: 1}}).fetch()
 			organizations_parents = _.compact(_.uniq(_.flatten([organizations, _.pluck(orgs, 'parents')])))
 			db.space_users.direct.update({_id: _id}, {$set: {organizations_parents: organizations_parents}})
+		
+		db.space_users.update_company_ids = (_id, su)->
+			unless su
+				su = db.space_users.findOne({_id: _id}, {fields: {organizations: 1, company_id: 1, space: 1}})
+			unless su
+				console.error "db.space_users.update_company_ids,can't find space_users by _id of:", _id
+				return
+			orgs = db.organizations.find({_id: {$in: su.organizations}}, {fields: {company_id: 1}}).fetch()
+			company_ids = _.pluck(orgs, 'company_id')
+			# company_ids中的空值就空着，不需要转换成根组织ID值
+			company_ids = _.uniq(_.compact(company_ids))
+			db.space_users.direct.update({_id: _id}, {$set: {company_ids: company_ids}})
 
 
 		Meteor.publish 'space_users', (spaceId)->

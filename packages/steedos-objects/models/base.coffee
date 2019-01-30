@@ -58,6 +58,22 @@ Creator.baseObject =
 			omit: true
 			index: true
 			hidden: true
+		deleted:
+			label:"删除时间"
+			type: "datetime"
+			readonly: true
+			sortable: true
+			index: true
+			omit: true
+			hidden: true
+		deleted_by:
+			label:"删除人"
+			type: "lookup"
+			readonly: true
+			reference_to: "users"
+			disabled: true
+			omit: true
+			hidden: true
 		instances:
 			label:"申请单"
 			type: "grid"
@@ -109,6 +125,20 @@ Creator.baseObject =
 			label:'已锁定'
 			type:'boolean'
 			omit:true
+			hidden: true
+
+		# 新增基本字段，类似子管理员作分级权限
+		company_id:
+			label: "所属单位"
+			type: "lookup"
+			reference_to: "organizations"
+			sortable: true
+			index: true
+			is_company_only: true
+			defaultValue: ()->
+				if Meteor.isClient
+					return Session.get("user_company_id")
+			omit: true
 			hidden: true
 
 	permission_set:
@@ -205,7 +235,22 @@ Creator.baseObject =
 							# 如果当前修改的记录有满足条件的共享规则存在，则把共享规则配置保存起来
 							push = { sharing: { "u": ps.users, "o": ps.organizations, "r": ps._id } }
 							collection.direct.update({ _id: doc._id }, {$push: push})
-
+		"after.update.server.audit":
+			"on": "server"
+			when: "after.update"
+			todo: (userId, doc, fieldNames, modifier, options)->
+				object_name = this.object_name
+				obj = Creator.getObject(object_name)
+				if obj.enable_audit
+					Creator.AuditRecords?.add('update', userId, this.object_name, doc, this.previous, modifier)
+		"after.insert.server.audit":
+			"on": "server"
+			when: "after.insert"
+			todo: (userId, doc)->
+				object_name = this.object_name
+				obj = Creator.getObject(object_name)
+				if obj.enable_audit
+					Creator.AuditRecords?.add('insert', userId, this.object_name, doc)
 	actions:
 
 		standard_query:
@@ -231,7 +276,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -240,7 +285,7 @@ Creator.baseObject =
 					return true
 
 				if !record
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 
 				if record && record.locked
 					return false
@@ -257,7 +302,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -266,7 +311,7 @@ Creator.baseObject =
 					return true
 
 				if !record
-					record = Creator.Collections[object_name].findOne record_id
+					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 
 				if record && record.locked
 					return false
@@ -282,7 +327,7 @@ Creator.baseObject =
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
 
-				record = Creator.Collections[object_name].findOne record_id
+				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
@@ -305,7 +350,7 @@ Creator.baseObject =
 		standard_view_instance:
 			label: "查看审批单"
 			visible: (object_name, record_id, record_permissions) ->
-				record = Creator.Collections[object_name].findOne record_id
+				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
 				if record && !_.isEmpty(record.instances)
 					return true
 

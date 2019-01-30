@@ -10,6 +10,10 @@
 					{{/each}}
 				{{else if isImage}}
 					<img class="creator-table-cell-image" src="{{baseUrl}}/{{value}}"/>
+				{{else if isUrl}}
+					<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false">{{value}}</a>
+				{{else if isEmail}}
+					<a href="mailto:{{value}}">{{value}}</a>
 				{{else}}
 					{{#if href}}
 						{{#if openWindow}}

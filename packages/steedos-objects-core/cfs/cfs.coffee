@@ -1,6 +1,7 @@
-
 @cfs = {}
 
+Meteor.startup ->
+  FS.HTTP.setBaseUrl("/api")
 
 
 # 通过文件扩展名获取文件contentType

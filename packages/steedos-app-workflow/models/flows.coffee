@@ -70,16 +70,9 @@ Creator.Objects.flows =
 			type: "textarea"
 			is_wide: true
 		company_id:
-			label: "所属单位"
-			type: "lookup"
-			reference_to: "organizations"
-			sortable: true
-			index:true
-			is_company_only: true
 			required: Meteor.settings?.public?.is_group_company
-			defaultValue: ()->
-				if Meteor.isClient
-					return Session.get("user_company_id")
+			omit: false
+			hidden: false
 		created_by:
 			label:"创建人"
 		modified_by:
@@ -203,14 +196,12 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
 		"perms.orgs_can_add":
 			label:"授权部门: 新建申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
 
 		"perms.users_can_monitor":
@@ -218,14 +209,12 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
 		"perms.orgs_can_monitor":
 			label:"授权部门: 查看所有申请单"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
 
 		"perms.users_can_admin":
@@ -233,14 +222,12 @@ Creator.Objects.flows =
 			type: "lookup"
 			reference_to: "users"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
 		"perms.orgs_can_admin":
 			label:"授权部门: 查看所有申请单，并能执行重定位、转签核、删除操作"
 			type: "lookup"
 			reference_to: "organizations"
 			multiple: true
-			filter_by_company: true
 			is_wide: true
 
 		app:
@@ -282,7 +269,6 @@ Creator.Objects.flows =
 			multiple: true
 			is_wide: true
 			group: "分发"
-			filter_by_company: true
 			blackbox: true
 		distribute_to_self:
 			label:"分发给自己"
