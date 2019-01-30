@@ -186,3 +186,4 @@ steedos:app-base
 
 steedos:version
 steedos:audit
+runisland:static-assets
