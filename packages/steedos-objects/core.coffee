@@ -280,12 +280,14 @@ Creator.processPermissions = (po)->
 	if po.modifyAllRecords
 		po.allowRead = true
 		po.allowEdit = true
+		po.allowDelete = true
 		po.viewAllRecords = true
 	if po.viewCompanyRecords
 		po.allowRead = true
 	if po.modifyCompanyRecords
 		po.allowRead = true
 		po.allowEdit = true
+		po.allowDelete = true
 		po.viewCompanyRecords = true
 	return po
 
