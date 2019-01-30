@@ -212,9 +212,6 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/grid.html', 'client');
 	api.addFiles('client/views/grid.coffee', 'client');
 	api.addFiles('client/views/grid.less', 'client');
-	api.addFiles('client/views/list.html', 'client');
-	api.addFiles('client/views/list.coffee', 'client');
-	api.addFiles('client/views/list.less', 'client');
 	api.addFiles('client/views/view.html', 'client');
 	api.addFiles('client/views/view.coffee', 'client');
 	api.addFiles('client/views/view.less', 'client');

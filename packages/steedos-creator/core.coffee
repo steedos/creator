@@ -38,9 +38,6 @@ Creator.loadObjects = (obj, object_name)->
 	# if Meteor.isServer
 	# 	Creator.initPermissions(object_name)
 
-Creator.getTable = (object_name)->
-	return Tabular.tablesByName["creator_" + object_name]
-
 Creator.getSchema = (object_name)->
 	return Creator.getObject(object_name)?.schema
 
