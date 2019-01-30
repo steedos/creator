@@ -13,4 +13,5 @@ Package.onUse(function(api) {
 
 	api.addFiles('lib/audit_records.coffee', 'server');
 	api.addFiles('models/audit_records.coffee');
+	api.addFiles('models/audit_login.coffee');
 })
