@@ -267,6 +267,16 @@ Creator.getUserCompanyId = (userId, spaceId)->
 	su = Creator.getCollection('space_users').findOne({space: spaceId, user: userId}, {fields: {company_id:1}})
 	return su.company_id
 
+Creator.getUserCompanyIds = (userId, spaceId)->
+	userId = userId || Meteor.userId()
+	if Meteor.isClient
+		spaceId = spaceId || Session.get('spaceId')
+	else
+		if !spaceId
+			throw new Meteor.Error(400, 'miss spaceId')
+	su = Creator.getCollection('space_users').findOne({space: spaceId, user: userId}, {fields: {company_ids:1}})
+	return su?.company_ids
+
 Creator.processPermissions = (po)->
 	if po.allowCreate
 		po.allowRead = true

@@ -9,7 +9,7 @@ Creator.getPermissions = (object_name, spaceId, userId)->
 	else if Meteor.isServer
 		Creator.getObjectPermissions(spaceId, userId, object_name)
 
-Creator.getRecordPermissions = (object_name, record, userId)->
+Creator.getRecordPermissions = (object_name, record, userId, spaceId)->
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
 
@@ -17,7 +17,10 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	if record
 		isOwner = record.owner == userId || record.owner?._id == userId
-		user_company_ids = Session.get("user_company_ids")
+		if Meteor.isClient
+			user_company_ids = Session.get("user_company_ids")
+		else
+			user_company_ids = Creator.getUserCompanyIds(userId, spaceId)
 		record_company_id = record?.company_id
 		if record_company_id and _.isObject(record_company_id) and record_company_id._id
 			# 因record_company_id是lookup类型，有可能dx控件会把它映射转为对应的object，所以这里取出其_id值
