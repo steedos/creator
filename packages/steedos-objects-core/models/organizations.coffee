@@ -139,6 +139,13 @@ Creator.Objects.organizations =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		organization_admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyCompanyRecords: true
+			viewAllRecords: true
 
 if Meteor.isServer
 	Meteor.publish "subCompany", (space_id)->

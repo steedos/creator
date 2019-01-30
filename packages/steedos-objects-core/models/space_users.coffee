@@ -132,6 +132,13 @@ Creator.Objects.space_users =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
+		organization_admin:
+			allowCreate: true
+			allowDelete: true
+			allowEdit: true
+			allowRead: true
+			modifyCompanyRecords: true
+			viewAllRecords: true
 
 
 Meteor.startup ()->
