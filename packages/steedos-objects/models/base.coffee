@@ -273,7 +273,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+					record = Creator.getObjectRecord(object_name, record_id)
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -291,7 +291,7 @@ Creator.baseObject =
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+					record = Creator.getObjectRecord(object_name, record_id)
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
@@ -307,7 +307,7 @@ Creator.baseObject =
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
 
-				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+				record = Creator.getObjectRecord(object_name, record_id)
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
@@ -330,7 +330,7 @@ Creator.baseObject =
 		standard_view_instance:
 			label: "查看审批单"
 			visible: (object_name, record_id, record_permissions) ->
-				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+				record = Creator.getObjectRecord(object_name, record_id)
 				if record && !_.isEmpty(record.instances)
 					return true
 
