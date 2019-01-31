@@ -334,6 +334,11 @@ Template.creator_grid.onRendered ->
 		related_object_name = self.data.related_object_name
 		curObjectName = if is_related then related_object_name else object_name
 		curObject = Creator.getObject(curObjectName)
+		
+		user_permission_sets = Session.get("user_permission_sets")
+		user_company_id = Session.get("user_company_id")
+		isSpaceAdmin = Creator.isSpaceAdmin()
+		isOrganizationAdmin = _.include(user_permission_sets,"organization_admin")
 
 		record_id = Session.get("record_id")
 
@@ -705,8 +710,20 @@ Template.creator_grid.onRendered ->
 					else
 						column.allowSearch = false
 
-				console.log('dxOptions.columns', dxOptions.columns)
-
+				if object_name == "organizations"
+					unless isSpaceAdmin
+						if isOrganizationAdmin
+							if user_company_id
+								dxOptions.rootValue = user_company_id
+							else
+								dxOptions.rootValue = "-1"
+						else
+							dxOptions.rootValue = "-1"
+				# dxOptions.dataSource.filter = [["name", "=", "a"], "or", ["name", "=", "b"], "or", ["name", "=", "c"]]
+				# dxOptions.dataSource.filter = [["_id", "=", "Hw7pSZ6Aj7x5cX7jP"]]
+				# dxOptions.filterValue = ["_id", "=", "Hw7pSZ6Aj7x5cX7jP"]
+				# dxOptions.filterSyncEnabled = true
+				# console.log "========dxOptions=========", dxOptions
 				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
 				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')

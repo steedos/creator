@@ -3,6 +3,10 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 	self.autorun (c)->
 		list_view_id = "all"
 		object_name = "organizations"
+		user_permission_sets = Session.get("user_permission_sets")
+		user_company_id = Session.get("user_company_id")
+		isSpaceAdmin = Creator.isSpaceAdmin()
+		isOrganizationAdmin = _.include(user_permission_sets,"organization_admin")
 		if Steedos.spaceId()
 			url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
 			dxOptions = 
@@ -78,6 +82,16 @@ Template.creator_grid_sidebar_organizations.onRendered ->
 			dxOptions.rootValue = null
 			dxOptions.dataStructure = "plain"
 			dxOptions.virtualModeEnabled = true 
+			
+			unless isSpaceAdmin
+				if isOrganizationAdmin
+					if user_company_id
+						dxOptions.rootValue = user_company_id
+					else
+						dxOptions.rootValue = "-1"
+				else
+					dxOptions.rootValue = "-1"
+
 			self.$(".gridSidebarContainer").dxTreeView(dxOptions).dxTreeView('instance')
 			
 Template.creator_grid_sidebar_organizations.helpers Creator.helpers
