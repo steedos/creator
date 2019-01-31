@@ -2,7 +2,8 @@ actions =
 	import:
 		label: "导入"
 		on: "list"
-		visible: true
+		visible: (object_name, record_id, record_permissions)->
+			return Creator.isSpaceAdmin()
 		todo: ()->
 			if !Steedos.isPaidSpace()
 				Steedos.spaceUpgradedModal()
@@ -13,7 +14,8 @@ actions =
 	export:
 		label: "导出"
 		on: "list"
-		visible: true
+		visible: (object_name, record_id, record_permissions)->
+			return Creator.isSpaceAdmin()
 		todo: ()->
 			spaceId = Session.get("spaceId")
 			orgId = Session.get("grid_sidebar_selected")?[0]
