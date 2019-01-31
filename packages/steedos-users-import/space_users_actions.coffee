@@ -19,7 +19,6 @@ actions =
 		todo: ()->
 			spaceId = Session.get("spaceId")
 			orgId = Session.get("grid_sidebar_selected")?[0]
-			console.log "orgId============", orgId
 			if spaceId and orgId
 				uobj = {}
 				uobj["X-User-Id"] = Meteor.userId()
