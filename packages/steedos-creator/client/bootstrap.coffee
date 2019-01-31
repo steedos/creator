@@ -34,6 +34,8 @@ Creator.bootstrap = (spaceId, callback)->
 			Creator.object_workflows = result.object_workflows
 			isSpaceAdmin = Steedos.isSpaceAdmin()
 
+			Session.set "user_permission_sets", result.user_permission_sets
+
 			_.each Creator.Objects, (object, object_name)->
 				_.extend object.list_views, object_listviews[object_name]
 				Creator.loadObjects object, object_name
