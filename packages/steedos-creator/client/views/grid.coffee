@@ -707,10 +707,14 @@ Template.creator_grid.onRendered ->
 
 				console.log('dxOptions.columns', dxOptions.columns)
 
-				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
+				module.dynamicImport('devextreme/ui/tree_list').then (dxTreeList)->
+					DevExpress.ui.dxTreeList = dxTreeList;
+					self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
-				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
-				self.dxDataGridInstance.pageSize(pageSize)
+				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+					DevExpress.ui.dxDataGrid = dxDataGrid;
+					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
+					# self.dxDataGridInstance.pageSize(pageSize)
 			
 Template.creator_grid.helpers Creator.helpers
 
