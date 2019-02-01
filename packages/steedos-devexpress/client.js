@@ -178,3 +178,4 @@ viz.dxSankey = require("devextreme/viz/sankey");
 
 /* Utilities for integration with ASP.NET */
 /* DevExpress.aspnet = require("devextreme/aspnet"); */
+const jszip = require("jszip");

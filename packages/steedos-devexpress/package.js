@@ -23,7 +23,6 @@ Package.onUse(function (api) {
 		'client/css/icons/dxiconsmaterial.woff2'
 	], 'client');
 
-	api.addFiles('client/jszip/jszip.js', 'client');
 	api.addFiles('client/css/dx.spa.css', 'client');
 	api.addFiles('client/css/dx.common.css', 'client');
 	api.addFiles('client/css/dx.material.light.blue.css', 'client');
