@@ -135,7 +135,7 @@ Template.creator_calendar.onRendered ->
 		unless Session.get("object_name") is "meeting"
 			return
 		if Steedos.spaceId()
-			dxSchedulerInstance =  $("#scheduler").dxScheduler({
+			schedulerOptions = {
 				dataSource: _dataSource()
 				views: [{
 					type: "day",
@@ -298,7 +298,10 @@ Template.creator_calendar.onRendered ->
 							_deleteData(data)
 					})
 					return markup;
-			}).dxScheduler("instance")
+			};
+			module.dynamicImport("devextreme/ui/scheduler").then (dxScheduler)->
+				DevExpress.ui.dxScheduler = dxScheduler;
+				dxSchedulerInstance =  $("#scheduler").dxScheduler(schedulerOptions).dxScheduler("instance")
 
 Template.creator_calendar.helpers Creator.helpers
 
