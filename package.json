@@ -31,6 +31,7 @@
     "odata-v4-service-document": "0.0.3",
     "odata-v4-service-metadata": "^0.1.6",
     "querystring": "^0.2.0",
+    "simplemde": "^1.11.2",
     "socket.io": "1.4.8",
     "socket.io-client": "1.4.8",
     "sprintf-js": "^1.0.3",
