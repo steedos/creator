@@ -39,6 +39,7 @@ accounts-ui
 accounts-password
 
 tmeasday:check-npm-versions
+fourseven:scss
 
 # fortawesome:fontawesome
 tap:i18n
@@ -55,7 +56,7 @@ steedos:creator-autoform-modals
 steedos:autoform-bs-minicolors
 steedos:autoform-file
 steedos:autoform-lookup
-yogiben:autoform-tags
+steedos:autoform-tags
 q42:autoform-markdown
 steedos:markdown@0.0.1
 
@@ -117,8 +118,6 @@ peppelg:bootstrap-3-modal@1.0.4
 
 # steedos:ionicons@0.1.7
 
-
-natestrauser:select2
 meteorhacks:unblock@1.1.0
 
 steedos:lightning-design-system
