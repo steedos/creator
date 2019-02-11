@@ -127,7 +127,7 @@ ui.dxPopover = require("devextreme/ui/popover");
 // data.PivotGridDataSource = require("devextreme/ui/pivot_grid/data_source");
 // data.XmlaStore = require("devextreme/ui/pivot_grid/xmla_store");
 // ui.dxScheduler = require("devextreme/ui/scheduler");
-// ui.dxTreeView = require("devextreme/ui/tree_view");
+ui.dxTreeView = require("devextreme/ui/tree_view");
 // ui.dxFilterBuilder = require("devextreme/ui/filter_builder");
 
 
