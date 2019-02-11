@@ -31,6 +31,8 @@ Creator.Objects.organizations =
 			sortable: true
 			index:true
 			blackbox: true
+			defaultValue: ()->
+				return Session.get("user_company_id")
 
 		parents:
 			label: "上级部门"
