@@ -24,18 +24,19 @@ Creator.Objects.project_issues =
 			type: 'master_detail'
 			reference_to: 'projects'
 			filterable: true
+			is_wide: true
 
-		level:
-			label: "级别"
-			type: "select"
-			options: [
-				{label:"车间级", value:"department"},
-				{label:"厂级", value:"company"},
-				{label:"公司级", value:"group"}
-			]
-			sortable: true
-			defaultValue: "department"
-			filterable: true
+		# level:
+		# 	label: "级别"
+		# 	type: "select"
+		# 	options: [
+		# 		{label:"车间级", value:"department"},
+		# 		{label:"厂级", value:"company"},
+		# # 		{label:"公司级", value:"group"}
+		# 	]
+		# 	sortable: true
+		# 	defaultValue: "department"
+		# 	filterable: true
 
 		company_id:
 			label: '提报单位'
@@ -83,7 +84,7 @@ Creator.Objects.project_issues =
 
 		deadline:
 			label: '截止时间'
-			type: 'datetime'
+			type: 'date'
 
 		end_organization:
 			label: '办结部门'
@@ -92,7 +93,7 @@ Creator.Objects.project_issues =
 
 		enddate:
 			label: '办结时间'
-			type: 'datetime'
+			type: 'date'
 
 		# state:
 		# 	label: "进度"

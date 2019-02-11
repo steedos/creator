@@ -153,6 +153,7 @@ steedos:mailqueue
 # steedos:vip-post
 steedos:objects
 steedos:objects-core
+steedos:objects-billing
 steedos:sso
 
 

@@ -9,7 +9,7 @@ Creator.getPermissions = (object_name, spaceId, userId)->
 	else if Meteor.isServer
 		Creator.getObjectPermissions(spaceId, userId, object_name)
 
-Creator.getRecordPermissions = (object_name, record, userId)->
+Creator.getRecordPermissions = (object_name, record, userId, spaceId)->
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
 
@@ -17,12 +17,44 @@ Creator.getRecordPermissions = (object_name, record, userId)->
 
 	if record
 		isOwner = record.owner == userId || record.owner?._id == userId
+		if Meteor.isClient
+			user_company_ids = Session.get("user_company_ids")
+		else
+			user_company_ids = Creator.getUserCompanyIds(userId, spaceId)
+		record_company_id = record?.company_id
+		if record_company_id and _.isObject(record_company_id) and record_company_id._id
+			# 因record_company_id是lookup类型，有可能dx控件会把它映射转为对应的object，所以这里取出其_id值
+			record_company_id = record_company_id._id
 		if !permissions.modifyAllRecords and !isOwner and !permissions.modifyCompanyRecords
+			permissions.allowEdit = false
+			permissions.allowDelete = false
+		else if permissions.modifyCompanyRecords
+			if record_company_id and _.isString(record_company_id)
+				if user_company_ids and user_company_ids.length
+					if !_.include(user_company_ids, record_company_id)
+						# 记录的company_id属性不在当前用户user_company_ids范围内时，认为无权修改
+						permissions.allowEdit = false
+						permissions.allowDelete = false
+				else
+					# 记录有company_id属性，但是当前用户user_company_ids为空时，认为无权修改
+					permissions.allowEdit = false
+					permissions.allowDelete = false
+		
+		if record.locked and !permissions.modifyAllRecords
 			permissions.allowEdit = false
 			permissions.allowDelete = false
 
 		if !permissions.viewAllRecords and !isOwner and !permissions.viewCompanyRecords
 			permissions.allowRead = false
+		else if permissions.viewCompanyRecords
+			if record_company_id and _.isString(record_company_id)
+				if user_company_ids and user_company_ids.length
+					if !_.include(user_company_ids, record_company_id)
+						# 记录的company_id属性不在当前用户user_company_ids范围内时，认为无权查看
+						permissions.allowRead = false
+				else
+					# 记录有company_id属性，但是当前用户user_company_ids为空时，认为无权查看
+					permissions.allowRead = false
 
 	return permissions
 
@@ -37,6 +69,7 @@ if Meteor.isServer
 		psetsMember = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1, assigned_apps:1}}) || null
 		psetsGuest = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1, assigned_apps:1}}) || null
 		psetsWorkflowAdmin = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'workflow_admin'}, {fields:{_id:1, assigned_apps:1, users:1}}) || null
+		psetsOrganizationAdmin = Creator.getCollection("permission_set").findOne({space: spaceId, name: 'organization_admin'}, {fields:{_id:1, assigned_apps:1, users:1}}) || null
 		psetsCurrent = Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1, name:1}}).fetch()
 
 		psetsAdmin_pos = null
@@ -44,6 +77,7 @@ if Meteor.isServer
 		psetsMember_pos = null
 		psetsGuest_pos = null
 		psetsWorkflowAdmin_pos = null
+		psetsOrganizationAdmin_pos = null
 		psetsCurrent_pos = null
 
 		if psetsAdmin?._id
@@ -56,18 +90,43 @@ if Meteor.isServer
 			psetsGuest_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsGuest._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
 		if psetsWorkflowAdmin?._id
 			psetsWorkflowAdmin_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsWorkflowAdmin._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
+		if psetsOrganizationAdmin?._id
+			psetsOrganizationAdmin_pos = Creator.getCollection("permission_objects").find({permission_set_id: psetsOrganizationAdmin._id}, {fields: {created: 0, modified: 0, created_by: 0, modified_by: 0}}).fetch()
 		if psetsCurrent.length > 0
 			set_ids = _.pluck psetsCurrent, "_id"
 			psetsCurrent_pos = Creator.getCollection("permission_objects").find({permission_set_id: {$in: set_ids}}).fetch()
+			psetsCurrentNames = _.pluck psetsCurrent, "name"
 		isSpaceAdmin = false
 		spaceUser = null
 		if userId
 			isSpaceAdmin = Creator.isSpaceAdmin(spaceId, userId)
+			isWorkflowAdmin = psetsWorkflowAdmin?.users?.includes(userId)
+			isOrganizationAdmin = psetsOrganizationAdmin?.users?.includes(userId)
 			spaceUser = Creator.getCollection("space_users").findOne({ space: spaceId, user: userId }, { fields: { profile: 1 } })
 
-		psets = { psetsAdmin, psetsUser, psetsCurrent, psetsMember, psetsGuest, psetsWorkflowAdmin, isSpaceAdmin, spaceUser, psetsAdmin_pos, psetsUser_pos, psetsMember_pos, psetsGuest_pos, psetsWorkflowAdmin_pos, psetsCurrent_pos}
+		psets = { 
+			psetsAdmin, 
+			psetsUser, 
+			psetsCurrent, 
+			psetsMember, 
+			psetsGuest, 
+			psetsWorkflowAdmin, 
+			psetsOrganizationAdmin, 
+			isSpaceAdmin, 
+			isWorkflowAdmin,
+			isOrganizationAdmin,
+			spaceUser, 
+			psetsAdmin_pos, 
+			psetsUser_pos, 
+			psetsMember_pos, 
+			psetsGuest_pos, 
+			psetsWorkflowAdmin_pos, 
+			psetsOrganizationAdmin_pos, 
+			psetsCurrent_pos
+		}
 		permissions.assigned_apps = Creator.getAssignedApps.bind(psets)(spaceId, userId)
 		permissions.assigned_menus = Creator.getAssignedMenus.bind(psets)(spaceId, userId)
+		permissions.user_permission_sets = psetsCurrentNames
 		_i = 0
 		_.each Creator.objectsByName, (object, object_name)->
 			_i++
@@ -91,8 +150,9 @@ if Meteor.isServer
 		# psetsMember = this.psetsMember || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1, assigned_apps:1}})
 		# psetsGuest = this.psetsGuest || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1, assigned_apps:1}})
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1}}).fetch()
+		isSpaceAdmin = if _.isBoolean(this.isSpaceAdmin) then this.isSpaceAdmin else Creator.isSpaceAdmin(spaceId, userId)
 		apps = []
-		if Creator.isSpaceAdmin(spaceId, userId)
+		if isSpaceAdmin
 			return []
 		else
 			psetBase = psetsUser
@@ -108,6 +168,7 @@ if Meteor.isServer
 
 	Creator.getAssignedMenus = (spaceId, userId)->
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, name:1}}).fetch()
+		isSpaceAdmin = if _.isBoolean(this.isSpaceAdmin) then this.isSpaceAdmin else Creator.isSpaceAdmin(spaceId, userId)
 		adminMenus = Creator.Apps.admin.admin_menus
 		aboutMenu = adminMenus.find (n) ->
 			n._id == 'about'
@@ -119,7 +180,7 @@ if Meteor.isServer
 		otherMenus = _.flatten(_.pluck(otherMenuApps, "admin_menus"))
 		# 菜单有三部分组成设置APP菜单、其他APP菜单以及about菜单
 		allMenus = _.union(adminMenus, otherMenus, [aboutMenu])
-		if Creator.isSpaceAdmin(spaceId, userId)
+		if isSpaceAdmin
 			# 工作区管理员有全部菜单功能
 			return allMenus
 		else
@@ -164,14 +225,18 @@ if Meteor.isServer
 		psetsMember = if _.isNull(this.psetsMember) or this.psetsMember then this.psetsMember else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'member'}, {fields:{_id:1}})
 		psetsGuest = if _.isNull(this.psetsGuest) or this.psetsGuest then this.psetsGuest else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'guest'}, {fields:{_id:1}})
 		psetsWorkflowAdmin = if _.isNull(this.psetsWorkflowAdmin) or this.psetsWorkflowAdmin then this.psetsWorkflowAdmin else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'workflow_admin'}, {fields:{_id:1, users:1}})
+		psetsOrganizationAdmin = if _.isNull(this.psetsOrganizationAdmin) or this.psetsOrganizationAdmin then this.psetsOrganizationAdmin else Creator.getCollection("permission_set").findOne({space: spaceId, name: 'organization_admin'}, {fields:{_id:1, users:1}})
 		psets =  this.psetsCurrent || Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1}}).fetch()
 		isSpaceAdmin = if _.isBoolean(this.isSpaceAdmin) then this.isSpaceAdmin else Creator.isSpaceAdmin(spaceId, userId)
+		isWorkflowAdmin = if _.isBoolean(this.isWorkflowAdmin) then this.isWorkflowAdmin else psetsWorkflowAdmin?.users?.includes(userId)
+		isOrganizationAdmin = if _.isBoolean(this.isOrganizationAdmin) then this.isOrganizationAdmin else psetsOrganizationAdmin?.users?.includes(userId)
 
 		psetsAdmin_pos = this.psetsAdmin_pos
 		psetsUser_pos = this.psetsUser_pos
 		psetsMember_pos = this.psetsMember_pos
 		psetsGuest_pos = this.psetsGuest_pos
 		psetsWorkflowAdmin_pos = this.psetsWorkflowAdmin_pos
+		psetsOrganizationAdmin_pos = this.psetsOrganizationAdmin_pos
 		psetsCurrent_pos = this.psetsCurrent_pos
 
 		opsetAdmin = _.clone(object.permission_set.admin) || {}
@@ -179,6 +244,7 @@ if Meteor.isServer
 		opsetMember = _.clone(object.permission_set.member) || {}
 		opsetGuest = _.clone(object.permission_set.guest) || {}
 		opsetWorkflowAdmin = _.clone(object.permission_set.workflow_admin) || {}
+		opsetOrganizationAdmin = _.clone(object.permission_set.organization_admin) || {}
 		# sharedListViews = Creator.getCollection('object_listviews').find({space: spaceId, object_name: object_name, shared: true}, {fields:{_id:1}}).fetch()
 		# sharedListViews = _.pluck(sharedListViews,"_id")
 		# if sharedListViews.length
@@ -269,6 +335,22 @@ if Meteor.isServer
 				opsetWorkflowAdmin.unreadable_fields = posWorkflowAdmin.unreadable_fields
 				opsetWorkflowAdmin.uneditable_fields = posWorkflowAdmin.uneditable_fields
 				opsetWorkflowAdmin.unrelated_objects = posWorkflowAdmin.unrelated_objects
+		if psetsOrganizationAdmin
+			posOrganizationAdmin = findOne_permission_object(psetsOrganizationAdmin_pos, object_name, psetsOrganizationAdmin._id)
+			if posOrganizationAdmin
+				opsetOrganizationAdmin.allowCreate = posOrganizationAdmin.allowCreate
+				opsetOrganizationAdmin.allowDelete = posOrganizationAdmin.allowDelete
+				opsetOrganizationAdmin.allowEdit = posOrganizationAdmin.allowEdit
+				opsetOrganizationAdmin.allowRead = posOrganizationAdmin.allowRead
+				opsetOrganizationAdmin.modifyAllRecords = posOrganizationAdmin.modifyAllRecords
+				opsetOrganizationAdmin.viewAllRecords = posOrganizationAdmin.viewAllRecords
+				opsetOrganizationAdmin.modifyCompanyRecords = posOrganizationAdmin.modifyCompanyRecords
+				opsetOrganizationAdmin.viewCompanyRecords = posOrganizationAdmin.viewCompanyRecords
+				opsetOrganizationAdmin.disabled_list_views = posOrganizationAdmin.disabled_list_views
+				opsetOrganizationAdmin.disabled_actions = posOrganizationAdmin.disabled_actions
+				opsetOrganizationAdmin.unreadable_fields = posOrganizationAdmin.unreadable_fields
+				opsetOrganizationAdmin.uneditable_fields = posOrganizationAdmin.uneditable_fields
+				opsetOrganizationAdmin.unrelated_objects = posOrganizationAdmin.unrelated_objects
 		if !userId
 			permissions = opsetAdmin
 		else
@@ -297,7 +379,12 @@ if Meteor.isServer
 			set_ids = _.pluck psets, "_id"
 			pos = find_permission_object(psetsCurrent_pos, object_name, set_ids)
 			_.each pos, (po)->
-				if po.permission_set_id == psetsAdmin?._id or po.permission_set_id == psetsUser?._id or po.permission_set_id == psetsMember?._id or po.permission_set_id == psetsGuest?._id or po.permission_set_id == psetsWorkflowAdmin?._id
+				if po.permission_set_id == psetsAdmin?._id or 
+				po.permission_set_id == psetsUser?._id or 
+				po.permission_set_id == psetsMember?._id or 
+				po.permission_set_id == psetsGuest?._id or 
+				po.permission_set_id == psetsWorkflowAdmin?._id or 
+				po.permission_set_id == psetsOrganizationAdmin?._id
 					# 默认的admin/user权限值只实行上面的默认值覆盖，不做算法判断
 					return
 				if po.allowRead
@@ -323,7 +410,7 @@ if Meteor.isServer
 				permissions.uneditable_fields = unionPlus(permissions.uneditable_fields, po.uneditable_fields)
 				permissions.unrelated_objects = unionPlus(permissions.unrelated_objects, po.unrelated_objects)
 
-			if psetsWorkflowAdmin?.users?.includes(userId)
+			if isWorkflowAdmin
 				if opsetWorkflowAdmin.allowRead
 					permissions.allowRead = true
 				if opsetWorkflowAdmin.allowCreate
@@ -346,6 +433,31 @@ if Meteor.isServer
 				permissions.unreadable_fields = unionPlus(permissions.unreadable_fields, opsetWorkflowAdmin.unreadable_fields)
 				permissions.uneditable_fields = unionPlus(permissions.uneditable_fields, opsetWorkflowAdmin.uneditable_fields)
 				permissions.unrelated_objects = unionPlus(permissions.unrelated_objects, opsetWorkflowAdmin.unrelated_objects)
+
+			if isOrganizationAdmin
+				if opsetOrganizationAdmin.allowRead
+					permissions.allowRead = true
+				if opsetOrganizationAdmin.allowCreate
+					permissions.allowCreate = true
+				if opsetOrganizationAdmin.allowEdit
+					permissions.allowEdit = true
+				if opsetOrganizationAdmin.allowDelete
+					permissions.allowDelete = true
+				if opsetOrganizationAdmin.modifyAllRecords
+					permissions.modifyAllRecords = true
+				if opsetOrganizationAdmin.viewAllRecords
+					permissions.viewAllRecords = true
+				if opsetOrganizationAdmin.modifyCompanyRecords
+					permissions.modifyCompanyRecords = true
+				if opsetOrganizationAdmin.viewCompanyRecords
+					permissions.viewCompanyRecords = true
+
+				permissions.disabled_list_views = unionPlus(permissions.disabled_list_views, opsetOrganizationAdmin.disabled_list_views)
+				permissions.disabled_actions = unionPlus(permissions.disabled_actions, opsetOrganizationAdmin.disabled_actions)
+				permissions.unreadable_fields = unionPlus(permissions.unreadable_fields, opsetOrganizationAdmin.unreadable_fields)
+				permissions.uneditable_fields = unionPlus(permissions.uneditable_fields, opsetOrganizationAdmin.uneditable_fields)
+				permissions.unrelated_objects = unionPlus(permissions.unrelated_objects, opsetOrganizationAdmin.unrelated_objects)
+		
 		if object.is_view
 			permissions.allowCreate = false
 			permissions.allowEdit = false

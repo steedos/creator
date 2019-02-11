@@ -226,7 +226,18 @@ InstanceRecordQueue.Configure = function (options) {
 						}
 					}
 				} else {
-					obj[fm.object_field] = values[fm.workflow_field];
+					if (oField.type === "boolean") {
+						var tmp_field_value = values[fm.workflow_field];
+						if (['true', '是'].includes(tmp_field_value)) {
+							obj[fm.object_field] = true;
+						} else if (['false', '否'].includes(tmp_field_value)) {
+							obj[fm.object_field] = false;
+						} else {
+							obj[fm.object_field] = tmp_field_value;
+						}
+					} else {
+						obj[fm.object_field] = values[fm.workflow_field];
+					}
 				}
 
 			} else {

@@ -12,8 +12,12 @@
     "busboy": "^0.2.13",
     "cookies": "^0.6.2",
     "core-js": "^2.5.3",
+    "ejs": "^2.5.5",
+    "ejs-lint": "^0.2.0",
+    "eval": "0.1.2",
     "fibers": "^3.1.1",
     "jquery": "^2.2.4",
+    "js-yaml": "^3.12.1",
     "md5": "^2.2.1",
     "meteor-node-stubs": "^0.4.1",
     "mkdirp": "^0.3.5",
@@ -24,13 +28,10 @@
     "odata-v4-service-document": "0.0.3",
     "odata-v4-service-metadata": "^0.1.6",
     "querystring": "^0.2.0",
-    "sprintf-js": "^1.0.3",
-    "weixin-pay": "^1.1.7",
-    "xml2js": "^0.4.19",
-    "ejs": "^2.5.5",
-    "ejs-lint": "^0.2.0",
     "socket.io": "1.4.8",
     "socket.io-client": "1.4.8",
-    "eval": "0.1.2"
+    "sprintf-js": "^1.0.3",
+    "weixin-pay": "^1.1.7",
+    "xml2js": "^0.4.19"
   }
 }

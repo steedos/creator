@@ -18,9 +18,9 @@ Creator.Apps.admin =
 		{ _id: 'account_password', name: '密码', permission_sets: ["user"], template_name: "account_password", parent: 'account' },
 		{ _id: 'account_background', name: '背景图', permission_sets: ["user"], template_name: "account_background", parent: 'account' }
 
-		{ _id: 'menu_users', name: '用户', permission_sets: ["admin"], expanded: false },
-		{ _id: 'organizations', name: '部门', permission_sets: ["admin"], object_name: "organizations", parent: 'menu_users' },
-		{ _id: 'space_users', name: '用户', permission_sets: ["admin"], object_name: "space_users", parent: 'menu_users' },
+		{ _id: 'menu_users', name: '用户', permission_sets: ["admin", "organization_admin"], expanded: false },
+		{ _id: 'organizations', name: '部门', permission_sets: ["admin", "organization_admin"], object_name: "organizations", parent: 'menu_users' },
+		{ _id: 'space_users', name: '用户', permission_sets: ["admin", "organization_admin"], object_name: "space_users", parent: 'menu_users' },
 		{ _id: 'permission_set', name: '权限组', permission_sets: ["admin"], object_name: "permission_set", parent: 'menu_users' },
 		{ _id: 'spaces', name: '公司信息', permission_sets: ["admin"], object_name: "spaces", parent: 'menu_users' },
 		{ _id: 'contacts_limit', name: '通讯录权限', permission_sets: ["admin"], template_name: "contacts_settings", parent: 'menu_users' },

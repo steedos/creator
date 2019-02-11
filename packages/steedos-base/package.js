@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:base',
-	version: '0.1.4',
+	version: '0.1.6',
 	summary: 'Steedos libraries',
 	git: 'https://github.com/steedos/creator/tree/master/packages/steedos-base'
 });
@@ -57,7 +57,6 @@ Package.onUse(function(api) {
 	api.use('aldeed:tabular@1.6.1');
 	// api.use('momentjs:moment');
 	api.use('simple:json-routes@2.1.0');
-	api.use('tap:i18n');
 	api.use('universe:i18n@1.13.0');
 
 	api.use('steedos:ionicons@0.1.7');
@@ -66,8 +65,9 @@ Package.onUse(function(api) {
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:e164-phones-countries@1.0.3');
 	api.use('steedos:i18n-iso-countries@3.3.0');
-	api.use('steedos:objects@0.0.9');
-	api.use('steedos:objects-core');
+	api.use('steedos:objects@0.0.10');
+	api.use('steedos:objects-core@0.0.2');
+	api.use('steedos:objects-billing@0.0.1');
 
 	api.addFiles('checkNpm.js', "server");
 
@@ -155,7 +155,6 @@ Package.onUse(function(api) {
 		'client/admin_menu.coffee',
 		'client/api.coffee',
 		'client/helpers.coffee',
-		'client/language.coffee',
 		'client/tooltip.coffee',
 		'client/router.coffee',
 		'client/layout/main.html',

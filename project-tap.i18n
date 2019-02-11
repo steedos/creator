@@ -1,5 +1,5 @@
 {
-    "supported_languages": ["en", "zh-CN"],
-    "i18n_files_route": "tap-i18n",
-    "preloaded_langs": ["zh-CN"]
+    "supported_languages": ["zh-CN","en"],
+    "i18n_files_route": "/tap-i18n",
+    "preloaded_langs": []
 }

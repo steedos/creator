@@ -2,18 +2,27 @@ import i18n from 'meteor/universe:i18n';
 sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
-@t = (key, replaces...) ->
-	if _.isObject replaces[0]
-		return TAPi18n.__ key, replaces
-	else
-		return sprintf(TAPi18n.__(key), replaces)
+@t = (key, parameters, locale) ->
+	if locale == "zh-cn"
+		locale = "zh-CN"
 
-
-@tr = (key, options, replaces...) ->
-	if _.isObject replaces[0]
-		return TAPi18n.__ key, options, replaces
+	if locale
+		translator = i18n.createTranslator('', locale);
 	else
-		return sprintf(TAPi18n.__(key, options), replaces)
+		translator = i18n.__;
+
+	if parameters?.context
+		key = key + "_" + parameters.context;
+			
+	if parameters? and !(_.isObject parameters)
+		# 兼容老格式 key中包含 %s，只支持一个参数。
+		return sprintf(translator(key), parameters)
+
+	return translator(key, parameters)
+
+@tr = t
+
+@trl = t
 
 # 重写tap:i18n函数，向后兼容
 i18n.setOptions
@@ -22,21 +31,24 @@ i18n.setOptions
 
 if TAPi18n?
 	TAPi18n.__original = TAPi18n.__
-	TAPi18n.__ = (key, options, lang)->
-		if lang == "zh-cn"
-			lang = "zh-CN"
-		translated = TAPi18n.__original key, options, lang
+
+	TAPi18n.__ = (key, options, locale)->
+
+		translated = t(key, options, locale);		
 		if translated != key
 			return translated
 
-		# TAP 翻译不出来，用 i18n 翻译	
-		if lang?
-			t2 = i18n.createTranslator('', lang);
-			translated = t2(key, options);
-		else
-			translated = i18n.__ key, options;		
-		return translated
+		# i18n 翻译不出来，尝试用 tap:i18n 翻译
+		return TAPi18n.__original key, options, locale
 
+	TAPi18n._getLanguageFilePath = (lang_tag) ->
+
+		path = if @.conf.cdn_path? then @.conf.cdn_path else @.conf.i18n_files_route
+		path = path.replace /\/$/, ""
+		if path[0] == "/"
+			path = Meteor.absoluteUrl().replace(/\/+$/, "") + path
+
+		return "#{path}/#{lang_tag}.json"
 
 if Meteor.isClient
 	getBrowserLocale = ()->
@@ -59,33 +71,35 @@ if Meteor.isClient
 		)
 
 	Template.registerHelper '_', (key, args)->
-		return t(key, args);
-
-	Session.set("steedos-locale", getBrowserLocale())
-
-	Tracker.autorun ()->
-		if Session.get("steedos-locale") == "zh-cn"
-			TAPi18n.setLanguage("zh-CN")
-			T9n.setLanguage("zh-CN")
-			i18n.setLocale("zh-CN")
-		else
-			TAPi18n.setLanguage("en")
-			T9n.setLanguage("en")
-			i18n.setLocale("en")
+		return TAPi18n.__(key, args);
 
 	Meteor.startup ->
 
 		Template.registerHelper '_', (key, args)->
-			return t(key, args);
-		
+			return TAPi18n.__(key, args);
+
+		Session.set("steedos-locale", getBrowserLocale())
+
+		Tracker.autorun ()->
+			if Session.get("steedos-locale") != "en-us"
+				if TAPi18n?
+					TAPi18n.setLanguage("zh-CN")
+				T9n.setLanguage("zh-CN")
+				i18n.setLocale("zh-CN")
+				moment.locale("zh-cn")
+			else
+				if TAPi18n?
+					TAPi18n.setLanguage("en")
+				T9n.setLanguage("en")
+				i18n.setLocale("en")
+				moment.locale("en")
+
 		Tracker.autorun ()->
 			if Meteor.user()
 				if Meteor.user().locale
 					Session.set("steedos-locale",Meteor.user().locale)
 
-
-		Tracker.autorun ->
-			lang = Session.get("steedos-locale")
+		i18n.onChangeLocale (newLocale)->
 
 			$.extend true, $.fn.dataTable.defaults,
 				language:
