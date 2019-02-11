@@ -12,7 +12,7 @@ DevExpress.framework = require("devextreme/bundles/modules/framework");
 
 /* Integrations (dx.module-core.js) */
 
-require("devextreme/integration/jquery");
+// require("devextreme/integration/jquery");
 
 
 /* Events (dx.module-core.js) */
@@ -123,25 +123,25 @@ ui.dxPopover = require("devextreme/ui/popover");
 // ui.dxTreeList = require("devextreme/ui/tree_list");
 // ui.dxMenu = require("devextreme/ui/menu");
 // ui.dxPivotGrid = require("devextreme/ui/pivot_grid");
-ui.dxPivotGridFieldChooser = require("devextreme/ui/pivot_grid_field_chooser");
-data.PivotGridDataSource = require("devextreme/ui/pivot_grid/data_source");
+// ui.dxPivotGridFieldChooser = require("devextreme/ui/pivot_grid_field_chooser");
+// data.PivotGridDataSource = require("devextreme/ui/pivot_grid/data_source");
 // data.XmlaStore = require("devextreme/ui/pivot_grid/xmla_store");
 // ui.dxScheduler = require("devextreme/ui/scheduler");
-ui.dxTreeView = require("devextreme/ui/tree_view");
+// ui.dxTreeView = require("devextreme/ui/tree_view");
 // ui.dxFilterBuilder = require("devextreme/ui/filter_builder");
 
 
 /* Viz core (dx.module-viz-core.js) */
 
 var viz = DevExpress.viz = require("devextreme/bundles/modules/viz");
-viz.currentTheme = require("devextreme/viz/themes").currentTheme;
-viz.registerTheme = require("devextreme/viz/themes").registerTheme;
-viz.exportFromMarkup = require("devextreme/viz/export").exportFromMarkup;
-viz.getMarkup = require("devextreme/viz/export").getMarkup;
-viz.currentPalette = require("devextreme/viz/palette").currentPalette;
-viz.getPalette = require("devextreme/viz/palette").getPalette;
-viz.registerPalette = require("devextreme/viz/palette").registerPalette;
-viz.refreshTheme = require("devextreme/viz/themes").refreshTheme;
+// viz.currentTheme = require("devextreme/viz/themes").currentTheme;
+// viz.registerTheme = require("devextreme/viz/themes").registerTheme;
+// viz.exportFromMarkup = require("devextreme/viz/export").exportFromMarkup;
+// viz.getMarkup = require("devextreme/viz/export").getMarkup;
+// viz.currentPalette = require("devextreme/viz/palette").currentPalette;
+// viz.getPalette = require("devextreme/viz/palette").getPalette;
+// viz.registerPalette = require("devextreme/viz/palette").registerPalette;
+// viz.refreshTheme = require("devextreme/viz/themes").refreshTheme;
 
 /* Charts (dx.module-viz-charts.js) */
 // viz.dxChart = require("devextreme/viz/chart");
