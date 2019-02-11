@@ -75,7 +75,7 @@ ui.dxDateBox = require("devextreme/ui/date_box");
 // ui.dxNumberBox = require("devextreme/ui/number_box");
 // ui.dxOverlay = require("devextreme/ui/overlay");
 ui.dxPopover = require("devextreme/ui/popover");
-ui.dxPopup = require("devextreme/ui/popup");
+// ui.dxPopup = require("devextreme/ui/popup");
 // ui.dxProgressBar = require("devextreme/ui/progress_bar");
 // ui.dxRadioGroup = require("devextreme/ui/radio_group");
 // ui.dxRangeSlider = require("devextreme/ui/range_slider");
@@ -122,7 +122,7 @@ ui.dxPopup = require("devextreme/ui/popup");
 // ui.dxDataGrid = require("devextreme/ui/data_grid");
 // ui.dxTreeList = require("devextreme/ui/tree_list");
 // ui.dxMenu = require("devextreme/ui/menu");
-ui.dxPivotGrid = require("devextreme/ui/pivot_grid");
+// ui.dxPivotGrid = require("devextreme/ui/pivot_grid");
 ui.dxPivotGridFieldChooser = require("devextreme/ui/pivot_grid_field_chooser");
 data.PivotGridDataSource = require("devextreme/ui/pivot_grid/data_source");
 // data.XmlaStore = require("devextreme/ui/pivot_grid/xmla_store");
@@ -144,7 +144,7 @@ viz.registerPalette = require("devextreme/viz/palette").registerPalette;
 viz.refreshTheme = require("devextreme/viz/themes").refreshTheme;
 
 /* Charts (dx.module-viz-charts.js) */
-viz.dxChart = require("devextreme/viz/chart");
+// viz.dxChart = require("devextreme/viz/chart");
 // viz.dxPieChart = require("devextreme/viz/pie_chart");
 // viz.dxPolarChart = require("devextreme/viz/polar_chart");
 
