@@ -436,10 +436,12 @@ Creator.getObjectSchema = (obj) ->
 		if field.blackbox
 			fs.blackbox = true
 
-		if field.index
-			fs.index = field.index
-		else if field.sortable
-			fs.index = true
+		# 只有生产环境才重建索引
+		if Meteor.isProduction
+			if field.index
+				fs.index = field.index
+			else if field.sortable
+				fs.index = true
 
 		schema[field_name] = fs
 
