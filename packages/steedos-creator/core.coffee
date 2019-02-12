@@ -1,7 +1,3 @@
-Meteor.startup ->
-	if Meteor.isServer
-		_.each Creator.Objects, (obj, object_name)->
-			Creator.loadObjects obj, object_name
 
 	# Creator.initApps()
 
@@ -17,26 +13,6 @@ Meteor.startup ->
 # 	app._id = app_id
 # 	db.apps.update({_id: app_id}, app)
 
-Creator.loadObjects = (obj, object_name)->
-	if !object_name
-		object_name = obj.name
-
-	if !obj.list_views
-		obj.list_views = {}
-
-	if obj.space
-		object_name = 'c_' + obj.space + '_' + obj.name
-
-#	console.log('loadObjects', obj.name, object_name)
-
-	Creator.convertObject(obj)
-#	console.log('new Creator.Object(obj)', obj.name, object_name)
-	new Creator.Object(obj);
-#	console.log('new Creator.Object(obj) end...')
-	Creator.initTriggers(object_name)
-	Creator.initListViews(object_name)
-	# if Meteor.isServer
-	# 	Creator.initPermissions(object_name)
 
 Creator.getSchema = (object_name)->
 	return Creator.getObject(object_name)?.schema

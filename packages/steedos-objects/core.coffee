@@ -25,6 +25,27 @@ Meteor.startup ->
 	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
 	SimpleSchema.extendOptions({createFunction: Match.Optional(Match.OneOf(Function, String))})
 
+	if Meteor.isServer
+		_.each Creator.Objects, (obj, object_name)->
+			Creator.loadObjects obj, object_name
+
+Creator.loadObjects = (obj, object_name)->
+	if !object_name
+		object_name = obj.name
+
+	if !obj.list_views
+		obj.list_views = {}
+
+	if obj.space
+		object_name = 'c_' + obj.space + '_' + obj.name
+
+	Creator.convertObject(obj)
+	new Creator.Object(obj);
+
+	Creator.initTriggers(object_name)
+	Creator.initListViews(object_name)
+	return obj
+
 Creator.getObjectName = (object) ->
 	if object.space
 		return "c_#{object.space}_#{object.name}"
