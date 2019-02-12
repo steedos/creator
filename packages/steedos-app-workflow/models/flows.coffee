@@ -287,6 +287,11 @@ Creator.Objects.flows =
 			label:"自动催办"
 			type: "boolean"
 			group: "高级"
+		sort_no:
+			type: "number"
+			label:'排序号'
+			group:'高级'
+			sortable: true
 	list_views:
 		# enabled:
 		# 	label: "已启用"
@@ -300,7 +305,8 @@ Creator.Objects.flows =
 			label: "所有"
 			filter_scope: "space"
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
-			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form"]
+			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form", "sort_no"]
+			sort: [["sort_no", "desc"],["modified", "desc"]]
 
 	actions:
 		# standard_query:
