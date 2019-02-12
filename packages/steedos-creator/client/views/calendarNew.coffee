@@ -502,6 +502,8 @@ Template.creator_calendarNew.onRendered ->
 
 			_.extend(dxSchedulerConfig, view.options)
 
-			dxSchedulerInstance =  $("#creator-scheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
+			module.dynamicImport("devextreme/ui/scheduler").then (dxScheduler)->
+				DevExpress.ui.dxScheduler = dxScheduler;
+				dxSchedulerInstance =  $("#creator-scheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
 
 			window.dxSchedulerInstance = dxSchedulerInstance;

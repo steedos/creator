@@ -254,26 +254,30 @@ renderChart = (self)->
 			panes: chartPanes,
 			series: chartSeries,
 			valueAxis: chartValueAxis
-		pivotGridChart = $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart('instance')
+		module.dynamicImport("devextreme/viz/chart").then (dxChart)->
+			DevExpress.viz.dxChart = dxChart;
+			pivotGridChart =  $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart("instance")
 	else
 		grid = Tracker.nonreactive ()->
 			return self.pivotGridInstance.get()
 		unless grid
 			return
-		pivotGridChart = $('#pivotgrid-chart').show().dxChart(
-			equalBarWidth: false
-			commonSeriesSettings: 
-				type: 'bar'
-			tooltip:
-				enabled: true
-			size: 
-				height: 300
-			adaptiveLayout: 
-				width: 450
-		).dxChart('instance')
-		grid.bindChart pivotGridChart,
-			dataFieldsDisplayMode: 'splitPanes'
-			alternateDataFields: false
+		module.dynamicImport("devextreme/viz/chart").then (dxChart)->
+			DevExpress.viz.dxChart = dxChart;
+			pivotGridChart =  $("#pivotgrid-chart").show().dxChart(
+				equalBarWidth: false
+				commonSeriesSettings:
+					type: 'bar'
+				tooltip:
+					enabled: true
+				size:
+					height: 300
+				adaptiveLayout:
+					width: 450
+			).dxChart('instance')
+			grid.bindChart pivotGridChart,
+				dataFieldsDisplayMode: 'splitPanes'
+				alternateDataFields: false
 
 renderTabularReport = (reportObject)->
 	self = this
@@ -380,11 +384,12 @@ renderTabularReport = (reportObject)->
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
-	
-	
-	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
 
-	self.dataGridInstance?.set datagrid
+	datagrid = null
+	module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+		DevExpress.ui.dxDataGrid = dxDataGrid;
+		datagrid= $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
+		self.dataGridInstance?.set datagrid
 
 renderSummaryReport = (reportObject)->
 	self = this
@@ -574,9 +579,11 @@ renderSummaryReport = (reportObject)->
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
-	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
-
-	this.dataGridInstance?.set datagrid
+	datagrid = null
+	module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+		DevExpress.ui.dxDataGrid = dxDataGrid;
+		datagrid= $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
+		self.dataGridInstance?.set datagrid
 
 transformValue = (object_name, fields, result)->
 
@@ -812,43 +819,53 @@ renderMatrixReport = (reportObject)->
 						error.message = t "creator_odata_api_not_found"
 
 	drillDownDataSource = {}
-	salesPopup = $('#drill-down-popup').dxPopup(
-		width: 600
-		height: 400
-		contentTemplate: (contentElement) ->
-			drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
-			drillDownFields = _.without drillDownFields, null, undefined
-			drillDownColumns = []
-			gridFields = self.pivotGridInstance.get().getDataSource()._fields
-			drillDownFields.forEach (n)->
-				if n == "_id"
-					return
-				# gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
-				gridFieldItem = _.findWhere(gridFields,{dataField:n})
-				drillDownColumns.push {
-					dataField: gridFieldItem.dataField
-					caption: gridFieldItem.caption
-					sortingMethod: Creator.sortingMethod
-				}
-			$('<div />').addClass('drill-down-content').dxDataGrid(
-				width: 560
-				height: 300
-				columns: drillDownColumns).appendTo contentElement
-		onShowing: ->
-			$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
-	).dxPopup('instance')
-	dxOptions.onCellClick = (e)->
-		if e.area == 'data'
-			pivotGridDataSource = e.component.getDataSource()
-			rowPathLength = e.cell.rowPath.length
-			rowPathName = e.cell.rowPath[rowPathLength - 1]
-			popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
-			drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
-			salesPopup.option 'title', popupTitle
-			salesPopup.show()
-	pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
+	salesPopup = null
+	pivotGrid = null
+	module.dynamicImport('devextreme/ui/popup').then (dxPopup)->
+		DevExpress.ui.dxPopup = dxPopup;
+		salesPopup = $('#drill-down-popup').dxPopup(
+			width: 600
+			height: 400
+			contentTemplate: (contentElement) ->
+				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
+				drillDownFields = _.without drillDownFields, null, undefined
+				drillDownColumns = []
+				gridFields = self.pivotGridInstance.get().getDataSource()._fields
+				drillDownFields.forEach (n)->
+					if n == "_id"
+						return
+					# gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
+					gridFieldItem = _.findWhere(gridFields,{dataField:n})
+					drillDownColumns.push {
+						dataField: gridFieldItem.dataField
+						caption: gridFieldItem.caption
+						sortingMethod: Creator.sortingMethod
+					}
+					module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+						DevExpress.ui.dxDataGrid = dxDataGrid;
+						$('<div />').addClass('drill-down-content').dxDataGrid(
+							width: 560
+							height: 300
+							columns: drillDownColumns).appendTo contentElement
+			onShowing: ->
+				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+					DevExpress.ui.dxDataGrid = dxDataGrid;
+					$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
+		).dxPopup('instance')
+		dxOptions.onCellClick = (e)->
+			if e.area == 'data'
+				pivotGridDataSource = e.component.getDataSource()
+				rowPathLength = e.cell.rowPath.length
+				rowPathName = e.cell.rowPath[rowPathLength - 1]
+				popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
+				drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
+				salesPopup.option 'title', popupTitle
+				salesPopup.show()
 
-	this.pivotGridInstance?.set pivotGrid
+		module.dynamicImport('devextreme/ui/pivot_grid').then (dxPivotGrid)->
+			DevExpress.ui.dxPivotGrid = dxPivotGrid;
+			pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
+			self.pivotGridInstance?.set pivotGrid
 
 renderReport = (reportObject)->
 	unless reportObject

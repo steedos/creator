@@ -719,15 +719,15 @@ Template.creator_grid.onRendered ->
 								dxOptions.rootValue = "-1"
 						else
 							dxOptions.rootValue = "-1"
-				# dxOptions.dataSource.filter = [["name", "=", "a"], "or", ["name", "=", "b"], "or", ["name", "=", "c"]]
-				# dxOptions.dataSource.filter = [["_id", "=", "Hw7pSZ6Aj7x5cX7jP"]]
-				# dxOptions.filterValue = ["_id", "=", "Hw7pSZ6Aj7x5cX7jP"]
-				# dxOptions.filterSyncEnabled = true
-				# console.log "========dxOptions=========", dxOptions
-				self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
+				
+				module.dynamicImport('devextreme/ui/tree_list').then (dxTreeList)->
+					DevExpress.ui.dxTreeList = dxTreeList;
+					self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
 			else
-				self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
-				self.dxDataGridInstance.pageSize(pageSize)
+				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+					DevExpress.ui.dxDataGrid = dxDataGrid;
+					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
+					# self.dxDataGridInstance.pageSize(pageSize)
 			
 Template.creator_grid.helpers Creator.helpers
 
@@ -793,23 +793,23 @@ Template.creator_grid.onCreated ->
 	self = this
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
 	AutoForm.hooks creatorCellEditForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
 	
 	AutoForm.hooks creatorAddRelatedForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 
 # Template.creator_grid.onDestroyed ->

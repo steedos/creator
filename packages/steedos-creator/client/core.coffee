@@ -308,9 +308,11 @@ Meteor.startup ->
 			if $(".modal").length > 1
 				return;
 			if e.target.tagName != "TEXTAREA" or $(e.target).closest("div").hasClass("bootstrap-tagsinput")
-				e.preventDefault()
-				e.stopPropagation()
 				if Session.get("cmOperation") == "update"
+					e.preventDefault()
+					e.stopPropagation()
 					$(".creator-auotform-modals .btn-update").click()
 				else if Session.get("cmOperation") == "insert"
+					e.preventDefault()
+					e.stopPropagation()
 					$(".creator-auotform-modals .btn-insert").click()
