@@ -793,23 +793,23 @@ Template.creator_grid.onCreated ->
 	self = this
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
 	AutoForm.hooks creatorEditForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
 	AutoForm.hooks creatorCellEditForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
 	
 	AutoForm.hooks creatorAddRelatedForm:
 		onSuccess: (formType,result)->
-			self.dxDataGridInstance.refresh().done (result)->
+			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 
 # Template.creator_grid.onDestroyed ->
