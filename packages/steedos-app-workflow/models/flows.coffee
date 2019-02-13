@@ -292,6 +292,10 @@ Creator.Objects.flows =
 			label:'排序号'
 			group:'高级'
 			sortable: true
+		timeout_auto_submit:
+			label:"超时自动流转"
+			type: "boolean"
+			group: "高级"
 	list_views:
 		# enabled:
 		# 	label: "已启用"

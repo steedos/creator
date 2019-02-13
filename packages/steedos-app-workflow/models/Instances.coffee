@@ -150,6 +150,12 @@ Creator.Objects.instances =
 			omit: false
 			hidden: false
 
+		current_step_auto_submit:
+			label:"当前步骤超时自动流转"
+			type: "boolean"
+			omit: true
+			hidden: true
+
 	list_views:
 		all:
 			label:'所有'
