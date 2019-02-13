@@ -436,7 +436,7 @@ CFDataManager.getRoot = function (spaceId, options) {
 		else{
 			query._id = "-1";
 			toastr.error("您的单位信息未设置，请联系系统管理员。");
-			console.error("公司级别的组织机构要求当前用户的company_id不为空，请联系管理员修正相关数据");
+			console.error("只显示本单位的部门时要求当前用户的company_ids不为空，请联系管理员修正相关数据");
 		}
 	}
 
@@ -505,7 +505,7 @@ CFDataManager.getChild = function (spaceId, parentId, options) {
 		} else {
 			query._id = "-1";
 			toastr.error("您的单位信息未设置，请联系系统管理员。");
-			console.error("公司级别的组织机构要求当前用户的company_id不为空，请联系管理员修正相关数据");
+			console.error("只显示本单位的部门时要求当前用户的company_ids不为空，请联系管理员修正相关数据");
 		}
 	}
 
