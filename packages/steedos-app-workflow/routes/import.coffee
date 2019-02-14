@@ -1,4 +1,4 @@
-Cookies = Npm.require("cookies")
+Cookies = require("cookies")
 
 JsonRoutes.add "post", "/api/workflow/import/form", (req, res, next) ->
 	cookies = new Cookies( req, res );

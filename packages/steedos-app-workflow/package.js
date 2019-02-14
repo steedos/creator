@@ -6,16 +6,13 @@ Package.describe({
 	documentation: null
 });
 
-Npm.depends({
-	mkdirp: "0.3.5",
-	cookies: "0.6.1"
-});
-
 Package.onUse(function(api) {
 	api.versionsFrom('METEOR@1.3');
 
 	api.use('reactive-var');
 	api.use('reactive-dict');
+	api.use('coffeescript');
+	api.use('ecmascript');
 	api.use('random');
 	api.use('ddp');
 	api.use('check');
@@ -26,7 +23,6 @@ Package.onUse(function(api) {
 	api.use('blaze');
 	api.use('templating');
 	api.use('flemay:less-autoprefixer@1.2.0');
-	api.use('coffeescript@1.11.1_4');
 	api.use('simple:json-routes@2.1.0');
 	api.use('aldeed:simple-schema@1.3.3');
 	api.use('aldeed:collection2@2.5.0');
@@ -44,6 +40,8 @@ Package.onUse(function(api) {
 	api.use('universe:i18n@1.13.0');
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json'];
 	api.addFiles(tapi18nFiles, ['client', 'server']);
+	
+	api.addFiles('checkNpm.js', 'server');
 
 	api.addFiles('core.coffee');
 	api.addFiles('client/new_flow_modal.less', 'client');
