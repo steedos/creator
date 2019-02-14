@@ -154,6 +154,7 @@ steedos:objects
 steedos:objects-core
 steedos:objects-billing
 steedos:sso
+steedos:webhookqueue
 
 
 ## 应用 apps

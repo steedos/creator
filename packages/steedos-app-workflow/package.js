@@ -32,12 +32,14 @@ Package.onUse(function(api) {
 	api.use('aldeed:collection2@2.5.0');
 	api.use('kadira:flow-router@2.10.1');
 	api.use('aldeed:tabular@1.6.1');
+	api.use('meteorhacks:ssr@2.2.0');
 
 	api.use('steedos:cfs-standard-packages@0.5.10');
 	api.use('steedos:cfs-s3@0.1.4');
 	api.use('steedos:cfs-aliyun@0.1.0');
 
 	api.use('steedos:base@0.0.90');
+	api.use('steedos:webhookqueue@0.0.1');
 
 	api.use('universe:i18n@1.13.0');
 	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json'];
@@ -61,6 +63,7 @@ Package.onUse(function(api) {
 	api.addFiles('models/space_user_signs.coffee');
 	api.addFiles('models/webhooks.coffee');
 	api.addFiles('models/instance_number_rules.coffee');
+	api.addFiles('models/process_delegation_rules.coffee');
 
 	api.addFiles('cfs/instances.coffee');
 
@@ -70,10 +73,13 @@ Package.onUse(function(api) {
 	api.addFiles('client/copy_flow_modal.html', 'client');
 	api.addFiles('client/copy_flow_modal.coffee', 'client');
 
+	api.addFiles('server/lib/workflow_manager.js', 'server');
+	api.addFiles('server/lib/uuflow_manager.coffee', 'server');
+	api.addFiles('server/lib/push_manager.coffee', 'server');
 	api.addFiles('server/lib/export.coffee', 'server');
 	api.addFiles('routes/export.coffee', 'server');
 	api.addFiles('server/lib/import.coffee', 'server');
 	api.addFiles('routes/import.coffee', 'server');
 
-	api.export(['steedosExport', 'steedosImport'], ['server']);
+	api.export(['WorkflowManager', 'uuflowManager', 'pushManager', 'steedosExport', 'steedosImport'], ['server']);
 })
