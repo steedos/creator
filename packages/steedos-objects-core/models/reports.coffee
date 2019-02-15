@@ -132,16 +132,20 @@ Creator.Objects.reports =
 		default:
 			columns: ["name", "report_type", "object_name"]
 		all:
-			label: "全部报表"
+			label: "所有报表"
+			filter_scope: "space"
+			filter_fields: ["report_type", "created"]
+		application:
+			label: "应用报表"
 			filter_scope: "space"
 			filters: ()->
 				object_names = Creator.getAppObjectNames()
 				return [["object_name","=",object_names]]
 			filter_fields: ["report_type", "created"]
-
 		mine:
 			label: "我的报表"
 			filter_scope: "mine"
+			filter_fields: ["report_type", "created"]
 	permission_set:
 		user:
 			allowCreate: true
@@ -150,6 +154,7 @@ Creator.Objects.reports =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true 
+			disabled_list_views: ["all"]
 		admin:
 			allowCreate: true
 			allowDelete: true
