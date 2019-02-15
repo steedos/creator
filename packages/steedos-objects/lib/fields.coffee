@@ -159,7 +159,11 @@ Creator.getObjectSchema = (obj) ->
 								# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
 								if Meteor.isClient
 									permissions = obj.permissions?.get()
-									if permissions?.viewAllRecords
+									isUnLimited = permissions?.viewAllRecords
+									if _.include(["organizations", "users", "space_users"], obj.name)
+										# 如果字段所属对象是用户或组织，则是否限制显示所属单位部门与modifyAllRecords权限关联
+										isUnLimited = permissions?.modifyAllRecords
+									if isUnLimited
 										fs.autoform.is_company_limited = false
 									else
 										fs.autoform.is_company_limited = true
@@ -187,7 +191,11 @@ Creator.getObjectSchema = (obj) ->
 								# 注意不是reference_to对象的viewAllRecords权限，而是当前对象的
 								if Meteor.isClient
 									permissions = obj.permissions?.get()
-									if permissions?.viewAllRecords
+									isUnLimited = permissions?.viewAllRecords
+									if _.include(["organizations", "users", "space_users"], obj.name)
+										# 如果字段所属对象是用户或组织，则是否限制显示所属单位部门与modifyAllRecords权限关联
+										isUnLimited = permissions?.modifyAllRecords
+									if isUnLimited
 										fs.autoform.is_company_limited = false
 									else
 										fs.autoform.is_company_limited = true
