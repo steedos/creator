@@ -362,6 +362,7 @@ InstanceRecordQueue.Configure = function (options) {
 
 					setObj['instances.$.state'] = ins.state;
 					setObj.locked = false;
+					setObj.instance_state = ins.state;
 
 					objectCollection.update({
 						_id: record._id,
@@ -389,7 +390,8 @@ InstanceRecordQueue.Configure = function (options) {
 					}, {
 						$set: {
 							'instances.$.state': 'pending',
-							'locked': true
+							'locked': true,
+							'instance_state': 'pending'
 						}
 					})
 
@@ -425,11 +427,12 @@ InstanceRecordQueue.Configure = function (options) {
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
-					newObj.name = ins.name;
+					newObj.name = newObj.name || ins.name;
 					newObj.instances = [{
 						_id: insId,
 						state: ins.state
 					}];
+					newObj.instance_state = ins.state;
 					newObj.owner = ins.applicant;
 					newObj.created_by = ins.applicant;
 					newObj.modified_by = ins.applicant;

@@ -137,6 +137,12 @@ Creator.baseObject =
 			omit: true
 			hidden: true
 
+		instance_state:
+			label:'审批状态'
+			type:'text'
+			omit: true
+			hidden: true
+
 	permission_set:
 		none:
 			allowCreate: false
