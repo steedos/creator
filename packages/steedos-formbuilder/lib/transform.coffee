@@ -92,7 +92,6 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 		_fieldName = field.name
 		field.name = field.label
 		field.is_required = field.required
-		field.default_value = field.value
 		delete field.label
 		delete field.className
 		delete field.required
@@ -105,15 +104,13 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 
 		if _.isArray(field.values) && field.values.length > 0
 			field.options = _.pluck(field.values, 'label').join('\n')
-# TODO 选择类型字段默认值处理
-#			if ['radio-group','select'].includes(field.type)
-#				field.default_value = _.find field.values, (v)->
-#					return v.selected
-#
-#			if ['checkbox-group'].includes(field.type)
-#				field.default_value = _.filter field.values, (v)->
-#					return v.selected
-
+			if ['radio-group','select'].includes(field.type)
+				field.default_value = (_.find field.values, (v)->
+					return v.selected)?.label
+			if ['checkbox-group'].includes(field.type)
+				field.default_value = (_.pluck (_.filter field.values, (v)->
+					return v.selected
+				), 'label').join(',')
 
 		delete field.values
 

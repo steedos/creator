@@ -6,7 +6,7 @@ FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 	"table", "section"]
 
 # 定义 禁用 的字段类型
-DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden', 'date']
+DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden', 'date', 'header']
 
 # 定义 禁用 的按钮
 DISABLEDACTIONBUTTONS = ['clear','data','save']
@@ -34,7 +34,7 @@ BASEUSERATTRS = {
 		label: '唯一键'
 		readonly: 'readonly'
 	},
-	value: {
+	default_value: {
 		label: '默认值'
 		type: 'text'
 	},
@@ -111,18 +111,14 @@ getTypeUserAttrs = ()->
 					}
 				}, BASEUSERATTRS, FORMULAUSERATTRS
 			when 'password'
-				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'value', 'is_wide')
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'is_wide')
 			when 'dateNew'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'dateTime'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'checkboxBoolean'
-				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, {
-					value: {
-						label: '默认值'
-						type: 'checkbox'
-					}
-				}
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
+				typeUserAttrs[item].default_value.type = 'checkbox'
 			when 'email'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'url'
@@ -166,6 +162,9 @@ getTypeUserAttrs = ()->
 # 定义字段的事件
 BASEUSEREVENTS = {
 	onadd: (fid)->
+		fieldId = fid.id
+		if $('#' + "default_value-" + fieldId).length > 0
+			$('#' + fieldId + ' .prev-holder .form-control').val($('#' + "default_value-" + fieldId).val())
 		$("input[type='textarea']",fid).each (_i, _element)->
 			_id = $(_element).attr('id')
 			_name = $(_element).attr('name')
@@ -324,7 +323,6 @@ getFieldTemplates  = ()->
 						if fieldData.fields
 							tableFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
 							tableFB.promise.then (tableFormBuilder)->
-								console.log('tableFields', tableFields)
 								tableFormBuilder.actions.setData(tableFields)
 								# fix bug: 第一个字段的typeUserAttrs不生效
 								Meteor.setTimeout ()->
@@ -342,13 +340,12 @@ getFieldTemplates  = ()->
 						if fieldData.fields
 							sectionFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
 							sectionFB.promise.then (sectionFormBuilder)->
-								console.log('sectionFields', sectionFields)
 								sectionFormBuilder.actions.setData(sectionFields)
 								# fix bug: 第一个字段的typeUserAttrs不生效
 								Meteor.setTimeout ()->
 									sectionFormBuilder.actions.setData(sectionFields)
 								, 100
-				, 100
+					, 100
 			};
 	}
 
@@ -356,10 +353,18 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 	options = {
 		i18n: {
 			locale: 'zh-CN'
+			location: '/packages/steedos_formbuilder/formbuilder/languages'
 		},
-		subtypes: {
-			text: ['datetime-local']
-		}
+		scrollToFieldOnAdd: true,
+		onCloseFieldEdit: (editPanel)->
+			fieldId = editPanel.dataset.fieldId
+			if $('#' + "default_value-" + fieldId).length > 0
+				Meteor.setTimeout ()->
+					if $('#' + "default_value-" + fieldId).attr('type') == 'checkbox'
+						$('#' + fieldId + ' .prev-holder input').prop('checked', $('#' + "default_value-" + fieldId).prop('checked'))
+					else
+						$('#' + fieldId + ' .prev-holder .form-control').val($('#' + "default_value-" + fieldId).val())
+				, 400
 	};
 
 	options.typeUserAttrs = getTypeUserAttrs()
@@ -375,6 +380,12 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 	if is_sub
 		disableFields.push 'table'
 		disableFields.push 'section'
+
+	#TODO stickyControls 不生效
+	if !is_sub
+		options.stickyControls = {
+			enable: true
+		}
 
 	options.disableFields = DISABLEFIELDS
 	options.disabledActionButtons = DISABLEDACTIONBUTTONS

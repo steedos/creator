@@ -1,6 +1,3 @@
-###TODO###
-# 1 国际化文件
-
 Template.formBuilder.onRendered ()->
 	console.log('formBuilder onRendered');
 
@@ -8,8 +5,6 @@ Template.formBuilder.onRendered ()->
 	form = Creator.odata.get("forms", "ecc83b9a82b6182e44f18681")
 
 	formFields = form.current.fields
-
-	console.log('formFields', formFields)
 
 	fields = Creator.formBuilder.transformFormFieldsIn(formFields)
 
@@ -28,7 +23,6 @@ Template.formBuilder.events
 	'click .form-builder-getData': (e, t)->
 		data = $("#fb-editor").data('formBuilder').actions.getData()
 		formFields = Creator.formBuilder.transformFormFieldsOut(data)
-		console.log('formFields', formFields)
 
 		if false
 			return
@@ -64,5 +58,19 @@ Template.formBuilder.events
 					toastr?.error?(TAPi18n.__(error.message))
 				else
 					toastr?.error?(error)
+
+	'click .fb-table .fld-required,.fb-section .fld-required': (e, t)->
+		e.preventDefault()
+		e.stopPropagation()
+		Meteor.defer ()->
+			$(e.target).prop("checked", !e.target.checked)
+			if e.target.checked
+				$('#'+e.target.id.replace("required-",'') + ' .required-asterisk').css('display','inline')
+			else
+				$('#'+e.target.id.replace("required-",'') + ' .required-asterisk').css('display','none')
+
+	'change .prev-holder .form-control': (e, t)->
+		if $(e.target.parentElement.parentElement).hasClass('prev-holder')
+			$("[name='default_value']", e.target.parentElement.parentElement.parentElement).val(e.target.value)
 
 

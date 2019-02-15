@@ -34,4 +34,6 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/router.coffee', 'client');
 
+	api.addAssets('formbuilder/languages/zh-CN.lang', 'client')
+
 });
