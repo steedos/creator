@@ -318,9 +318,8 @@ Creator.baseObject =
 				if not object_workflow
 					return false
 
-				r = Creator.getObjectRecord object_name, record_id
-				if r and ( (r.instances and r.instances[0].state is 'completed') or (not r.instances) )
-					return true
+				if record and record.instances and record.instances.length > 0
+					return false
 
 				return false
 			on: "record"
