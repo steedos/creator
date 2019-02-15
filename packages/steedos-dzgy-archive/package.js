@@ -1,6 +1,6 @@
 Package.describe({
-	name: 'steedos:app-archive',
-	version: '0.0.5',
+	name: 'steedos:dzgy-archive',
+	version: '0.0.1',
 	summary: 'Creator archive',
 	git: ''
 });
