@@ -128,6 +128,7 @@
 	"organizations_error_organization_has_children": "The organization has children",
 	"organizations_error_can_not_remove_root_organization": "The root organization can not be removed",
 	"organizations_error_organization_is_company": "The root organization can not be modified",
+	"organizations_error_organization_name_required": "Organization name is required",
 	"organizations_error_organizations_parent_required": "Organization parent required",
 	"organizations_error_space_admins_only_for_org_admins": "Only the space admin can deal organization admins",
 	"organizations_error_org_admins_only": "Access denied,only organization admins can do this operation.",
