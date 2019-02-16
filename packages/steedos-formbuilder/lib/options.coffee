@@ -58,6 +58,9 @@ CODEUSERATTRS = {
 		label: '字段名'
 		type: 'text'
 		required: 'true'
+	},
+	label: {
+		type: 'text'
 	}
 }
 
@@ -158,6 +161,24 @@ getTypeUserAttrs = ()->
 			else
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs
+
+
+getFieldsCode = (formFields)->
+	fieldsCode = []
+	fieldsCode = fieldsCode.concat(_.pluck(formFields, 'code'))
+	subFields = _.filter formFields, (f)->
+		return f.type == 'table' || f.type == 'section'
+	_.each subFields, (sf)->
+		fieldsCode = fieldsCode.concat(getFieldsCode(sf.fields))
+	return fieldsCode
+
+getFieldCode = (fieldsCode, fieldLabel)->
+	index = 1
+	fieldCode = fieldLabel
+	while fieldsCode.includes(fieldCode)
+		fieldCode = fieldLabel + index
+		index++
+	return fieldCode
 
 # 定义字段的事件
 BASEUSEREVENTS = {
@@ -365,6 +386,11 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 					else
 						$('#' + fieldId + ' .prev-holder .form-control').val($('#' + "default_value-" + fieldId).val())
 				, 400
+		onAddField: (fieldId, field)->
+			formFields = Creator.formBuilder.transformFormFieldsOut(fb.actions.getData())
+			fieldsCode = getFieldsCode(formFields) || []
+			fieldCode = getFieldCode(fieldsCode, field.label)
+			field.label = field.code = fieldCode
 	};
 
 	options.typeUserAttrs = getTypeUserAttrs()

@@ -86,7 +86,6 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 
 
 Creator.formBuilder.transformFormFieldsOut = (fields)->
-	console.log('Creator.formBuilder.transformFormFieldsOut', fields);
 	formFields = []
 	_.each fields, (field)->
 		_fieldName = field.name
