@@ -180,6 +180,8 @@ getFieldCode = (fieldsCode, fieldLabel)->
 		index++
 	return fieldCode
 
+_FORMBUILDERCLONEINDEX = 1
+
 # 定义字段的事件
 BASEUSEREVENTS = {
 	onadd: (fid)->
@@ -200,6 +202,22 @@ BASEUSEREVENTS = {
 		$("input[type='checkbox']",fid).each (_i, _element)->
 			if $(_element).val() == 'true'
 				$(_element).attr('checked',true)
+	onclone: (fid)->
+		formFields = Creator.formBuilder.transformFormFieldsOut(fb.actions.getData())
+		fieldsCode = getFieldsCode(formFields) || []
+		fieldCode = getFieldCode(fieldsCode, fid.querySelector('.field-label').innerText)
+		fid.querySelector('[name="code"]').value = fieldCode
+		fid.querySelector('[name="label"]').value = fieldCode
+		fid.querySelector('.field-label').innerText = fieldCode
+		liId = fid.id
+		Meteor.setTimeout ()->
+			if $("##{liId}").parent().parent().parent().parent().hasClass('fb-table') || $("##{liId}").parent().parent().parent().parent().hasClass('fb-section')
+				if _FORMBUILDERCLONEINDEX == 2
+					$("##{liId}").remove()
+					_FORMBUILDERCLONEINDEX = 1
+				else
+					_FORMBUILDERCLONEINDEX++
+		, 1
 }
 # 获取各字段类型的事件
 getTypeUserEvents = ()->
@@ -371,6 +389,7 @@ getFieldTemplates  = ()->
 	}
 
 Creator.formBuilder.optionsForFormFields = (is_sub)->
+	#TODO 表格，分组支持copy功能
 	options = {
 		i18n: {
 			locale: 'zh-CN'
@@ -391,6 +410,10 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 			fieldsCode = getFieldsCode(formFields) || []
 			fieldCode = getFieldCode(fieldsCode, field.label)
 			field.label = field.code = fieldCode
+		disabledFieldButtons: {
+			table: ['copy'],
+			section: ['copy']
+		}
 	};
 
 	options.typeUserAttrs = getTypeUserAttrs()
