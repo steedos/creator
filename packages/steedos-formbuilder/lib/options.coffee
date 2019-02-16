@@ -121,7 +121,6 @@ getTypeUserAttrs = ()->
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'checkboxBoolean'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
-				typeUserAttrs[item].default_value.type = 'checkbox'
 			when 'email'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS
 			when 'url'
@@ -186,6 +185,9 @@ _FORMBUILDERCLONEINDEX = 1
 BASEUSEREVENTS = {
 	onadd: (fid)->
 		fieldId = fid.id
+		if fid.type == 'checkboxBoolean'
+			$(fid.querySelector('[name="default_value"]')).removeClass("form-control").prop('type','checkbox')
+
 		if $('#' + "default_value-" + fieldId).length > 0
 			$('#' + fieldId + ' .prev-holder .form-control').val($('#' + "default_value-" + fieldId).val())
 		$("input[type='textarea']",fid).each (_i, _element)->
