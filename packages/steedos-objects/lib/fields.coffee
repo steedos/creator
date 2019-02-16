@@ -193,6 +193,8 @@ Creator.getObjectSchema = (obj) ->
 									permissions = obj.permissions?.get()
 									isUnLimited = permissions?.viewAllRecords
 									if _.include(["organizations", "users", "space_users"], obj.name)
+										if obj.name == "space_users"
+											console.log "=======permissions========", permissions
 										# 如果字段所属对象是用户或组织，则是否限制显示所属单位部门与modifyAllRecords权限关联
 										isUnLimited = permissions?.modifyAllRecords
 									if isUnLimited
@@ -475,6 +477,62 @@ Creator.getFieldDisplayValue = (object_name, field_name, field_value)->
 Creator.checkFieldTypeSupportBetweenQuery = (field_type)->
 	return ["date", "datetime", "currency", "number"].includes(field_type)
 
+Creator.pushBetweenBuiltinOptionals = (field_type, operations)->
+	builtinValues = Creator.getBetweenBuiltinValues(field_type)
+	if builtinValues
+		_.forEach builtinValues, (builtinItem, key)->
+			operations.push({label: builtinItem.label, value: key})
+
+Creator.getBetweenBuiltinValues = (field_type)->
+	# 过滤器字段类型对应的内置选项
+	if ["date", "datetime"].includes(field_type)
+		return Creator.getBetweenTimeBuiltinValues()
+
+Creator.getBetweenTimeBuiltinValues = ()->
+	# 过滤器时间字段类型对应的内置选项
+	now = new Date()
+	currentYear = now.getFullYear()
+	previousYear = currentYear - 1
+	nextYear = currentYear + 1
+	return {
+		"between_time_last_year": Creator.getBetweenTimeBuiltinValueItem(last_year),
+		"between_time_this_year": Creator.getBetweenTimeBuiltinValueItem(this_year),
+		"between_time_next_year": Creator.getBetweenTimeBuiltinValueItem(next_year)
+	}
+
+Creator.getBetweenBuiltinValueItem = (field_type, key)->
+	# 过滤器字段类型对应的内置选项
+	if ["date", "datetime"].includes(field_type)
+		return Creator.getBetweenTimeBuiltinValueItem(key)
+
+Creator.getBetweenTimeBuiltinValueItem = (key)->
+	now = new Date()
+	currentYear = now.getFullYear()
+	previousYear = currentYear - 1
+	nextYear = currentYear + 1
+	switch key
+		when "last_year"
+			return {
+				#去年
+				label: t("creator_filter_operation_between_last_year"),
+				key: "last_year",
+				values: [new Date("#{previousYear}-01-01T00:00:00Z"), new Date("#{previousYear}-12-31T23:59:59Z")]
+			}
+		when "this_year"
+			return {
+				#今年
+				label: t("creator_filter_operation_between_this_year"),
+				key: "this_year",
+				values: [new Date("#{currentYear}-01-01T00:00:00Z"), new Date("#{currentYear}-12-31T23:59:59Z")]
+			}
+		when "next_year"
+			return {
+				#明年
+				label: t("creator_filter_operation_between_next_year"),
+				key: "next_year",
+				values: [new Date("#{nextYear}-01-01T00:00:00Z"), new Date("#{nextYear}-12-31T23:59:59Z")]
+			}
+
 Creator.getFieldOperation = (field_type) ->
 	# 日期类型: date, datetime  支持操作符: "=", "<>", "<", ">", "<=", ">="
 	# 文本类型: text, textarea, html  支持操作符: "=", "<>", "contains", "notcontains", "startswith"
@@ -503,6 +561,7 @@ Creator.getFieldOperation = (field_type) ->
 
 	if Creator.checkFieldTypeSupportBetweenQuery(field_type)
 		operations.push(optionals.between)
+		Creator.pushBetweenBuiltinOptionals(field_type, operations)
 	else if field_type == "text" or field_type == "textarea" or field_type == "html" or field_type == "code"
 #		operations.push(optionals.equal, optionals.unequal, optionals.contains, optionals.not_contain, optionals.starts_with)
 		operations.push(optionals.contains)

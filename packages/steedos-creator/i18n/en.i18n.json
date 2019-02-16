@@ -55,6 +55,9 @@
 	"creator_app_launcher_all_apps": "App Apps",
 	"creator_app_launcher_all_items": "All Items",
 	"creator_filter_operation_between": "Range",
+	"creator_filter_operation_between_last_year": "Last Year",
+	"creator_filter_operation_between_this_year": "This Year",
+	"creator_filter_operation_between_next_year": "Next Year",
 
 	"creator_header_search": "Search in %s and more...",
 	"creator_header_search_recent_items": "Recent Items",

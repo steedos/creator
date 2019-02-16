@@ -362,9 +362,15 @@ Template.creator_grid.onRendered ->
 				_.forEach filter_items, (fi)->
 					_f = _objFields[fi?.field]
 					if _f?.type == 'date' && fi.operation == 'between'
-						_.forEach fi.value, (fv)->
-							if fv
-								fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+						if _.isString(fi.value)
+							builtinValue = Creator.getBetweenTimeBuiltinValueItem(fi.value)
+							if builtinValue
+								fi.value = builtinValue.values
+						if _.isArray(fi.value)
+							_.forEach fi.value, (fv)->
+								if fv
+									fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+
 				_filters = []
 				_.forEach filter_items, (fi)->
 					_f = _objFields[fi?.field]
