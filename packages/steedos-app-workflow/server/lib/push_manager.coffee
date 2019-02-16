@@ -23,7 +23,7 @@ pushManager.get_to_users = (send_from, instance, cc_user_ids, current_user_info)
 
 		approve_user_ids = _.difference(instance.outbox_users, remove_users)
 		to_users = db.users.find({ _id: { $in: approve_user_ids } }).fetch()
-	else if ['reassign_new_inbox_users', 'submit_pending_rejected_inbox', 'submit_pending_inbox', 'first_submit_inbox'].includes(send_from)
+	else if ['reassign_new_inbox_users', 'submit_pending_rejected_inbox', 'submit_pending_inbox', 'first_submit_inbox', 'return_pending_inbox'].includes(send_from)
 		# 待审批人
 		to_users = db.users.find({ _id: { $in: instance.inbox_users } }).fetch()
 	else if ['submit_completed_applicant', 'approved_completed_applicant', 'rejected_completed_applicant', 'monitor_delete_applicant', 'submit_terminate_applicant', 'submit_pending_rejected_applicant', 'submit_pending_rejected_applicant_inbox'].includes(send_from)
@@ -185,6 +185,9 @@ pushManager.get_body = (parameters, lang = "zh-CN") ->
 	else if "auto_submit_pending_inbox" is send_from
 		body["push"] = TAPi18n.__ 'instance.push.body.auto_submit_pending_inbox', {instance_name: instance_name, current_step_name: current_step_name}, lang
 		body["email"] = TAPi18n.__ 'instance.email.body.auto_submit_pending_inbox', {instance_name: instance_name, current_step_name: current_step_name, to_username: to_username}, lang
+	else if "return_pending_inbox" is send_from
+		body["push"] = TAPi18n.__ 'instance.push.body.return_pending_inbox', {instance_name: instance_name, current_step_name: current_step_name}, lang
+		body["email"] = TAPi18n.__ 'instance.email.body.return_pending_inbox', {instance_name: instance_name, current_step_name: current_step_name, to_username: to_username}, lang
 	return body
 
 pushManager.get_title = (parameters, lang="zh-CN")->
@@ -263,10 +266,13 @@ pushManager.get_title = (parameters, lang="zh-CN")->
 	else if "auto_submit_pending_inbox" is send_from
 		title["push"] = TAPi18n.__ 'instance.push.title.auto_submit_pending_inbox', {from_username: from_username,instance_name: instance_name,applicant_name: applicant_name}, lang
 		title["email"] = TAPi18n.__ 'instance.email.title.auto_submit_pending_inbox', {from_username: from_username,instance_name: instance_name,applicant_name: applicant_name,approve_type: approve_type}, lang
+	else if "return_pending_inbox" is send_from
+		title["push"] = TAPi18n.__ 'instance.push.title.return_pending_inbox', {from_username: from_username,instance_name: instance_name,applicant_name: applicant_name}, lang
+		title["email"] = TAPi18n.__ 'instance.email.title.return_pending_inbox', {from_username: from_username,instance_name: instance_name,applicant_name: applicant_name,approve_type: approve_type}, lang
 	return title
 
 pushManager.get_badge = (send_from, user_id)->
-	if not ['first_submit_inbox', 'submit_pending_rejected_inbox', 'submit_pending_inbox', 'current_user', 'terminate_approval', 'reassign_new_inbox_users', 'trace_approve_cc', 'trace_approve_cc_submit', 'auto_submit_pending_inbox'].includes(send_from)
+	if not ['first_submit_inbox', 'submit_pending_rejected_inbox', 'submit_pending_inbox', 'current_user', 'terminate_approval', 'reassign_new_inbox_users', 'trace_approve_cc', 'trace_approve_cc_submit', 'auto_submit_pending_inbox', 'return_pending_inbox'].includes(send_from)
 		return null
 
 	badge = 0
