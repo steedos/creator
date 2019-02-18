@@ -483,21 +483,18 @@ Creator.pushBetweenBuiltinOptionals = (field_type, operations)->
 		_.forEach builtinValues, (builtinItem, key)->
 			operations.push({label: builtinItem.label, value: key})
 
-Creator.getBetweenBuiltinValues = (field_type)->
+Creator.getBetweenBuiltinValues = (field_type, is_check_only)->
 	# 过滤器字段类型对应的内置选项
 	if ["date", "datetime"].includes(field_type)
-		return Creator.getBetweenTimeBuiltinValues()
+		return Creator.getBetweenTimeBuiltinValues(is_check_only)
 
-Creator.getBetweenTimeBuiltinValues = ()->
+# 如果只是为判断operation是否存在，则没必要计算values，传入is_check_only为true即可
+Creator.getBetweenTimeBuiltinValues = (is_check_only)->
 	# 过滤器时间字段类型对应的内置选项
-	now = new Date()
-	currentYear = now.getFullYear()
-	previousYear = currentYear - 1
-	nextYear = currentYear + 1
 	return {
-		"between_time_last_year": Creator.getBetweenTimeBuiltinValueItem("last_year"),
-		"between_time_this_year": Creator.getBetweenTimeBuiltinValueItem("this_year"),
-		"between_time_next_year": Creator.getBetweenTimeBuiltinValueItem("next_year")
+		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
+		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
+		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year")
 	}
 
 Creator.getBetweenBuiltinValueItem = (field_type, key)->

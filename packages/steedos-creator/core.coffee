@@ -259,7 +259,7 @@ Creator.formatFiltersToMongo = (filters, options)->
 	return selector
 
 Creator.isBetweenFilterOperation = (operation)->
-	return operation == "between" or !!Creator.getBetweenTimeBuiltinValues()?[operation]
+	return operation == "between" or !!Creator.getBetweenTimeBuiltinValues(true)?[operation]
 
 ###
 options参数：
