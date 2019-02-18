@@ -137,6 +137,7 @@ Creator.baseObject =
 			omit: true
 			hidden: true
 
+		# 值范围为 draft, pending, completed, approved, rejected, terminated
 		instance_state:
 			label:'审批状态'
 			type:'text'

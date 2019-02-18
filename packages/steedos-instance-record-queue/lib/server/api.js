@@ -359,10 +359,13 @@ InstanceRecordQueue.Configure = function (options) {
 				// 附件同步
 				try {
 					var setObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
-
-					setObj['instances.$.state'] = ins.state;
 					setObj.locked = false;
-					setObj.instance_state = ins.state;
+
+					var instance_state = ins.state;
+					if (ins.state === 'completed' && ins.final_decision) {
+						instance_state = ins.final_decision;
+					}
+					setObj['instances.$.state'] = setObj.instance_state = instance_state;
 
 					objectCollection.update({
 						_id: record._id,
@@ -428,11 +431,17 @@ InstanceRecordQueue.Configure = function (options) {
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
 					newObj.name = newObj.name || ins.name;
+
+					var instance_state = ins.state;
+					if (ins.state === 'completed' && ins.final_decision) {
+						instance_state = ins.final_decision;
+					}
 					newObj.instances = [{
 						_id: insId,
-						state: ins.state
+						state: instance_state
 					}];
-					newObj.instance_state = ins.state;
+					newObj.instance_state = instance_state;
+
 					newObj.owner = ins.applicant;
 					newObj.created_by = ins.applicant;
 					newObj.modified_by = ins.applicant;
