@@ -6,15 +6,14 @@ Package.describe({
   documentation: 'README.md'
 });
 
-Npm.depends({
-  'aliyun-sdk': '1.9.2',
-});
 
 Package.onUse(function(api) {
-  api.versionsFrom('1.0');
+  api.versionsFrom('1.3');
+	api.use('ecmascript');
 
   api.use(['steedos:cfs-base-package@0.0.30', 'steedos:cfs-storage-adapter@0.2.3']);
   api.addFiles([
+    'checkNpm.js',
     'aliyun.server.js',
     'aliyun.stream.js',
     ], 'server');
