@@ -427,6 +427,7 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 									sub_selector.push [field, option, v], "and"
 							else if isBetweenOperation and value.length = 2
 								if filter_field_type == "date"
+									# 因日期字段数据库保存的值中不带时间值的，所以日期类型过滤条件需要特意处理的，为了兼容dx控件显示
 									_.forEach value, (fv)->
 										if fv
 											fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移

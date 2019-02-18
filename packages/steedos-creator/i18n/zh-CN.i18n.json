@@ -56,6 +56,7 @@
 	"creator_filter_operation_between_last_year": "去年",
 	"creator_filter_operation_between_this_year": "今年",
 	"creator_filter_operation_between_next_year": "明年",
+	"creator_filter_operation_between_today": "今天",
 
 	"creator_app_launcher": "应用程序启动器",
 	"creator_app_launcher_all_apps": "所有应用程序",

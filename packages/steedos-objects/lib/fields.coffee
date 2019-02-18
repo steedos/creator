@@ -494,7 +494,8 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only)->
 	return {
 		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
 		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
-		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year")
+		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year"),
+		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("today")
 	}
 
 Creator.getBetweenBuiltinValueItem = (field_type, key)->
@@ -524,25 +525,33 @@ Creator.getBetweenTimeBuiltinValueItem = (key)->
 	nextYear = currentYear + 1
 	switch key
 		when "last_year"
+			#去年
 			return {
-				#去年
 				label: t("creator_filter_operation_between_last_year"),
 				key: "last_year",
 				values: [new Date("#{previousYear}-01-01T00:00:00Z"), new Date("#{previousYear}-12-31T23:59:59Z")]
 			}
 		when "this_year"
+			#今年
 			return {
-				#今年
 				label: t("creator_filter_operation_between_this_year"),
 				key: "this_year",
 				values: [new Date("#{currentYear}-01-01T00:00:00Z"), new Date("#{currentYear}-12-31T23:59:59Z")]
 			}
 		when "next_year"
+			#明年
 			return {
-				#明年
 				label: t("creator_filter_operation_between_next_year"),
 				key: "next_year",
 				values: [new Date("#{nextYear}-01-01T00:00:00Z"), new Date("#{nextYear}-12-31T23:59:59Z")]
+			}
+		when "today"
+			#今天
+			strToday = moment(now).format("YYYY-MM-DD")
+			return {
+				label: t("creator_filter_operation_between_today"),
+				key: "today",
+				values: [new Date("#{strToday}T00:00:00Z"), new Date("#{strToday}T23:59:59Z")]
 			}
 
 Creator.getFieldDefaultOperation = (field_type)->
