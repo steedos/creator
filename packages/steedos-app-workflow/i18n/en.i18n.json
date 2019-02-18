@@ -1,5 +1,7 @@
 {
 	"_namespace": "",
 
-	"categories_in_use": "Category is in use and cannot be deleted"
+	"categories_in_use": "Category is in use and cannot be deleted",
+
+	"process_delegation_rules_start_must_lt_end": "Strat time must less than end time"
 }
