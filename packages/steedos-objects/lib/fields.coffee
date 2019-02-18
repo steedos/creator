@@ -488,16 +488,6 @@ Creator.getBetweenBuiltinValues = (field_type, is_check_only)->
 	if ["date", "datetime"].includes(field_type)
 		return Creator.getBetweenTimeBuiltinValues(is_check_only)
 
-# 如果只是为判断operation是否存在，则没必要计算values，传入is_check_only为true即可
-Creator.getBetweenTimeBuiltinValues = (is_check_only)->
-	# 过滤器时间字段类型对应的内置选项
-	return {
-		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
-		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
-		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year"),
-		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("today")
-	}
-
 Creator.getBetweenBuiltinValueItem = (field_type, key)->
 	# 过滤器字段类型对应的内置选项
 	if ["date", "datetime"].includes(field_type)
@@ -516,6 +506,16 @@ Creator.getBetweenBuiltinOperation = (field_type, value)->
 		if item.key == value
 			result = operation
 	return result
+
+# 如果只是为判断operation是否存在，则没必要计算values，传入is_check_only为true即可
+Creator.getBetweenTimeBuiltinValues = (is_check_only)->
+	# 过滤器时间字段类型对应的内置选项
+	return {
+		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
+		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
+		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year"),
+		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("today")
+	}
 
 Creator.getBetweenTimeBuiltinValueItem = (key)->
 	# 过滤器between运算符，现算日期/日期时间类型字段的values值
