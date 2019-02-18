@@ -6,7 +6,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@salesforce-ux/design-system": "^2.7.4",
     "aliyun-sdk": "^1.11.12",
     "basic-auth": "^2.0.1",
     "bcrypt": "3.0.2",
@@ -14,13 +13,12 @@
     "busboy": "^0.2.13",
     "cookies": "^0.6.2",
     "core-js": "^2.5.3",
-    "datatables": "^1.10.18",
-    "devextreme": "^18.2.4",
     "ejs": "^2.5.5",
     "ejs-lint": "^0.2.0",
     "eval": "0.1.2",
     "fibers": "^3.1.1",
     "jquery": "^2.2.4",
+    "jquery-ui-sortable": "^1.0.0",
     "js-yaml": "^3.12.1",
     "jszip": "^3.1.5",
     "knockout": "^3.4.2",
@@ -43,5 +41,11 @@
     "summernote": "^0.8.11",
     "weixin-pay": "^1.1.7",
     "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "@salesforce-ux/design-system": "^2.7.4",
+    "formBuilder": "^3.1.3",
+    "datatables": "^1.10.18",
+    "devextreme": "^18.2.4"
   }
 }
