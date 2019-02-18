@@ -140,7 +140,15 @@ Creator.baseObject =
 		# 值范围为 draft, pending, completed, approved, rejected, terminated
 		instance_state:
 			label:'审批状态'
-			type:'text'
+			type:'select'
+			options: [
+				{label:"草稿", value:"draft"},
+				{label:"进行中", value:"pending"},
+				{label: "已完成", value:"completed"}
+				{label:"已核准", value:"approved"},
+				{label:"已驳回", value:"rejected"},
+				{label:"已取消", value:"terminated"}
+			]
 			omit: true
 			hidden: true
 
