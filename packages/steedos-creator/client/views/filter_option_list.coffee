@@ -246,7 +246,8 @@ Template.filter_option_list.onCreated ->
 										filter.valuelabel = "<= #{endLabel}"
 									if builtinValue
 										# 如果是between运算符内置值，应该显示出内置值对应的label
-										filter.valuelabel = "#{builtinValue.label}:#{filter.valuelabel}"
+										# filter.valuelabel = "#{builtinValue.label}:#{filter.valuelabel}"
+										filter.valuelabel = "#{builtinValue.label}"
 								else
 									filter.valuelabel = ""
 						else
