@@ -21,7 +21,7 @@ _standardQuery = (curObjectName, standard_query)->
 								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
 								query_or.push([key, "contains", val_item])
 							if query_or.length > 0
-								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: false})
+								query_arr.push Creator.formatFiltersToDev(query_or, object_name, {is_logic_or: false})
 						else if _.isArray(val)
 							query_arr.push([key, "=", val])
 		else
@@ -40,7 +40,7 @@ _standardQuery = (curObjectName, standard_query)->
 								val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
 								query_or.push([key, "contains", val_item])
 							if query_or.length > 0
-								query_arr.push Creator.formatFiltersToDev(query_or, {is_logic_or: false})
+								query_arr.push Creator.formatFiltersToDev(query_or, object_name, {is_logic_or: false})
 						else if _.isArray(val)
 							query_arr.push([key, "=", val])
 
@@ -79,7 +79,7 @@ _standardQuery = (curObjectName, standard_query)->
 
 		is_logic_or = if standard_query.is_mini then true else false
 		options = is_logic_or: is_logic_or
-		return Creator.formatFiltersToDev(query_arr, options)
+		return Creator.formatFiltersToDev(query_arr, object_name, options)
 	
 _itemClick = (e, curObjectName, list_view_id)->
 	self = this
@@ -359,17 +359,6 @@ Template.creator_grid.onRendered ->
 
 				filter_items = Session.get("filter_items")
 				_objFields = creator_obj.fields
-				_.forEach filter_items, (fi)->
-					_f = _objFields[fi?.field]
-					if _f?.type == 'date' && fi.operation == 'between'
-						if _.isString(fi.value)
-							builtinValue = Creator.getBetweenTimeBuiltinValueItem(fi.value)
-							if builtinValue
-								fi.value = builtinValue.values
-						if _.isArray(fi.value)
-							_.forEach fi.value, (fv)->
-								if fv
-									fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 
 				_filters = []
 				_.forEach filter_items, (fi)->
@@ -385,7 +374,7 @@ Template.creator_grid.onRendered ->
 								is_logic_or = false
 								if ['<>','notcontains'].includes(fi.operation)
 									is_logic_or = false
-								_filters.push Creator.formatFiltersToDev(query_or, {is_logic_or: is_logic_or})
+								_filters.push Creator.formatFiltersToDev(query_or, object_name, {is_logic_or: is_logic_or})
 					else if ["lookup", "master_detail"].includes(_f?.type)
 						_reference_to = _f?.reference_to
 						if _.isFunction(_reference_to)
@@ -415,6 +404,7 @@ Template.creator_grid.onRendered ->
 						filter_logic: filter_logic
 						filter_scope: filter_scope
 						filters: _filters
+				debugger
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
@@ -432,7 +422,6 @@ Template.creator_grid.onRendered ->
 
 				if !filter
 					filter = ["_id", "<>", -1]
-
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
@@ -732,6 +721,7 @@ Template.creator_grid.onRendered ->
 			else
 				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
 					DevExpress.ui.dxDataGrid = dxDataGrid;
+					# console.log("dxOptions.dataSource.filter=======", dxOptions.dataSource.filter);
 					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 					# self.dxDataGridInstance.pageSize(pageSize)
 			

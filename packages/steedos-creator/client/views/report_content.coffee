@@ -18,7 +18,7 @@ getODataFilterForReport = (object_name, filter_scope, filters, filter_logic)->
 				else
 					selector.push(format_logic)
 			else
-				filters = Creator.formatFiltersToDev(filters)
+				filters = Creator.formatFiltersToDev(filters, object_name)
 				if filters and filters.length > 0
 					if selector.length > 0
 						selector.push "and"

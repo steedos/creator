@@ -329,7 +329,7 @@ options参数：
 	spaceId-- 当前所在工作区
 	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
-Creator.formatFiltersToDev = (filters, options)->
+Creator.formatFiltersToDev = (filters, object_name, options)->
 	# console.log "Creator.formatFiltersToDev======filters==", filters
 	# console.log "Creator.formatFiltersToDev======options==", options
 	unless filters.length
@@ -342,6 +342,8 @@ Creator.formatFiltersToDev = (filters, options)->
 			logicTempFilters.push("or")
 		logicTempFilters.pop()
 		filters = logicTempFilters
+	
+	object_fields = Creator.getObject(object_name).fields
 
 	selector = []
 	filtersLooper = (filters_loop)->
@@ -407,7 +409,15 @@ Creator.formatFiltersToDev = (filters, options)->
 						else
 							value = Creator.evaluateFormula(value, null, options)
 						sub_selector = []
-						if _.isArray(value) == true
+						isBetweenOperation = Creator.isBetweenFilterOperation(option)
+						filter_field_type = object_fields[field]?.type
+						if isBetweenOperation and _.isString(value)
+							# 如果是between运算符内置值，则取出对应values作为过滤值
+							# 比如value为last_year，返回对应的时间值
+							builtinValue = Creator.getBetweenBuiltinValueItem(filter_field_type, value)
+							if builtinValue
+								value = builtinValue.values
+						if _.isArray(value)
 							v_selector = []
 							if option == "="
 								_.each value, (v)->
@@ -415,7 +425,11 @@ Creator.formatFiltersToDev = (filters, options)->
 							else if option == "<>"
 								_.each value, (v)->
 									sub_selector.push [field, option, v], "and"
-							else if Creator.isBetweenFilterOperation(option) and value.length = 2
+							else if isBetweenOperation and value.length = 2
+								if filter_field_type == "date"
+									_.forEach value, (fv)->
+										if fv
+											fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 								if value[0] != null or value[1] != null
 									if value[0] != null
 										sub_selector.push [field, ">=", value[0]], "and"
