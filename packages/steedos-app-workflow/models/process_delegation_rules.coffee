@@ -34,7 +34,7 @@ Creator.Objects.process_delegation_rules =
 			type:"datetime"
 			label:'委托开始'
 			required: true
-		
+
 		end_time:
 			type:"datetime"
 			label:'委托结束'
@@ -98,6 +98,9 @@ if Meteor.isServer
 	db.process_delegation_rules.before.insert (userId, doc) ->
 		if doc.start_time >= doc.end_time
 			throw new Meteor.Error(400, "process_delegation_rules_start_must_lt_end")
+
+		if db.process_delegation_rules.find({ from: userId }).count() > 0
+			throw new Meteor.Error(400, "process_delegation_rules_only_one")
 
 		doc.created_by = userId
 		doc.created = new Date()
