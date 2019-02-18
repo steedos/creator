@@ -495,9 +495,9 @@ Creator.getBetweenTimeBuiltinValues = ()->
 	previousYear = currentYear - 1
 	nextYear = currentYear + 1
 	return {
-		"between_time_last_year": Creator.getBetweenTimeBuiltinValueItem(last_year),
-		"between_time_this_year": Creator.getBetweenTimeBuiltinValueItem(this_year),
-		"between_time_next_year": Creator.getBetweenTimeBuiltinValueItem(next_year)
+		"between_time_last_year": Creator.getBetweenTimeBuiltinValueItem("last_year"),
+		"between_time_this_year": Creator.getBetweenTimeBuiltinValueItem("this_year"),
+		"between_time_next_year": Creator.getBetweenTimeBuiltinValueItem("next_year")
 	}
 
 Creator.getBetweenBuiltinValueItem = (field_type, key)->
@@ -505,7 +505,22 @@ Creator.getBetweenBuiltinValueItem = (field_type, key)->
 	if ["date", "datetime"].includes(field_type)
 		return Creator.getBetweenTimeBuiltinValueItem(key)
 
+Creator.getBetweenBuiltinOperation = (field_type, value)->
+	# 根据过滤器的过滤值，获取对应的内置运算符
+	# 比如value为last_year，返回between_time_last_year
+	unless _.isString(value)
+		return
+	betweenBuiltinValues = Creator.getBetweenBuiltinValues(field_type)
+	unless betweenBuiltinValues
+		return
+	result = null
+	_.each betweenBuiltinValues, (item, operation)->
+		if item.key == value
+			result = operation
+	return result
+
 Creator.getBetweenTimeBuiltinValueItem = (key)->
+	# 过滤器between运算符，现算日期/日期时间类型字段的values值
 	now = new Date()
 	currentYear = now.getFullYear()
 	previousYear = currentYear - 1

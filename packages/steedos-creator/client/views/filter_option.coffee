@@ -47,8 +47,8 @@ Template.filter_option.helpers
 		
 		filter_item_operation = template.filter_item_operation.get()
 		isBetweenOperation = Creator.isBetweenFilterOperation(filter_item_operation)
-		builtinValues = Creator.getBetweenBuiltinValues(filter_field_type)
-		currentBuiltinValue = builtinValues?[filter_item_operation]
+		betweenBuiltinValues = Creator.getBetweenBuiltinValues(filter_field_type)
+		currentBuiltinValue = betweenBuiltinValues?[filter_item_operation]
 		if isBetweenOperation
 			schema.start_value = 
 				type: ->
@@ -179,8 +179,8 @@ Template.filter_option.events
 			if filter.start_value > filter.end_value
 				toastr.error(t("creator_filter_option_start_end_error"))
 				return
-			builtinValues = Creator.getBetweenBuiltinValues(filter_field_type)
-			currentBuiltinValue = builtinValues?[filter.operation]
+			betweenBuiltinValues = Creator.getBetweenBuiltinValues(filter_field_type)
+			currentBuiltinValue = betweenBuiltinValues?[filter.operation]
 			if currentBuiltinValue
 				filter.operation = "between"
 				filter.value = currentBuiltinValue.key
@@ -238,9 +238,20 @@ Template.filter_option.onCreated ->
 		key = filter_item.field
 		key_obj = Creator.getSchema(object_name)._schema[key]
 
+		operation = filter_item.operation
+		if operation == "between"
+			object_fields = Creator.getObject(object_name).fields
+			filter_field_type = object_fields[key]?.type
+			# 根据过滤器的过滤值，获取对应的内置运算符
+			# 比如value为last_year，返回between_time_last_year
+			builtinOperation = Creator.getBetweenBuiltinOperation(filter_field_type, filter_item.value)
+			if builtinOperation
+				operation = builtinOperation
+				filter_item.operation = builtinOperation
+		
 		this.schema_key = new ReactiveVar(key)
 		this.schema_obj = new ReactiveVar(key_obj)
-		this.filter_item_operation = new ReactiveVar(filter_item.operation)
+		this.filter_item_operation = new ReactiveVar(operation)
 		this.filter_item = new ReactiveVar(filter_item)
 
 		this.show_form = new ReactiveVar(true)
