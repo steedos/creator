@@ -548,6 +548,14 @@ Creator.getBetweenTimeBuiltinValueItem = (key)->
 				values: [new Date("#{nextYear}-01-01T00:00:00Z"), new Date("#{nextYear}-12-31T23:59:59Z")]
 			}
 
+Creator.getFieldDefaultOperation = (field_type)->
+	if field_type && Creator.checkFieldTypeSupportBetweenQuery(field_type)
+		return 'between'
+	else if ["textarea", "text", "code"].includes(field_type)
+		return 'contains'
+	else
+		return "="
+
 Creator.getFieldOperation = (field_type) ->
 	# 日期类型: date, datetime  支持操作符: "=", "<>", "<", ">", "<=", ">="
 	# 文本类型: text, textarea, html  支持操作符: "=", "<>", "contains", "notcontains", "startswith"

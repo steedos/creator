@@ -32,12 +32,7 @@ Template.filter_option.helpers
 				autoform:
 					type: "select"
 					defaultValue: ()->
-						if filter_field_type && Creator.checkFieldTypeSupportBetweenQuery(filter_field_type)
-							return 'between'
-						else if ["textarea", "text", "code"].includes(filter_field_type)
-							return 'contains'
-						else
-							return "="
+						return Creator.getFieldDefaultOperation(filter_field_type)
 					firstOption: ""
 					options: ()->
 						if object_fields[schema_key]
@@ -210,7 +205,14 @@ Template.filter_option.events
 			delete filter_item.operation
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
-		template.filter_item_operation.set(null)
+		object_fields = Creator.getObject(object_name).fields
+		filter_field_type = object_fields[field]?.type
+		defaultOperation = Creator.getFieldDefaultOperation(filter_field_type)
+		# 不能直接清除filter_item_operation，否则有默认值时，相关依赖的地方会出现异常
+		if defaultOperation
+			template.filter_item_operation.set(defaultOperation)
+		else
+			template.filter_item_operation.set(null)
 		_schema = Creator.getSchema(object_name)._schema
 		template.show_form.set(false)
 		template.schema_key.set(field)
