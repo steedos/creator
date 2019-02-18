@@ -31,8 +31,6 @@ Creator.Objects.organizations =
 			sortable: true
 			index:true
 			blackbox: true
-			defaultValue: ()->
-				return Session.get("user_company_id")
 
 		parents:
 			label: "上级部门"
@@ -489,10 +487,8 @@ if (Meteor.isServer)
 		# 	if existed > 0
 		# 		throw new Meteor.Error(400, "organizations_error.organizations_name_exists"))
 
-		# 根部门名字无法修改
-		if modifier.$set.name != doc.name && (doc.is_company == true) && !doc.parent
-			throw new Meteor.Error(400, "organizations_error_organization_is_company")
-
+		if modifier.$unset?.name
+			throw new Meteor.Error(400, "organizations_error_organization_name_required")
 
 	db.organizations.after.update (userId, doc, fieldNames, modifier, options) ->
 		modifier.$set = modifier.$set || {};
@@ -616,6 +612,10 @@ if (Meteor.isServer)
 				childUsers = db.space_users.find({organizations: child._id}, {fields: {_id: 1, organizations: 1}})
 				childUsers.forEach (su)->
 					db.space_users.update_organizations_parents(su._id, su.organizations)
+		
+		if modifier.$set.name != this.previous.name && (doc.is_company == true) && !doc.parent
+			# 根组织名称变更时同步更新工作区名称
+			db.spaces.direct.update({_id: doc.space}, {$set: {name: modifier.$set.name}})
 
 		# 更新部门后在audit_logs表中添加一条记录
 		updatedDoc = db.organizations.findOne({_id: doc._id})

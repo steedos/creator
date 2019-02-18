@@ -206,15 +206,15 @@ if Meteor.isClient
 			FlowRouter.go("/")
 			return
 		
-		creatorSettings = Meteor.settings.public?.webservices?.creator
-		if app._id == "admin" and creatorSettings?.status == "active"
-			url = creatorSettings.url
-			reg = /\/$/
-			unless reg.test url
-				url += "/"
-			url = "#{url}app/admin"
-			Steedos.openWindow(url)
-			return
+		# creatorSettings = Meteor.settings.public?.webservices?.creator
+		# if app._id == "admin" and creatorSettings?.status == "active"
+		# 	url = creatorSettings.url
+		# 	reg = /\/$/
+		# 	unless reg.test url
+		# 		url += "/"
+		# 	url = "#{url}app/admin"
+		# 	Steedos.openWindow(url)
+		# 	return
 
 		on_click = app.on_click
 		if app.is_use_ie

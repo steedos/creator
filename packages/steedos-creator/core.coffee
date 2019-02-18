@@ -61,12 +61,14 @@ Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_name) ->
 	return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/grid")
 
-Creator.getObjectLookupFieldOptions = (object_name, is_deep)->
+Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide)->
 	_options = []
 	_object = Creator.getObject(object_name)
 	fields = _object?.fields
 	icon = _object?.icon
 	_.forEach fields, (f, k)->
+		if is_skip_hide and f.hidden
+			return
 		if f.type == "select"
 			_options.push {label: "#{f.label || k}", value: "#{k}", icon: icon}
 		else

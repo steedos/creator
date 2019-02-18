@@ -410,6 +410,9 @@ Meteor.startup ->
 							if field.indexOf('$')<0
 								#if fields[field]?.multiple!= true
 								createQuery.projection[field] = 1
+
+					excludeDeleted(createQuery.query)
+
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					entities_index = []

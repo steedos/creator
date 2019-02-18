@@ -69,7 +69,7 @@ Creator.Objects.reports =
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
 		rows: 
 			label: "行"
 			type: "lookup"
@@ -77,7 +77,7 @@ Creator.Objects.reports =
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
 		columns:
 			label: "列"
 			type: "lookup"
@@ -85,7 +85,7 @@ Creator.Objects.reports =
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
 		values: 
 			label: "统计"
 			type: "lookup"
@@ -93,7 +93,7 @@ Creator.Objects.reports =
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
 		filter_fields:
 			label: "默认过虑字段"
 			type: "lookup"
@@ -132,16 +132,20 @@ Creator.Objects.reports =
 		default:
 			columns: ["name", "report_type", "object_name"]
 		all:
-			label: "全部报表"
+			label: "所有报表"
+			filter_scope: "space"
+			filter_fields: ["report_type", "created"]
+		application:
+			label: "应用报表"
 			filter_scope: "space"
 			filters: ()->
 				object_names = Creator.getAppObjectNames()
 				return [["object_name","=",object_names]]
 			filter_fields: ["report_type", "created"]
-
 		mine:
 			label: "我的报表"
 			filter_scope: "mine"
+			filter_fields: ["report_type", "created"]
 	permission_set:
 		user:
 			allowCreate: true
@@ -150,6 +154,7 @@ Creator.Objects.reports =
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true 
+			disabled_list_views: ["all"]
 		admin:
 			allowCreate: true
 			allowDelete: true

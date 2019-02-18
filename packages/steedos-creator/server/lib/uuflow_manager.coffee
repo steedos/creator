@@ -196,7 +196,14 @@ uuflowManager.create_instance = (instance_from_client, user_info) ->
 	return new_ins_id
 
 uuflowManager.initiateValues = (recordIds, flowId, spaceId, fields) ->
-	fieldCodes = _.pluck fields, 'code'
+	fieldCodes = []
+	_.each fields, (f)->
+		if f.type == 'section'
+			_.each f.fields, (ff)->
+				fieldCodes.push ff.code
+		else
+			fieldCodes.push f.code
+
 	values = {}
 	ow = Creator.Collections.object_workflows.findOne({
 		object_name: recordIds.o,
@@ -322,6 +329,7 @@ uuflowManager.initiateRecordInstanceInfo = (recordIds, insId, spaceId) ->
 		},
 		$set: {
 			locked: true
+			instance_state: 'draft'
 		}
 	})
 

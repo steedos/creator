@@ -200,9 +200,23 @@ InstanceRecordQueue.Configure = function (options) {
 				}
 
 			} else if (values.hasOwnProperty(fm.workflow_field)) {
-				var wField = _.find(formFields, function (ff) {
-					return ff.code === fm.workflow_field;
-				});
+				var wField = null;
+
+				_.each(formFields, function (ff) {
+					if (!wField) {
+						if (ff.code === fm.workflow_field) {
+							wField = ff;
+						} else if (ff.type === 'section') {
+							_.each(ff.fields, function (f) {
+								if (!wField) {
+									if (f.code === fm.workflow_field) {
+										wField = f;
+									}
+								}
+							})
+						}
+					}
+				})
 
 				var oField = objectFields[fm.object_field];
 
@@ -346,8 +360,9 @@ InstanceRecordQueue.Configure = function (options) {
 				try {
 					var setObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
 
-					setObj['instances.$.state'] = 'completed';
+					setObj['instances.$.state'] = ins.state;
 					setObj.locked = false;
+					setObj.instance_state = ins.state;
 
 					objectCollection.update({
 						_id: record._id,
@@ -375,7 +390,8 @@ InstanceRecordQueue.Configure = function (options) {
 					}, {
 						$set: {
 							'instances.$.state': 'pending',
-							'locked': true
+							'locked': true,
+							'instance_state': 'pending'
 						}
 					})
 
@@ -411,11 +427,12 @@ InstanceRecordQueue.Configure = function (options) {
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
-					newObj.name = ins.name;
+					newObj.name = newObj.name || ins.name;
 					newObj.instances = [{
 						_id: insId,
 						state: ins.state
 					}];
+					newObj.instance_state = ins.state;
 					newObj.owner = ins.applicant;
 					newObj.created_by = ins.applicant;
 					newObj.modified_by = ins.applicant;
