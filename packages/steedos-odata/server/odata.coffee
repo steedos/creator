@@ -521,10 +521,12 @@ Meteor.startup ->
 
 				if field  and fieldValue and (field.type is 'lookup' or field.type is 'master_detail')
 					lookupCollection = Creator.getCollection(field.reference_to, @urlParams.spaceId)
-					lookupObj = Creator.getObject(field.reference_to, @urlParams.spaceId)
 					queryOptions = {fields: {}}
-					_.each lookupObj.fields, (v, k)->
-						queryOptions.fields[k] = 1
+					readable_fields = Creator.getFields(field.reference_to, @urlParams.spaceId, @userId)
+					_.each readable_fields,(field)->
+						if field.indexOf('$')<0
+							queryOptions.fields[field] = 1
+
 
 					if field.multiple
 						body['value'] = lookupCollection.find({_id: {$in: fieldValue}}, queryOptions).fetch()
