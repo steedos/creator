@@ -530,7 +530,7 @@ Meteor.startup ->
 						values = []
 						lookupCollection.find({_id: {$in: fieldValue}}, queryOptions).forEach (obj)->
 							_.each obj, (v, k)->
-								if _.isArray(v)
+								if _.isArray(v) || (_.isObject(v) && !_.isDate(v))
 									obj[k] = JSON.stringify(v)
 							values.push(obj)
 						body['value'] = values
@@ -538,7 +538,7 @@ Meteor.startup ->
 					else
 						body = lookupCollection.findOne({_id: fieldValue}, queryOptions) || {}
 						_.each body, (v, k)->
-							if _.isArray(v)
+							if _.isArray(v) || (_.isObject(v) && !_.isDate(v))
 								body[k] = JSON.stringify(v)
 						body['@odata.context'] = SteedosOData.getMetaDataPath(@urlParams.spaceId) + "##{field.reference_to}/$entity"
 
