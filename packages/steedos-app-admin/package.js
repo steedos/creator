@@ -22,6 +22,7 @@ Package.onUse(function(api) {
 	api.use('flemay:less-autoprefixer@1.2.0');
 
 	api.use('steedos:objects@0.0.7');
+	api.use('steedos:application-package@0.0.1');
 	api.use('steedos:base@0.0.11');
 	api.use('steedos:i18n@0.0.11');
 	
