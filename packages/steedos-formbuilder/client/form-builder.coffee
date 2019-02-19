@@ -1,15 +1,11 @@
 Template.formBuilder.onRendered ()->
-	console.log('formBuilder onRendered');
-
-
-	form = Creator.odata.get("forms", "ecc83b9a82b6182e44f18681")
-
+#	formId = this.data.form
+#	console.log('formBuilder onRendered', formId);
+#	form = Creator.odata.get("forms", formId)
+	form = this.data.form
 	formFields = form.current.fields
-
 	fields = Creator.formBuilder.transformFormFieldsIn(formFields)
-
 	options = Creator.formBuilder.optionsForFormFields()
-
 	fb = $("#fb-editor").formBuilder(options)
 	fb.promise.then (formBuilder)->
 		formBuilder.actions.setData(fields)
@@ -18,6 +14,9 @@ Template.formBuilder.onRendered ()->
 			formBuilder.actions.setData(fields)
 		, 100
 	window.fb = fb
+	config = {}
+	Meteor.defer ()->
+		Creator.formBuilder.stickyControls()
 
 Template.formBuilder.events
 	'click .form-builder-getData': (e, t)->
