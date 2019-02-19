@@ -193,8 +193,6 @@ Creator.getObjectSchema = (obj) ->
 									permissions = obj.permissions?.get()
 									isUnLimited = permissions?.viewAllRecords
 									if _.include(["organizations", "users", "space_users"], obj.name)
-										if obj.name == "space_users"
-											console.log "=======permissions========", permissions
 										# 如果字段所属对象是用户或组织，则是否限制显示所属单位部门与modifyAllRecords权限关联
 										isUnLimited = permissions?.modifyAllRecords
 									if isUnLimited
