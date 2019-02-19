@@ -512,6 +512,7 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only)->
 		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
 		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
 		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year"),
+		"between_time_this_week": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_week"),
 		"between_time_yestday": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("yestday"),
 		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("today"),
 		"between_time_tomorrow": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("tomorrow")
@@ -520,8 +521,17 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only)->
 Creator.getBetweenTimeBuiltinValueItem = (key)->
 	# 过滤器between运算符，现算日期/日期时间类型字段的values值
 	now = new Date()
-	yestday = new Date(now.getTime()-24*60*60*1000)
-	tomorrow = new Date(now.getTime()+24*60*60*1000)
+	# 一天的毫秒数
+	millisecond = 1000 * 60 * 60 * 24
+	yestday = new Date(now.getTime() - millisecond)
+	tomorrow = new Date(now.getTime() + millisecond)
+	# 一周中的某一天
+	week = now.getDay()
+	# 一个月中的某一天
+	month = now.getDate()
+	# 减去的天数
+	minusDay = week != 0 ? week - 1 : 6
+	
 	currentYear = now.getFullYear()
 	previousYear = currentYear - 1
 	nextYear = currentYear + 1
@@ -546,6 +556,17 @@ Creator.getBetweenTimeBuiltinValueItem = (key)->
 				label: t("creator_filter_operation_between_next_year"),
 				key: "next_year",
 				values: [new Date("#{nextYear}-01-01T00:00:00Z"), new Date("#{nextYear}-12-31T23:59:59Z")]
+			}
+		when "this_week"
+			#本周
+			monday = new Date(now.getTime() - (minusDay * millisecond))
+			sunday = new Date(monday.getTime() + (6 * millisecond))
+			strMonday = moment(monday).format("YYYY-MM-DD")
+			strSunday = moment(sunday).format("YYYY-MM-DD")
+			return {
+				label: t("creator_filter_operation_between_this_week"),
+				key: "this_week",
+				values: [new Date("#{strMonday}T00:00:00Z"), new Date("#{strSunday}T23:59:59Z")]
 			}
 		when "yestday"
 			#昨天
