@@ -427,14 +427,10 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 		disableFields.push 'table'
 		disableFields.push 'section'
 
-	#TODO stickyControls 不生效
-	if !is_sub
-		options.stickyControls = {
-			enable: true,
-			offset: {
-				top: 1
-			}
-		}
+	# stickyControls 功能有bug， 事件是绑定在window的scroll上，在此处无法使用，因此关闭。已重新写代码实现此功能,见Creator.formBuilder.stickyControls
+	options.stickyControls = {
+		enable: false
+	}
 
 	options.disableFields = disableFields
 	options.disabledActionButtons = _.clone(DISABLEDACTIONBUTTONS)
