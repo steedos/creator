@@ -496,7 +496,6 @@ Meteor.startup ->
 			catch e
 				return handleError e
 		get:()->
-
 			key = @urlParams.object_name
 			if key.indexOf("(") > -1
 				body = {}
@@ -519,20 +518,28 @@ Meteor.startup ->
 				obj = Creator.getObject(collectionName, @urlParams.spaceId)
 				field = obj.fields[fieldName]
 
-				if field  and fieldValue and (field.type is 'lookup' or field.type is 'master_detail')
+				if field and fieldValue and (field.type is 'lookup' or field.type is 'master_detail')
 					lookupCollection = Creator.getCollection(field.reference_to, @urlParams.spaceId)
 					queryOptions = {fields: {}}
 					readable_fields = Creator.getFields(field.reference_to, @urlParams.spaceId, @userId)
-					_.each readable_fields,(field)->
-						if field.indexOf('$')<0
-							queryOptions.fields[field] = 1
-
+					_.each readable_fields,(f)->
+						if f.indexOf('$')<0
+							queryOptions.fields[f] = 1
 
 					if field.multiple
-						body['value'] = lookupCollection.find({_id: {$in: fieldValue}}, queryOptions).fetch()
+						values = []
+						lookupCollection.find({_id: {$in: fieldValue}}, queryOptions).forEach (obj)->
+							_.each obj, (v, k)->
+								if _.isArray(v)
+									obj[k] = JSON.stringify(v)
+							values.push(obj)
+						body['value'] = values
 						body['@odata.context'] = SteedosOData.getMetaDataPath(@urlParams.spaceId) + "##{collectionInfo}/#{@urlParams._id}"
 					else
 						body = lookupCollection.findOne({_id: fieldValue}, queryOptions) || {}
+						_.each body, (v, k)->
+							if _.isArray(v)
+								body[k] = JSON.stringify(v)
 						body['@odata.context'] = SteedosOData.getMetaDataPath(@urlParams.spaceId) + "##{field.reference_to}/$entity"
 
 				else
