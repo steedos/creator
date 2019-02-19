@@ -514,12 +514,14 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only)->
 		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
 		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
 		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year"),
+		"between_time_yestday": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("yestday"),
 		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("today")
 	}
 
 Creator.getBetweenTimeBuiltinValueItem = (key)->
 	# 过滤器between运算符，现算日期/日期时间类型字段的values值
 	now = new Date()
+	yestday = new Date(now.setTime(now.getTime()-24*60*60*1000));
 	currentYear = now.getFullYear()
 	previousYear = currentYear - 1
 	nextYear = currentYear + 1
@@ -544,6 +546,14 @@ Creator.getBetweenTimeBuiltinValueItem = (key)->
 				label: t("creator_filter_operation_between_next_year"),
 				key: "next_year",
 				values: [new Date("#{nextYear}-01-01T00:00:00Z"), new Date("#{nextYear}-12-31T23:59:59Z")]
+			}
+		when "yestday"
+			#昨天
+			strYestday = moment(yestday).format("YYYY-MM-DD")
+			return {
+				label: t("creator_filter_operation_between_yestday"),
+				key: "yestday",
+				values: [new Date("#{strYestday}T00:00:00Z"), new Date("#{strYestday}T23:59:59Z")]
 			}
 		when "today"
 			#今天

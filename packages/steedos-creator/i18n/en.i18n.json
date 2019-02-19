@@ -59,6 +59,8 @@
 	"creator_filter_operation_between_this_year": "This Year",
 	"creator_filter_operation_between_next_year": "Next Year",
 	"creator_filter_operation_between_today": "Today",
+	"creator_filter_operation_between_yestday": "Yestday",
+	"creator_filter_operation_between_last_quarter": "Last Quarter",
 
 	"creator_header_search": "Search in %s and more...",
 	"creator_header_search_recent_items": "Recent Items",
