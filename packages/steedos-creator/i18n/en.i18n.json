@@ -63,6 +63,7 @@
 	"creator_filter_operation_between_last_quarter": "Last Quarter",
 	"creator_filter_operation_between_tomorrow": "Tomorrow",
 	"creator_filter_operation_between_this_week": "This Week",
+	"creator_filter_operation_between_last_week": "Last Week",
 
 	"creator_header_search": "Search in %s and more...",
 	"creator_header_search_recent_items": "Recent Items",
