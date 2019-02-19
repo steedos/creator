@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:oauth2-server',
-	version: '0.0.6',
+	version: '0.0.7',
 	summary: 'Add oauth2 server support to your application.'
 });
 
@@ -33,7 +33,7 @@ Package.onUse(function(api) {
 	api.use('http');
 
 	api.use('steedos:base@0.0.72');
-	api.use('universe:i18n');
+	api.use('universe:i18n@1.13.0');
 	// api.addFiles('lib/random.coffee', ['client', 'server']);
 
 	api.addFiles('lib/common.js', ['client', 'server']);
