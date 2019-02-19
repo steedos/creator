@@ -519,7 +519,7 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only)->
 Creator.getBetweenTimeBuiltinValueItem = (key)->
 	# 过滤器between运算符，现算日期/日期时间类型字段的values值
 	now = new Date()
-	yestday = new Date(now.setTime(now.getTime()-24*60*60*1000));
+	yestday = new Date(now.getTime()-24*60*60*1000)
 	currentYear = now.getFullYear()
 	previousYear = currentYear - 1
 	nextYear = currentYear + 1
