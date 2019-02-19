@@ -80,7 +80,7 @@ _standardQuery = (curObjectName, standard_query)->
 		is_logic_or = if standard_query.is_mini then true else false
 		options = is_logic_or: is_logic_or
 		return Creator.formatFiltersToDev(query_arr, object_name, options)
-	
+
 _itemClick = (e, curObjectName, list_view_id)->
 	self = this
 	record = e.data
@@ -98,8 +98,8 @@ _itemClick = (e, curObjectName, list_view_id)->
 			return {text: action.label, record: record, action: action, object_name: curObjectName}
 	else
 		actionSheetItems = [{text: t("creator_list_no_actions_tip")}]
-	
-	actionSheetOption = 
+
+	actionSheetOption =
 		dataSource: actionSheetItems
 		showTitle: false
 		usePopover: true
@@ -128,7 +128,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"
 
 	actionSheet = $(".action-sheet").dxActionSheet(actionSheetOption).dxActionSheet("instance")
-	
+
 	actionSheet.option("target", e.event.target);
 	actionSheet.option("visible", true);
 
@@ -223,7 +223,7 @@ _expandFields = (object_name, columns)->
 
 			if !_.isArray(ref)
 				ref = [ref]
-				
+
 			ref = _.map ref, (o)->
 				key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
 				return key
@@ -231,7 +231,7 @@ _expandFields = (object_name, columns)->
 			ref = _.compact(ref)
 
 			ref = _.uniq(ref)
-			
+
 			ref = ref.join(",")
 
 			if ref
@@ -256,10 +256,10 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	else
 		#默认读取default view的sort配置
 		list_view_sort = column_default_sort
-	
+
 	result = columns.map (n,i)->
 		field = object.fields[n]
-		columnItem = 
+		columnItem =
 			cssClass: "slds-cell-edit"
 			caption: field.label || TAPi18n.__(object.schema.label(n))
 			dataField: n
@@ -270,12 +270,12 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
 					field_name = n.replace(/\$\./,"")
 				# 需要考虑field_name为 a.b.c 这种格式
-				field_val = eval("options.data." + field_name) 
+				field_val = eval("options.data." + field_name)
 				cellOption = {_id: options.data._id, val: field_val, doc: options.data, field: field, field_name: field_name, object_name:object_name, agreement: "odata", is_related: is_related}
 				if field.type is "markdown"
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
-		
+
 		# if !is_related
 		# 	if column_width_settings
 		# 		width = column_width_settings[n]
@@ -285,18 +285,18 @@ _columns = (object_name, columns, list_view_id, is_related)->
 		# 			columnItem.width = defaultWidth
 		# 	else
 		# 		columnItem.width = defaultWidth
-		
+
 		unless field.sortable
 			columnItem.allowSorting = false
 		return columnItem
-	
+
 	if !_.isEmpty(list_view_sort)
 		_.each list_view_sort, (sort,index)->
 			sortColumn = _.findWhere(result,{dataField:sort[0]})
 			if sortColumn
 				sortColumn.sortOrder = sort[1]
 				sortColumn.sortIndex = index
-	
+
 	return result
 
 _defaultWidth = (columns, isTree)->
@@ -330,11 +330,11 @@ Template.creator_grid.onRendered ->
 
 		if !creator_obj
 			return
-		
+
 		related_object_name = self.data.related_object_name
 		curObjectName = if is_related then related_object_name else object_name
 		curObject = Creator.getObject(curObjectName)
-		
+
 		user_permission_sets = Session.get("user_permission_sets")
 		user_company_id = Session.get("user_company_id")
 		isSpaceAdmin = Creator.isSpaceAdmin()
@@ -400,11 +400,11 @@ Template.creator_grid.onRendered ->
 
 				if _filters.length > 0
 					# 支持直接把过虑器变更的过虑条件应用到grid列表，而不是非得先保存到视图中才生效
-					filters_set = 
+					filters_set =
 						filter_logic: filter_logic
 						filter_scope: filter_scope
 						filters: _filters
-				debugger
+
 				if Creator.getListViewIsRecent(object_name, list_view_id)
 					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
@@ -425,7 +425,7 @@ Template.creator_grid.onRendered ->
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
-				
+
 				unless is_related
 					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
 					sidebarFilter = Session.get("grid_sidebar_filters")
@@ -462,11 +462,11 @@ Template.creator_grid.onRendered ->
 			defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
 			if defaultExtraColumns
 				extra_columns = _.union extra_columns, defaultExtraColumns
-			
+
 			selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
 			#expand_fields 不需要包含 extra_columns
 			expand_fields = _expandFields(curObjectName, selectColumns)
-			
+
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
 			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
@@ -498,13 +498,13 @@ Template.creator_grid.onRendered ->
 							</span>
 						"""
 						$("<div>").append(htmlText).appendTo(container);
-			
+
 			if is_related || !curObject.enable_tree
 				nameFieldKey = curObject.NAME_FIELD_KEY
 				needToShowLinkForIndexColumn = false
 				if selectColumns.indexOf(nameFieldKey) < 0
 					needToShowLinkForIndexColumn = true
-				showColumns.splice 0, 0, 
+				showColumns.splice 0, 0,
 					dataField: "_id_checkbox"
 					width: 30
 					allowResizing: false
@@ -515,7 +515,7 @@ Template.creator_grid.onRendered ->
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
 					cellTemplate: (container, options) ->
 						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
-		
+
 				showColumns.splice 0, 0,
 					dataField: "_index"
 					width: 50
@@ -547,10 +547,10 @@ Template.creator_grid.onRendered ->
 			# 对于a.b的字段，发送odata请求时需要转换为a/b
 			selectColumns = selectColumns.map (n)->
 				return n.replace(".", "/");
-			dxOptions = 
-				paging: 
+			dxOptions =
+				paging:
 					pageSize: pageSize
-				pager: 
+				pager:
 					showPageSizeSelector: true,
 					allowedPageSizes: [10, 50, 100, 200],
 					showInfo: false,
@@ -588,8 +588,8 @@ Template.creator_grid.onRendered ->
 					customLoad: ->
 						return {pageIndex: pageIndex}
 				}
-				dataSource: 
-					store: 
+				dataSource:
+					store:
 						type: "odata"
 						version: 4
 						url: Steedos.absoluteUrl(url)
@@ -617,7 +617,7 @@ Template.creator_grid.onRendered ->
 					expand: expand_fields
 				columns: showColumns
 				columnAutoWidth: true
-				sorting: 
+				sorting:
 					mode: "multiple"
 				customizeExportData: (col, row)->
 					fields = curObject.fields
@@ -667,7 +667,7 @@ Template.creator_grid.onRendered ->
 				# 		firstNodeKey = rootNode?.children[0]?.key
 				# 		if firstNodeKey
 				# 			e.component.expandRow(firstNodeKey)
-			
+
 			if is_related
 				dxOptions.pager.showPageSizeSelector = false
 			fileName = Creator.getObject(curObjectName).label + "-" + Creator.getListView(curObjectName, list_view_id)?.label
@@ -681,18 +681,18 @@ Template.creator_grid.onRendered ->
 				dxOptions.parentIdExpr = "parent"
 				dxOptions.hasItemsExpr = (params)->
 					if params?.children?.length>0
-						return true 
+						return true
 					return false;
 				dxOptions.expandNodesOnFiltering = true
 				# tree 模式不能设置filter，filter由tree动态生成
 				dxOptions.dataSource.filter = null
 				dxOptions.rootValue = null
-				dxOptions.remoteOperations = 
+				dxOptions.remoteOperations =
 					filtering: true
 					sorting: false
 					grouping: false
 				dxOptions.scrolling = null
-				dxOptions.pageing = 
+				dxOptions.pageing =
 					pageSize: 1000
 				# dxOptions.expandedRowKeys = ["9b7maW3W2sXdg8fKq"]
 				# dxOptions.autoExpandAll = true
@@ -714,7 +714,7 @@ Template.creator_grid.onRendered ->
 								dxOptions.rootValue = "-1"
 						else
 							dxOptions.rootValue = "-1"
-				
+
 				module.dynamicImport('devextreme/ui/tree_list').then (dxTreeList)->
 					DevExpress.ui.dxTreeList = dxTreeList;
 					self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
@@ -724,10 +724,10 @@ Template.creator_grid.onRendered ->
 					# console.log("dxOptions.dataSource.filter=======", dxOptions.dataSource.filter);
 					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 					# self.dxDataGridInstance.pageSize(pageSize)
-			
+
 Template.creator_grid.helpers Creator.helpers
 
-Template.creator_grid.helpers 
+Template.creator_grid.helpers
 	hideGridContent: ()->
 		is_related = Template.instance().data.is_related
 		recordsTotal = Template.instance().data.recordsTotal
@@ -766,7 +766,7 @@ Template.creator_grid.events
 				$(".btn.creator-cell-edit").click()
 
 		return false
-	
+
 	'dblclick td': (event) ->
 		$(".table-cell-edit", event.currentTarget).click()
 
@@ -802,7 +802,7 @@ Template.creator_grid.onCreated ->
 			self.dxDataGridInstance?.refresh().done (result)->
 				Creator.remainCheckboxState(self.dxDataGridInstance.$element())
 	,false
-	
+
 	AutoForm.hooks creatorAddRelatedForm:
 		onSuccess: (formType,result)->
 			self.dxDataGridInstance?.refresh().done (result)->
