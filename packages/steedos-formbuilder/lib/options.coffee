@@ -161,16 +161,7 @@ getTypeUserAttrs = ()->
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs
 
-
-getFieldsCode = (formFields)->
-	fieldsCode = []
-	fieldsCode = fieldsCode.concat(_.pluck(formFields, 'code'))
-	subFields = _.filter formFields, (f)->
-		return f.type == 'table' || f.type == 'section'
-	_.each subFields, (sf)->
-		fieldsCode = fieldsCode.concat(getFieldsCode(sf.fields))
-	return fieldsCode
-
+# 自动生成不重复的字段code
 getFieldCode = (fieldsCode, fieldLabel)->
 	index = 1
 	fieldCode = fieldLabel
@@ -206,7 +197,7 @@ BASEUSEREVENTS = {
 				$(_element).attr('checked',true)
 	onclone: (fid)->
 		formFields = Creator.formBuilder.transformFormFieldsOut(fb.actions.getData())
-		fieldsCode = getFieldsCode(formFields) || []
+		fieldsCode = Creator.formBuilder.getFieldsCode(formFields) || []
 		fieldCode = getFieldCode(fieldsCode, fid.querySelector('.field-label').innerText)
 		fid.querySelector('[name="code"]').value = fieldCode
 		fid.querySelector('[name="label"]').value = fieldCode
@@ -361,6 +352,8 @@ getFieldTemplates  = ()->
 				onRender: ()->
 					Meteor.setTimeout ()->
 						tableFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
+						Meteor.defer ()->
+							Creator.formBuilder.stickyControls($("##{fieldData.name}"))
 						if fieldData.fields
 							tableFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
 							tableFB.promise.then (tableFormBuilder)->
@@ -378,6 +371,8 @@ getFieldTemplates  = ()->
 				onRender: ()->
 					Meteor.setTimeout ()->
 						sectionFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
+						Meteor.defer ()->
+							Creator.formBuilder.stickyControls($("##{fieldData.name}"))
 						if fieldData.fields
 							sectionFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
 							sectionFB.promise.then (sectionFormBuilder)->
@@ -409,7 +404,7 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 				, 400
 		onAddField: (fieldId, field)->
 			formFields = Creator.formBuilder.transformFormFieldsOut(fb.actions.getData())
-			fieldsCode = getFieldsCode(formFields) || []
+			fieldsCode = Creator.formBuilder.getFieldsCode(formFields) || []
 			fieldCode = getFieldCode(fieldsCode, field.label)
 			field.label = field.code = fieldCode
 		disabledFieldButtons: {
@@ -424,9 +419,9 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 
 #	options.typeUserDisabledAttrs = TYPEUSERDISABLEDATTRS
 
-	options.disabledAttrs = DISABLEDATTRS
+	options.disabledAttrs = _.clone(DISABLEDATTRS)
 
-	disableFields = DISABLEFIELDS
+	disableFields = _.clone(DISABLEFIELDS)
 
 	if is_sub
 		disableFields.push 'table'
@@ -435,19 +430,68 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 	#TODO stickyControls 不生效
 	if !is_sub
 		options.stickyControls = {
-			enable: true
+			enable: true,
+			offset: {
+				top: 1
+			}
 		}
 
-	options.disableFields = DISABLEFIELDS
-	options.disabledActionButtons = DISABLEDACTIONBUTTONS
+	options.disableFields = disableFields
+	options.disabledActionButtons = _.clone(DISABLEDACTIONBUTTONS)
 
 	options.fields = getFields()
 
 	options.templates = getFieldTemplates()
 
-	options.controlOrder = CONTROLORDER
+	options.controlOrder = _.clone(CONTROLORDER)
 
 	return options
+
+Creator.formBuilder.stickyControls = (scope)->
+	$('div').scroll (evt)->
+		if scope
+			controls = $(".frmb-control", scope)[0]
+			stage = $(".stage-wrap", scope)[0]
+		else
+			controls = $("#fb-editor>div>div>.frmb-control")[0]
+			stage = $('#fb-editor>div>.stage-wrap')[0]
+		if !controls || !stage
+			return ;
+		scrollTop = $(evt.target).scrollTop()
+		$cbWrap = $(controls).parent()
+		cbPosition = controls.getBoundingClientRect()
+		stageTop = stage.getBoundingClientRect().top
+		offsetDefaults = {
+			top: 0,
+			bottom: 'auto',
+			right: 'auto',
+			left: cbPosition.left,
+		}
+
+		offset = Object.assign({}, offsetDefaults, config?.opts?.stickyControls?.offset)
+
+		if scrollTop > stageTop
+			style = {
+				position: 'sticky',
+			}
+			cbStyle = Object.assign(style, offset)
+			cbPosition = controls.getBoundingClientRect()
+			stagePosition = stage.getBoundingClientRect()
+			cbBottom = cbPosition.top + cbPosition.height
+			stageBottom = stagePosition.top + stagePosition.height
+			atBottom = cbBottom == stageBottom && cbPosition.top > scrollTop
+			if cbBottom > stageBottom && cbPosition.top != stagePosition.top
+				$cbWrap.css({
+					position: 'absolute',
+					top: 'auto',
+					bottom: 0,
+					right: 0,
+					left: 'auto',
+				})
+			if cbBottom < stageBottom || atBottom
+				$cbWrap.css(cbStyle)
+		else
+			controls.parentElement.removeAttribute('style')
 
 
 Creator.formBuilder.forObjectFields = ()->
