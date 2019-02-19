@@ -484,12 +484,12 @@ Creator.pushBetweenBuiltinOptionals = (field_type, operations)->
 Creator.getBetweenBuiltinValues = (field_type, is_check_only)->
 	# 过滤器字段类型对应的内置选项
 	if ["date", "datetime"].includes(field_type)
-		return Creator.getBetweenTimeBuiltinValues(is_check_only)
+		return Creator.getBetweenTimeBuiltinValues(is_check_only, field_type)
 
 Creator.getBetweenBuiltinValueItem = (field_type, key)->
 	# 过滤器字段类型对应的内置选项
 	if ["date", "datetime"].includes(field_type)
-		return Creator.getBetweenTimeBuiltinValueItem(key)
+		return Creator.getBetweenTimeBuiltinValueItem(field_type, key)
 
 Creator.getBetweenBuiltinOperation = (field_type, value)->
 	# 根据过滤器的过滤值，获取对应的内置运算符
@@ -506,19 +506,19 @@ Creator.getBetweenBuiltinOperation = (field_type, value)->
 	return result
 
 # 如果只是为判断operation是否存在，则没必要计算values，传入is_check_only为true即可
-Creator.getBetweenTimeBuiltinValues = (is_check_only)->
+Creator.getBetweenTimeBuiltinValues = (is_check_only, field_type)->
 	# 过滤器时间字段类型对应的内置选项
 	return {
-		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("last_year"),
-		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_year"),
-		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("next_year"),
-		"between_time_this_week": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("this_week"),
-		"between_time_yestday": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("yestday"),
-		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("today"),
-		"between_time_tomorrow": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem("tomorrow")
+		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_year"),
+		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "this_year"),
+		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_year"),
+		"between_time_this_week": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "this_week"),
+		"between_time_yestday": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "yestday"),
+		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "today"),
+		"between_time_tomorrow": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "tomorrow")
 	}
 
-Creator.getBetweenTimeBuiltinValueItem = (key)->
+Creator.getBetweenTimeBuiltinValueItem = (field_type, key)->
 	# 过滤器between运算符，现算日期/日期时间类型字段的values值
 	now = new Date()
 	# 一天的毫秒数
@@ -538,60 +538,61 @@ Creator.getBetweenTimeBuiltinValueItem = (key)->
 	switch key
 		when "last_year"
 			#去年
-			return {
-				label: t("creator_filter_operation_between_last_year"),
-				key: "last_year",
-				values: [new Date("#{previousYear}-01-01T00:00:00Z"), new Date("#{previousYear}-12-31T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_last_year")
+			startValue = new Date("#{previousYear}-01-01T00:00:00Z")
+			endValue = new Date("#{previousYear}-12-31T23:59:59Z")
 		when "this_year"
 			#今年
-			return {
-				label: t("creator_filter_operation_between_this_year"),
-				key: "this_year",
-				values: [new Date("#{currentYear}-01-01T00:00:00Z"), new Date("#{currentYear}-12-31T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_this_year")
+			startValue = new Date("#{currentYear}-01-01T00:00:00Z")
+			endValue = new Date("#{currentYear}-12-31T23:59:59Z")
 		when "next_year"
 			#明年
-			return {
-				label: t("creator_filter_operation_between_next_year"),
-				key: "next_year",
-				values: [new Date("#{nextYear}-01-01T00:00:00Z"), new Date("#{nextYear}-12-31T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_next_year")
+			startValue = new Date("#{nextYear}-01-01T00:00:00Z")
+			endValue = new Date("#{nextYear}-12-31T23:59:59Z")
 		when "this_week"
 			#本周
 			monday = new Date(now.getTime() - (minusDay * millisecond))
 			sunday = new Date(monday.getTime() + (6 * millisecond))
 			strMonday = moment(monday).format("YYYY-MM-DD")
 			strSunday = moment(sunday).format("YYYY-MM-DD")
-			return {
-				label: t("creator_filter_operation_between_this_week"),
-				key: "this_week",
-				values: [new Date("#{strMonday}T00:00:00Z"), new Date("#{strSunday}T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_this_week")
+			startValue = new Date("#{strMonday}T00:00:00Z")
+			endValue = new Date("#{strSunday}T23:59:59Z")
 		when "yestday"
 			#昨天
 			strYestday = moment(yestday).format("YYYY-MM-DD")
-			return {
-				label: t("creator_filter_operation_between_yestday"),
-				key: "yestday",
-				values: [new Date("#{strYestday}T00:00:00Z"), new Date("#{strYestday}T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_yestday")
+			startValue = new Date("#{strYestday}T00:00:00Z")
+			endValue = new Date("#{strYestday}T23:59:59Z")
 		when "today"
 			#今天
 			strToday = moment(now).format("YYYY-MM-DD")
-			return {
-				label: t("creator_filter_operation_between_today"),
-				key: "today",
-				values: [new Date("#{strToday}T00:00:00Z"), new Date("#{strToday}T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_today")
+			startValue = new Date("#{strToday}T00:00:00Z")
+			endValue = new Date("#{strToday}T23:59:59Z")
 		when "tomorrow"
 			#明天
 			strTomorrow = moment(tomorrow).format("YYYY-MM-DD")
-			return {
-				label: t("creator_filter_operation_between_tomorrow"),
-				key: "tomorrow",
-				values: [new Date("#{strTomorrow}T00:00:00Z"), new Date("#{strTomorrow}T23:59:59Z")]
-			}
+			label = t("creator_filter_operation_between_tomorrow")
+			startValue = new Date("#{strTomorrow}T00:00:00Z")
+			endValue = new Date("#{strTomorrow}T23:59:59Z")
+	
+	values = [startValue, endValue]
+	if field_type == "datetime"
+		# 时间类型字段，内置时间范围应该考虑偏移时区值，否则过滤数据存在偏差
+		# 非内置时间范围时，用户通过时间控件选择的范围，会自动处理时区偏差情况
+		# 日期类型字段，数据库本来就存的是UTC的0点，不存在偏差
+		_.forEach values, (fv)->
+			if fv
+				fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )
+	
+	return {
+		label: label
+		key: key
+		values: values
+	}
 
 Creator.getFieldDefaultOperation = (field_type)->
 	if field_type && Creator.checkFieldTypeSupportBetweenQuery(field_type)
