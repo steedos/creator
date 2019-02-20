@@ -418,6 +418,12 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 							if builtinValue
 								value = builtinValue.values
 						if _.isArray(value)
+							if ["date", "datetime"].includes(filter_field_type)
+								# date:因日期字段数据库保存的值中不带时间值的，所以日期类型过滤条件需要特意处理的，为了兼容dx控件显示
+								# datetime:因新建/编辑记录保存的时候network中是处理了时区偏差的，所以在请求过滤条件的时候也应该相应的设置
+								_.forEach value, (fv)->
+									if fv
+										fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 							v_selector = []
 							if option == "="
 								_.each value, (v)->
@@ -426,11 +432,6 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 								_.each value, (v)->
 									sub_selector.push [field, option, v], "and"
 							else if isBetweenOperation and value.length = 2
-								if filter_field_type == "date"
-									# 因日期字段数据库保存的值中不带时间值的，所以日期类型过滤条件需要特意处理的，为了兼容dx控件显示
-									_.forEach value, (fv)->
-										if fv
-											fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 								if value[0] != null or value[1] != null
 									if value[0] != null
 										sub_selector.push [field, ">=", value[0]], "and"
@@ -445,6 +446,11 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 							if sub_selector.length
 								tempFilters = sub_selector
 						else
+							if ["date", "datetime"].includes(filter_field_type)
+								# date:因日期字段数据库保存的值中不带时间值的，所以日期类型过滤条件需要特意处理的，为了兼容dx控件显示
+								# datetime:因新建/编辑记录保存的时候network中是处理了时区偏差的，所以在请求过滤条件的时候也应该相应的设置
+								if value
+									value.setHours(value.getHours() + value.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 							tempFilters = [field, option, value]
 				else
 					# 普通数组，当成完整过虑条件进一步循环解析每个条件
