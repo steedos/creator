@@ -253,4 +253,5 @@ if Meteor.isServer
 
 	db.contracts.before.insert (userId, doc) ->
 		doc.yinhuashuilv = db.contract_types.findOne(doc.contract_type).yinhuashuilv;
-		doc.stamp_duty = doc.pretax_amount * doc.yinhuashuilv
+		if doc.pretax_amount 
+			doc.stamp_duty = doc.pretax_amount * doc.yinhuashuilv
