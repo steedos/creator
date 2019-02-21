@@ -195,7 +195,7 @@ optionsValid = (field)->
 emailValid = (field)->
 	if field.default_value
 		reg = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/;
-		if !reg.test(value)
+		if !reg.test(field.default_value)
 			throw new Meteor.Error('500', "#{field.name}默认值不符合邮件地址的规则")
 
 tableValid = (field)->
