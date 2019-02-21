@@ -6,16 +6,18 @@ FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 	"table", "section"]
 
 # 定义 禁用 的字段类型
-DISABLEFIELDS = ['button','file','paragraph','autocomplete', 'hidden', 'date', 'header']
+DISABLEFIELDS = ['button', 'file', 'paragraph', 'autocomplete', 'hidden', 'date', 'header']
 
 # 定义 禁用 的按钮
-DISABLEDACTIONBUTTONS = ['clear','data','save']
+DISABLEDACTIONBUTTONS = ['clear', 'data', 'save']
 
 # 定义 禁用 的字段属性
-DISABLEDATTRS = ['description','maxlength','placeholder',"access","value",'min', 'max', 'step', 'inline', 'other', 'toggle', 'rows', 'subtype', 'multiple', 'name']
+DISABLEDATTRS = ['description', 'maxlength', 'placeholder', "access", "value", 'min', 'max', 'step', 'inline', 'other',
+	'toggle', 'rows', 'subtype', 'multiple', 'name']
 
 # 定义字段类型排序
-CONTROLORDER = ['table', 'section', 'text','textarea','number','dateNew','dateTime','date','checkboxBoolean','email','url','password','select','user','group',"radio-group","checkbox-group"]
+CONTROLORDER = ['table', 'section', 'text', 'textarea', 'number', 'dateNew', 'dateTime', 'date', 'checkboxBoolean',
+	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group"]
 
 # 获取各字段类型禁用的字段属性
 #TYPEUSERDISABLEDATTRS = (()->
@@ -177,24 +179,24 @@ BASEUSEREVENTS = {
 	onadd: (fid)->
 		fieldId = fid.id
 		if fid.type == 'checkboxBoolean'
-			$(fid.querySelector('[name="default_value"]')).removeClass("form-control").prop('type','checkbox')
+			$(fid.querySelector('[name="default_value"]')).removeClass("form-control").prop('type', 'checkbox')
 
 		if $('#' + "default_value-" + fieldId).length > 0
 			$('#' + fieldId + ' .prev-holder .form-control').val($('#' + "default_value-" + fieldId).val())
-		$("input[type='textarea']",fid).each (_i, _element)->
+		$("input[type='textarea']", fid).each (_i, _element)->
 			_id = $(_element).attr('id')
 			_name = $(_element).attr('name')
 			_class = $(_element).attr('class')
 			_title = $(_element).attr('title')
 			_placeholder = $(_element).attr('placeholder') || ''
 			_value = $(_element).attr('value') || ''
-			_rows =  $(_element).attr('rows') || 3
+			_rows = $(_element).attr('rows') || 3
 			textarea = $("<textarea id='#{_id}' name='#{_name}' class='#{_class}' title='#{_title}' placeholder='#{_placeholder}' rows='#{_rows}'>#{_value}</textarea>")
 			$(_element).parent().append(textarea)
 			$(_element).remove()
-		$("input[type='checkbox']",fid).each (_i, _element)->
+		$("input[type='checkbox']", fid).each (_i, _element)->
 			if $(_element).val() == 'true'
-				$(_element).attr('checked',true)
+				$(_element).attr('checked', true)
 	onclone: (fid)->
 		formFields = Creator.formBuilder.transformFormFieldsOut(fb.actions.getData())
 		fieldsCode = Creator.formBuilder.getFieldsCode(formFields) || []
@@ -295,7 +297,7 @@ getFields = ()->
 	]
 
 # 定义扩展的字段显示模板
-getFieldTemplates  = ()->
+getFieldTemplates = ()->
 	{
 		dateNew: (fieldData) ->
 			if !fieldData.className
@@ -311,7 +313,7 @@ getFieldTemplates  = ()->
 			};
 		checkboxBoolean: (fieldData)->
 			if fieldData.value
-				fieldData.checked =  fieldData.value
+				fieldData.checked = fieldData.value
 			return {
 				field: "<input id='#{fieldData.name}' type='checkbox' #{Creator.formBuilder.utils.attrString(fieldData)} disabled>",
 			};
@@ -350,6 +352,7 @@ getFieldTemplates  = ()->
 			return {
 				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",
 				onRender: ()->
+					console.log('table render...');
 					Meteor.setTimeout ()->
 						tableFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
 						Meteor.defer ()->
@@ -386,13 +389,16 @@ getFieldTemplates  = ()->
 	}
 
 Creator.formBuilder.optionsForFormFields = (is_sub)->
-	#TODO 表格，分组支持copy功能
+#TODO 表格，分组支持copy功能
 	options = {
 		i18n: {
 			locale: 'zh-CN'
 			location: '/packages/steedos_formbuilder/formbuilder/languages'
 		},
+		editOnAdd: true,
 		scrollToFieldOnAdd: true,
+#		onOpenFieldEdit: (editPanel)->
+#			debugger;
 		onCloseFieldEdit: (editPanel)->
 			fieldId = editPanel.dataset.fieldId
 			if $('#' + "default_value-" + fieldId).length > 0
@@ -417,7 +423,7 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 
 	options.typeUserEvents = getTypeUserEvents()
 
-#	options.typeUserDisabledAttrs = TYPEUSERDISABLEDATTRS
+	#	options.typeUserDisabledAttrs = TYPEUSERDISABLEDATTRS
 
 	options.disabledAttrs = _.clone(DISABLEDATTRS)
 
@@ -452,7 +458,7 @@ Creator.formBuilder.stickyControls = (scope)->
 			controls = $("#fb-editor>div>div>.frmb-control")[0]
 			stage = $('#fb-editor>div>.stage-wrap')[0]
 		if !controls || !stage
-			return ;
+			return;
 		scrollTop = $(evt.target).scrollTop()
 		$cbWrap = $(controls).parent()
 		cbPosition = controls.getBoundingClientRect()

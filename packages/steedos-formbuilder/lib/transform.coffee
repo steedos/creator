@@ -11,7 +11,12 @@ getFormFieldOptions = (field)->
 Creator.formBuilder.transformFormFieldsIn = (formFields)->
 	fields = []
 	_.each formFields, (f)->
-		field = _.extend({label: f.name || f.code, className: "form-control", value: f.default_value, required: f.is_required}, f)
+		field = _.extend({
+			label: f.name || f.code,
+			className: "form-control",
+			value: f.default_value,
+			required: f.is_required
+		}, f)
 		switch f.type
 			when 'input'
 				field.type = 'text'
@@ -30,7 +35,7 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 				field.type = 'dateTime'
 				fields.push field
 			when 'checkbox'
-				#TODO 默认值 boolean
+#TODO 默认值 boolean
 				field.type = 'checkboxBoolean'
 				delete field.className
 				fields.push field
@@ -79,10 +84,9 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 			else
 				console.log(f.code, f.name, f.type)
 
-#		fields.push field
+	#		fields.push field
 
 	return fields
-
 
 
 Creator.formBuilder.transformFormFieldsOut = (fields)->
@@ -103,7 +107,7 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 
 		if _.isArray(field.values) && field.values.length > 0
 			field.options = _.pluck(field.values, 'label').join('\n')
-			if ['radio-group','select'].includes(field.type)
+			if ['radio-group', 'select'].includes(field.type)
 				field.default_value = (_.find field.values, (v)->
 					return v.selected)?.label
 			if ['checkbox-group'].includes(field.type)
@@ -137,3 +141,80 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 				field.type = 'date'
 		formFields.push field
 	return formFields
+
+Creator.formBuilder.validateForm = (form)->
+
+Creator.formBuilder.getFieldsCode = (formFields)->
+	fieldsCode = []
+	fieldsCode = fieldsCode.concat(_.pluck(formFields, 'code'))
+	subFields = _.filter formFields, (f)->
+		return f.type == 'table' || f.type == 'section'
+	_.each subFields, (sf)->
+		fieldsCode = fieldsCode.concat(Creator.formBuilder.getFieldsCode(sf.fields))
+	return fieldsCode
+
+Creator.formBuilder.validateFormFields = (fields)->
+	fieldsCode = Creator.formBuilder.getFieldsCode(fields)
+	validate = true
+	_.each fields, (field)->
+		try
+			Creator.formBuilder.validateForFmield field, fields
+		catch e
+			validate = false
+			toastr.error(e.reason)
+	return validate
+Creator.formBuilder.validateForFmield = (field, fields)->
+	if !field.code
+		throw new Meteor.Error('500', "请填写#{field.name}的字段名")
+
+	if _.filter(fields, (f)->
+		f.code == field.code
+	).length > 1
+		throw new Meteor.Error('500', "#{field.name}字段名重复")
+
+	switch field.type
+		when 'email'
+			emailValid(field)
+		when 'select'
+			optionsValid(field)
+		when 'multiSelect'
+			optionsValid(field)
+		when 'radio'
+			optionsValid(field)
+		when 'table'
+			tableValid(field)
+	return true
+
+########private function#########
+optionsValid = (field)->
+	if !_.isString(field.options) || !field.options
+		throw new Meteor.Error('500', "#{field.name}未设置选择项")
+
+emailValid = (field)->
+	if field.default_value
+		reg = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/;
+		if !reg.test(value)
+			throw new Meteor.Error('500', "#{field.name}默认值不符合邮件地址的规则")
+
+tableValid = (field)->
+	if !_.isArray(field.fields) || field.fields.length == 0
+		throw new Meteor.Error('500', "#{field.name}未设置列表字段")
+
+#字段公式不是循环引用
+hasFormulaFieldValid = (field, fields)->
+	fields_has_formula = new Array()
+	formula_codes = new Array()
+	subForms = new Array()
+
+	fields.reverse()
+
+	_.each fields, (f)->
+		if _.contains(['table', 'section'], f.type)
+
+		else
+			if f.formula
+				fields_has_formula.push(f)
+				formula_codes.push(f.code)
+
+
+
