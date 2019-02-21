@@ -148,7 +148,7 @@ Creator.formBuilder.getFieldsCode = (formFields)->
 	fieldsCode = []
 	fieldsCode = fieldsCode.concat(_.pluck(formFields, 'code'))
 	subFields = _.filter formFields, (f)->
-		return f.type == 'table' || f.type == 'section'
+		return ['table','section'].includes(f.type)
 	_.each subFields, (sf)->
 		fieldsCode = fieldsCode.concat(Creator.formBuilder.getFieldsCode(sf.fields))
 	return fieldsCode
@@ -158,20 +158,22 @@ Creator.formBuilder.validateFormFields = (fields)->
 	validate = true
 	_.each fields, (field)->
 		try
+			if !field.code
+				throw new Meteor.Error('500', "请填写#{field.name}的字段名")
+
+			if _.filter(fieldsCode, (fc)->
+				fc == field.code
+			).length > 1
+				throw new Meteor.Error('500', "#{field.name}字段名重复")
+			if ['table','section'].includes(field.type)
+				Creator.formBuilder.validateFormFields field.fields
 			Creator.formBuilder.validateForFmield field, fields
+
 		catch e
 			validate = false
 			toastr.error(e.reason)
 	return validate
-Creator.formBuilder.validateForFmield = (field, fields)->
-	if !field.code
-		throw new Meteor.Error('500', "请填写#{field.name}的字段名")
-
-	if _.filter(fields, (f)->
-		f.code == field.code
-	).length > 1
-		throw new Meteor.Error('500', "#{field.name}字段名重复")
-
+Creator.formBuilder.validateForFmield = (field)->
 	switch field.type
 		when 'email'
 			emailValid(field)
