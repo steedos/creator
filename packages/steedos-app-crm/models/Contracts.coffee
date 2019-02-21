@@ -1,3 +1,5 @@
+db.contracts = new Meteor.Collection('contracts')
+
 Creator.Objects.contracts =
 	name: "contracts"
 	label: "合同"
@@ -260,3 +262,10 @@ Creator.Objects.contracts =
 			unreadable_fields: []
 			uneditable_fields: []
 			unrelated_objects: []
+
+if Meteor.isServer
+
+	db.contracts.before.insert (userId, doc) ->
+		doc.yinhuashuilv = db.contract_types.findOne(doc.contract_type).yinhuashuilv;
+		if doc.pretax_amount 
+			doc.stamp_duty = doc.pretax_amount * doc.yinhuashuilv

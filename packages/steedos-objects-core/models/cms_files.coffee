@@ -70,6 +70,10 @@ Creator.Objects.cms_files =
 				collection.remove {"metadata.parent": doc._id}
 
 	actions:
+		standard_new:
+			label: "新建"
+			visible: false
+
 		standard_edit:
 			label: "编辑"
 			sort: 0

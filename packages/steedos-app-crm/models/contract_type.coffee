@@ -1,3 +1,5 @@
+db.contract_types = new Meteor.Collection('contract_types')
+
 Creator.Objects.contract_types = 
     name: "contract_types"
     icon: "record"

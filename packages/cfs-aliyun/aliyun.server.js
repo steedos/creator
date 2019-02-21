@@ -1,5 +1,5 @@
 // We use the official aws sdk
-Aliyun = Npm.require('aliyun-sdk');
+Aliyun = require('aliyun-sdk');
 
 /**
  * Creates an Aliyun OSS store instance on server. Inherits `FS.StorageAdapter`

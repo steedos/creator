@@ -205,7 +205,7 @@ if Meteor.isClient
 		if !app
 			FlowRouter.go("/")
 			return
-		
+
 		# creatorSettings = Meteor.settings.public?.webservices?.creator
 		# if app._id == "admin" and creatorSettings?.status == "active"
 		# 	url = creatorSettings.url
@@ -815,7 +815,7 @@ if Meteor.isServer
 			return locale
 
 		checkUsernameAvailability: (username) ->
-			return not Meteor.users.findOne({ username: { $regex : new RegExp("^" + s.trim(s.escapeRegExp(username)) + "$", "i") } })
+			return not Meteor.users.findOne({ username: { $regex : new RegExp("^" + Meteor._escapeRegExp(username).trim() + "$", "i") } })
 
 
 		validatePassword: (pwd)->

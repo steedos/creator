@@ -1,6 +1,6 @@
 Package.describe({
 	name: 'steedos:app-admin',
-	version: '0.0.1',
+	version: '0.0.3',
 	summary: 'Creator admin',
 	git: '',
 	documentation: null
@@ -23,10 +23,10 @@ Package.onUse(function(api) {
 
 	api.use('steedos:objects@0.0.7');
 	api.use('steedos:application-package@0.0.1');
-	api.use('steedos:base');
+	api.use('steedos:base@0.0.11');
 	api.use('steedos:i18n@0.0.11');
 	
-	api.use('universe:i18n');
+	api.use('universe:i18n@1.13.0');
 
 	api.addFiles('i18n/en.i18n.json');
 	api.addFiles('i18n/zh-CN.i18n.json');

@@ -305,7 +305,7 @@ if Meteor.isServer
 			throw new Meteor.Error(400, "users_error_username_exists");
 
 	db.users.validateUsername = (username, userId) ->
-		user = db.users.findOne({username: { $regex : new RegExp("^" + s.trim(s.escapeRegExp(username)) + "$", "i") }, _id: { $ne: userId }})
+		user = db.users.findOne({username: { $regex : new RegExp("^" + Meteor._escapeRegExp(username).trim() + "$", "i") }, _id: { $ne: userId }})
 		if user
 			throw new Meteor.Error 'username-unavailable', 'username-unavailable'
 		if !Meteor.settings.public?.accounts?.is_username_skip_minrequiredlength

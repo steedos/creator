@@ -224,6 +224,12 @@ Template.filter_option_list.onCreated ->
 						else
 							return moment.utc(value).format('YYYY-MM-DD')
 					if filterValue
+						if _.isString(filterValue)
+							builtinValue = Creator.getBetweenBuiltinValueItem(fieldType, filterValue)
+							# 如果是between运算符内置值，则取出对应values作为过滤值
+							# 比如value为last_year，返回对应的时间值
+							if builtinValue
+								filterValue = builtinValue.values
 						if _.isArray(filterValue)
 							if filterValue.length
 								if filterValue[0] || filterValue[1]
@@ -238,6 +244,10 @@ Template.filter_option_list.onCreated ->
 										filter.valuelabel = ">= #{startLabel}"
 									else if endLabel
 										filter.valuelabel = "<= #{endLabel}"
+									if builtinValue
+										# 如果是between运算符内置值，应该显示出内置值对应的label
+										# filter.valuelabel = "#{builtinValue.label}:#{filter.valuelabel}"
+										filter.valuelabel = "#{builtinValue.label}"
 								else
 									filter.valuelabel = ""
 						else

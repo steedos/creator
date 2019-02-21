@@ -46,11 +46,17 @@ _dataSource = (options) ->
 			withCredentials: false
 			onLoaded: (a,b,c)->
 			onLoading: (loadOptions)->
+				# 注意这里的startDate、endDate是取的第一天上班时间及最后一天下班时间，且取的是utc时间的8点到17点59分
+				# _dataSource===startDate===== Mon Jan 28 2019 08:00:00 GMT+0800 (中国标准时间)
+				# _dataSource===endDate===== Sun Mar 10 2019 17:59:00 GMT+0800 (中国标准时间)
 				startDate = loadOptions.dxScheduler.startDate
 				endDate = loadOptions.dxScheduler.endDate
 				_f = [
 					[[ options.endDateExpr, ">=", startDate], 'and', [ options.startDateExpr, "<=", endDate]]
 				]
+
+				# _f中的时区问题需要通过formatFiltersToDev统一处理
+				_f = Creator.formatFiltersToDev(_f, Session.get('object_name'))
 
 				if loadOptions.filter && _.isArray(loadOptions.filter)
 					loadOptions.filter = [loadOptions.filter, 'and', _f]

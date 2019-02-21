@@ -32,22 +32,18 @@ Template.filter_option.helpers
 				autoform:
 					type: "select"
 					defaultValue: ()->
-						if filter_field_type && Creator.checkFieldTypeSupportBetweenQuery(filter_field_type)
-							template.filter_item_operation.set('between')
-							return 'between'
-						else if ["textarea", "text", "code"].includes(filter_field_type)
-							return 'contains'
-						else
-							return "="
+						return Creator.getFieldDefaultOperation(filter_field_type)
 					firstOption: ""
 					options: ()->
 						if object_fields[schema_key]
-							return Creator.getFieldOperation(object_fields[schema_key].type)
+							return Creator.getFieldOperation(filter_field_type)
 						else
 							return Creator.getFieldOperation("text")
 		
 		filter_item_operation = template.filter_item_operation.get()
 		isBetweenOperation = Creator.isBetweenFilterOperation(filter_item_operation)
+		betweenBuiltinValues = Creator.getBetweenBuiltinValues(filter_field_type)
+		currentBuiltinValue = betweenBuiltinValues?[filter_item_operation]
 		if isBetweenOperation
 			schema.start_value = 
 				type: ->
@@ -76,13 +72,22 @@ Template.filter_option.helpers
 					schema.start_value.autoform.readonly = false
 					schema.start_value.autoform.disabled = false
 					schema.start_value.autoform.omit = false
+					if currentBuiltinValue
+						# 如果是内置的运算符，则起止值控件只读，且显示出默认值
+						schema.start_value.autoform.readonly = true
+						schema.start_value.autoform.disabled = true
+						schema.start_value.autoform.value = currentBuiltinValue.values[0]
+
 				schema.end_value = _.clone schema.start_value
 				schema.end_value.label = "end_value"
 				if schema.start_value.autoform
 					schema.end_value.autoform = _.clone(schema.start_value.autoform)
+					if currentBuiltinValue
+						# 如果是内置的运算符，则起止值控件只读，且显示出默认值
+						schema.end_value.autoform.value = currentBuiltinValue.values[1]
 			else
 				schema.value = _.clone obj_schema[schema_key]
-				if ["lookup", "master_detail", "select", "checkbox"].includes(object_fields[schema_key].type)
+				if ["lookup", "master_detail", "select", "checkbox"].includes(filter_field_type)
 					schema.value.autoform.multiple = true
 					schema.value.type = [String]
 
@@ -101,7 +106,7 @@ Template.filter_option.helpers
 							schema.value.blackbox = true
 
 				if schema.value.autoform
-					schema.value.autoform =  _.clone obj_schema[schema_key].autoform
+					schema.value.autoform = _.clone obj_schema[schema_key].autoform
 					schema.value.autoform.readonly = false
 					schema.value.autoform.disabled = false
 					schema.value.autoform.omit = false
@@ -112,7 +117,7 @@ Template.filter_option.helpers
 					schema.value.autoform.type = 'text'
 
 			# 参考【查找时，按日期类型字段来查 有问题 #896】未能实现outFormat功能
-			if object_fields[schema_key].type == "date"
+			if filter_field_type == "date"
 				if isBetweenOperation
 					if schema.start_value.autoform
 						schema.start_value.autoform.outFormat = 'yyyy-MM-dd';
@@ -160,7 +165,7 @@ Template.filter_option.events
 	'click .save-filter': (event, template) ->
 		fields = Creator.getObject(template.data.object_name).fields
 		filter = AutoForm.getFormValues("filter-option").insertDoc
-		isDateField = fields[filter.field]?.type == "date"
+		filter_field_type = fields[filter.field]?.type
 		unless filter.operation
 			toastr.error(t("creator_filter_operation_required_error"))
 			return
@@ -169,7 +174,13 @@ Template.filter_option.events
 			if filter.start_value > filter.end_value
 				toastr.error(t("creator_filter_option_start_end_error"))
 				return
-			filter.value = [filter.start_value, filter.end_value]
+			betweenBuiltinValues = Creator.getBetweenBuiltinValues(filter_field_type)
+			currentBuiltinValue = betweenBuiltinValues?[filter.operation]
+			if currentBuiltinValue
+				filter.operation = "between"
+				filter.value = currentBuiltinValue.key
+			else
+				filter.value = [filter.start_value, filter.end_value]
 		index = this.index
 		filter_items = Session.get("filter_items")
 		filter_items[index] = filter
@@ -194,7 +205,14 @@ Template.filter_option.events
 			delete filter_item.operation
 			filter_item.value = ""
 			template.filter_item.set(filter_item)
-		template.filter_item_operation.set(null)
+		object_fields = Creator.getObject(object_name).fields
+		filter_field_type = object_fields[field]?.type
+		defaultOperation = Creator.getFieldDefaultOperation(filter_field_type)
+		# 不能直接清除filter_item_operation，否则有默认值时，相关依赖的地方会出现异常
+		if defaultOperation
+			template.filter_item_operation.set(defaultOperation)
+		else
+			template.filter_item_operation.set(null)
 		_schema = Creator.getSchema(object_name)._schema
 		template.show_form.set(false)
 		template.schema_key.set(field)
@@ -222,9 +240,20 @@ Template.filter_option.onCreated ->
 		key = filter_item.field
 		key_obj = Creator.getSchema(object_name)._schema[key]
 
+		operation = filter_item.operation
+		if operation == "between"
+			object_fields = Creator.getObject(object_name).fields
+			filter_field_type = object_fields[key]?.type
+			# 根据过滤器的过滤值，获取对应的内置运算符
+			# 比如value为last_year，返回between_time_last_year
+			builtinOperation = Creator.getBetweenBuiltinOperation(filter_field_type, filter_item.value)
+			if builtinOperation
+				operation = builtinOperation
+				filter_item.operation = builtinOperation
+		
 		this.schema_key = new ReactiveVar(key)
 		this.schema_obj = new ReactiveVar(key_obj)
-		this.filter_item_operation = new ReactiveVar(filter_item.operation)
+		this.filter_item_operation = new ReactiveVar(operation)
 		this.filter_item = new ReactiveVar(filter_item)
 
 		this.show_form = new ReactiveVar(true)
