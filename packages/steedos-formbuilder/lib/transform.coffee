@@ -170,8 +170,6 @@ Creator.formBuilder.validateFormFields = (fields)->
 				Creator.formBuilder.validateFormFields field.fields
 
 			validate = Creator.formBuilder.validateForFmield field, fields
-
-			console.log('validate', validate);
 		catch e
 			console.error('validateFormFields', e);
 			validate = false
@@ -241,7 +239,6 @@ hasFormulaFieldValid = (field, fields) ->
 				aft_char = tem_formula_str.charAt(code_position + formula_codes[j].length)
 				tem_formula_str = tem_formula_str.slice(code_position + formula_codes[j].length - 1)
 				if pre_char.match(/\w/) == null and aft_char.match(/\w/) == null
-					console.log('this_code', this_code, formula_codes[j]);
 					if formula_codes[j] != this_code
 						#去除掉 公式中包含的自身code
 						formula_contains_codes.push formula_codes[j]
@@ -265,7 +262,6 @@ hasFormulaFieldValid = (field, fields) ->
 
 
 _fieldFormulaValid = (formula_codes, formulas_by_code, fields_has_formula, this_code) ->
-	console.log('formulas_by_code', formulas_by_code);
 	# 判断找出的field集合中的公式是否包含当前field的code，
 	# 如果包含则fieldsValid=false，如果不包含则继续查找下一层
 	i = formulas_by_code.length - 1
@@ -296,10 +292,7 @@ _fieldFormulaValid = (formula_codes, formulas_by_code, fields_has_formula, this_
 						f_contains_codes.push formula_codes[j]
 					m--
 			j--
-		console.log('f_contains_codes1', JSON.stringify(f_contains_codes))
 		f_contains_codes = _.uniq f_contains_codes
-		console.log('f_contains_codes2', JSON.stringify(f_contains_codes))
-		console.log('this_code', this_code)
 		if f_contains_codes.length > 0
 			if _.contains(f_contains_codes, this_code)
 				return false
