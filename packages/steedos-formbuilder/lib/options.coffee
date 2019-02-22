@@ -177,6 +177,7 @@ _FORMBUILDERCLONEINDEX = 1
 # 定义字段的事件
 BASEUSEREVENTS = {
 	onadd: (fid)->
+		fid.contentEditable = 'true'
 		fieldId = fid.id
 		if fid.type == 'checkboxBoolean'
 			$(fid.querySelector('[name="default_value"]')).removeClass("form-control").prop('type', 'checkbox')
@@ -296,6 +297,10 @@ getFields = ()->
 		}
 	]
 
+
+subFieldOnEdit = (e)->
+	$(e.target.parentElement.parentElement).data('fields', $("##{e.data.fid}").data('formBuilder').actions.getData())
+
 # 定义扩展的字段显示模板
 getFieldTemplates = ()->
 	{
@@ -352,13 +357,19 @@ getFieldTemplates = ()->
 			return {
 				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",
 				onRender: ()->
-					console.log('table render...');
+					_scope = $(".field-actions", $("##{fieldData.name}").parent().parent().parent())
+					_scope.off 'click', ".toggle-form", subFieldOnEdit
+					_scope.on 'click', ".toggle-form", {fid: fieldData.name}, subFieldOnEdit
 					Meteor.setTimeout ()->
+						liDataFields = $("#"+fieldData.name).parent().parent().parent().data('fields')
 						tableFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
 						Meteor.defer ()->
 							Creator.formBuilder.stickyControls($("##{fieldData.name}"))
 						if fieldData.fields
 							tableFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
+						if !_.isEmpty(liDataFields)
+							tableFields = liDataFields
+						if !_.isEmpty(tableFields)
 							tableFB.promise.then (tableFormBuilder)->
 								tableFormBuilder.actions.setData(tableFields)
 								# fix bug: 第一个字段的typeUserAttrs不生效
@@ -372,12 +383,19 @@ getFieldTemplates = ()->
 			return {
 				field: "<div id='#{fieldData.name}' #{Creator.formBuilder.utils.attrString(fieldData)}></div>",
 				onRender: ()->
+					_scope = $(".field-actions", $("##{fieldData.name}").parent().parent().parent())
+					_scope.off 'click', ".toggle-form", subFieldOnEdit
+					_scope.on 'click', ".toggle-form", {fid: fieldData.name}, subFieldOnEdit
 					Meteor.setTimeout ()->
+						liDataFields = $("#"+fieldData.name).parent().parent().parent().data('fields')
 						sectionFB = $("##{fieldData.name}").formBuilder(Creator.formBuilder.optionsForFormFields(true))
 						Meteor.defer ()->
 							Creator.formBuilder.stickyControls($("##{fieldData.name}"))
 						if fieldData.fields
 							sectionFields = Creator.formBuilder.transformFormFieldsIn(JSON.parse(fieldData.fields))
+						if !_.isEmpty(liDataFields)
+							sectionFields = liDataFields
+						if !_.isEmpty(sectionFields)
 							sectionFB.promise.then (sectionFormBuilder)->
 								sectionFormBuilder.actions.setData(sectionFields)
 								# fix bug: 第一个字段的typeUserAttrs不生效
@@ -395,10 +413,7 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 			locale: 'zh-CN'
 			location: '/packages/steedos_formbuilder/formbuilder/languages'
 		},
-		editOnAdd: true,
 		scrollToFieldOnAdd: true,
-#		onOpenFieldEdit: (editPanel)->
-#			debugger;
 		onCloseFieldEdit: (editPanel)->
 			fieldId = editPanel.dataset.fieldId
 			if $('#' + "default_value-" + fieldId).length > 0
@@ -409,10 +424,13 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 						$('#' + fieldId + ' .prev-holder .form-control').val($('#' + "default_value-" + fieldId).val())
 				, 400
 		onAddField: (fieldId, field)->
+			field.label = field.label.replace('\r','')
 			formFields = Creator.formBuilder.transformFormFieldsOut(fb.actions.getData())
 			fieldsCode = Creator.formBuilder.getFieldsCode(formFields) || []
 			fieldCode = getFieldCode(fieldsCode, field.label)
 			field.label = field.code = fieldCode
+			Meteor.defer ()->
+				$("#"+fieldId).attr('contentEditable', 'true')
 		disabledFieldButtons: {
 			table: ['copy'],
 			section: ['copy']
@@ -494,7 +512,3 @@ Creator.formBuilder.stickyControls = (scope)->
 				$cbWrap.css(cbStyle)
 		else
 			controls.parentElement.removeAttribute('style')
-
-
-Creator.formBuilder.forObjectFields = ()->
-	console.log('Creator.formBuilder.forObjectFields')
