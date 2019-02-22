@@ -10,7 +10,6 @@ Package.onUse(function(api) {
 
 	api.use('coffeescript@1.11.1_4');
 	api.use('templating@1.2.15');
-	api.use('kadira:flow-router@2.10.1');
 	api.use('flemay:less-autoprefixer@1.2.0');
 	api.use('underscore@1.0.10');
 
@@ -30,9 +29,8 @@ Package.onUse(function(api) {
 	api.addFiles('core.coffee', 'client');
 	api.addFiles('lib/utils.coffee', 'client');
 	api.addFiles('lib/transform.coffee', 'client');
+	api.addFiles('lib/validate.coffee', 'client');
 	api.addFiles('lib/options.coffee', 'client');
-
-	api.addFiles('client/router.coffee', 'client');
 
 	api.addAssets('formbuilder/languages/zh-CN.lang', 'client')
 
