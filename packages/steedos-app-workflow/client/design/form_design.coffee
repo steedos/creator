@@ -18,10 +18,7 @@ Template.formDesign.events
 
 		form.current.fields = formFields
 
-		console.log('formFields', formFields)
-
 		url = "#{Meteor.settings.public.webservices.workflowDesigner.url}am/forms?sync_token=#{(new Date()).getTime() / 1000}"
-		console.log('url', url)
 		data = {}
 		form.id = form._id
 		data['Forms'] = [form]
@@ -37,7 +34,8 @@ Template.formDesign.events
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
 
 			success: (data) ->
-				console.log('data', data)
+				toastr.success("修改成功")
+				Modal.hide(t)
 
 			error: (jqXHR, textStatus, errorThrown) ->
 				if jqXHR.status == 504
