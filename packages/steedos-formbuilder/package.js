@@ -7,20 +7,15 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-
 	api.use('coffeescript@1.11.1_4');
+	api.use('ecmascript');
 	api.use('templating@1.2.15');
 	api.use('flemay:less-autoprefixer@1.2.0');
 	api.use('underscore@1.0.10');
 
-	api.addFiles('formbuilder/jquery-ui.min.js','client');
-	// api.addFiles('formbuilder/form-builder.css','client');
-	api.addFiles('formbuilder/form-builder.min.js','client');
-	// api.addFiles('formbuilder/form-render.css','client');
-	api.addFiles('formbuilder/form-render.min.js','client');
+	api.addFiles('checkNpm.js', "server");
 
-	// api.addFiles('formbuilder/control_plugins/starRating.min.js','client');
-	// api.addFiles('formbuilder/control_plugins/textarea.trumbowyg.min.js','client');
+	api.addFiles('formbuilder/jquery-ui.min.js','client');
 
 	api.addFiles('client/form-builder.html', 'client');
 	api.addFiles('client/form-builder.coffee', 'client');
@@ -32,6 +27,6 @@ Package.onUse(function(api) {
 	api.addFiles('lib/validate.coffee', 'client');
 	api.addFiles('lib/options.coffee', 'client');
 
-	api.addAssets('formbuilder/languages/zh-CN.lang', 'client')
+	api.addAssets('formbuilder/languages/zh-CN.lang', 'client');
 
 });
