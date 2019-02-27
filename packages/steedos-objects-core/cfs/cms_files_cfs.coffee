@@ -1,6 +1,6 @@
 files_store
 
-if Meteor.settings.public.cfs?.store == "OSS"
+if Meteor.settings.public.cfs?.file_store == "OSS"
   if Meteor.isClient
     files_store = new FS.Store.OSS("files")
   else if Meteor.isServer

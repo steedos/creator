@@ -1,9 +1,22 @@
 {
+  "public": {
+    "cfs": {
+        "store": "OSS",
+        "file_store":""
+    }
+  },
+  "cfs": {
+    "aliyun": {
+      "region": "oss-cn-beijing",
+      "internal": false,
+      "bucket": "prod-apps",
+      "accessKeyId": "eWxvqZjv1lx6i50U",
+      "secretAccessKey": "nwnvpgA30crD32BZrxBbdb9bPJHYIj"
+    }
+  },
   "records_sync": {
     "spaces": ["51ae9b1a8e296a29c9000001"],
     "-recurrenceRule": "* /10 * * * *",
-    "-instance_file_path":"C:\\Users\\dell\\Documents\\GitHub\\apps\\.meteor\\local\\cfs\files\\instances",
-    "instance_file_path":"D:\\meteor_temp_pgs\\instances",
     "to_archive": {
       "object_name": "archive_document",
       "hide_traces": "0",
