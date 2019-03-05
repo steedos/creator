@@ -256,5 +256,6 @@
 								filter.value = Creator.eval("(#{filter._value})")
 							else if filter._is_date == true
 								filter.value = new Date(filter.value)
+		return object
 
 
