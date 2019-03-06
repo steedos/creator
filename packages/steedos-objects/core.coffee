@@ -9,9 +9,9 @@ Creator.Reports = {}
 Creator.subs = {}
 
 if Meteor.isServer
-	steedosCore = require('@steedos/core')
-	steedosCore.init()
-	_objects = steedosCore.object.getAll();
+	steedosCoreObj = require('@steedos/core/objects')
+	steedosCoreObj.init()
+	_objects = steedosCoreObj.getAll();
 	_.each _objects, (_obj, name)->
 		Creator.Objects[name] = _obj
 
