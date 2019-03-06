@@ -1,18 +1,19 @@
 @db = {}
+if !Creator?
+	@Creator = {}
+Creator.Objects = {}
+Creator.Collections = {}
+Creator.Menus = []
+Creator.Apps = {}
+Creator.Reports = {}
+Creator.subs = {}
 
 if Meteor.isServer
 	steedosCore = require('@steedos/core')
-	steedosCore.objects.loadBaseObject()
-else
-	if !Creator?
-		@Creator = {}
-	Creator.Objects = {}
-	Creator.Collections = {}
-	Creator.Menus = []
-	Creator.Apps = {}
-	Creator.Reports = {}
-	Creator.subs = {}
-
+	steedosCore.init()
+	_objects = steedosCore.object.getAll();
+	_.each _objects, (_obj, name)->
+		Creator.Objects[name] = _obj
 
 Creator.deps = {
 	app: new Tracker.Dependency
