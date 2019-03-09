@@ -9,11 +9,10 @@ Creator.Reports = {}
 Creator.subs = {}
 
 if Meteor.isServer
-	steedosCoreObj = require('@steedos/core/standard/objects')
-	steedosCoreObj.init()
-	_objects = steedosCoreObj.getAll();
-	_.each _objects, (_obj, name)->
-		Creator.Objects[name] = _obj
+	steedosCord = require('@steedos/core')
+	steedosCord.ObjectManager.loadStandardObjects()
+	Creator.Objects = steedosCord.Objects
+	Creator.Reports = steedosCord.Reports
 
 Creator.deps = {
 	app: new Tracker.Dependency
