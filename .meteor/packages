@@ -161,9 +161,6 @@ steedos:creator
 steedos:instance-record-queue
 # steedos:instances-statistics
 # steedos:love
-steedos:app-chat
-
-# steedos:instances-statistics
 # steedos:meeting
 
 # steedos:weixin
@@ -186,8 +183,6 @@ steedos:app-base
 
 # 正式发布时开启
 # steedos:version
-steedos:audit
-steedos:version
 steedos:audit
 steedos:formbuilder
 #steedos:app-workflow
