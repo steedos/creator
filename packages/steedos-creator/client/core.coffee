@@ -128,7 +128,7 @@ if Meteor.isClient
 					if selector.length > 0
 						selector.push "and"
 
-					filters = Creator.formatFiltersToDev(filters)
+					filters = Creator.formatFiltersToDev(filters, object_name)
 					_.each filters, (filter)->
 						selector.push filter
 		else
@@ -136,7 +136,7 @@ if Meteor.isClient
 				if object_name == "users"
 					selector.push ["_id", "=", userId]
 				if filters
-					filters = Creator.formatFiltersToDev(filters)
+					filters = Creator.formatFiltersToDev(filters, object_name)
 					if filters and filters.length > 0
 						if selector.length > 0
 							selector.push "and"
@@ -208,7 +208,7 @@ if Meteor.isClient
 								return [obj.field, obj.operation, obj.value]
 							else
 								return obj
-						filters = Creator.formatFiltersToDev(filters)
+						filters = Creator.formatFiltersToDev(filters, related_object_name)
 						_.each filters, (filter)->
 							selector.push filter
 		if selector.length > 0
@@ -308,9 +308,11 @@ Meteor.startup ->
 			if $(".modal").length > 1
 				return;
 			if e.target.tagName != "TEXTAREA" or $(e.target).closest("div").hasClass("bootstrap-tagsinput")
-				e.preventDefault()
-				e.stopPropagation()
 				if Session.get("cmOperation") == "update"
+					e.preventDefault()
+					e.stopPropagation()
 					$(".creator-auotform-modals .btn-update").click()
 				else if Session.get("cmOperation") == "insert"
+					e.preventDefault()
+					e.stopPropagation()
 					$(".creator-auotform-modals .btn-insert").click()

@@ -287,6 +287,15 @@ Creator.Objects.flows =
 			label:"自动催办"
 			type: "boolean"
 			group: "高级"
+		sort_no:
+			type: "number"
+			label:'排序号'
+			group:'高级'
+			sortable: true
+		timeout_auto_submit:
+			label:"超时自动流转"
+			type: "boolean"
+			group: "高级"
 	list_views:
 		# enabled:
 		# 	label: "已启用"
@@ -300,7 +309,8 @@ Creator.Objects.flows =
 			label: "所有"
 			filter_scope: "space"
 #			extra_columns: ["instance_template", "print_template", "field_map", "events", "distribute_optional_users", "perms"]
-			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form"]
+			columns: ["name", "modified", "modified_by", "auto_remind", "state", "is_deleted", "company_id", "form", "sort_no"]
+			sort: [["sort_no", "desc"],["modified", "desc"]]
 
 	actions:
 		# standard_query:
@@ -402,6 +412,13 @@ Creator.Objects.flows =
 			on: "record"
 			todo: (object_name, record_id, fields)->
 				WorkflowCore.openFlowDesign(Steedos.locale(), Steedos.spaceId(), record_id, Creator.getUserCompanyId())
+		designForm:
+			label: "表单设计器"
+			visible: (object_name, record_id, record_permissions)->
+				return true;
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				WorkflowCore.openFormDesign(Steedos.locale(), Steedos.spaceId(), this.record.form, Creator.getUserCompanyId())
 
 #		edit_steps:
 #			label: "设置步骤"

@@ -206,15 +206,15 @@ if Meteor.isClient
 			FlowRouter.go("/")
 			return
 		
-		creatorSettings = Meteor.settings.public?.webservices?.creator
-		if app._id == "admin" and creatorSettings?.status == "active"
-			url = creatorSettings.url
-			reg = /\/$/
-			unless reg.test url
-				url += "/"
-			url = "#{url}app/admin"
-			Steedos.openWindow(url)
-			return
+		# creatorSettings = Meteor.settings.public?.webservices?.creator
+		# if app._id == "admin" and creatorSettings?.status == "active"
+		# 	url = creatorSettings.url
+		# 	reg = /\/$/
+		# 	unless reg.test url
+		# 		url += "/"
+		# 	url = "#{url}app/admin"
+		# 	Steedos.openWindow(url)
+		# 	return
 
 		on_click = app.on_click
 		if app.is_use_ie
@@ -256,6 +256,8 @@ if Meteor.isClient
 				console.error "#{e.message}\r\n#{e.stack}"
 		else
 			Steedos.openAppWithToken(app_id)
+		
+		Session.set("current_app_id", app_id)
 
 	Steedos.checkSpaceBalance = (spaceId)->
 		unless spaceId
@@ -815,7 +817,7 @@ if Meteor.isServer
 			return locale
 
 		checkUsernameAvailability: (username) ->
-			return not Meteor.users.findOne({ username: { $regex : new RegExp("^" + s.trim(s.escapeRegExp(username)) + "$", "i") } })
+			return not Meteor.users.findOne({ username: { $regex : new RegExp("^" + Meteor._escapeRegExp(username).trim() + "$", "i") } })
 
 
 		validatePassword: (pwd)->
@@ -840,3 +842,18 @@ Steedos.convertSpecialCharacter = (str)->
 
 Steedos.removeSpecialCharacter = (str)->
 	return str.replace(/([\^\$\(\)\*\+\?\.\\\|\[\]\{\}\~\`\@\#\%\&\=\'\"\:\;\<\>\,\/])/g, "")
+
+Creator.getDBApps = (space_id)->
+	dbApps = {}
+	Creator.Collections["apps"].find({space: space_id,is_creator:true,visible:true}, {
+		fields: {
+			created: 0,
+			created_by: 0,
+			modified: 0,
+			modified_by: 0
+		}
+	}).forEach (app)->
+		dbApps[app._id] = app
+
+	return dbApps
+

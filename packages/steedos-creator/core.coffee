@@ -1,7 +1,3 @@
-Meteor.startup ->
-	if Meteor.isServer
-		_.each Creator.Objects, (obj, object_name)->
-			Creator.loadObjects obj, object_name
 
 	# Creator.initApps()
 
@@ -16,30 +12,6 @@ Meteor.startup ->
 # else
 # 	app._id = app_id
 # 	db.apps.update({_id: app_id}, app)
-
-Creator.loadObjects = (obj, object_name)->
-	if !object_name
-		object_name = obj.name
-
-	if !obj.list_views
-		obj.list_views = {}
-
-	if obj.space
-		object_name = 'c_' + obj.space + '_' + obj.name
-
-#	console.log('loadObjects', obj.name, object_name)
-
-	Creator.convertObject(obj)
-#	console.log('new Creator.Object(obj)', obj.name, object_name)
-	new Creator.Object(obj);
-#	console.log('new Creator.Object(obj) end...')
-	Creator.initTriggers(object_name)
-	Creator.initListViews(object_name)
-	# if Meteor.isServer
-	# 	Creator.initPermissions(object_name)
-
-Creator.getTable = (object_name)->
-	return Tabular.tablesByName["creator_" + object_name]
 
 Creator.getSchema = (object_name)->
 	return Creator.getObject(object_name)?.schema
@@ -89,27 +61,36 @@ Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_name) ->
 	return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/grid")
 
-Creator.getObjectLookupFieldOptions = (object_name, is_deep)->
+Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide)->
 	_options = []
+	unless object_name
+		return _options
 	_object = Creator.getObject(object_name)
 	fields = _object?.fields
 	icon = _object?.icon
 	_.forEach fields, (f, k)->
+		if is_skip_hide and f.hidden
+			return
 		if f.type == "select"
 			_options.push {label: "#{f.label || k}", value: "#{k}", icon: icon}
 		else
 			_options.push {label: f.label || k, value: k, icon: icon}
-			if is_deep
-				if (f.type == "lookup" || f.type == "master_detail") && f.reference_to
-					r_object = Creator.getObject(f.reference_to)
-					if r_object
-						_.forEach r_object.fields, (f2, k2)->
-							_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
+	if is_deep
+		_.forEach fields, (f, k)->
+			if is_skip_hide and f.hidden
+				return
+			if (f.type == "lookup" || f.type == "master_detail") && f.reference_to
+				r_object = Creator.getObject(f.reference_to)
+				if r_object
+					_.forEach r_object.fields, (f2, k2)->
+						_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
 	return _options
 
 # 统一为对象object_name提供可用于过虑器过虑字段
 Creator.getObjectFilterFieldOptions = (object_name)->
 	_options = []
+	unless object_name
+		return _options
 	_object = Creator.getObject(object_name)
 	fields = _object?.fields
 	permission_fields = Creator.getFields(object_name)
@@ -152,7 +133,7 @@ Creator.getAppObjectNames = (app_id)->
 Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
-		if v.visible != false or (includeAdmin and v._id == "admin")
+		if (v.visible != false and v._id != "admin") or (includeAdmin and v._id == "admin")
 			apps.push v
 	return apps;
 
@@ -284,7 +265,7 @@ Creator.formatFiltersToMongo = (filters, options)->
 	return selector
 
 Creator.isBetweenFilterOperation = (operation)->
-	return operation == "between"
+	return operation == "between" or !!Creator.getBetweenTimeBuiltinValues(true)?[operation]
 
 ###
 options参数：
@@ -354,7 +335,7 @@ options参数：
 	spaceId-- 当前所在工作区
 	extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
-Creator.formatFiltersToDev = (filters, options)->
+Creator.formatFiltersToDev = (filters, object_name, options)->
 	# console.log "Creator.formatFiltersToDev======filters==", filters
 	# console.log "Creator.formatFiltersToDev======options==", options
 	unless filters.length
@@ -367,6 +348,8 @@ Creator.formatFiltersToDev = (filters, options)->
 			logicTempFilters.push("or")
 		logicTempFilters.pop()
 		filters = logicTempFilters
+	
+	object_fields = Creator.getObject(object_name).fields
 
 	selector = []
 	filtersLooper = (filters_loop)->
@@ -432,7 +415,21 @@ Creator.formatFiltersToDev = (filters, options)->
 						else
 							value = Creator.evaluateFormula(value, null, options)
 						sub_selector = []
-						if _.isArray(value) == true
+						isBetweenOperation = Creator.isBetweenFilterOperation(option)
+						filter_field_type = object_fields[field]?.type
+						if isBetweenOperation and _.isString(value)
+							# 如果是between运算符内置值，则取出对应values作为过滤值
+							# 比如value为last_year，返回对应的时间值
+							builtinValue = Creator.getBetweenBuiltinValueItem(filter_field_type, value)
+							if builtinValue
+								value = builtinValue.values
+						if _.isArray(value)
+							if ["date", "datetime"].includes(filter_field_type)
+								# date:因日期字段数据库保存的值中不带时间值的，所以日期类型过滤条件需要特意处理的，为了兼容dx控件显示
+								# datetime:因新建/编辑记录保存的时候network中是处理了时区偏差的，所以在请求过滤条件的时候也应该相应的设置
+								_.forEach value, (fv)->
+									if fv
+										fv.setHours(fv.getHours() + fv.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 							v_selector = []
 							if option == "="
 								_.each value, (v)->
@@ -440,7 +437,7 @@ Creator.formatFiltersToDev = (filters, options)->
 							else if option == "<>"
 								_.each value, (v)->
 									sub_selector.push [field, option, v], "and"
-							else if Creator.isBetweenFilterOperation(option) and value.length = 2
+							else if isBetweenOperation and value.length = 2
 								if value[0] != null or value[1] != null
 									if value[0] != null
 										sub_selector.push [field, ">=", value[0]], "and"
@@ -455,6 +452,11 @@ Creator.formatFiltersToDev = (filters, options)->
 							if sub_selector.length
 								tempFilters = sub_selector
 						else
+							if ["date", "datetime"].includes(filter_field_type)
+								# date:因日期字段数据库保存的值中不带时间值的，所以日期类型过滤条件需要特意处理的，为了兼容dx控件显示
+								# datetime:因新建/编辑记录保存的时候network中是处理了时区偏差的，所以在请求过滤条件的时候也应该相应的设置
+								if value
+									value.setHours(value.getHours() + value.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
 							tempFilters = [field, option, value]
 				else
 					# 普通数组，当成完整过虑条件进一步循环解析每个条件
@@ -621,7 +623,12 @@ Creator.getListViews = (object_name, spaceId, userId)->
 
 	list_views = []
 
+	isMobile = Steedos.isMobile()
+
 	_.each object.list_views, (item, item_name)->
+		if isMobile and item.type == "calendar"
+			# 手机上先不显示日历视图
+			return
 		if item_name != "default"
 			if _.indexOf(disabled_list_views, item_name) < 0 || item.owner == userId
 				list_views.push item
@@ -761,21 +768,6 @@ Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 				i += 2
 
 	return fields
-
-
-Creator.getDBApps = (space_id)->
-	dbApps = {}
-	Creator.Collections["apps"].find({space: space_id,is_creator:true,visible:true}, {
-		fields: {
-			created: 0,
-			created_by: 0,
-			modified: 0,
-			modified_by: 0
-		}
-	}).forEach (app)->
-		dbApps[app._id] = app
-
-	return dbApps
 
 # END
 

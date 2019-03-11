@@ -99,9 +99,7 @@ if Meteor.isClient
 				if Meteor.user().locale
 					Session.set("steedos-locale",Meteor.user().locale)
 
-
-		Tracker.autorun ->
-			lang = Session.get("steedos-locale")
+		i18n.onChangeLocale (newLocale)->
 
 			$.extend true, $.fn.dataTable.defaults,
 				language:

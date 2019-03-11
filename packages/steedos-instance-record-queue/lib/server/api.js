@@ -162,7 +162,7 @@ InstanceRecordQueue.Configure = function (options) {
 	self.syncInsFields = ['name', 'submitter_name', 'applicant_name', 'applicant_organization_name', 'applicant_organization_fullname', 'state',
 		'current_step_name', 'flow_name', 'category_name', 'submit_date', 'finish_date', 'final_decision', 'applicant_organization', 'applicant_company'
 	];
-	self.syncValues = function (field_map_back, values, ins, objectInfo, field_map_back_script) {
+	self.syncValues = function (field_map_back, values, ins, objectInfo, field_map_back_script, record) {
 		var
 			obj = {},
 			tableFieldCodes = [],
@@ -200,51 +200,107 @@ InstanceRecordQueue.Configure = function (options) {
 				}
 
 			} else if (values.hasOwnProperty(fm.workflow_field)) {
-				var wField = _.find(formFields, function (ff) {
-					return ff.code === fm.workflow_field;
-				});
+				var wField = null;
+
+				_.each(formFields, function (ff) {
+					if (!wField) {
+						if (ff.code === fm.workflow_field) {
+							wField = ff;
+						} else if (ff.type === 'section') {
+							_.each(ff.fields, function (f) {
+								if (!wField) {
+									if (f.code === fm.workflow_field) {
+										wField = f;
+									}
+								}
+							})
+						}
+					}
+				})
 
 				var oField = objectFields[fm.object_field];
 
-				// 表单选人选组字段 至 对象 lookup master_detail类型字段同步
-				if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to)) {
-					obj[fm.object_field] = values[fm.workflow_field]['id'];
-				} else if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to) && _.isString(values[fm.workflow_field])) {
-					var oCollection = Creator.getCollection(oField.reference_to, spaceId)
-					var referObject = Creator.getObject(oField.reference_to, spaceId)
-					if (oCollection && referObject) {
-						var nameFieldKey = referObject.NAME_FIELD_KEY;
-						var selector = {};
-						selector[nameFieldKey] = values[fm.workflow_field];
-						var referData = oCollection.findOne(selector, {
-							fields: {
-								_id: 1
+				if (oField) {
+					// 表单选人选组字段 至 对象 lookup master_detail类型字段同步
+					if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to)) {
+						obj[fm.object_field] = values[fm.workflow_field]['id'];
+					} else if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to) && _.isString(values[fm.workflow_field])) {
+						var oCollection = Creator.getCollection(oField.reference_to, spaceId)
+						var referObject = Creator.getObject(oField.reference_to, spaceId)
+						if (oCollection && referObject) {
+							var nameFieldKey = referObject.NAME_FIELD_KEY;
+							var selector = {};
+							selector[nameFieldKey] = values[fm.workflow_field];
+							var referData = oCollection.findOne(selector, {
+								fields: {
+									_id: 1
+								}
+							});
+							if (referData) {
+								obj[fm.object_field] = referData._id;
 							}
-						});
-						if (referData) {
-							obj[fm.object_field] = referData._id;
+						}
+					} else {
+						if (oField.type === "boolean") {
+							var tmp_field_value = values[fm.workflow_field];
+							if (['true', '是'].includes(tmp_field_value)) {
+								obj[fm.object_field] = true;
+							} else if (['false', '否'].includes(tmp_field_value)) {
+								obj[fm.object_field] = false;
+							} else {
+								obj[fm.object_field] = tmp_field_value;
+							}
+						} else {
+							obj[fm.object_field] = values[fm.workflow_field];
 						}
 					}
 				} else {
-					if (oField.type === "boolean") {
-						var tmp_field_value = values[fm.workflow_field];
-						if (['true', '是'].includes(tmp_field_value)) {
-							obj[fm.object_field] = true;
-						} else if (['false', '否'].includes(tmp_field_value)) {
-							obj[fm.object_field] = false;
-						} else {
-							obj[fm.object_field] = tmp_field_value;
+					if (fm.object_field.indexOf('.') > -1) {
+						var temObjFields = fm.object_field.split('.');
+						if (temObjFields.length === 2) {
+							var objField = temObjFields[0];
+							var referObjField = temObjFields[1];
+							var oField = objectFields[objField];
+							if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to)) {
+								var oCollection = Creator.getCollection(oField.reference_to, spaceId)
+								if (oCollection && record[objField]) {
+									var referSetObj = {};
+									referSetObj[referObjField] = values[fm.workflow_field];
+									oCollection.update(record[objField], {
+										$set: referSetObj
+									})
+								}
+							}
 						}
-					} else {
-						obj[fm.object_field] = values[fm.workflow_field];
 					}
 				}
 
 			} else {
 				if (fm.workflow_field.startsWith('instance.')) {
 					var insField = fm.workflow_field.split('instance.')[1];
-					if (self.syncInsFields.includes(insField))
-						obj[fm.object_field] = ins[insField];
+					if (self.syncInsFields.includes(insField)) {
+						if (fm.object_field.indexOf('.') < 0) {
+							obj[fm.object_field] = ins[insField];
+						} else {
+							var temObjFields = fm.object_field.split('.');
+							if (temObjFields.length === 2) {
+								var objField = temObjFields[0];
+								var referObjField = temObjFields[1];
+								var oField = objectFields[objField];
+								if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to)) {
+									var oCollection = Creator.getCollection(oField.reference_to, spaceId)
+									if (oCollection && record[objField]) {
+										var referSetObj = {};
+										referSetObj[referObjField] = ins[insField];
+										oCollection.update(record[objField], {
+											$set: referSetObj
+										})
+									}
+								}
+							}
+						}
+					}
+
 				} else {
 					if (ins[fm.workflow_field]) {
 						obj[fm.object_field] = ins[fm.workflow_field];
@@ -344,10 +400,14 @@ InstanceRecordQueue.Configure = function (options) {
 			}).forEach(function (record) {
 				// 附件同步
 				try {
-					var setObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script);
-
-					setObj['instances.$.state'] = 'completed';
+					var setObj = self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script, record);
 					setObj.locked = false;
+
+					var instance_state = ins.state;
+					if (ins.state === 'completed' && ins.final_decision) {
+						instance_state = ins.final_decision;
+					}
+					setObj['instances.$.state'] = setObj.instance_state = instance_state;
 
 					objectCollection.update({
 						_id: record._id,
@@ -375,7 +435,8 @@ InstanceRecordQueue.Configure = function (options) {
 					}, {
 						$set: {
 							'instances.$.state': 'pending',
-							'locked': true
+							'locked': true,
+							'instance_state': 'pending'
 						}
 					})
 
@@ -411,11 +472,18 @@ InstanceRecordQueue.Configure = function (options) {
 
 					newObj._id = newRecordId;
 					newObj.space = spaceId;
-					newObj.name = ins.name;
+					newObj.name = newObj.name || ins.name;
+
+					var instance_state = ins.state;
+					if (ins.state === 'completed' && ins.final_decision) {
+						instance_state = ins.final_decision;
+					}
 					newObj.instances = [{
 						_id: insId,
-						state: ins.state
+						state: instance_state
 					}];
+					newObj.instance_state = instance_state;
+
 					newObj.owner = ins.applicant;
 					newObj.created_by = ins.applicant;
 					newObj.modified_by = ins.applicant;

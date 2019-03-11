@@ -141,6 +141,21 @@ Creator.baseObject =
 			omit: true
 			hidden: true
 
+		# 值范围为 draft, pending, completed, approved, rejected, terminated
+		instance_state:
+			label:'审批状态'
+			type:'select'
+			options: [
+				{label:"草稿", value:"draft"},
+				{label:"进行中", value:"pending"},
+				{label: "已完成", value:"completed"}
+				{label:"已核准", value:"approved"},
+				{label:"已驳回", value:"rejected"},
+				{label:"已取消", value:"terminated"}
+			]
+			omit: true
+			hidden: true
+
 	permission_set:
 		none:
 			allowCreate: false
@@ -272,23 +287,15 @@ Creator.baseObject =
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+					record = Creator.getObjectRecord(object_name, record_id)
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
-
-				if perms["modifyAllRecords"]
-					return true
-
-				if !record
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
-
-				if record && record.locked
-					return false
 
 				return perms["allowEdit"]
 
@@ -298,23 +305,15 @@ Creator.baseObject =
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
 				if record_permissions
 					perms = record_permissions
 				else
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+					record = Creator.getObjectRecord(object_name, record_id)
 					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 					if record_permissions
 						perms = record_permissions
-
-				if perms["modifyAllRecords"]
-					return true
-
-				if !record
-					record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
-
-				if record && record.locked
-					return false
 
 				return perms["allowDelete"]
 
@@ -327,7 +326,7 @@ Creator.baseObject =
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
 
-				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+				record = Creator.getObjectRecord(object_name, record_id)
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions && !record_permissions["allowEdit"]
 					return false
@@ -338,9 +337,8 @@ Creator.baseObject =
 				if not object_workflow
 					return false
 
-				r = Creator.getObjectRecord object_name, record_id
-				if r and ( (r.instances and r.instances[0].state is 'completed') or (not r.instances) )
-					return true
+				if record and record.instances and record.instances.length > 0
+					return false
 
 				return false
 			on: "record"
@@ -350,7 +348,7 @@ Creator.baseObject =
 		standard_view_instance:
 			label: "查看审批单"
 			visible: (object_name, record_id, record_permissions) ->
-				record = Creator.getCollection(object_name, Session.get('spaceId')).findOne record_id
+				record = Creator.getObjectRecord(object_name, record_id)
 				if record && !_.isEmpty(record.instances)
 					return true
 

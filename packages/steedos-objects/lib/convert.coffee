@@ -1,4 +1,3 @@
-Meteor.startup ()->
 	getOption = (option)->
 		foo = option.split(":")
 		if foo.length > 1

@@ -52,6 +52,9 @@ _dataSource = (options) ->
 					[[ options.endDateExpr, ">=", startDate], 'and', [ options.startDateExpr, "<=", endDate]]
 				]
 
+				# _f中的时区问题需要通过formatFiltersToDev统一处理
+				_f = Creator.formatFiltersToDev(_f, Session.get('object_name'))
+
 				if loadOptions.filter && _.isArray(loadOptions.filter)
 					loadOptions.filter = [loadOptions.filter, 'and', _f]
 				else
@@ -502,6 +505,8 @@ Template.creator_calendarNew.onRendered ->
 
 			_.extend(dxSchedulerConfig, view.options)
 
-			dxSchedulerInstance =  $("#creator-scheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
+			module.dynamicImport("devextreme/ui/scheduler").then (dxScheduler)->
+				DevExpress.ui.dxScheduler = dxScheduler;
+				dxSchedulerInstance =  $("#creator-scheduler").dxScheduler(dxSchedulerConfig).dxScheduler("instance")
 
 			window.dxSchedulerInstance = dxSchedulerInstance;

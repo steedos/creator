@@ -1,18 +1,26 @@
 # 视图新增filter_fileds，配置了filter_fields的视图，右侧自动列出过滤器 #915
-getDefaultFilters = (object_name, filter_fields)->
+getDefaultFilters = (object_name, filter_fields, filters)->
 	unless filter_fields
 		list_view_id = Session.get("list_view_id")
 		list_view = Creator.getListView(object_name, list_view_id, true)
 		filter_fields = list_view?.filter_fields
 	fields = Creator.getObject(object_name)?.fields
-	filters = []
+	unless filters
+		filters = []
+	unless filter_fields
+		filter_fields = []
 	if filter_fields?.length
 		filter_fields.forEach (n)->
-			if fields[n]
+			if fields[n] and !_.findWhere(filters,{field:n})
 				filters.push {
 					field: n
 					is_default: true
 				}
+	filters.forEach (filterItem)->
+		if _.include(filter_fields, filterItem.field)
+			filterItem.is_default = true
+		else
+			delete filterItem.is_default
 	return filters
 
 Template.filter_option_list.helpers Creator.helpers
@@ -162,22 +170,28 @@ Template.filter_option_list.onCreated ->
 	$(document).on "click",".creator-content-wrapper, .oneHeader", self.destroyOptionbox
 
 	self.filterItems = new ReactiveVar()
-	self.autorun -> 
+
+	self.autorun ->
 		list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 		if list_view_obj and list_view_obj.filter_logic
 			Session.set("filter_logic", list_view_obj.filter_logic)
-
-	self.autorun ->
+		
 		filters = Session.get("filter_items")
 		object_name = Template.instance().data?.object_name
 		fields = Creator.getObject(object_name)?.fields
-		unless filters?.length
-			# 报表过虑器会传入报表的filter_fields属性，否则默认取当前视图的filter_fields属性
-			filter_fields = Template.instance().data?.filter_fields
-			filters = getDefaultFilters(object_name, filter_fields)
-			if filters.length
-				Session.set("filter_items", filters)
-
+		# 报表过虑器会传入报表的filter_fields属性，否则默认取当前视图的filter_fields属性
+		is_report = Template.instance().data?.is_report
+		if is_report
+			# 报表本身未配置过滤器默认过虑字段的情况下，默认过虑为空
+			# 不能返回null或undefined，否则会默认去取Session中list_view_id对应的视图中配置的默认过虑字段
+			record_id = Session.get "record_id"
+			reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+			filter_fields = reportObject?.filter_fields
+			unless filter_fields
+				filter_fields = []
+		filters = getDefaultFilters(object_name, filter_fields, filters)
+		if filters.length
+			Session.set("filter_items", filters)
 		if filters?.length
 			self.filterItems.set(filters)
 			unless fields
@@ -224,6 +238,12 @@ Template.filter_option_list.onCreated ->
 						else
 							return moment.utc(value).format('YYYY-MM-DD')
 					if filterValue
+						if _.isString(filterValue)
+							builtinValue = Creator.getBetweenBuiltinValueItem(fieldType, filterValue)
+							# 如果是between运算符内置值，则取出对应values作为过滤值
+							# 比如value为last_year，返回对应的时间值
+							if builtinValue
+								filterValue = builtinValue.values
 						if _.isArray(filterValue)
 							if filterValue.length
 								if filterValue[0] || filterValue[1]
@@ -238,6 +258,10 @@ Template.filter_option_list.onCreated ->
 										filter.valuelabel = ">= #{startLabel}"
 									else if endLabel
 										filter.valuelabel = "<= #{endLabel}"
+									if builtinValue
+										# 如果是between运算符内置值，应该显示出内置值对应的label
+										# filter.valuelabel = "#{builtinValue.label}:#{filter.valuelabel}"
+										filter.valuelabel = "#{builtinValue.label}"
 								else
 									filter.valuelabel = ""
 						else

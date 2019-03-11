@@ -18,7 +18,7 @@ getODataFilterForReport = (object_name, filter_scope, filters, filter_logic)->
 				else
 					selector.push(format_logic)
 			else
-				filters = Creator.formatFiltersToDev(filters)
+				filters = Creator.formatFiltersToDev(filters, object_name)
 				if filters and filters.length > 0
 					if selector.length > 0
 						selector.push "and"
@@ -167,6 +167,19 @@ getSelectFieldLabel = (value, options)->
 getBooleanFieldLabel = (value, caption)->
 	return "#{caption}: #{value}"
 
+getSummaryTypeLabel = (type)->
+	switch type
+		when "sum"
+			caption = "总和"
+			break
+		when "count"
+			caption = "计数"
+			break
+		else
+			caption = "计数"
+			break
+	return caption
+
 pivotGridChart = null
 gridLoadedArray = null
 maxLoadCount = 10000
@@ -194,9 +207,19 @@ renderChart = (self)->
 			return
 		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
 		objectGroupField = objectFields[firstRowField.dataField]
-		if objectGroupField?.type == "select"
+		isSelectType = objectGroupField?.type == "select"
+		isDateType = objectGroupField?.type == "date"
+		isDatetimeType = objectGroupField?.type == "datetime"
+		if isSelectType or isDateType or isDatetimeType
 			_.each dataSourceItems, (dsi)->
-				dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+				if isSelectType
+					dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+				else if isDateType
+					# 如果不加这个转换语句，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+					dsi.key = DevExpress.localization.formatDate(dsi.key, 'yyyy-MM-dd')
+				else if isDatetimeType
+					# 如果不加这个转换语句，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+					dsi.key = DevExpress.localization.formatDate(dsi.key, 'yyyy-MM-dd hh:mm:ss')
 		dataSourceItems = dataSourceItems.sort(Creator.sortingMethod.bind({key:"key"}))
 		aggregateSeeds = []
 		aggregateKeys = []
@@ -231,7 +254,8 @@ renderChart = (self)->
 			tempSummaryType = gs.summaryType
 			tempPaneName = "#{gs.column}_#{tempSummaryType}"
 			chartPanes.push name: tempPaneName
-			tempAxisText = if tempSummaryType == "count" then "计数" else "总和"
+			tempSummaryTypeLabel = getSummaryTypeLabel tempSummaryType
+			tempAxisText = tempSummaryTypeLabel
 			unless gs.column == "_id"
 				fieldName = objectFields[gs.column]?.label
 				unless fieldName
@@ -244,7 +268,7 @@ renderChart = (self)->
 				chartItem[tempKey] = if dsi.key then dsi.key else "--"
 				chartItem[tempSummaryType] = dsi.aggregates[index1]
 				chartData.push chartItem
-				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryType}", argumentField: tempKey
+				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryTypeLabel}", argumentField: tempKey
 		dxOptions = 
 			dataSource: chartData, 
 			commonSeriesSettings: {
@@ -254,26 +278,30 @@ renderChart = (self)->
 			panes: chartPanes,
 			series: chartSeries,
 			valueAxis: chartValueAxis
-		pivotGridChart = $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart('instance')
+		module.dynamicImport("devextreme/viz/chart").then (dxChart)->
+			DevExpress.viz.dxChart = dxChart;
+			pivotGridChart =  $("#pivotgrid-chart").show().dxChart(dxOptions).dxChart("instance")
 	else
 		grid = Tracker.nonreactive ()->
 			return self.pivotGridInstance.get()
 		unless grid
 			return
-		pivotGridChart = $('#pivotgrid-chart').show().dxChart(
-			equalBarWidth: false
-			commonSeriesSettings: 
-				type: 'bar'
-			tooltip:
-				enabled: true
-			size: 
-				height: 300
-			adaptiveLayout: 
-				width: 450
-		).dxChart('instance')
-		grid.bindChart pivotGridChart,
-			dataFieldsDisplayMode: 'splitPanes'
-			alternateDataFields: false
+		module.dynamicImport("devextreme/viz/chart").then (dxChart)->
+			DevExpress.viz.dxChart = dxChart;
+			pivotGridChart =  $("#pivotgrid-chart").show().dxChart(
+				equalBarWidth: false
+				commonSeriesSettings:
+					type: 'bar'
+				tooltip:
+					enabled: true
+				size:
+					height: 300
+				adaptiveLayout:
+					width: 450
+			).dxChart('instance')
+			grid.bindChart pivotGridChart,
+				dataFieldsDisplayMode: 'splitPanes'
+				alternateDataFields: false
 
 renderTabularReport = (reportObject)->
 	self = this
@@ -305,6 +333,13 @@ renderTabularReport = (reportObject)->
 		if itemField.type == "select"
 			field.calculateDisplayValue = (rowData)->
 				return getSelectFieldLabel rowData[item], itemField.options
+		else if itemField.type == "date"
+			# 如果不加这个转换语句，则datetime会显示为2019年 2月 28日这种格式，未显示时间值
+			field.dataType = "date"
+		else if itemField.type == "datetime"
+			# 如果不加这个转换语句，则datetime会显示为2019年 2月 28日这种格式，未显示时间值
+			field.dataType = "datetime"
+
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -380,11 +415,14 @@ renderTabularReport = (reportObject)->
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
-	
-	
-	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
-
-	self.dataGridInstance?.set datagrid
+	if Steedos.isMobile()
+		# 手机上不需要导出按钮
+		delete dxOptions.export
+	datagrid = null
+	module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+		DevExpress.ui.dxDataGrid = dxDataGrid;
+		datagrid= $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
+		self.dataGridInstance?.set datagrid
 
 renderSummaryReport = (reportObject)->
 	self = this
@@ -416,6 +454,13 @@ renderSummaryReport = (reportObject)->
 		if itemField.type == "select"
 			field.calculateDisplayValue = (rowData)->
 				return getSelectFieldLabel rowData[item], itemField.options
+		else if itemField.type == "date"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "date"
+		else if itemField.type == "datetime"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "datetime"
+
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -441,6 +486,13 @@ renderSummaryReport = (reportObject)->
 		if groupField.type == "select"
 			field.calculateDisplayValue = (rowData)->
 				return getSelectFieldLabel rowData[group], groupField.options
+		else if groupField.type == "date"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "date"
+		else if groupField.type == "datetime"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "datetime"
+	
 		if sorts[group]
 			field.sortOrder = sorts[group]
 		if columnWidths[group]
@@ -495,13 +547,7 @@ renderSummaryReport = (reportObject)->
 					relate_valueField = relate_object_Fields[value.split(".")[1]]
 					if relate_valueField?.type == "number" or relate_valueField?.type == "currency"
 						operation = "sum"
-			switch operation
-				when "sum"
-					caption = "总和: {0}"
-					break
-				when "count"
-					caption = "计数: {0}"
-					break
+			caption = "#{getSummaryTypeLabel operation}: {0}"
 			summaryItem = 
 				displayFormat: caption
 				column: value
@@ -574,9 +620,14 @@ renderSummaryReport = (reportObject)->
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
-	datagrid = $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
-
-	this.dataGridInstance?.set datagrid
+	if Steedos.isMobile()
+		# 手机上不需要导出按钮
+		delete dxOptions.export
+	datagrid = null
+	module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+		DevExpress.ui.dxDataGrid = dxDataGrid;
+		datagrid= $('#datagrid').dxDataGrid(dxOptions).dxDataGrid('instance')
+		self.dataGridInstance?.set datagrid
 
 transformValue = (object_name, fields, result)->
 
@@ -711,13 +762,7 @@ renderMatrixReport = (reportObject)->
 			caption = valueField.label
 			unless caption
 				caption = objectName + "_" + value
-			switch operation
-				when "sum"
-					caption = "总和 #{caption}"
-					break
-				when "count"
-					caption = "计数 #{caption}"
-					break
+			caption = "#{getSummaryTypeLabel operation} #{caption}"
 			reportFields.push 
 				caption: caption
 				dataField: value
@@ -812,43 +857,56 @@ renderMatrixReport = (reportObject)->
 						error.message = t "creator_odata_api_not_found"
 
 	drillDownDataSource = {}
-	salesPopup = $('#drill-down-popup').dxPopup(
-		width: 600
-		height: 400
-		contentTemplate: (contentElement) ->
-			drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
-			drillDownFields = _.without drillDownFields, null, undefined
-			drillDownColumns = []
-			gridFields = self.pivotGridInstance.get().getDataSource()._fields
-			drillDownFields.forEach (n)->
-				if n == "_id"
-					return
-				# gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
-				gridFieldItem = _.findWhere(gridFields,{dataField:n})
-				drillDownColumns.push {
-					dataField: gridFieldItem.dataField
-					caption: gridFieldItem.caption
-					sortingMethod: Creator.sortingMethod
-				}
-			$('<div />').addClass('drill-down-content').dxDataGrid(
-				width: 560
-				height: 300
-				columns: drillDownColumns).appendTo contentElement
-		onShowing: ->
-			$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
-	).dxPopup('instance')
-	dxOptions.onCellClick = (e)->
-		if e.area == 'data'
-			pivotGridDataSource = e.component.getDataSource()
-			rowPathLength = e.cell.rowPath.length
-			rowPathName = e.cell.rowPath[rowPathLength - 1]
-			popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
-			drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
-			salesPopup.option 'title', popupTitle
-			salesPopup.show()
-	pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
+	salesPopup = null
+	pivotGrid = null
+	if Steedos.isMobile()
+		# 手机上不需要导出按钮
+		delete dxOptions.export
+	module.dynamicImport('devextreme/ui/popup').then (dxPopup)->
+		DevExpress.ui.dxPopup = dxPopup;
+		salesPopup = $('#drill-down-popup').dxPopup(
+			width: 600
+			height: 400
+			contentTemplate: (contentElement) ->
+				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
+				drillDownFields = _.without drillDownFields, null, undefined
+				drillDownColumns = []
+				gridFields = self.pivotGridInstance.get().getDataSource()._fields
+				drillDownFields.forEach (n)->
+					if n == "_id"
+						return
+					# gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
+					gridFieldItem = _.findWhere(gridFields,{dataField:n})
+					drillDownColumns.push {
+						dataField: gridFieldItem.dataField
+						caption: gridFieldItem.caption
+						sortingMethod: Creator.sortingMethod
+					}
+					module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+						DevExpress.ui.dxDataGrid = dxDataGrid;
+						$('<div />').addClass('drill-down-content').dxDataGrid(
+							width: 560
+							height: 300
+							columns: drillDownColumns).appendTo contentElement
+			onShowing: ->
+				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+					DevExpress.ui.dxDataGrid = dxDataGrid;
+					$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
+		).dxPopup('instance')
+		dxOptions.onCellClick = (e)->
+			if e.area == 'data'
+				pivotGridDataSource = e.component.getDataSource()
+				rowPathLength = e.cell.rowPath.length
+				rowPathName = e.cell.rowPath[rowPathLength - 1]
+				popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
+				drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
+				salesPopup.option 'title', popupTitle
+				salesPopup.show()
 
-	this.pivotGridInstance?.set pivotGrid
+		module.dynamicImport('devextreme/ui/pivot_grid').then (dxPivotGrid)->
+			DevExpress.ui.dxPivotGrid = dxPivotGrid;
+			pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
+			self.pivotGridInstance?.set pivotGrid
 
 renderReport = (reportObject)->
 	unless reportObject

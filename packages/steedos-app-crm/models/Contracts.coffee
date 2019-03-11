@@ -1,3 +1,5 @@
+db.contracts = new Meteor.Collection('contracts')
+
 Creator.Objects.contracts =
 	name: "contracts"
 	label: "合同"
@@ -10,6 +12,7 @@ Creator.Objects.contracts =
 	enable_audit: true
 	enable_api: true
 	enable_instances: true
+	enable_trash: true
 	fields:
 		no:
 			type:'text'
@@ -204,18 +207,31 @@ Creator.Objects.contracts =
 			allowedValues:["收入","支出"]
 			required:true
 
+		urlTest:
+			type: 'url'
+			label: 'url字段测试'
+		emailTest:
+			type: 'email'
+			label: 'email字段测试'
+
+#		st:
+#			type: 'summary'
+#			summaryFk: 'contract_payments'
+#			summaryFkField: 'name'
+#			operation: 'sum'
+
 	list_views:
-		recent:
-			label: "最近查看"
-			filter_scope: "space"
-		all:
-			label: "所有合同"
-			columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
-			filter_scope: "space"
-			filter_fields: ["company_id", "contract_type", "signed_date", "account", "contract_state"]
-		mine:
-			label: "我的合同"
-			filter_scope: "mine"
+			recent:
+				label: "最近查看"
+				filter_scope: "space"
+			all:
+				label: "所有合同"
+				columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
+				filter_scope: "space"
+				filter_fields: ["company_id", "contract_type", "signed_date", "account", "contract_state"]
+			mine:
+				label: "我的合同"
+				filter_scope: "mine"
 
 	permission_set:
 		user:
@@ -246,3 +262,10 @@ Creator.Objects.contracts =
 			unreadable_fields: []
 			uneditable_fields: []
 			unrelated_objects: []
+
+if Meteor.isServer
+
+	db.contracts.before.insert (userId, doc) ->
+		doc.yinhuashuilv = db.contract_types.findOne(doc.contract_type).yinhuashuilv;
+		if doc.pretax_amount 
+			doc.stamp_duty = doc.pretax_amount * doc.yinhuashuilv

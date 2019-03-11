@@ -487,10 +487,8 @@ if (Meteor.isServer)
 		# 	if existed > 0
 		# 		throw new Meteor.Error(400, "organizations_error.organizations_name_exists"))
 
-		# 根部门名字无法修改
-		if modifier.$set.name != doc.name && (doc.is_company == true) && !doc.parent
-			throw new Meteor.Error(400, "organizations_error_organization_is_company")
-
+		if modifier.$unset?.name
+			throw new Meteor.Error(400, "organizations_error_organization_name_required")
 
 	db.organizations.after.update (userId, doc, fieldNames, modifier, options) ->
 		modifier.$set = modifier.$set || {};
@@ -554,6 +552,7 @@ if (Meteor.isServer)
 						db.space_users.direct.update({_id: su._id}, {$set: {organizations: [rootOrg._id], organization: rootOrg._id, company_id: rootOrg._id}})
 						db.space_users.update_organizations_parents(su._id, [rootOrg._id])
 						db.space_users.update_company_ids(su._id, su)
+						db.space_users.update_company(su._id,rootOrg._id)
 					else if orgs.length > 1
 						new_orgs = _.filter(orgs, (org_id)->
 							return org_id isnt doc._id
@@ -561,6 +560,7 @@ if (Meteor.isServer)
 						if su.organization is doc._id
 							top_organization = db.organizations.findOne(new_orgs[0],fields:{company_id:1})
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs, organization: new_orgs[0], company_id: top_organization.company_id}})
+							db.space_users.update_company(su._id,top_organization.company_id)
 						else
 							db.space_users.direct.update({_id: su._id}, {$set: {organizations: new_orgs}})
 						db.space_users.update_organizations_parents(su._id, new_orgs)
@@ -614,6 +614,10 @@ if (Meteor.isServer)
 				childUsers = db.space_users.find({organizations: child._id}, {fields: {_id: 1, organizations: 1}})
 				childUsers.forEach (su)->
 					db.space_users.update_organizations_parents(su._id, su.organizations)
+		
+		if modifier.$set.name != this.previous.name && (doc.is_company == true) && !doc.parent
+			# 根组织名称变更时同步更新工作区名称
+			db.spaces.direct.update({_id: doc.space}, {$set: {name: modifier.$set.name}})
 
 		# 更新部门后在audit_logs表中添加一条记录
 		updatedDoc = db.organizations.findOne({_id: doc._id})

@@ -179,6 +179,12 @@ Meteor.startup ->
 	excludeDeleted = (query)->
 		query.is_deleted = { $ne: true }
 
+	# 修改、删除时，如果 doc.space = "global"，报错
+	checkGlobalRecord = (collection, id, object)->
+		if object.enable_space_global && collection.find({ _id: id, space: 'global'}).count()
+			throw new Meteor.Error(400, "不能修改或者删除标准对象")
+
+
 	SteedosOdataAPI.addRoute(':object_name', {authRequired: true, spaceRequired: false}, {
 		get: ()->
 			try
@@ -209,7 +215,7 @@ Meteor.startup ->
 						if spaceId isnt 'guest'
 							createQuery.query._id = spaceId
 					else
-						if spaceId isnt 'guest' and key != "users"
+						if spaceId isnt 'guest' and key != "users" and createQuery.query.space isnt 'global'
 							createQuery.query.space = spaceId
 
 					if Creator.isCommonSpace(spaceId)
@@ -223,7 +229,7 @@ Meteor.startup ->
 							if key is 'spaces'
 								# space 对所有用户记录为只读
 								delete createQuery.query._id
-#								createQuery.query._id = {$in: _.pluck(user_spaces, 'space')}
+								# createQuery.query._id = {$in: _.pluck(user_spaces, 'space')}
 							else
 								createQuery.query.space = {$in: _.pluck(user_spaces, 'space')}
 
@@ -258,8 +264,8 @@ Meteor.startup ->
 					if not createQuery.projection or !_.size(createQuery.projection)
 						readable_fields = Creator.getFields(key, spaceId, @userId)
 						fields = Creator.getObject(key, spaceId).fields
-						_.each readable_fields,(field)->
-							if field.indexOf('$')<0
+						_.each readable_fields, (field)->
+							if field.indexOf('$') < 0
 								#if fields[field]?.multiple!= true
 								createQuery.projection[field] = 1
 					if not permissions.viewAllRecords && !permissions.viewCompanyRecords
@@ -359,7 +365,8 @@ Meteor.startup ->
 		get:()->
 			try
 				key = @urlParams.object_name
-				if not Creator.getObject(key, @urlParams.spaceId)?.enable_api
+				object = Creator.getObject(key, @urlParams.spaceId)
+				if not object?.enable_api
 					return{
 						statusCode: 401
 						body: setErrorMessage(401)
@@ -395,21 +402,23 @@ Meteor.startup ->
 						recent_view_records_ids = _.first(recent_view_records_ids,createQuery.limit)
 					createQuery.query._id = {$in:recent_view_records_ids}
 					unreadable_fields = permissions.unreadable_fields || []
-				#	fields = Creator.getObject(key).fields
 					if createQuery.projection
 						projection = {}
 						_.keys(createQuery.projection).forEach (key)->
 							if _.indexOf(unreadable_fields, key) < 0
-							#	if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
+								# if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
 								projection[key] = 1
 						createQuery.projection = projection
 					if not createQuery.projection or !_.size(createQuery.projection)
 						readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
 						fields = Creator.getObject(key, @urlParams.spaceId).fields
-						_.each readable_fields,(field)->
-							if field.indexOf('$')<0
+						_.each readable_fields, (field)->
+							if field.indexOf('$') < 0
 								#if fields[field]?.multiple!= true
 								createQuery.projection[field] = 1
+
+					excludeDeleted(createQuery.query)
+
 					if @queryParams.$top isnt '0'
 						entities = collection.find(createQuery.query, visitorParser(createQuery)).fetch()
 					entities_index = []
@@ -493,7 +502,6 @@ Meteor.startup ->
 			catch e
 				return handleError e
 		get:()->
-
 			key = @urlParams.object_name
 			if key.indexOf("(") > -1
 				body = {}
@@ -516,18 +524,28 @@ Meteor.startup ->
 				obj = Creator.getObject(collectionName, @urlParams.spaceId)
 				field = obj.fields[fieldName]
 
-				if field  and fieldValue and (field.type is 'lookup' or field.type is 'master_detail')
+				if field and fieldValue and (field.type is 'lookup' or field.type is 'master_detail')
 					lookupCollection = Creator.getCollection(field.reference_to, @urlParams.spaceId)
-					lookupObj = Creator.getObject(field.reference_to, @urlParams.spaceId)
 					queryOptions = {fields: {}}
-					_.each lookupObj.fields, (v, k)->
-						queryOptions.fields[k] = 1
+					readable_fields = Creator.getFields(field.reference_to, @urlParams.spaceId, @userId)
+					_.each readable_fields, (f)->
+						if f.indexOf('$') < 0
+							queryOptions.fields[f] = 1
 
 					if field.multiple
-						body['value'] = lookupCollection.find({_id: {$in: fieldValue}}, queryOptions).fetch()
+						values = []
+						lookupCollection.find({_id: {$in: fieldValue}}, queryOptions).forEach (obj)->
+							_.each obj, (v, k)->
+								if _.isArray(v) || (_.isObject(v) && !_.isDate(v))
+									obj[k] = JSON.stringify(v)
+							values.push(obj)
+						body['value'] = values
 						body['@odata.context'] = SteedosOData.getMetaDataPath(@urlParams.spaceId) + "##{collectionInfo}/#{@urlParams._id}"
 					else
 						body = lookupCollection.findOne({_id: fieldValue}, queryOptions) || {}
+						_.each body, (v, k)->
+							if _.isArray(v) || (_.isObject(v) && !_.isDate(v))
+								body[k] = JSON.stringify(v)
 						body['@odata.context'] = SteedosOData.getMetaDataPath(@urlParams.spaceId) + "##{field.reference_to}/$entity"
 
 				else
@@ -565,19 +583,18 @@ Meteor.startup ->
 						else if key != 'spaces'
 							createQuery.query.space =  @urlParams.spaceId
 						unreadable_fields = permissions.unreadable_fields || []
-						#fields = Creator.getObject(key).fields
 						if createQuery.projection
 							projection = {}
 							_.keys(createQuery.projection).forEach (key)->
 								if _.indexOf(unreadable_fields, key) < 0
-								#	if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
+									# if not ((fields[key]?.type == 'lookup' or fields[key]?.type == 'master_detail') and fields[key].multiple)
 									projection[key] = 1
 							createQuery.projection = projection
 						if not createQuery.projection or !_.size(createQuery.projection)
 							readable_fields = Creator.getFields(key, @urlParams.spaceId, @userId)
-							fields = Creator.getObject(key, @urlParams.spaceId).fields
-							_.each readable_fields,(field)->
-								if field.indexOf('$')<0
+							fields = object.fields
+							_.each readable_fields, (field) ->
+								if field.indexOf('$') < 0
 									createQuery.projection[field] = 1
 						entity = collection.findOne(createQuery.query,visitorParser(createQuery))
 						entities = []
@@ -645,6 +662,7 @@ Meteor.startup ->
 
 				isAllowed = permissions.modifyAllRecords or (permissions.allowEdit and record_owner == @userId ) or (permissions.modifyCompanyRecords && isSameCompany(spaceId, @userId, companyId))
 				if isAllowed
+					checkGlobalRecord(collection, @urlParams._id, object)
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest' or spaceId is 'common' or key == "users"
 						delete selector.space
@@ -710,6 +728,7 @@ Meteor.startup ->
 				companyId = recordData?.company_id
 				isAllowed = (permissions.modifyAllRecords and permissions.allowDelete) or (permissions.modifyCompanyRecords and permissions.allowDelete and isSameCompany(spaceId, @userId, companyId)) or (permissions.allowDelete and record_owner==@userId )
 				if isAllowed
+					checkGlobalRecord(collection, @urlParams._id, object)
 					selector = {_id: @urlParams._id, space: spaceId}
 					if spaceId is 'guest'
 						delete selector.space

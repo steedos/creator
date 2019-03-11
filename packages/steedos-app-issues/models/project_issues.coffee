@@ -24,7 +24,17 @@ Creator.Objects.project_issues =
 			type: 'master_detail'
 			reference_to: 'projects'
 			filterable: true
-			is_wide: true
+		
+		priority:
+			label: '处理优先级'
+			type: "select"
+			options: [
+				{label:"高", value:"high"},
+				{label:"中", value:"medium"},
+				{label:"低", value:"low"}
+			]
+			defaultValue: "medium"
+			filterable: true
 
 		# level:
 		# 	label: "级别"
@@ -51,23 +61,14 @@ Creator.Objects.project_issues =
 			filterable: true
 
 
-		tags:
-			label: '标签'
-			type: 'lookup'
-			reference_to: 'project_tags'
-			multiple: true
-			filterable: true
+		# tags:
+		# 	label: '标签'
+		# 	type: 'lookup'
+		# 	reference_to: 'project_tags'
+		# 	multiple: true
+		# 	filterable: true
 
-		priority:
-			label: '优先级'
-			type: "select"
-			options: [
-				{label:"高", value:"high"},
-				{label:"中", value:"medium"},
-				{label:"低", value:"low"}
-			]
-			defaultValue: "medium"
-			filterable: true
+	
 
 		# owner:
 		# 	label: '责任人'
@@ -76,7 +77,7 @@ Creator.Objects.project_issues =
 		# 	hidden: false
 		# 	omit: false
 		# 	required: false
-		
+
 		owner_organization:
 			label: '受理部门'
 			type: 'lookup'
@@ -127,13 +128,13 @@ Creator.Objects.project_issues =
 			options: [
 				{label:"已提交，未确认", value:"submit"},
 				{label:"已确认，未处理", value:"Confirmed"}
-                {label:"已处理，未完成", value:"Processed"}
-                {label:"已完成，已办结", value:"solved"}   
-                {label:"已办结，未解决", value:"Unsolved"} 
+				{label:"已处理，未完成", value:"Processed"}
+				{label:"已完成，已办结", value:"solved"}
+				{label:"已办结，未解决", value:"Unsolved"}
 			]
 			defaultValue: "submit"
 			filterable: true
-   
+
 		status:
 			label: "状态"
 			type: "select"
@@ -144,7 +145,7 @@ Creator.Objects.project_issues =
 			defaultValue: "open"
 			filterable: true
 
-		
+
 
 		# investment_amount:
 		# 	label: '投资估算(万元)'
@@ -176,6 +177,11 @@ Creator.Objects.project_issues =
 		created_by:
 			label: '提报人'
 
+		instance_state:
+			omit: false
+			hidden: false
+			readonly: true
+
 
 	list_views:
 		open:
@@ -199,9 +205,9 @@ Creator.Objects.project_issues =
 
 	permission_set:
 		user:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
+			allowCreate: false
+			allowDelete: false
+			allowEdit: false
 			allowRead: true
 			modifyAllRecords: false
 			viewAllRecords: true

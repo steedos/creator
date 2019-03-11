@@ -73,34 +73,33 @@ Creator.Objects.cms_files =
 				collection.remove {"metadata.parent": doc._id}
 
 	actions:
+		standard_new:
+			label: "新建"
+			visible: false
+
 		standard_edit:
 			label: "编辑"
 			sort: 0
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
+				if object_name == Session.get('object_name')
+					# 文件详细界面编辑
+					fileRecord = Creator.getObjectRecord()
+					unless fileRecord
+						# 如果fileRecord为空说明是在文件列表界面
+						return false
+					object_name = fileRecord.parent.o
+					record_id = fileRecord.parent.ids[0]
+				else
+					# 其他记录详细界面的相关文件列表编辑
+					object_name = Session.get('object_name')
+					record_id = Session.get("record_id")
+				
+				record = Creator.getObjectRecord(object_name, record_id)
+				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
-				else
-					record = Creator.Collections[object_name].findOne record_id
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						perms = record_permissions
-
-				if object_name == Session.get('object_name')
-					fileRecord = Creator.getObjectRecord()
-					parent_record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
-					parent_perms = Creator.getRecordPermissions fileRecord.parent.o, parent_record, Meteor.userId()
-					if parent_perms["modifyAllRecords"]
-						return true
-					if parent_record && parent_record.locked
-						return false
-				else
-					parent_record = Creator.getObjectRecord()
-					parent_perms = Creator.getRecordPermissions Session.get('object_name'), parent_record, Meteor.userId()
-					if parent_perms["modifyAllRecords"]
-						return true
-					if parent_record && parent_record.locked
-						return false
 
 				return perms["allowEdit"]
 			on: "record"
@@ -109,37 +108,39 @@ Creator.Objects.cms_files =
 		standard_delete:
 			label: "删除"
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
+				if object_name == Session.get('object_name')
+					# 文件详细界面编辑
+					fileRecord = Creator.getObjectRecord()
+					unless fileRecord
+						# 如果fileRecord为空说明是在文件列表界面
+						return false
+					object_name = fileRecord.parent.o
+					record_id = fileRecord.parent.ids[0]
+				else
+					# 其他记录详细界面的相关文件列表编辑
+					object_name = Session.get('object_name')
+					record_id = Session.get("record_id")
+				
+				record = Creator.getObjectRecord(object_name, record_id)
+				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
-				else
-					record = Creator.Collections[object_name].findOne record_id
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						perms = record_permissions
 
-				if object_name == Session.get('object_name')
-					fileRecord = Creator.getObjectRecord()
-					parent_record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
-					parent_perms = Creator.getRecordPermissions fileRecord.parent.o, parent_record, Meteor.userId()
-					if parent_perms["modifyAllRecords"]
-						return true
-					if parent_record && parent_record.locked
-						return false
-				else
-					parent_record = Creator.getObjectRecord()
-					parent_perms = Creator.getRecordPermissions Session.get('object_name'), parent_record, Meteor.userId()
-					if parent_perms["modifyAllRecords"]
-						return true
-					if parent_record && parent_record.locked
-						return false
-
-				return perms["allowDelete"]
+				return perms["allowEdit"]
 			on: "record_more"
 			todo: "standard_delete"
 		download:
 			label: "下载"
-			visible: true
+			visible: (object_name, record_id, record_permissions)->
+				if object_name == Session.get('object_name')
+					# 文件详细界面编辑
+					fileRecord = Creator.getObjectRecord()
+					unless fileRecord
+						# 如果fileRecord为空说明是在文件列表界面
+						return false
+				return true
 			on: "record"
 			todo: (object_name, record_id)->
 				file = this.record
@@ -161,30 +162,25 @@ Creator.Objects.cms_files =
 			is_file: true
 			on: "record"
 			visible: (object_name, record_id, record_permissions)->
+				# 记录权限统一走Creator.getRecordPermissions函数，所以record_permissions参数值都应该是这个函数的结果
 				perms = {}
+				if object_name == Session.get('object_name')
+					# 文件详细界面编辑
+					fileRecord = Creator.getObjectRecord()
+					unless fileRecord
+						# 如果fileRecord为空说明是在文件列表界面
+						return false
+					object_name = fileRecord.parent.o
+					record_id = fileRecord.parent.ids[0]
+				else
+					# 其他记录详细界面的相关文件列表编辑
+					object_name = Session.get('object_name')
+					record_id = Session.get("record_id")
+				
+				record = Creator.getObjectRecord(object_name, record_id)
+				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
-				else
-					record = Creator.Collections[object_name].findOne record_id
-					record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
-					if record_permissions
-						perms = record_permissions
-
-				if object_name == Session.get('object_name')
-					fileRecord = Creator.getObjectRecord()
-					parent_record = Creator.getObjectRecord(fileRecord.parent.o, fileRecord.parent.ids[0])
-					parent_perms = Creator.getRecordPermissions fileRecord.parent.o, parent_record, Meteor.userId()
-					if parent_perms["modifyAllRecords"]
-						return true
-					if parent_record && parent_record.locked
-						return false
-				else
-					parent_record = Creator.getObjectRecord()
-					parent_perms = Creator.getRecordPermissions Session.get('object_name'), parent_record, Meteor.userId()
-					if parent_perms["modifyAllRecords"]
-						return true
-					if parent_record && parent_record.locked
-						return false
 
 				return perms["allowEdit"]
 			todo: (object_name, record_id)->

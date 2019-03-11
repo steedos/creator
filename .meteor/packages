@@ -39,6 +39,7 @@ accounts-ui
 accounts-password
 
 tmeasday:check-npm-versions
+fourseven:scss
 
 # fortawesome:fontawesome
 tap:i18n
@@ -55,9 +56,10 @@ steedos:creator-autoform-modals
 steedos:autoform-bs-minicolors
 steedos:autoform-file
 steedos:autoform-lookup
-yogiben:autoform-tags
+steedos:autoform-tags
 q42:autoform-markdown
 steedos:markdown@0.0.1
+steedos:autoform-dx-date-box
 
 steedos:devexpress
 
@@ -117,8 +119,6 @@ peppelg:bootstrap-3-modal@1.0.4
 
 # steedos:ionicons@0.1.7
 
-
-natestrauser:select2
 meteorhacks:unblock@1.1.0
 
 steedos:lightning-design-system
@@ -138,8 +138,6 @@ steedos:object-database
 # steedos:mini-web
 
 
-steedos:application-template
-
 steedos:mailqueue
 
 
@@ -156,19 +154,7 @@ steedos:objects
 steedos:objects-core
 steedos:objects-billing
 steedos:sso
-
-
-## 应用 apps
-steedos:app-crm
-# steedos:app-informations
-# ssteedos:app-cms
-steedos:app-workflow
-steedos:app-admin
-# steedos:app-example
-# steedos:cms
-steedos:app-meeting
-steedos:app-projects
-
+steedos:webhookqueue
 
 steedos:creator
 
@@ -201,3 +187,20 @@ steedos:app-base
 # 正式发布时开启
 # steedos:version
 steedos:audit
+steedos:version
+steedos:audit
+steedos:formbuilder
+#steedos:app-workflow
+steedos:app-admin
+
+#steedos:objects-to-yaml
+
+# 应用 apps
+# steedos:app-informations
+# ssteedos:app-cms
+# steedos:app-example
+# steedos:cms
+
+#steedos:app-crm
+#steedos:app-meeting
+#steedos:app-projects

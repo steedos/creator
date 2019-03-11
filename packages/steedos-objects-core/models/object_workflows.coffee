@@ -36,20 +36,20 @@ Creator.Objects.object_workflows =
 			type: "lookup"
 			depend_on: ["flow_id"]
 			optionsFunction: (values)->
-				instance_fields = [{value:"name",label:"申请单名称"},
-						{value:"submitter_name",label:"提交人姓名"},
-						{value:"applicant_name",label:"申请人姓名"},
-						{value:"applicant_company",label:"申请人所属单位"},
-						{value:"applicant_organization",label:"申请人所属组织"},
-						{value:"applicant_organization_name",label:"申请人所属组织名称"},
-						{value:"applicant_organization_fullname",label:"申请人所属组织全名"},
-						{value:"state",label:"申请单状态"},
-						{value:"current_step_name",label:"申请单当前步骤名称"},
-						{value:"flow_name",label:"流程名称"},
-						{value:"category_name",label:"分类名称"},
-						{value:"submit_date",label:"提交时间"},
-						{value:"finish_date",label:"结束时间"},
-						{value:"final_decision",label:"最终意见"}
+				instance_fields = [{value:"instance.name",label:"申请单名称"},
+						{value:"instance.submitter_name",label:"提交人姓名"},
+						{value:"instance.applicant_name",label:"申请人姓名"},
+						{value:"instance.applicant_company",label:"申请人所属单位"},
+						{value:"instance.applicant_organization",label:"申请人所属组织"},
+						{value:"instance.applicant_organization_name",label:"申请人所属组织名称"},
+						{value:"instance.applicant_organization_fullname",label:"申请人所属组织全名"},
+						{value:"instance.state",label:"申请单状态"},
+						{value:"instance.current_step_name",label:"申请单当前步骤名称"},
+						{value:"instance.flow_name",label:"流程名称"},
+						{value:"instance.category_name",label:"分类名称"},
+						{value:"instance.submit_date",label:"提交时间"},
+						{value:"instance.finish_date",label:"结束时间"},
+						{value:"instance.final_decision",label:"最终意见"}
 					]
 				form_fields = []
 				if values?.flow_id
@@ -99,20 +99,20 @@ Creator.Objects.object_workflows =
 			type: "lookup"
 			depend_on: ["flow_id"]
 			optionsFunction: (values)->
-				instance_fields = [{value:"name",label:"申请单名称"},
-						{value:"submitter_name",label:"提交人姓名"},
-						{value:"applicant_name",label:"申请人姓名"},
-						{value:"applicant_company",label:"申请人所属单位"},
-						{value:"applicant_organization",label:"申请人所属组织"},
-						{value:"applicant_organization_name",label:"申请人所属组织名称"},
-						{value:"applicant_organization_fullname",label:"申请人所属组织全名"},
-						{value:"state",label:"申请单状态"},
-						{value:"current_step_name",label:"申请单当前步骤名称"},
-						{value:"flow_name",label:"流程名称"},
-						{value:"category_name",label:"分类名称"},
-						{value:"submit_date",label:"提交时间"},
-						{value:"finish_date",label:"结束时间"},
-						{value:"final_decision",label:"最终意见"}
+				instance_fields = [{value:"instance.name",label:"申请单名称"},
+						{value:"instance.submitter_name",label:"提交人姓名"},
+						{value:"instance.applicant_name",label:"申请人姓名"},
+						{value:"instance.applicant_company",label:"申请人所属单位"},
+						{value:"instance.applicant_organization",label:"申请人所属组织"},
+						{value:"instance.applicant_organization_name",label:"申请人所属组织名称"},
+						{value:"instance.applicant_organization_fullname",label:"申请人所属组织全名"},
+						{value:"instance.state",label:"申请单状态"},
+						{value:"instance.current_step_name",label:"申请单当前步骤名称"},
+						{value:"instance.flow_name",label:"流程名称"},
+						{value:"instance.category_name",label:"分类名称"},
+						{value:"instance.submit_date",label:"提交时间"},
+						{value:"instance.finish_date",label:"结束时间"},
+						{value:"instance.final_decision",label:"最终意见"}
 					]
 				form_fields = []
 				if values?.flow_id

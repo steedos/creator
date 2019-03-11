@@ -20,6 +20,9 @@ Template.related_object_list.helpers
 
 	allow_create: ()->
 		related_object_name = Session.get "related_object_name"
+		if related_object_name == "cms_files"
+			# 附件列表及相关列表的新建按钮应该去掉 #940，先去掉，以后有需要可以再改为上传附件功能
+			return false
 		return Creator.getPermissions(related_object_name).allowCreate
 
 	recordsTotalCount: ()->

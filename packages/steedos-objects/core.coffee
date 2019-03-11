@@ -25,6 +25,35 @@ Meteor.startup ->
 	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
 	SimpleSchema.extendOptions({createFunction: Match.Optional(Match.OneOf(Function, String))})
 
+	if Meteor.isServer
+		_.each Creator.Objects, (obj, object_name)->
+			Creator.loadObjects obj, object_name
+
+# Creator.fiberLoadObjects 供steedos-cli项目使用
+if Meteor.isServer
+	Fiber = require('fibers')
+	Creator.fiberLoadObjects = (obj, object_name)->
+		Fiber(()->
+			Creator.loadObjects(obj, object_name)
+		).run()
+
+Creator.loadObjects = (obj, object_name)->
+	if !object_name
+		object_name = obj.name
+
+	if !obj.list_views
+		obj.list_views = {}
+
+	if obj.space
+		object_name = 'c_' + obj.space + '_' + obj.name
+
+	Creator.convertObject(obj)
+	new Creator.Object(obj);
+
+	Creator.initTriggers(object_name)
+	Creator.initListViews(object_name)
+	return obj
+
 Creator.getObjectName = (object) ->
 	if object.space
 		return "c_#{object.space}_#{object.name}"
@@ -267,6 +296,16 @@ Creator.getUserCompanyId = (userId, spaceId)->
 	su = Creator.getCollection('space_users').findOne({space: spaceId, user: userId}, {fields: {company_id:1}})
 	return su.company_id
 
+Creator.getUserCompanyIds = (userId, spaceId)->
+	userId = userId || Meteor.userId()
+	if Meteor.isClient
+		spaceId = spaceId || Session.get('spaceId')
+	else
+		if !spaceId
+			throw new Meteor.Error(400, 'miss spaceId')
+	su = Creator.getCollection('space_users').findOne({space: spaceId, user: userId}, {fields: {company_ids:1}})
+	return su?.company_ids
+
 Creator.processPermissions = (po)->
 	if po.allowCreate
 		po.allowRead = true
@@ -280,11 +319,20 @@ Creator.processPermissions = (po)->
 	if po.modifyAllRecords
 		po.allowRead = true
 		po.allowEdit = true
+		po.allowDelete = true
 		po.viewAllRecords = true
+	if po.viewCompanyRecords
+		po.allowRead = true
 	if po.modifyCompanyRecords
 		po.allowRead = true
 		po.allowEdit = true
+		po.allowDelete = true
 		po.viewCompanyRecords = true
 	return po
 
-
+if Meteor.isServer
+	if process.env.STEEDOS_STORAGE_DIR
+		Creator.steedosStorageDir = process.env.STEEDOS_STORAGE_DIR
+	else
+		path = require('path')
+		Creator.steedosStorageDir = path.resolve(path.join(__meteor_bootstrap__.serverDir, '../../../cfs'))

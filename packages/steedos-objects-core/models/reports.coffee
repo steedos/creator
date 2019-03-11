@@ -1,9 +1,10 @@
-Creator.Objects.reports = 
+Creator.Objects.reports =
 	name: "reports"
 	label: "报表"
 	icon: "report"
+	enable_space_global: true
 	fields:
-		name: 
+		name:
 			label: "名称"
 			type: "text"
 			required: true
@@ -18,7 +19,7 @@ Creator.Objects.reports =
 				{label: "摘要", value: "summary"},
 				{label: "矩阵", value: "matrix"}
 			]
-		object_name: 
+		object_name:
 			label: "对象名"
 			type: "lookup"
 			optionsFunction: ()->
@@ -36,7 +37,7 @@ Creator.Objects.reports =
 				{label: "所有", value: "space"},
 				{label: "与我相关", value: "mine"}
 			]
-		filters: 
+		filters:
 			label: "过滤条件"
 			type: "[Object]"
 			omit: true
@@ -45,16 +46,16 @@ Creator.Objects.reports =
 			blackbox: true
 			omit: true
 			hidden: true
-		"filters.$.field": 
+		"filters.$.field":
 			label: "字段名"
 			type: "text"
-		"filters.$.operation": 
+		"filters.$.operation":
 			label: "操作符"
 			type: "select"
 			defaultValue: "="
 			options: ()->
 				return Creator.getFieldOperation()
-		"filters.$.value": 
+		"filters.$.value":
 			label: "字段值"
 			# type: "text"
 			blackbox: true
@@ -62,22 +63,22 @@ Creator.Objects.reports =
 			label: "过滤逻辑"
 			type: "text"
 			omit: true
-		fields: 
+		fields:
 			label: "字段"
 			type: "lookup"
 			multiple: true
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
-		rows: 
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
+		rows:
 			label: "行"
 			type: "lookup"
 			multiple: true
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
 		columns:
 			label: "列"
 			type: "lookup"
@@ -85,15 +86,15 @@ Creator.Objects.reports =
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
-		values: 
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
+		values:
 			label: "统计"
 			type: "lookup"
 			multiple: true
 			depend_on: ["object_name"]
 			defaultIcon: "service_contract"
 			optionsFunction: (values)->
-				return Creator.getObjectLookupFieldOptions values?.object_name, true
+				return Creator.getObjectLookupFieldOptions values?.object_name, true, true
 		filter_fields:
 			label: "默认过虑字段"
 			type: "lookup"
@@ -105,10 +106,10 @@ Creator.Objects.reports =
 			label: "操作"
 			omit: true
 			blackbox: true
-		# column_width: 
+		# column_width:
 		# 	label: "排序"
 		# 	type: "object"
-		description: 
+		description:
 			label: "描述"
 			type: "textarea"
 			is_wide: true
@@ -132,16 +133,25 @@ Creator.Objects.reports =
 		default:
 			columns: ["name", "report_type", "object_name"]
 		all:
-			label: "全部报表"
+			label: "所有报表"
+			filter_scope: "space"
+			filter_fields: ["report_type", "created"]
+		application:
+			label: "应用报表"
 			filter_scope: "space"
 			filters: ()->
 				object_names = Creator.getAppObjectNames()
 				return [["object_name","=",object_names]]
 			filter_fields: ["report_type", "created"]
-
 		mine:
 			label: "我的报表"
 			filter_scope: "mine"
+			filter_fields: ["report_type", "created"]
+		global:
+			label: "标准报表"
+			filter_scope: "space"
+			filters: [["space", "=", 'global']]
+			filter_fields: ["report_type", "created"]
 	permission_set:
 		user:
 			allowCreate: true
@@ -149,11 +159,12 @@ Creator.Objects.reports =
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: true 
+			viewAllRecords: true
+			disabled_list_views: ["all"]
 		admin:
 			allowCreate: true
 			allowDelete: true
 			allowEdit: true
 			allowRead: true
 			modifyAllRecords: true
-			viewAllRecords: true 
+			viewAllRecords: true
