@@ -132,14 +132,8 @@ steedos:accounts@0.0.35
 steedos:accounts-phone@0.0.7
 steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
-steedos:app-admin@0.0.1
-steedos:app-archive@0.0.5
 steedos:app-admin@0.0.3
 steedos:app-base@0.0.1
-steedos:app-chat@0.0.1
-steedos:app-crm@0.0.1
-steedos:app-meeting@0.0.1
-steedos:app-projects@0.0.1
 steedos:app-workflow@0.0.11
 steedos:application-package@0.0.1
 steedos:audit@0.0.1
@@ -179,6 +173,7 @@ steedos:creator@0.0.9
 steedos:creator-autoform-modals@0.0.1
 steedos:datatables-extensions@0.0.1
 steedos:devexpress@18.1.4
+steedos:dzgy-archive@0.0.1
 steedos:dzgy-archive-sync@0.0.1
 steedos:e164-phones-countries@1.0.3
 steedos:formbuilder@0.0.1
@@ -207,7 +202,6 @@ steedos:useraccounts-bootstrap@1.14.2_8
 steedos:useraccounts-core@1.14.2_6
 steedos:useraccounts-flow-routing@1.14.2_4
 steedos:users-import@0.0.1
-steedos:version@1.0.6
 steedos:webhookqueue@0.0.1
 tap:i18n@1.8.2
 templating@1.3.2
