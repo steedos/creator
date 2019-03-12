@@ -2,7 +2,7 @@ stores = ['avatars', 'audios', 'images', 'videos', 'files']
 
 _.each stores, (store_name)->
     file_store
-    if Meteor.settings.public.cfs?.store == "OSS"
+    if Meteor.settings.public.cfs?.file_store == "OSS"
         if Meteor.isClient
             file_store = new FS.Store.OSS(store_name)
         else if Meteor.isServer
