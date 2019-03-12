@@ -1,4 +1,4 @@
-Creator.Objects.archive_document = 
+Creator.Objects.archive_document =
 	name: "archive_document"
 	icon: "drafts"
 	label: "文件归档"
@@ -21,11 +21,14 @@ Creator.Objects.archive_document =
 			reference_to: "flows"
 			depend_on: ["flow_category"]
 			filtersFunction: (filters, context) ->
-    			console.log('filtersFunction', filters, context);
-    			if _.isArray(context?.classification)
-     				return {category: {$in: context.classification}}
-   				else if _.isString(context?.classification) && !_.isEmpty(context?.classification)
-     				return {category: context.classification}
+				console.log('filtersFunction', filters, context);
+				if _.isArray(context?.flow_category)
+					fs = []
+					_.each context.flow_category, (fc)->
+						fs.push("(category eq '#{fc}')")
+					return "(#{fs.join(' and ')})"
+				else if _.isString(context?.flow_category) && !_.isEmpty(context?.flow_category)
+					return "(category eq '#{context.flow_category}')"
 		name:
 			type: "text"
 			label: "标题"
@@ -63,8 +66,8 @@ Creator.Objects.archive_document =
 			omit: true
 			hidden: true
 		external_id:
-			type:"text"
-			label:'表单ID'
+			type: "text"
+			label: '表单ID'
 			hidden: true
 		state:
 			type: "text"
@@ -73,24 +76,24 @@ Creator.Objects.archive_document =
 
 	list_views:
 		submit:
-			label:"我发起的"
+			label: "我发起的"
 			filter_scope: "space"
 			filters: [["submitter", "=", "{userId}"]]
-			columns:["name","flow_name","submitter","submit_date"]
+			columns: ["name", "flow_name", "submitter", "submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
 		approved:
-			label:"我审核的"
+			label: "我审核的"
 			filter_scope: "space"
 			filters: [["outbox_users", "=", "{userId}"]]
-			columns:["name","flow_name","submitter","submit_date"]
+			columns: ["name", "flow_name", "submitter", "submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
 		all:
 			label: "全部"
 			filter_scope: "space"
-			filters: [["submitter", "=", "{userId}"],'or',["outbox_users", "=", "{userId}"]]
-			columns:["name","flow_name","submitter","submit_date"]
+			filters: [["submitter", "=", "{userId}"], 'or', ["outbox_users", "=", "{userId}"]]
+			columns: ["name", "flow_name", "submitter", "submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
-	
+
 	permission_set:
 		user:
 			allowCreate: false
@@ -110,15 +113,15 @@ Creator.Objects.archive_document =
 	actions:
 		standard_view:
 			label: "查看表单"
-			visible:true
+			visible: true
 			on: "record"
-			todo:(object_name, record_id)->
+			todo: (object_name, record_id)->
 				if record_id
-					Meteor.call "archive_view", record_id, (error,result) ->
-						if result 
+					Meteor.call "archive_view", record_id, (error, result) ->
+						if result
 							if result == ""
-								toastr.error "未找到html！"							
-							console.log "result",result
+								toastr.error "未找到html！"
+							console.log "result", result
 							Steedos.openWindow(result)
 
 
