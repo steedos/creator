@@ -35,9 +35,6 @@ _minxiInstanceData = (formData, instance) ->
 
 	formData.flow = instance?.flow
 
-	# 字段映射:表单字段对应到formData
-	# field_values = InstanceManager.handlerInstanceByFieldMap(instance)
-	
 	formData.name = instance?.name
 
 	# 获取当前归档流程的名称
@@ -47,12 +44,22 @@ _minxiInstanceData = (formData, instance) ->
 		formData.flow_name = flow?.name
 		# 流程分类
 		formData.flow_category = flow?.category
+
+	# 归档到指定流程
+	if instance.flow_to_archive
+		formData.flow_name = instance.flow_to_archive
+		flowArchive = Creator.Collections["flows"].findOne({name:instance.flow_to_archive},{fields:{_id:1,category:1}})
+		if flowArchive
+			formData.flow_category = flowArchive?.category
+			formData.flow = flowArchive?._id
+	
  	
 	# 公文分类
 	# if flow?.field_map["gongwenfenlei"]
 	# 	gongwenfenlei = flow?.field_map["gongwenfenlei"]
 	# else
-	gongwenfenlei = "大众公用"
+	space = Creator.Collections['spaces'].findOne({_id:instance.space},{fields:{name:1}})
+	gongwenfenlei = space?.name || "大众公用"
 		
 	classification = Creator.Collections["archive_classification"].findOne({name:gongwenfenlei},{fields:{_id:1}})
 	formData.classification = classification?._id
