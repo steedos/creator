@@ -12,6 +12,7 @@ _checkParameter = (formData) ->
 
 # 整理档案表数据
 _minxiInstanceData = (formData, instance) ->
+	archiveSpace = RecordsSync?.settings_records_sync?.to_archive?.space
 
 	if !instance
 		return
@@ -25,7 +26,7 @@ _minxiInstanceData = (formData, instance) ->
 
 	formData.owner = instance?.submitter
 
-	formData.space = instance?.space
+	formData.space = archiveSpace || instance?.space
 
 	formData.submit_date = instance?.submit_date
 
@@ -47,11 +48,12 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 归档到指定流程
 	if instance.flow_to_archive
-		formData.flow_name = instance.flow_to_archive
-		flowArchive = Creator.Collections["flows"].findOne({name:instance.flow_to_archive},{fields:{_id:1,category:1}})
+		formData.flow = instance.flow_to_archive
+		flowArchive = Creator.Collections["flows"].findOne({_id:instance.flow_to_archive},{fields:{name:1,category:1}})
 		if flowArchive
+			formData.flow_name = flowArchive?.name
 			formData.flow_category = flowArchive?.category
-			formData.flow = flowArchive?._id
+			
 	
  	
 	# 公文分类
@@ -132,6 +134,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 	# 对象名
 	object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
 	parents = []
+	archiveSpace = RecordsSync?.settings_records_sync?.to_archive?.space
 	spaceId = instance?.space
 	apps_url = RecordsSync?.settings_records_sync?.to_archive?.apps_url
 
@@ -164,7 +167,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 					modified_by: cf?.metadata?.modified_by,
 					created: cf?.metadata?.created,
 					name: cf.name(),
-					space: spaceId,
+					space: archiveSpace,
 					extention: cf.extension()
 				})
 
@@ -191,7 +194,7 @@ _minxiAttachmentInfo = (instance, record_id) ->
 						metadata = {
 							owner: hf.metadata.owner,
 							owner_name: hf.metadata?.owner_name,
-							space: spaceId,
+							space: archiveSpace,
 							record_id: record_id,
 							object_name: object_name,
 							parent: cmsFileId,
@@ -213,7 +216,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 	admin = RecordsSync?.settings_records_sync?.to_archive?.admin
 	apps_url = RecordsSync?.settings_records_sync?.to_archive?.apps_url
 	hide_traces = RecordsSync?.settings_records_sync?.to_archive?.hide_traces
-	
+	archiveSpace = RecordsSync?.settings_records_sync?.to_archive?.space
 	space_id = instance?.space
 	ins_id = instance?._id
 
@@ -256,7 +259,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 					created: date_now,
 					created_by: user_id,
 					name: file_name,
-					space: space_id,
+					space: archiveSpace,
 					extention: 'html'
 				},
 				(error,result)->
@@ -276,7 +279,7 @@ _minxiInstanceHtml = (instance, record_id) ->
 					metadata = {
 						owner: user_id,
 						owner_name: "系统生成",
-						space: space_id,
+						space: archiveSpace,
 						record_id: record_id,
 						object_name: object_name,
 						parent: cmsFileId,
