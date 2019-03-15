@@ -167,6 +167,19 @@ getSelectFieldLabel = (value, options)->
 getBooleanFieldLabel = (value, caption)->
 	return "#{caption}: #{value}"
 
+getSummaryTypeLabel = (type)->
+	switch type
+		when "sum"
+			caption = "总和"
+			break
+		when "count"
+			caption = "计数"
+			break
+		else
+			caption = "计数"
+			break
+	return caption
+
 pivotGridChart = null
 gridLoadedArray = null
 maxLoadCount = 10000
@@ -194,9 +207,19 @@ renderChart = (self)->
 			return
 		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
 		objectGroupField = objectFields[firstRowField.dataField]
-		if objectGroupField?.type == "select"
+		isSelectType = objectGroupField?.type == "select"
+		isDateType = objectGroupField?.type == "date"
+		isDatetimeType = objectGroupField?.type == "datetime"
+		if isSelectType or isDateType or isDatetimeType
 			_.each dataSourceItems, (dsi)->
-				dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+				if isSelectType
+					dsi.key = getSelectFieldLabel dsi.key, objectGroupField.options
+				else if isDateType
+					# 如果不加这个转换语句，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+					dsi.key = DevExpress.localization.formatDate(dsi.key, 'yyyy-MM-dd')
+				else if isDatetimeType
+					# 如果不加这个转换语句，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+					dsi.key = DevExpress.localization.formatDate(dsi.key, 'yyyy-MM-dd hh:mm:ss')
 		dataSourceItems = dataSourceItems.sort(Creator.sortingMethod.bind({key:"key"}))
 		aggregateSeeds = []
 		aggregateKeys = []
@@ -231,7 +254,8 @@ renderChart = (self)->
 			tempSummaryType = gs.summaryType
 			tempPaneName = "#{gs.column}_#{tempSummaryType}"
 			chartPanes.push name: tempPaneName
-			tempAxisText = if tempSummaryType == "count" then "计数" else "总和"
+			tempSummaryTypeLabel = getSummaryTypeLabel tempSummaryType
+			tempAxisText = tempSummaryTypeLabel
 			unless gs.column == "_id"
 				fieldName = objectFields[gs.column]?.label
 				unless fieldName
@@ -244,7 +268,7 @@ renderChart = (self)->
 				chartItem[tempKey] = if dsi.key then dsi.key else "--"
 				chartItem[tempSummaryType] = dsi.aggregates[index1]
 				chartData.push chartItem
-				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryType}", argumentField: tempKey
+				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryTypeLabel}", argumentField: tempKey
 		dxOptions = 
 			dataSource: chartData, 
 			commonSeriesSettings: {
@@ -309,6 +333,13 @@ renderTabularReport = (reportObject)->
 		if itemField.type == "select"
 			field.calculateDisplayValue = (rowData)->
 				return getSelectFieldLabel rowData[item], itemField.options
+		else if itemField.type == "date"
+			# 如果不加这个转换语句，则datetime会显示为2019年 2月 28日这种格式，未显示时间值
+			field.dataType = "date"
+		else if itemField.type == "datetime"
+			# 如果不加这个转换语句，则datetime会显示为2019年 2月 28日这种格式，未显示时间值
+			field.dataType = "datetime"
+
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -384,7 +415,9 @@ renderTabularReport = (reportObject)->
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
-
+	if Steedos.isMobile()
+		# 手机上不需要导出按钮
+		delete dxOptions.export
 	datagrid = null
 	module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
 		DevExpress.ui.dxDataGrid = dxDataGrid;
@@ -421,6 +454,13 @@ renderSummaryReport = (reportObject)->
 		if itemField.type == "select"
 			field.calculateDisplayValue = (rowData)->
 				return getSelectFieldLabel rowData[item], itemField.options
+		else if itemField.type == "date"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "date"
+		else if itemField.type == "datetime"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "datetime"
+
 		if sorts[item]
 			field.sortOrder = sorts[item]
 		if columnWidths[item]
@@ -446,6 +486,13 @@ renderSummaryReport = (reportObject)->
 		if groupField.type == "select"
 			field.calculateDisplayValue = (rowData)->
 				return getSelectFieldLabel rowData[group], groupField.options
+		else if groupField.type == "date"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "date"
+		else if groupField.type == "datetime"
+			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
+			field.dataType = "datetime"
+	
 		if sorts[group]
 			field.sortOrder = sorts[group]
 		if columnWidths[group]
@@ -500,13 +547,7 @@ renderSummaryReport = (reportObject)->
 					relate_valueField = relate_object_Fields[value.split(".")[1]]
 					if relate_valueField?.type == "number" or relate_valueField?.type == "currency"
 						operation = "sum"
-			switch operation
-				when "sum"
-					caption = "总和: {0}"
-					break
-				when "count"
-					caption = "计数: {0}"
-					break
+			caption = "#{getSummaryTypeLabel operation}: {0}"
 			summaryItem = 
 				displayFormat: caption
 				column: value
@@ -579,6 +620,9 @@ renderSummaryReport = (reportObject)->
 			mode: "virtual"
 		columns: reportColumns
 		summary: reportSummary
+	if Steedos.isMobile()
+		# 手机上不需要导出按钮
+		delete dxOptions.export
 	datagrid = null
 	module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
 		DevExpress.ui.dxDataGrid = dxDataGrid;
@@ -718,13 +762,7 @@ renderMatrixReport = (reportObject)->
 			caption = valueField.label
 			unless caption
 				caption = objectName + "_" + value
-			switch operation
-				when "sum"
-					caption = "总和 #{caption}"
-					break
-				when "count"
-					caption = "计数 #{caption}"
-					break
+			caption = "#{getSummaryTypeLabel operation} #{caption}"
 			reportFields.push 
 				caption: caption
 				dataField: value
@@ -821,6 +859,9 @@ renderMatrixReport = (reportObject)->
 	drillDownDataSource = {}
 	salesPopup = null
 	pivotGrid = null
+	if Steedos.isMobile()
+		# 手机上不需要导出按钮
+		delete dxOptions.export
 	module.dynamicImport('devextreme/ui/popup').then (dxPopup)->
 		DevExpress.ui.dxPopup = dxPopup;
 		salesPopup = $('#drill-down-popup').dxPopup(

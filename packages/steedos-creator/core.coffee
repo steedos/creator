@@ -133,7 +133,7 @@ Creator.getAppObjectNames = (app_id)->
 Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
-		if v.visible != false or (includeAdmin and v._id == "admin")
+		if (v.visible != false and v._id != "admin") or (includeAdmin and v._id == "admin")
 			apps.push v
 	return apps;
 
@@ -623,7 +623,12 @@ Creator.getListViews = (object_name, spaceId, userId)->
 
 	list_views = []
 
+	isMobile = Steedos.isMobile()
+
 	_.each object.list_views, (item, item_name)->
+		if isMobile and item.type == "calendar"
+			# 手机上先不显示日历视图
+			return
 		if item_name != "default"
 			if _.indexOf(disabled_list_views, item_name) < 0 || item.owner == userId
 				list_views.push item
