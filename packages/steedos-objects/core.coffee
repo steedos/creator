@@ -10,7 +10,7 @@ Creator.subs = {}
 
 if Meteor.isServer
 	steedosCord = require('@steedos/core')
-	steedosCord.getObjectSchemaManager().loadStandardObjects()
+	steedosCord.getObjectConfigManager().loadStandardObjects()
 #	Creator.Objects = steedosCord.Objects
 #	Creator.Reports = steedosCord.Reports
 
