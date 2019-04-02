@@ -7,12 +7,33 @@ Creator.Menus = []
 Creator.Apps = {}
 Creator.Reports = {}
 Creator.subs = {}
-
+Creator.steedosSchema = {}
 if Meteor.isServer
 	steedosCord = require('@steedos/core')
 	steedosCord.getObjectConfigManager().loadStandardObjects()
-#	Creator.Objects = steedosCord.Objects
-#	Creator.Reports = steedosCord.Reports
+	# Creator.Objects = steedosCord.Objects
+	# Creator.Reports = steedosCord.Reports
+	Meteor.startup ->
+		try
+			objectql = require("@steedos/objectql")
+			newObjects = {}
+			_.each Creator.Objects, (obj, key)->
+				if /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(key)
+					newObjects[key] = obj
+			console.log('Creator.steedosSchema: ', Creator.steedosSchema)
+			Creator.steedosSchema = new objectql.SteedosSchema({
+				datasources: {
+					default: {
+						driver: 'meteor-mongo'
+						objects: newObjects
+					}
+				}
+			})
+			console.log('Creator.steedosSchema: ', Creator.steedosSchema)
+		catch e
+			console.error('@steedos/core load object error')
+			console.error(e)
+
 
 Creator.deps = {
 	app: new Tracker.Dependency
