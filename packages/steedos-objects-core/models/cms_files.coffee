@@ -43,7 +43,7 @@ Creator.Objects.cms_files =
 
 	list_views:
 		all:
-			columns: ["name", "size", "owner", "created", "modified"]
+			columns: ["name", "size", "created", "modified"]
 			extra_columns: ["versions"]
 			order: [[4, "asc"]]
 			filter_scope: "space"

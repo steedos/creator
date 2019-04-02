@@ -9,8 +9,12 @@ Creator.Objects.archive_document =
 	fields:
 		classification:
 			type: "lookup"
-			label: "公文分类"
+			label: "所属单位"
 			reference_to: "archive_classification"
+		organization:
+			type: "lookup"
+			label: "部门"
+			reference_to: "organizations"
 		flow_category:
 			type: "lookup"
 			label: "流程分类"
@@ -44,10 +48,6 @@ Creator.Objects.archive_document =
 			label: "提交人"
 			reference_to: "users"
 			default_width: 150
-		organization:
-			type: "lookup"
-			label: "部门"
-			reference_to: "organizations"
 		submit_date:
 			type: "datetime"
 			label: "提交时间"
