@@ -42,10 +42,12 @@ Creator.Objects.archive_document =
 			type: "text"
 			label: "流程名称"
 			hidden: true
+			sortable: true
 			default_width: 300
 		submitter:
 			type: "lookup"
 			label: "提交人"
+			sortable: true
 			reference_to: "users"
 			default_width: 150
 		submit_date:
