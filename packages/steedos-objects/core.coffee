@@ -17,21 +17,25 @@ if Meteor.isServer
 		try
 			objectql = require("@steedos/objectql")
 			newObjects = {}
+			objectsRolesPermission = {}
 			_.each Creator.Objects, (obj, key)->
 				if /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(key)
 					newObjects[key] = obj
-			console.log('Creator.steedosSchema: ', Creator.steedosSchema)
+				objectsRolesPermission[key] = obj.permission_set
+
 			Creator.steedosSchema = new objectql.SteedosSchema({
 				datasources: {
 					default: {
 						driver: 'meteor-mongo'
 						objects: newObjects
+						objectsRolesPermission: objectsRolesPermission
 					}
 				}
+				getRoles: (userId)->
+					# TODO 获取用户角色
+					return ['admin']
 			})
-			console.log('Creator.steedosSchema: ', Creator.steedosSchema)
 		catch e
-			console.error('@steedos/core load object error')
 			console.error(e)
 
 
