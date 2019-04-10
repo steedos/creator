@@ -1,8 +1,8 @@
 Meteor.startup ->
-	ODataRouter = require('@steedos/core').ODataRouter;
+	MeteorODataRouter = require('@steedos/core').MeteorODataRouter;
 	express = require('express');
 	app = express();
-	app.use('/api/odata/v4', ODataRouter);
+	app.use('/api/odata/v4', MeteorODataRouter);
 	WebApp.connectHandlers.use(app);
 
 # 	odataV4Mongodb = require 'odata-v4-mongodb'
