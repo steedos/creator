@@ -28,6 +28,9 @@ Template.user.helpers
 		fields = Creator.getSchema("space_users")._firstLevelSchemaKeys
 		fields.splice(_.indexOf(fields, "instances"), 1)
 		fields.splice(_.indexOf(fields, "sharing"), 1)
+		obj_fields = Creator.getObject("space_users").fields
+		fields = fields.filter (n)->
+			return !obj_fields[n]?.hidden
 		fields = Creator.getFieldsForReorder(schema, fields)
 		return fields
 
@@ -36,7 +39,6 @@ Template.user.helpers
 		userId = Session.get "record_id"
 		doc = Creator.getCollection("space_users").findOne({space: spaceId, user: userId})
 		if doc
-			console.log doc
 			return doc[key]
 	
 	showEditBtn: ()->

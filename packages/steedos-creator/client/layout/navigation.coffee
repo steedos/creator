@@ -7,18 +7,12 @@ Template.creatorNavigation.helpers
 
 	app_name: ()->
 		app = Creator.getApp()
-		return if app then t(app.name) else ""
+		unless app
+			return ""
+		return if app.label then t(app.label) else t(app.name)
 
 	app_objects: ()->
-		app = Creator.getApp()
-
-		objects = []
-		if app
-			_.each app.objects, (v)->
-				obj = Creator.getObject(v)
-				if obj?.permissions.get().allowRead and !obj.hidden
-					objects.push v
-		return objects
+		return Creator.getAppObjectNames()
 
 	object_i: ()->
 		return Creator.getObject(this)
@@ -28,7 +22,7 @@ Template.creatorNavigation.helpers
 			return "slds-is-active"
 
 	object_url: ()->
-		return Creator.getObjectUrl(String(this), null)
+		return Creator.getObjectFirstListViewUrl(String(this), null)
 
 	spaces: ->
 		return db.spaces.find();
@@ -57,6 +51,13 @@ Template.creatorNavigation.helpers
 
 	isNode: ()->
 		return Steedos.isNode()
+	
+	hideObjects: ()->
+		app = Creator.getApp()
+		if app and app._id == "admin"
+			return true
+		else
+			return false
 
 Template.creatorNavigation.events
 

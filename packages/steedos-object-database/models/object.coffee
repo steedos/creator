@@ -1,6 +1,6 @@
 #TODO object的name不能重复，需要考虑到系统表
 isRepeatedName = (doc)->
-	other = Creator.getCollection("objects").find({_id: {$ne: doc._id}, name: doc.name}, {fields:{_id: 1}})
+	other = Creator.getCollection("objects").find({_id: {$ne: doc._id}, space: doc.space, name: doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false
@@ -18,6 +18,7 @@ Creator.Objects.objects =
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
+			required: true
 		icon:
 			type: "lookup"
 			optionsFunction: ()->
@@ -36,6 +37,8 @@ Creator.Objects.objects =
 			type: "boolean"
 		enable_notes:
 			type: "boolean"
+		enable_events:
+			type: "boolean"
 		enable_api:
 			type: "boolean"
 			defaultValue: true
@@ -45,6 +48,15 @@ Creator.Objects.objects =
 			defaultValue: false
 		enable_instances:
 			type: "boolean"
+		enable_chatter:
+			type: "boolean"
+		enable_audit:
+			type: "boolean"
+		enable_trash:
+			type: "boolean"
+		enable_space_global:
+			type: "boolean"
+			defaultValue: false
 		is_view:
 			type: 'boolean'
 			defaultValue: false
@@ -57,6 +69,12 @@ Creator.Objects.objects =
 			label: "Description"
 			type: "textarea"
 			is_wide: true
+		sidebar:
+			type: "object"
+			label: "左侧列表"
+			blackbox: true
+			omit: true
+			hidden: true
 		fields:
 			type: "object"
 			label: "字段"
@@ -94,11 +112,17 @@ Creator.Objects.objects =
 		owner:
 			type: "lookup"
 			hidden: true
+		app_unique_id:
+			type: 'text'
+			hidden: true
+		app_version:
+			type: 'text',
+			hidden: true
 
 	list_views:
 		all:
 			columns: ["name", "label", "is_enable", "modified"]
-			label:"所有对象"
+			label:"全部"
 			filter_scope: "space"
 
 	permission_set:
@@ -153,6 +177,7 @@ Creator.Objects.objects =
 			when: "before.insert"
 			todo: (userId, doc)->
 				if isRepeatedName(doc)
+					console.log("object对象名称不能重复#{doc.name}")
 					throw new Meteor.Error 500, "对象名称不能重复"
 				doc.custom = true
 
@@ -183,7 +208,11 @@ Creator.Objects.objects =
 			on: "server"
 			when: "before.remove"
 			todo: (userId, doc)->
-				object_collections = Creator.getCollection(doc.name)
+
+				if doc.app_unique_id && doc.app_version
+					return
+
+				object_collections = Creator.getCollection(doc.name, doc.space)
 
 				documents = object_collections.find({},{fields: {_id: 1}})
 
@@ -195,20 +224,21 @@ Creator.Objects.objects =
 			when: "after.remove"
 			todo: (userId, doc)->
 				#删除object 后，自动删除fields、actions、triggers、permission_objects
-				Creator.getCollection("object_fields").direct.remove({object: doc.name})
+				Creator.getCollection("object_fields").direct.remove({object: doc.name, space: doc.space})
 
-				Creator.getCollection("object_actions").direct.remove({object: doc.name})
+				Creator.getCollection("object_actions").direct.remove({object: doc.name, space: doc.space})
 
-				Creator.getCollection("object_triggers").direct.remove({object: doc.name})
+				Creator.getCollection("object_triggers").direct.remove({object: doc.name, space: doc.space})
 
-				Creator.getCollection("permission_objects").direct.remove({object_name: doc.name})
+				Creator.getCollection("permission_objects").direct.remove({object_name: doc.name, space: doc.space})
 
-				Creator.getCollection("object_listviews").direct.remove({object_name: doc.name})
+				Creator.getCollection("object_listviews").direct.remove({object_name: doc.name, space: doc.space})
 
 				#drop collection
 				console.log "drop collection", doc.name
 				try
-					Creator.getCollection(doc.name)._collection.dropCollection()
+#					Creator.getCollection(doc.name)._collection.dropCollection()
+					Creator.Collections["c_#{doc.space}_#{doc.name}"]._collection.dropCollection()
 				catch e
-					console.error("#{e.stack}")
+					console.error("c_#{doc.space}_#{doc.name}", "#{e.stack}")
 					throw new Meteor.Error 500, "对象(#{doc.name})不存在或已被删除"

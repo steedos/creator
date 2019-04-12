@@ -10,8 +10,8 @@ Template.related_object_list.helpers
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
 		name_field_key = Creator.getObject(object_name).NAME_FIELD_KEY
-		if Creator.Collections[object_name].findOne(record_id)
-			return Creator.Collections[object_name].findOne(record_id)[name_field_key]
+		if Creator.getCollection(object_name).findOne(record_id)
+			return Creator.getCollection(object_name).findOne(record_id)[name_field_key]
 
 	record_url: ()->
 		object_name = Session.get "object_name"
@@ -20,13 +20,18 @@ Template.related_object_list.helpers
 
 	allow_create: ()->
 		related_object_name = Session.get "related_object_name"
+		if related_object_name == "cms_files"
+			# 附件列表及相关列表的新建按钮应该去掉 #940，先去掉，以后有需要可以再改为上传附件功能
+			return false
 		return Creator.getPermissions(related_object_name).allowCreate
 
 	recordsTotalCount: ()->
 		return Template.instance().recordsTotal.get()
 		
 	list_data: ()->
-		return {total: Template.instance().recordsTotal, is_related: true}
+		object_name = Session.get "object_name"
+		related_object_name = Session.get("related_object_name")
+		return {related_object_name:related_object_name, object_name: object_name, total: Template.instance().recordsTotal, is_related: true}
 
 
 Template.related_object_list.events
@@ -45,7 +50,8 @@ Template.related_object_list.events
 			$(".creator-add").click()
 
 	'click .btn-refresh': (event, template)->
-		Template.creator_grid.refresh()
+		dxDataGridInstance = $(event.currentTarget).closest(".related_object_list").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
+		Template.creator_grid.refresh(dxDataGridInstance)
 
 
 Template.related_object_list.onCreated ->

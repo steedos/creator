@@ -1,10 +1,20 @@
 <template name="creatorLayout">
 	{{#unless isloading}}
 	<div class="steedos layout-top-nav skin-blue-light">
-		{{> creatorHeader}}
-
-		<div class="content-wrapper">
-			{{> Template.dynamic template=main}}
+		{{#unless hiddenHeader}}
+			{{> creatorHeader}}
+		{{/unless}}
+		<div class="creator-content-wrapper {{#if split}}split{{/if}}" style="{{#if hiddenHeader}}top: 0px;{{/if}}">
+			{{#if split}}
+				<div class="split-left">
+					{{> Template.dynamic template="creatorSidebar"}}
+				</div>
+				<div class="split-right">
+					{{> Template.dynamic template=main}}
+				</div>
+			{{else}}
+				{{> Template.dynamic template=main}}
+			{{/if}}
 		</div>
 	</div>
 	<div class="connection-status">

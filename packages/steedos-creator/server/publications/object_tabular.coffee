@@ -1,4 +1,4 @@
-Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
+Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields, spaceId)->
 	unless this.userId
 		return this.ready()
 
@@ -6,13 +6,17 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 	check(ids, Array);
 	check(fields, Match.Optional(Object));
 
-	_table = Tabular.tablesByName[tableName];
-
 	_object_name = tableName.replace("creator_","")
+	_object = Creator.getObject(_object_name, spaceId)
 
-	_fields = Creator.objectsByName[_object_name]?.fields
+	if spaceId
+		_object_name = Creator.getObjectName(_object)
 
-	if !_fields || !_table
+	object_colleciton = Creator.getCollection(_object_name)
+
+
+	_fields = _object?.fields
+	if !_fields || !object_colleciton
 		return this.ready()
 
 	reference_fields = _.filter _fields, (f)->
@@ -31,7 +35,7 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 					unless /\w+(\.\$){1}\w?/.test(f)
 						field_keys[f] = 1
 				
-				return _table.collection.find({_id: {$in: ids}}, {fields: field_keys});
+				return object_colleciton.find({_id: {$in: ids}}, {fields: field_keys});
 		}
 
 		data.children = []
@@ -41,12 +45,19 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 		if keys.length < 1
 			keys = _.keys(_fields)
 
-		keys.forEach (key)->
+		_keys = []
 
+		keys.forEach (key)->
+			if _object.schema._objectKeys[key + '.']
+				_keys = _keys.concat(_.map(_object.schema._objectKeys[key + '.'], (k)->
+					return key + '.' + k
+				))
+			_keys.push(key)
+
+		_keys.forEach (key)->
 			reference_field = _fields[key]
 
 			if reference_field && (_.isFunction(reference_field.reference_to) || !_.isEmpty(reference_field.reference_to))  # and Creator.Collections[reference_field.reference_to]
-
 				data.children.push {
 					find: (parent) ->
 						try
@@ -60,7 +71,9 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 								s_k = key.replace(/\w+\.\$\.(\w+)/ig, "$1")
 								reference_ids = parent[p_k].getProperty(s_k)
 							else
-								reference_ids = parent[key]
+								reference_ids = key.split('.').reduce (o, x) ->
+										o?[x]
+								, parent
 
 							reference_to = reference_field.reference_to
 
@@ -79,7 +92,7 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 							else
 								query._id = reference_ids
 
-							reference_to_object = Creator.getObject(reference_to)
+							reference_to_object = Creator.getObject(reference_to, spaceId)
 
 							name_field_key = reference_to_object.NAME_FIELD_KEY
 
@@ -88,7 +101,7 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 							if name_field_key
 								children_fields[name_field_key] = 1
 
-							return Creator.Collections[reference_to].find(query, {
+							return Creator.getCollection(reference_to, spaceId).find(query, {
 								fields: children_fields
 							});
 						catch e
@@ -101,6 +114,6 @@ Meteor.publishComposite "steedos_object_tabular", (tableName, ids, fields)->
 		return {
 			find: ()->
 				self.unblock();
-				return _table.collection.find({_id: {$in: ids}}, {fields: fields})
+				return object_colleciton.find({_id: {$in: ids}}, {fields: fields})
 		};
 

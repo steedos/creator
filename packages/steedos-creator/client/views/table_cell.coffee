@@ -29,8 +29,10 @@ Template.creator_table_cell.onRendered ->
 		record_id = self.data._id
 		record = Creator.getCollection(object_name).findOne(record_id)
 		if record
-			if  _field.type == "grid"
-				val = record[_field.name]
+			if  _field?.type == "grid"
+				val = _field.name.split('.').reduce (o, x) ->
+								o[x]
+						, record
 
 				columns = Creator.getSchema(object_name)._objectKeys[_field.name + ".$."]
 
@@ -46,22 +48,54 @@ Template.creator_table_cell.onRendered ->
 						cellTemplate: (container, options) ->
 							field_name = _field.name + ".$." + column
 							field_name = field_name.replace(/\$\./,"")
-							cellOption = {_id: options.data._id, val: options.data[column], record_val: record, doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true}
+							cellOption = {_id: options.data._id, val: options.data[column], record_val: record, doc: options.data, field: field, field_name: field_name, object_name:object_name, hideIcon: true, is_detail_view: true}
 							Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 					return columnItem
-				
-				columns = _.compact(columns)
 
-				self.$(".cellGridContainer").dxDataGrid
-					dataSource: val,
-					columns: columns
-					showColumnLines: false
-					showRowLines: true
-					height: "auto"
+				columns = _.compact(columns)
+				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+					DevExpress.ui.dxDataGrid = dxDataGrid;
+					self.$(".cellGridContainer").dxDataGrid
+						dataSource: val,
+						columns: columns
+						showColumnLines: false
+						showRowLines: true
+						height: "auto"
+		
+		# 显示额外的其他字段
+		if _field.name == "created_by"
+			_field.extra_field = "created"
+		else if _field.name == "modified_by"
+			_field.extra_field = "modified"
+		extra_field = _field?.extra_field
+		if extra_field and self.data.is_detail_view
+			extraContainer = self.$(".cell-extra-field-container")
+			unless extraContainer.find(".creator_table_cell").length
+				currentDoc = self.data.doc
+				if extra_field.indexOf(".") > 0
+					# 子表字段取值
+					extraKeys = extra_field.split(".")
+					extraFirstLevelValue = currentDoc[extraKeys[0]]
+					extraVal = extraFirstLevelValue[extraKeys[1]]
+				else
+					extraVal = currentDoc[extra_field]
+				cellOption = {_id: currentDoc._id, val: extraVal, doc: currentDoc, field: this_object.fields[extra_field], field_name: extra_field, object_name:object_name, hideIcon: true, is_detail_view: true}
+				Blaze.renderWithData Template.creator_table_cell, cellOption, extraContainer[0]
 
 Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
+	openWindow: ()->
+		if Template.instance().data?.open_window || Template.instance().data?.is_related
+			return true
+		object_name = this.object_name
+		this_object = Creator.getObject(object_name)
+		if this_object?.open_window == true || this.reference_to # 所有的相关链接 改为弹出新窗口 #735
+			return true
+		else
+			return false
+
+
 	cellData: ()->
 		data = []
 
@@ -72,6 +106,9 @@ Template.creator_table_cell.helpers
 		this_object = Creator.getObject(object_name)
 
 		this_name_field_key = this_object.NAME_FIELD_KEY
+		if object_name == "organizations"
+			# 显示组织列表时，特殊处理name_field_key为name字段
+			this_name_field_key = "name"
 
 		_field = this.field
 
@@ -91,7 +128,7 @@ Template.creator_table_cell.helpers
 			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
 			# 有optionsFunction的情况下，reference_to不考虑数组
-			if _.isFunction(_field.optionsFunction) && !reference_to
+			if _.isFunction(_field.optionsFunction)
 				_values = this.doc || {}
 				_record_val = this.record_val
 				_val = val
@@ -107,7 +144,7 @@ Template.creator_table_cell.helpers
 						if val && _.isArray(val) && _.isArray(selectedOptions)
 							selectedOptions = Creator.getOrderlySetByIds(selectedOptions, val, "value")
 						val = selectedOptions.getProperty("label")
-				if reference_to
+				if reference_to && false
 					_.each val, (v)->
 						href = Creator.getObjectUrl(reference_to, v)
 						data.push {reference_to: reference_to,  rid: v, value: v, id: this._id, href: href}
@@ -132,7 +169,6 @@ Template.creator_table_cell.helpers
 						val = if val then [val] else []
 					try
 						# debugger;
-
 						reference_to_object = Creator.getObject(reference_to)
 
 						reference_to_object_name_field_key = reference_to_object.NAME_FIELD_KEY
@@ -161,7 +197,7 @@ Template.creator_table_cell.helpers
 									val = selectedOptions.getProperty("label").join(',')
 									data.push {value: val}
 						else
-							values = Creator.Collections[reference_to].find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
+							values = Creator.getCollection(reference_to).find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
 							values = Creator.getOrderlySetByIds(values, val)
 							values.forEach (v)->
 								href = Creator.getObjectUrl(reference_to, v._id)
@@ -169,6 +205,40 @@ Template.creator_table_cell.helpers
 					catch e
 						console.error(reference_to, e)
 						return
+		else if _field.type == "image"
+			if typeof val is "string"
+				data.push {value: val, id: this._id, isImage: true, baseUrl: Creator.getRelativeUrl("/api/files/images")}
+			else
+				data.push {value: val, id: this._id, isImages: true, baseUrl: Creator.getRelativeUrl("/api/files/images")}
+		else if _field.type == "avatar"
+			if typeof val is "string"
+				data.push {value: val, id: this._id, isImage: true, baseUrl: Creator.getRelativeUrl("/api/files/avatars")}
+			else
+				data.push {value: val, id: this._id, isImages: true, baseUrl: Creator.getRelativeUrl("/api/files/avatars")}
+		else if _field.type == "code"
+			if val
+				val = '...'
+			else
+				val = ''
+			data.push {value: val, id: this._id}
+		else if _field.type == "password"
+			if val
+				val = '******'
+			else
+				val = ''
+			data.push {value: val, id: this._id}
+		else if _field.type == "url"
+			href = val
+			if !href?.startsWith("http")
+				href = "http://" + encodeURI(href)
+			data.push({value: val, href: href, id: this._id, isUrl: true})
+		else if _field.type == "email"
+			data.push({value: val, href: href, id: this._id, isEmail: true})
+		else if _field.type == "textarea"
+			if val
+				val = val.replace(/\n/g, '\n<br>');
+				val = val.replace(/ /g, '&nbsp;');
+			data.push {value: val, id: this._id, type: _field.type}
 		else
 			if (val instanceof Date)
 				if this.agreement == "odata"
@@ -220,7 +290,6 @@ Template.creator_table_cell.helpers
 				val = formatFileSize(val)
 			else if _field.type == "number" && val
 				val = Number(val).toFixed(_field.scale)
-
 			else if _field.type == "markdown"
 				val = Spacebars.SafeString(marked(val))
 
@@ -254,3 +323,10 @@ Template.creator_table_cell.helpers
 
 	isMarkdown: (type)->
 		return type is "markdown"
+
+	isType: (type) ->
+		return this.type is type
+
+	isExtraField: () ->
+		fieldName = this.field.name
+		return fieldName == "created_by" or fieldName == "modified_by"

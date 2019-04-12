@@ -18,7 +18,7 @@ JsonRoutes.add 'post', '/api/mini/vip/match/result', (req, res, next) ->
 		result = Creator.getCollection('love_result').findOne({ space: spaceId, owner: userId })
 
 		if not result
-			throw new Meteor.Error(500, "No result")
+			throw new Meteor.Error(200, "No result")
 
 		scores = result.score || []
 
@@ -29,10 +29,22 @@ JsonRoutes.add 'post', '/api/mini/vip/match/result', (req, res, next) ->
 		recommendCount = customer.recommend_count_every_day || 3
 
 		if recommendUserIds.length >= recommendCount
-			throw new Meteor.Error(500, "Reach the upper limit")
+			throw new Meteor.Error(200, "Reach the upper limit")
 
 		userB = ''
 		score = 0
+		# {
+		# 	_id: '',
+		# 	user_b: {
+		# 		_id: '',
+		# 		name: '',
+		# 		profile: {
+		# 			sex: '',
+		# 			avatar: ''
+		# 		}
+		# 	}
+		# }
+		data = {}
 
 		i = 0
 		while i < scores.length
@@ -45,15 +57,7 @@ JsonRoutes.add 'post', '/api/mini/vip/match/result', (req, res, next) ->
 		if userB
 			now = new Date()
 
-			Creator.getCollection('love_recommend').direct.insert({
-				user_a: userId
-				user_b: userB
-				match: score
-				recommend_date: now
-				owner: userId
-				space: spaceId
-			})
-			Creator.getCollection('love_recommend_history').direct.insert({
+			Creator.getCollection('love_recommend').insert({
 				user_a: userId
 				user_b: userB
 				match: score
@@ -62,13 +66,23 @@ JsonRoutes.add 'post', '/api/mini/vip/match/result', (req, res, next) ->
 				space: spaceId
 			})
 
+			data._id = Creator.getCollection('love_recommend_history').insert({
+				user_a: userId
+				user_b: userB
+				match: score
+				recommend_date: now
+				owner: userId
+				space: spaceId
+			})
+
+			data.user_b = Meteor.users.findOne(userB, { fields: { name: 1, profile: 1, avatarUrl: 1 } })
+
 		JsonRoutes.sendResult res, {
 			code: 200,
-			data: userB
+			data: data
 		}
 		return
 	catch e
-		console.error e.stack
 		JsonRoutes.sendResult res, {
 			code: e.error
 			data: { errors: e.reason || e.message }

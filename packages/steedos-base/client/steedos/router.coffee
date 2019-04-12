@@ -13,14 +13,14 @@ FlowRouter.notFound =
 
 FlowRouter.triggers.enter [
 	()-> Session.set("router-path", FlowRouter.current().path)
-	()-> 
-		Tracker.autorun ->
-			if Session.get "is_tap_loaded"
-				appName = Steedos.getAppName()
-				if appName
-					Steedos.setAppTitle t(appName)
-				else
-					Steedos.setAppTitle "Steedos"
+	# ()-> 
+	# 	Tracker.autorun ->
+	# 		if Session.get "is_tap_loaded"
+	# 			appName = Steedos.getAppName()
+	# 			if appName
+	# 				Steedos.setAppTitle t(appName)
+	# 			else
+	# 				Steedos.setAppTitle "Steedos"
 	()-> 
 		# 变更路由时记录url作为下次登录的url
 		if Meteor.userId()
@@ -28,6 +28,12 @@ FlowRouter.triggers.enter [
 			if lastUrl != '/'
 				unless /^\/?steedos\b/.test(lastUrl)
 					localStorage.setItem('Steedos.lastURL:' + Meteor.userId(), lastUrl)
+]
+
+FlowRouter.triggers.exit [
+	()-> 
+		# 变更路由时清除current_app_id值
+		Session.set("current_app_id", null)
 ]
 
 

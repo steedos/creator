@@ -1,5 +1,5 @@
 _syncToObject = (doc) ->
-	object_fields = Creator.getCollection("object_fields").find({object: doc.object}, {
+	object_fields = Creator.getCollection("object_fields").find({space: doc.space, object: doc.object}, {
 		fields: {
 			created: 0,
 			modified: 0,
@@ -30,13 +30,13 @@ _syncToObject = (doc) ->
 				fields[k].fields = {}
 			_.extend(fields[k].fields, f)
 
-	Creator.getCollection("objects").update({name: doc.object}, {
+	Creator.getCollection("objects").update({space: doc.space, name: doc.object}, {
 		$set:
 			fields: fields
 	})
 
 isRepeatedName = (doc, name)->
-	other = Creator.getCollection("object_fields").find({object: doc.object, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
+	other = Creator.getCollection("object_fields").find({object: doc.object,  space: doc.space, _id: {$ne: doc._id}, name: name || doc.name}, {fields:{_id: 1}})
 	if other.count() > 0
 		return true
 	return false
@@ -55,6 +55,9 @@ Creator.Objects.object_fields =
 			regEx: SimpleSchema.RegEx.field
 		label:
 			type: "text"
+		is_name:
+			type: "boolean"
+			hidden: true
 		object:
 			type: "master_detail"
 			reference_to: "objects"
@@ -66,7 +69,7 @@ Creator.Objects.object_fields =
 				return _options
 		type:
 			type: "select"
-			required: true
+#			required: true
 			options:
 				text: "文本",
 				textarea: "长文本"
@@ -77,9 +80,12 @@ Creator.Objects.object_fields =
 				datetime: "日期时间"
 				number: "数值"
 				currency: "金额"
+				password: "密码"
 				lookup: "相关表"
 				master_detail: "主表/子表"
 				grid: "表格"
+				url: "网址"
+				email: "邮件地址"
 		sort_no:
 			label: "排序号"
 			type: "number"
@@ -111,6 +117,8 @@ Creator.Objects.object_fields =
 
 #		disabled:
 #			type: "boolean"
+		hidden:
+			type: "boolean"
 		#TODO 将此功能开放给用户时，需要关闭此属性
 		omit:
 			type: "boolean"
@@ -198,6 +206,7 @@ Creator.Objects.object_fields =
 				if doc.name == 'name' && modifier?.$set?.name && doc.name != modifier.$set.name
 					throw new Meteor.Error 500, "不能修改此纪录的name属性"
 				if modifier?.$set?.name && isRepeatedName(doc, modifier.$set.name)
+					console.log("update fields对象名称不能重复#{doc.name}")
 					throw new Meteor.Error 500, "对象名称不能重复"
 
 				if modifier?.$set?.reference_to
@@ -230,6 +239,7 @@ Creator.Objects.object_fields =
 #					doc.reference_to = doc.reference_to[0]
 
 				if isRepeatedName(doc)
+					console.log("insert fields对象名称不能重复#{doc.name}")
 					throw new Meteor.Error 500, "对象名称不能重复"
 				if doc?.index and (doc?.type == 'textarea' or doc?.type == 'html')
 					throw new Meteor.Error 500,'多行文本不支持建立索引'
