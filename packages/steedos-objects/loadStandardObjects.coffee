@@ -24,5 +24,21 @@ Meteor.startup ->
 				# TODO 获取用户角色
 				return ['admin']
 		})
+
+		express = require('express');
+		graphqlHTTP = require('express-graphql');
+		app = express();
+		app.use((req, res, next)->
+			# //TODO 处理userId
+			next();
+		)
+
+		_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
+			app.use("/graphql/#{name}", graphqlHTTP({
+				schema: datasource.buildGraphQLSchema(),
+				graphiql: true
+			}))
+
+		WebApp.connectHandlers.use(app);
 	catch e
 		console.error(e)
