@@ -2,6 +2,7 @@ Creator.Apps.archive_manage =
 	url: "/app/archive_manage/archive_wenshu/grid/all"
 	name: "档案管理"
 	icon_slds: "document"
+	is_creator:true
 	objects: [
 		"archive_chuantong",
 		"archive_wenshu",

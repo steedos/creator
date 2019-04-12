@@ -133,6 +133,7 @@ steedos:accounts-phone@0.0.7
 steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
 steedos:app-admin@0.0.3
+steedos:app-archive@0.0.5
 steedos:app-base@0.0.1
 steedos:app-chat@0.0.1
 steedos:app-crm@0.0.1
@@ -195,6 +196,8 @@ steedos:objects-billing@0.0.1
 steedos:objects-core@0.0.9
 steedos:odata@0.0.7
 steedos:qcloud-smsqueue@0.0.5
+steedos:qhd-archive-sync@0.0.1
+steedos:qhd-archive-xml@0.0.1
 steedos:smsqueue@0.0.4
 steedos:sso@0.0.4
 steedos:theme@0.0.30
