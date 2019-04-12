@@ -12,7 +12,6 @@ getTreeData = ()->
 	subCompany = db.organizations.find({space: Session.get('spaceId'), is_company: true}, {fields: {_id: 1, name: 1, parent: 1, parents: 1, is_company: 1}}).fetch()
 	#处理数据上下级
 	_.forEach subCompany, (item)->
-
 		listTreeCompany = localStorage.getItem("listTreeCompany")
 
 		if item.is_company
@@ -49,9 +48,9 @@ Template.list_tree_modal.events
 
 Template.list_tree_modal.onRendered ->
 	$("#creator_list_tree_modal").on('select_node.jstree', (e, data) ->
-		localStorage.setItem("listTreeCompany", data.node.data.filter)
-		if (data.node.data.filter)
-			Session.set('listTreeCompany', data.node.data.filter);
+		localStorage.setItem("listTreeCompany", data.node.id)
+		if (data.node.id)
+			Session.set('listTreeCompany', data.node.id);
 		else
 			Session.set('listTreeCompany', "-1");
 	).jstree
