@@ -27,10 +27,24 @@ Meteor.startup ->
 
 		express = require('express');
 		graphqlHTTP = require('express-graphql');
+		Cookies = require("cookies");
 		app = express();
 		app.use((req, res, next)->
-			# //TODO 处理userId
-			next();
+			cookies = new Cookies(req, res)
+			userId = req.headers['x-user-id'] || cookies.get("X-User-Id")
+			authToken = req.headers['x-auth-token'] || cookies.get("X-Auth-Token")
+			user = null
+			if userId and authToken
+				searchQuery = {}
+				searchQuery['services.resume.loginTokens.hashedToken'] = Accounts._hashLoginToken authToken
+				user = Meteor.users.findOne
+					'_id': userId
+					searchQuery
+
+			if user
+				next();
+			else
+				res.status(401).send({ errors: [{ 'message': 'You must be logged in to do this.' }] });
 		)
 
 		_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
