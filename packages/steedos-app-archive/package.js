@@ -38,10 +38,6 @@ Package.onUse(function(api) {
 	api.addFiles('archive_borrow.coffee');
 	api.addFiles('models/archive_borrow/archive_borrow.coffee');
 
-	// 档案借阅
-	api.addFiles('archive_borrow.coffee');
-	api.addFiles('models/archive_borrow/archive_borrow.coffee');
-
 	// 档案销毁
 	api.addFiles('archive_destroy.coffee');
 	api.addFiles('models/archive_destroy/archive_destroy.coffee');
