@@ -187,3 +187,5 @@ steedos:app-admin
 steedos:app-crm
 steedos:app-meeting
 steedos:app-projects
+
+steedos:oauth2-client

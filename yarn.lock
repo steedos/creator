@@ -68,7 +68,10 @@
     cookies "^0.6.1"
     devextreme "^18.2.6"
     express "^4.15.4"
+    express-graphql "^0.7.1"
     fibers "^3.1.1"
+    graphql "^14.1.1"
+    graphql-type-json "^0.2.2"
     js-yaml "3.12.2"
     jsen "^0.6.6"
     mongodb "^3.0.8"
@@ -90,8 +93,8 @@
     "@salesforce/dev-config" "^1.4.4"
     "@salesforce/kit" "^1.0.4"
     "@salesforce/ts-types" "^1.1.1"
-    "@steedos/filters" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-b4b4d0a3-b156-4da7-9af1-30b92decf9a5-1555058461691/node_modules/@steedos/filters"
-    "@steedos/standard-objects" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-b4b4d0a3-b156-4da7-9af1-30b92decf9a5-1555058461691/node_modules/@steedos/standard-objects"
+    "@steedos/filters" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-0e300316-99a1-46ab-abed-4f1602f70543-1555318294396/node_modules/@steedos/filters"
+    "@steedos/standard-objects" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-0e300316-99a1-46ab-abed-4f1602f70543-1555318294396/node_modules/@steedos/standard-objects"
     "@types/express" "^4.16.1"
     "@types/mongodb" "^3.1.22"
     "@types/node" "^11.10.4"
@@ -105,7 +108,7 @@
     express-graphql "^0.7.1"
     fibers "^3.1.1"
     globby "^9.1.0"
-    graphql "14.1.1"
+    graphql "^14.1.1"
     graphql-type-json "^0.2.2"
     jsen "^0.6.6"
     mongodb "^3.0.8"
@@ -574,6 +577,11 @@ base64id@0.1.0:
   version "0.1.0"
   resolved "http://registry.npm.taobao.org/base64id/download/base64id-0.1.0.tgz#02ce0fdeee0cef4f40080e1e73e834f0b1bfce3f"
   integrity sha1-As4P3u4M709ACA4ec+g08LG/zj8=
+
+base64url@3.x.x:
+  version "3.0.1"
+  resolved "http://registry.npm.taobao.org/base64url/download/base64url-3.0.1.tgz#6399d572e2bc3f90a9a8b22d5dbb0a32d33f788d"
+  integrity sha1-Y5nVcuK8P5CpqLItXbsKMtM/eI0=
 
 base@^0.11.1:
   version "0.11.2"
@@ -2287,6 +2295,13 @@ graphql@14.1.1:
   dependencies:
     iterall "^1.2.2"
 
+graphql@^14.1.1:
+  version "14.2.1"
+  resolved "http://registry.npm.taobao.org/graphql/download/graphql-14.2.1.tgz#779529bf9a01e7207b977a54c20670b48ca6e95c"
+  integrity sha1-d5Upv5oB5yB7l3pUwgZwtIym6Vw=
+  dependencies:
+    iterall "^1.2.2"
+
 gridfs-stream@^1.1.1:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/gridfs-stream/download/gridfs-stream-1.1.1.tgz?cache=0&other_urls=http%3A%2F%2Fregistry.npm.taobao.org%2Fgridfs-stream%2Fdownload%2Fgridfs-stream-1.1.1.tgz#3dd3a100ec2021a181282f6eb46709636074df89"
@@ -3694,6 +3709,11 @@ oauth-sign@~0.9.0:
   resolved "http://registry.npm.taobao.org/oauth-sign/download/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
   integrity sha1-R6ewFrqmi1+g7PPe4IqFxnmsZFU=
 
+oauth@0.9.x:
+  version "0.9.15"
+  resolved "http://registry.npm.taobao.org/oauth/download/oauth-0.9.15.tgz#bd1fefaf686c96b75475aed5196412ff60cfb9c1"
+  integrity sha1-vR/vr2hslrdUda7VGWQS/2DPucE=
+
 object-assign@^4.0.1, object-assign@^4.1.0:
   version "4.1.1"
   resolved "http://registry.npm.taobao.org/object-assign/download/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
@@ -4016,6 +4036,47 @@ pass-stream@~0.1.0:
   dependencies:
     readable-stream "https://github.com/jeffbski/readable-stream/archive/v1.0.2-object-transform2-ret-self.tar.gz"
 
+passport-oauth1@1.x.x:
+  version "1.1.0"
+  resolved "http://registry.npm.taobao.org/passport-oauth1/download/passport-oauth1-1.1.0.tgz#a7de988a211f9cf4687377130ea74df32730c918"
+  integrity sha1-p96YiiEfnPRoc3cTDqdN8ycwyRg=
+  dependencies:
+    oauth "0.9.x"
+    passport-strategy "1.x.x"
+    utils-merge "1.x.x"
+
+passport-oauth2@1.x.x:
+  version "1.5.0"
+  resolved "http://registry.npm.taobao.org/passport-oauth2/download/passport-oauth2-1.5.0.tgz#64babbb54ac46a4dcab35e7f266ed5294e3c4108"
+  integrity sha1-ZLq7tUrEak3Ks15/Jm7VKU48QQg=
+  dependencies:
+    base64url "3.x.x"
+    oauth "0.9.x"
+    passport-strategy "1.x.x"
+    uid2 "0.0.x"
+    utils-merge "1.x.x"
+
+passport-oauth@^1.0.0:
+  version "1.0.0"
+  resolved "http://registry.npm.taobao.org/passport-oauth/download/passport-oauth-1.0.0.tgz#90aff63387540f02089af28cdad39ea7f80d77df"
+  integrity sha1-kK/2M4dUDwIImvKM2tOep/gNd98=
+  dependencies:
+    passport-oauth1 "1.x.x"
+    passport-oauth2 "1.x.x"
+
+passport-strategy@1.x.x:
+  version "1.0.0"
+  resolved "http://registry.npm.taobao.org/passport-strategy/download/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
+  integrity sha1-tVOaqPwiWj0a0XlHbd8ja0QPUuQ=
+
+passport@^0.4.0:
+  version "0.4.0"
+  resolved "http://registry.npm.taobao.org/passport/download/passport-0.4.0.tgz#c5095691347bd5ad3b5e180238c3914d16f05811"
+  integrity sha1-xQlWkTR71a07XhgCOMORTRbwWBE=
+  dependencies:
+    passport-strategy "1.x.x"
+    pause "0.0.1"
+
 path-browserify@0.0.0:
   version "0.0.0"
   resolved "http://registry.npm.taobao.org/path-browserify/download/path-browserify-0.0.0.tgz#a0b870729aae214005b7d5032ec2cbbb0fb4451a"
@@ -4078,6 +4139,11 @@ pathval@^1.1.0:
   version "1.1.0"
   resolved "http://registry.npm.taobao.org/pathval/download/pathval-1.1.0.tgz#b942e6d4bde653005ef6b71361def8727d0645e0"
   integrity sha1-uULm1L3mUwBe9rcTYd74cn0GReA=
+
+pause@0.0.1:
+  version "0.0.1"
+  resolved "http://registry.npm.taobao.org/pause/download/pause-0.0.1.tgz#1d408b3fdb76923b9543d96fb4c9dfd535d9cb5d"
+  integrity sha1-HUCLP9t2kjuVQ9lvtMnf1TXZy10=
 
 pbkdf2@^3.0.3:
   version "3.0.17"
@@ -5493,6 +5559,11 @@ uglify-js@^3.4.9:
     commander "~2.20.0"
     source-map "~0.6.1"
 
+uid2@0.0.x:
+  version "0.0.3"
+  resolved "http://registry.npm.taobao.org/uid2/download/uid2-0.0.3.tgz#483126e11774df2f71b8b639dcd799c376162b82"
+  integrity sha1-SDEm4Rd03y9xuLY53NeZw3YWK4I=
+
 ultron@1.0.x:
   version "1.0.2"
   resolved "http://registry.npm.taobao.org/ultron/download/ultron-1.0.2.tgz#ace116ab557cd197386a4e88f4685378c8b2e4fa"
@@ -5588,7 +5659,7 @@ util@^0.10.3:
   dependencies:
     inherits "2.0.3"
 
-utils-merge@1.0.1:
+utils-merge@1.0.1, utils-merge@1.x.x:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/utils-merge/download/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=

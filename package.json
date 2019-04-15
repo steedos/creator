@@ -48,6 +48,8 @@
     "odata-v4-service-document": "0.0.3",
     "odata-v4-service-metadata": "^0.1.6",
     "parsejson": "0.0.3",
+    "passport": "^0.4.0",
+    "passport-oauth": "^1.0.0",
     "phone": "^1.0.12",
     "qs": "^6.6.0",
     "querystring": "^0.2.0",
