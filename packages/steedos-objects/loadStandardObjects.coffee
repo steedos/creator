@@ -29,7 +29,8 @@ Meteor.startup ->
 		graphqlHTTP = require('express-graphql');
 		Cookies = require("cookies");
 		app = express();
-		app.use((req, res, next)->
+		router = express.Router();
+		router.use((req, res, next)->
 			cookies = new Cookies(req, res)
 			userId = req.headers['x-user-id'] || cookies.get("X-User-Id")
 			authToken = req.headers['x-auth-token'] || cookies.get("X-Auth-Token")
@@ -48,11 +49,12 @@ Meteor.startup ->
 		)
 
 		_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
-			app.use("/graphql/#{name}", graphqlHTTP({
+			router.use("/#{name}", graphqlHTTP({
 				schema: datasource.buildGraphQLSchema(),
 				graphiql: true
 			}))
 
+		app.use('/graphql', router);
 		WebApp.connectHandlers.use(app);
 	catch e
 		console.error(e)
