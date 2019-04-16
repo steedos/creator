@@ -220,6 +220,16 @@ Creator.Objects.archive_wenshu =
 			default_width: 80
 			group:"档号"
 		
+		title:
+			type:"text"
+			label:"题名"
+			is_wide:true
+			is_name:true
+			required:true
+			searchable:true
+			default_width: 200
+			group:"内容描述"
+
 		retention_peroid:
 			type:"master_detail"
 			label:"保管期限"
@@ -256,16 +266,6 @@ Creator.Objects.archive_wenshu =
 			type: "number"
 			label:"文档序号"
 			group:"档号"
-		
-		title:
-			type:"textarea"
-			label:"题名"
-			is_wide:true
-			is_name:true
-			required:true
-			searchable:true
-			default_width: 200
-			group:"内容描述"
 		
 		parallel_title:
 			type: "text"
