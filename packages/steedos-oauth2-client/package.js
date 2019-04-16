@@ -22,7 +22,7 @@ Package.onUse(function(api) {
 	api.addFiles('checkNpm.js', 'server');
 
 
-	api.addFiles('server/router.coffee', 'server');
+	api.addFiles('server/mattermostRouter.coffee', 'server');
 
 });
 
