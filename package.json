@@ -29,7 +29,7 @@
     "express-graphql": "^0.7.1",
     "fibers": "^3.1.1",
     "gm": "^1.17.0",
-    "graphql": "14.1.1",
+    "graphql": "^14.1.1",
     "gridfs-stream": "^1.1.1",
     "js-yaml": "3.12.0",
     "jszip": "^3.1.5",
@@ -79,5 +79,8 @@
     "simplemde": "^1.11.2",
     "summernote": "^0.8.11",
     "xlsx": "0.10.6"
+  },
+  "resolutions": {
+    "graphql": "^14.1.1"
   }
 }

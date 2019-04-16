@@ -93,8 +93,8 @@
     "@salesforce/dev-config" "^1.4.4"
     "@salesforce/kit" "^1.0.4"
     "@salesforce/ts-types" "^1.1.1"
-    "@steedos/filters" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-72b52703-828c-4cc8-8184-11502107325b-1555382868088/node_modules/@steedos/filters"
-    "@steedos/standard-objects" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-72b52703-828c-4cc8-8184-11502107325b-1555382868088/node_modules/@steedos/standard-objects"
+    "@steedos/filters" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-85c1a31a-d292-4e5a-a7f6-b27f59295c41-1555406562609/node_modules/@steedos/filters"
+    "@steedos/standard-objects" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-objectql-0.0.1-85c1a31a-d292-4e5a-a7f6-b27f59295c41-1555406562609/node_modules/@steedos/standard-objects"
     "@types/express" "^4.16.1"
     "@types/mongodb" "^3.1.22"
     "@types/node" "^11.10.4"
@@ -2314,13 +2314,6 @@ graphql-type-json@^0.2.2:
   version "0.2.4"
   resolved "http://registry.npm.taobao.org/graphql-type-json/download/graphql-type-json-0.2.4.tgz#545af27903e40c061edd30840a272ea0a49992f9"
   integrity sha1-VFryeQPkDAYe3TCECicuoKSZkvk=
-
-graphql@14.1.1:
-  version "14.1.1"
-  resolved "http://registry.npm.taobao.org/graphql/download/graphql-14.1.1.tgz#d5d77df4b19ef41538d7215d1e7a28834619fac0"
-  integrity sha1-1dd99LGe9BU41yFdHnoog0YZ+sA=
-  dependencies:
-    iterall "^1.2.2"
 
 graphql@^14.1.1:
   version "14.2.1"
