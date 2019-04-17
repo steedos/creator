@@ -87,13 +87,13 @@ Creator.Objects.instances =
 			reference_to: "users"
 			label:"已办处理人"
 		traces:
-			type: [Object]
+			type: "[Object]"
 			blackbox: true
 			omit: true
 			label:"步骤审批"
 			hidden: true
 		attachments:
-			type: [Object]
+			type: "[Object]"
 			blackbox: true
 			omit: true
 			label:"附件"

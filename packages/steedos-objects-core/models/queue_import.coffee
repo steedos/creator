@@ -87,7 +87,7 @@ Creator.Objects.queue_import =
 			omit:true
 		error:
 			label:"错误信息"
-			type:["text"]
+			type:"[text]"
 			omit:true
 	list_views:
 		all:
