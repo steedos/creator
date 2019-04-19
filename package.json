@@ -7,7 +7,7 @@
   "dependencies": {
     "@babel/runtime": "^7.2.0",
     "@steedos/core": "1.1.10",
-    "@steedos/oauth2-messenger": "file:C:\\Users\\dell\\Documents\\GitHub\\object-server\\packages\\steedos-oauth2-messenger",
+    "@steedos/oauth2-messenger": "1.0.0",
     "@steedos/objectql": "0.0.3",
     "aliyun-sdk": "^1.11.12",
     "aws-sdk": "^2.0.23",

@@ -107,8 +107,10 @@
   dependencies:
     devextreme "^18.2.6"
 
-"@steedos/oauth2-messenger@file:../object-server/packages/steedos-oauth2-messenger":
+"@steedos/oauth2-messenger@1.0.0":
   version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@steedos/oauth2-messenger/-/oauth2-messenger-1.0.0.tgz#ff1223ea72fa9c8e2b2dc732ea323619b0cdc0b8"
+  integrity sha512-0xyvDOtSFiNiRSMsc4SbXYfiCu4bzObLgF2I64oiYPkkUENm8CgUT+MewGtqJxA1KNpkTWnphaRroB121GcP2Q==
   dependencies:
     cookies "^0.7.3"
     express "^4.16.4"
