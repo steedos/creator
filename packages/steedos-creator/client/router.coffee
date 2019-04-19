@@ -4,6 +4,18 @@ Accounts.onLogout ()->
 	Creator.bootstrapLoaded.set(false)
 
 checkUserSigned = (context, redirect) ->
+	listTreeCompany = localStorage.getItem("listTreeCompany")
+	if listTreeCompany
+		Session.set('listTreeCompany', listTreeCompany);
+	else
+		# 从当前用户的space_users表中获取
+		s_user = db.space_users.findOne()
+		if s_user?.company
+			localStorage.setItem("listTreeCompany", s_user?.company)
+			Session.set('listTreeCompany', s_user?.company);
+		else
+			Session.set('listTreeCompany', "-1");
+	
 	if !Meteor.userId()
 		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
 	else
@@ -25,7 +37,9 @@ checkAppPermission = (context, redirect)->
 		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
 			c.stop()
 			app_id = context.params.app_id
-			apps = _.pluck(Creator.getVisibleApps(),"_id")
+			if app_id == "admin"
+				return
+			apps = _.pluck(Creator.getVisibleApps(true),"_id")
 			if apps.indexOf(app_id) < 0
 				Session.set("app_id", null)
 				FlowRouter.go "/app"
@@ -55,7 +69,7 @@ FlowRouter.route '/app',
 			if Creator.bootstrapLoaded.get()
 				c.stop()
 				$("body").removeClass("loading")
-				apps = Creator.getVisibleApps()
+				apps = Creator.getVisibleApps(true)
 				firstAppId = apps[0]?._id
 				if firstAppId
 					FlowRouter.go '/app/' + firstAppId
@@ -70,6 +84,7 @@ FlowRouter.route '/app/:app_id',
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		Session.set("app_id", app_id)
+		Session.set("admin_template_name", null)
 		if Steedos.isMobile()
 			Tracker.autorun (c)->
 				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
@@ -215,6 +230,9 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
 
+		if queryParams?.hidden_header=="true"
+			Session.set("hidden_header", true)
+
 		Session.set("app_id", FlowRouter.getParam("app_id"))
 		Session.set("object_name", FlowRouter.getParam("object_name"))
 		Session.set("list_view_id", FlowRouter.getParam("list_view_id"))
@@ -241,3 +259,22 @@ FlowRouter.route '/app/:app_id/:object_name/calendar/',
 		
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_calendar"
+
+FlowRouter.route '/app/admin/page/:template_name', 
+	triggersEnter: [ checkUserSigned ],
+	action: (params, queryParams)->
+		template_name = params?.template_name
+		if Steedos.isMobile()
+			Tracker.autorun (c)->
+				if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+					c.stop()
+					if $(".mobile-content-wrapper ##{template_name}").length == 0
+						Meteor.defer ->
+							Blaze.renderWithData(Template[template_name], {}, $(".mobile-content-wrapper")[0], $(".layout-placeholder")[0])
+		else
+			if Meteor.userId()
+				Session.set("app_id", "admin")
+				Session.set("admin_template_name", template_name)
+				BlazeLayout.render Creator.getLayout(),
+					main: template_name
+

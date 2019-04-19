@@ -43,6 +43,14 @@ Creator.Objects.love_recommend_history =
 			label:"推荐时间"
 			type: "datetime"
 
+		heart:
+			label: "点“心”"
+			type: "boolean"
+
+		heart_at:
+			label: "点“心”时间"
+			type: "datetime"
+
 	list_views:
 		all:
 			label: "所有"
@@ -53,10 +61,10 @@ Creator.Objects.love_recommend_history =
 		user:
 			allowCreate: false
 			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		admin:
 			allowCreate: true
 			allowDelete: true
@@ -67,15 +75,15 @@ Creator.Objects.love_recommend_history =
 		member:
 			allowCreate: false
 			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 		guest:
 			allowCreate: false
 			allowDelete: false
-			allowEdit: false
+			allowEdit: true
 			allowRead: true
 			modifyAllRecords: false
-			viewAllRecords: false
+			viewAllRecords: true
 

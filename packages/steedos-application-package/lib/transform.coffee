@@ -59,6 +59,13 @@ APTransform.exportObject = (object)->
 			_field.options = _field.options.toString()
 			delete _field._options
 
+		if _.isArray(_field.options)
+			_fo = []
+			_.forEach _field.options, (_o1)->
+				_fo.push("#{_o1.label}:#{_o1.value}")
+			_field.options = _fo.join(",")
+			delete _field._options
+
 		if _field.regEx
 			_field.regEx = _field.regEx.toString()
 			delete _field._regEx
@@ -85,15 +92,15 @@ APTransform.exportObject = (object)->
 
 	return _obj
 
-
 ###
+导出数据:
 {
-	apps:[{}],
-	objects:[{}],
-    list_views:[{}],
-    permissions:[{}],
-    permission_objects:[{}],
-    reports:[{}]
+	apps:[{}], 软件包选中的apps
+	objects:[{}], 选中的object及其fields, list_views, triggers, actions, permission_set等
+    list_views:[{}], 软件包选中的list_views
+    permissions:[{}], 软件包选中的权限集
+    permission_objects:[{}], 软件包选中的权限对象
+    reports:[{}] 软件包选中的报表
 }
 ###
 APTransform.export = (record)->

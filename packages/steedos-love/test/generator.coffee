@@ -210,14 +210,14 @@ if Meteor.isDevelopment
 	###
 	Generator.init_love_test_data = (spaceId, number)->
 		console.time('init_love_test_data')
-		objects = ['love_about_me', 'love_answer', 'love_answer2', 'love_looking_for', 'love_hobby','love_work_experience', 'love_educational_experience']
+		objects = ['love_about_me', 'love_answer', 'love_answer2', 'love_looking_for', 'love_hobby','love_work_experience', 'love_educational_experience', 'love_test']
 		_.range(0, number).forEach ()->
 			Generator.space_users(spaceId, 10000, objects)
 		console.timeEnd('init_love_test_data')
 
 	Generator.space_users = (space_id, number, other_object)->
 		console.time('init_space_users')
-		main_org = Creator.getCollection('organizations').findOne({space: space_id, is_company: true}, {fields: {_id: 1}})
+		main_org = Creator.getCollection('organizations').findOne({space: space_id, is_company: true, parent: null}, {fields: {_id: 1}})
 
 		if !main_org
 			throw new Error('未找到is_company为true的部门')

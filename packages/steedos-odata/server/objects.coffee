@@ -8,7 +8,7 @@ Meteor.startup ->
 		return data;
 
 	getObject = (spaceId, userId, object_name)->
-		data = _.clone(Creator.Objects[object_name])
+		data = _.clone(Creator.Objects[Creator.getObjectName(Creator.getObject(object_name, spaceId))])
 		if !data
 			throw new Meteor.Error(500, "无效的id #{object_name}")
 
@@ -64,6 +64,11 @@ Meteor.startup ->
 			object_name = req.params?.id
 			if !object_name
 				throw new Meteor.Error(500, "Miss id")
+
+			_obj = Creator.getCollection("objects").findOne({_id: object_name})
+
+			if _obj && _obj.name
+				object_name = _obj.name
 
 			if object_name.split(',').length > 1
 				data = getObjects(spaceId, userId, object_name)

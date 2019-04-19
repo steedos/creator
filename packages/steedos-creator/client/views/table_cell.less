@@ -1,8 +1,8 @@
-.creator_table_cell{
+.creator_table_cell {
 	flex-wrap: wrap;
 	flex-direction: row;
 
-	.slds-truncate{
+	.cell-container{
 		& > a:not(:last-of-type):after {
 			content: ",";
 		}
@@ -36,6 +36,11 @@
 				}
 			}
 		}
+		img.creator-table-cell-image{
+			max-height: 60px;
+			border-radius: 6px;
+			margin: 3px 6px 3px 0;
+		}
 	}
 	.editor-preview-side {
 		display: flex;
@@ -55,10 +60,19 @@
 	}
 }
 
+
 #creator-quick-form{
 	.cell-container{
 		.fulltex{
 			white-space: pre-line;
 		}
+		img.creator-table-cell-image{
+			max-height: 80px;
+		}
 	}
+	
+	.cell-extra-field-container{
+		padding-left: 10px;
+	}
+
 }

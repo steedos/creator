@@ -24,14 +24,65 @@ Template.creator_view.onRendered ->
 			_.each fields, (f)->
 				if f.indexOf(".")  < 0
 					ref_fields[f] = 1
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields
+			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
 
 Template.creator_view.helpers Creator.helpers
 
 Template.creator_view.helpers
+	form_horizontal: ()->
+		if Session.get("app_id") == "admin"
+			return window.innerWidth > (767 + 250)
+		else
+			return window.innerWidth > 767
+
+	hasUnObjectField: (t)->
+		r = false;
+
+		if t && t.length > 0
+			_object = Creator.getObject(Session.get("object_name"))
+			_.find t, (fieldKey)->
+				if !fieldKey
+					return
+				field = _object.fields[fieldKey]
+				if _object.schema._schema[fieldKey]?.type.name != 'Object'
+					r = true;
+				if field.type == 'lookup' || field.type == 'master_detail'
+					reference_to = field.reference_to
+					if _.isFunction(reference_to)
+						reference_to = reference_to()
+					if _.isArray(reference_to)
+						r = true;
+				return r;
+		return r;
+
+	isObjectField: (fieldKey)->
+		if !fieldKey
+			return
+		_object = Creator.getObject(Session.get("object_name"))
+		return _object.schema._schema[fieldKey]?.type.name == 'Object' && _object.fields[fieldKey].type != 'lookup' && _object.fields[fieldKey].type != 'master_detail'
+
+	objectField: (fieldKey)->
+		schema = Creator.getObject(Session.get("object_name")).schema
+		name = schema._schema[fieldKey].label
+		schemaFieldKeys = _.map(schema._objectKeys[fieldKey + '.'], (k)->
+			return fieldKey + '.' + k
+		)
+		schemaFieldKeys = schemaFieldKeys.filter (key)->
+			# 子表字段不应该显示hidden字段
+			schemaFieldItem = schema._schema[key]
+			if schemaFieldItem
+				return !(schemaFieldItem.autoform?.type == "hidden")
+			else
+				return false
+
+		fields = Creator.getFieldsForReorder(schema, schemaFieldKeys)
+		return {
+			name: name
+			fields: fields
+		}
 
 	collection: ()->
-		return "Creator.Collections." + Session.get("object_name")
+		return "Creator.Collections." + Creator.getObject(Session.get("object_name"))._collection_name
 
 	schema: ()->
 		schema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(Session.get("object_name"))))
@@ -42,14 +93,16 @@ Template.creator_view.helpers
 		return schema
 
 	schemaFields: ()->
-		simpleSchema = new SimpleSchema(Creator.getObjectSchema(Creator.getObject(Session.get("object_name"))))
+		object = Creator.getObject(Session.get("object_name"))
+		simpleSchema = new SimpleSchema(Creator.getObjectSchema(object))
 		schema = simpleSchema._schema
-		firstLevelKeys = simpleSchema._firstLevelSchemaKeys
+		# 不显示created/modified，因为它们显示在created_by/modified_by字段后面
+		firstLevelKeys = _.without simpleSchema._firstLevelSchemaKeys, "created", "modified"
 		permission_fields = Creator.getFields()
 
-		_.forEach schema, (field, name)->
-			if field.type == Object && field.autoform
-				field.autoform.type = 'hidden'
+#		_.forEach schema, (field, name)->
+#			if field.type == Object && field.autoform
+#				field.autoform.type = 'hidden'
 
 		fieldGroups = []
 		fieldsForGroup = []
@@ -82,15 +135,22 @@ Template.creator_view.helpers
 
 	keyValue: (key) ->
 		record = Creator.getObjectRecord()
-		return record[key]
+#		return record[key]
+		key.split('.').reduce (o, x) ->
+				o?[x]
+		, record
 
 	keyField: (key) ->
 		fields = Creator.getObject().fields
 		return fields[key]
 
+	is_wide: (key) ->
+		fields = Creator.getObject().fields
+		return fields[key]?.is_wide
+
 	full_screen: (key) ->
 		fields = Creator.getObject().fields
-		if fields[key].type is "markdown"
+		if fields[key]?.type is "markdown"
 			return true
 		else
 			return false
@@ -127,7 +187,7 @@ Template.creator_view.helpers
 	recordPerminssion: (permissionName)->
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		record = Creator.Collections[object_name].findOne record_id
+		record = Creator.getCollection(object_name).findOne record_id
 		recordPerminssion = Creator.getRecordPermissions object_name, record, Meteor.userId()
 		if recordPerminssion
 			return recordPerminssion[permissionName]
@@ -187,6 +247,12 @@ Template.creator_view.helpers
 
 	allowCreate: ()->
 		return Creator.getPermissions(this.object_name).allowCreate
+
+	isUnlocked: ()->
+		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
+			return true
+		record = Creator.getObjectRecord()
+		return !record.locked
 
 	detail_info_visible: ()->
 		return Session.get("detail_info_visible")
@@ -250,13 +316,18 @@ Template.creator_view.helpers
 		data.object_name = Session.get("object_name")
 		data.disabled = true
 		data.parent_view = "record_details"
-		console.log data
 		return data
 
 	list_data: (obj) ->
-		console.log obj
+		object_name = Session.get "object_name"
 		related_object_name = obj.object_name
-		return {related_object_name: related_object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
+		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
+
+	enable_chatter: ()->
+		return Creator.getObject(Session.get("object_name"))?.enable_chatter
+
+	show_chatter: ()->
+		return Creator.subs["Creator"].ready() && Creator.getObjectRecord()
 
 Template.creator_view.events
 
@@ -267,7 +338,7 @@ Template.creator_view.events
 		object = Creator.getObject(objectName)
 		collection_name = object.label
 		Session.set("action_fields", undefined)
-		Session.set("action_collection", "Creator.Collections.#{objectName}")
+		Session.set("action_collection", "Creator.Collections.#{object._collection_name}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
 		if this.todo == "standard_delete"
@@ -329,7 +400,7 @@ Template.creator_view.events
 	'click .add-related-object-record': (event, template) ->
 		object_name = event.currentTarget.dataset.objectName
 		collection_name = Creator.getObject(object_name).label
-		collection = "Creator.Collections.#{object_name}"
+		collection = "Creator.Collections.#{Creator.getObject(object_name)._collection_name}"
 
 		relatedKey = ""
 		relatedValue = Session.get("record_id")
@@ -359,7 +430,7 @@ Template.creator_view.events
 		action = object.actions[actionKey]
 		collection_name = object.label
 		Session.set("action_fields", undefined)
-		Session.set("action_collection", "Creator.Collections.#{objectName}")
+		Session.set("action_collection", "Creator.Collections.#{object._collection_name}")
 		Session.set("action_collection_name", collection_name)
 		Session.set("action_save_and_insert", true)
 		Creator.executeAction objectName, action, recordId
@@ -372,6 +443,14 @@ Template.creator_view.events
 		# $(".creator-record-edit").click()
 		full_screen = this.full_screen
 		field = this.field_name
+		_fs = field.split('.')
+		if _fs.length > 1
+			schema = Creator.getObject(Session.get("object_name")).schema
+			_obj_fields = _.map(schema._objectKeys[_fs[0] + '.'], (k)->
+				return _fs[0] + '.' + k
+			)
+			field = _fs[0] + ',' + _obj_fields.join(',')
+
 		if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
 			field.push(this.field_name)
@@ -383,7 +462,7 @@ Template.creator_view.events
 		if doc
 			Session.set("cmFullScreen", full_screen)
 			Session.set("action_fields", field)
-			Session.set("action_collection", "Creator.Collections.#{object_name}")
+			Session.set("action_collection", "Creator.Collections.#{Creator.getObject(object_name)._collection_name}")
 			Session.set("action_collection_name", collection_name)
 			Session.set("action_save_and_insert", false)
 			Session.set 'cmDoc', doc
@@ -392,12 +471,15 @@ Template.creator_view.events
 				$(".btn.creator-edit").click()
 
 	'change .input-file-upload': (event, template)->
-		parent = event.currentTarget.dataset?.parent
+		dataset = event.currentTarget.dataset
+		parent = dataset?.parent
+		targetObjectName = dataset?.targetObjectName
 		files = event.currentTarget.files
 		i = 0
 		record_id = Session.get("record_id")
 		object_name = Session.get("object_name")
 		spaceId = Session.get("spaceId")
+		dxDataGridInstance = $(".related-object-tabular").find(".gridContainer.#{targetObjectName}").dxDataGrid().dxDataGrid('instance')
 		while i < files.length
 			file = files[i]
 			if !file.name
@@ -440,6 +522,7 @@ Template.creator_view.events
 							return
 						return
 					toastr.success TAPi18n.__('Attachment was added successfully')
+					Template.creator_grid.refresh dxDataGridInstance
 					return
 				error: (xhr, msg, ex) ->
 					$(document.body).removeClass 'loading'

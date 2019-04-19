@@ -1,3 +1,6 @@
+source /srv/git/nvm/nvm.sh
+nvm use v8.11.3
+meteor npm i
 #!/bin/bash
 BUNDLE_PATH="/srv/creator"
 
@@ -5,7 +8,7 @@ BUNDLE_PATH="/srv/creator"
 [ ! -d $BUNDLE_PATH ] && mkdir -p $BUNDLE_PATH || :
 
 if [ -d "$BUNDLE_PATH" ]; then
-	meteor build --server https://cn.steedos.com/creator --directory $BUNDLE_PATH --allow-superuser
+	meteor build --directory $BUNDLE_PATH --allow-superuser
 	cd $BUNDLE_PATH/bundle/programs/server
 	rm -rf node_modules
 	rm -f npm-shrinkwrap.json

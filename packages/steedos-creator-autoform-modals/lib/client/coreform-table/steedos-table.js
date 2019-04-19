@@ -97,8 +97,22 @@ if(Meteor.isClient){
 
             var key_schema = CreatorTable.getKeySchema(field)
 
+			fieldValues = AutoForm.getFieldValue(field);
 
-            var trField = template.trField.get();
+            formValues = Session.get('cmDoc') || {};
+
+			formValues[field] = fieldValues;
+
+			Session.set('cmDoc', formValues);
+
+			var trField = template.trField.get();
+
+			if(fieldValues && _.isArray(fieldValues)){
+				trField = [];
+				fieldValues.forEach(function(fv, index){
+					trField.push({index: index, value: fv })
+                })
+            }
 
             var index = trField.length;
 
@@ -157,13 +171,19 @@ if(Meteor.isClient){
             }
         },
         fieldName: function(index, value){
+
             var field = Template.instance().data.name;
+
+			var formId = AutoForm.getFormId();
+			var schema = AutoForm.getFormSchema(formId)._schema;
+
             var keys = CreatorTable.getKeys(field);
             keys = _.map(keys, function(key, i){
                 var _value = {};
                 _value.name = field + "."+ index +"." + key;
                 _value.value = value[i]
                 _value.key = field + ".$." + key;
+                _value.type = 'field-type-' + schema[_value.key].type.name;
                 return _value
             });
             return keys

@@ -20,7 +20,6 @@ displayListGrid = (object_name, app_id, list_view_id, name_field_key, icon, self
 					request.headers['X-Space-Id'] = Steedos.spaceId()
 					request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
 				onLoading: (loadOptions)->
-					console.log loadOptions
 					return
 			},
 			select: [
@@ -45,23 +44,26 @@ displayListGrid = (object_name, app_id, list_view_id, name_field_key, icon, self
 
 Template.listSwitch.onRendered ->
 	self = this
+	templateData = Template.instance().data
 
-	object_name = Template.instance().data.object_name
-	app_id = Template.instance().data.app_id
-	name_field_key = Creator.getObject(object_name).NAME_FIELD_KEY
-	icon = Creator.getObject(object_name).icon
+	module.dynamicImport('devextreme/ui/list').then (dxList)->
+		DevExpress.ui.dxList = dxList;
+		object_name = templateData.object_name
+		app_id = templateData.app_id
+		name_field_key = Creator.getObject(object_name).NAME_FIELD_KEY
+		icon = Creator.getObject(object_name).icon
 
-	this.$("#list_switch").removeClass "hidden"	
-	this.$("#list_switch").animateCss "fadeInRight", ->
+		self.$("#list_switch").removeClass "hidden"	
+		self.$("#list_switch").animateCss "fadeInRight", ->
 
-		self.autorun (c)->
-			list_view_id = self.list_view_id.get()
-			if Steedos.spaceId() and Creator.subs["CreatorListViews"].ready() and !Creator.isloading() and list_view_id
-				displayListGrid(object_name, app_id, list_view_id, name_field_key, icon, self)
-		
-		self.autorun (c)->
-			if Session.get("reload_dxlist")
-				self.$("#gridContainer").dxList("reload")
+			self.autorun (c)->
+				list_view_id = self.list_view_id.get()
+				if Steedos.spaceId() and Creator.subs["CreatorListViews"].ready() and !Creator.isloading() and list_view_id
+					displayListGrid(object_name, app_id, list_view_id, name_field_key, icon, self)
+			
+			self.autorun (c)->
+				if Session.get("reload_dxlist")
+					self.$("#gridContainer").dxList("reload")
 
 Template.listSwitch.helpers Creator.helpers
 
@@ -148,13 +150,11 @@ Template.listSwitch.onCreated ->
 			if list_views.length
 				self.list_view_id.set(list_views[0].name)
 				self.list_view_label.set(list_views[0].label)
-				console.log "list_views",self.list_view_id.get()
 			else
 				custom_list_views = Creator.Collections.object_listviews.find({object_name: object_name}).fetch()
 				if custom_list_views.length
 					self.list_view_id.set(custom_list_views[0]._id)
 					self.list_view_label.set(custom_list_views[0].name)
-					console.log "custom_list_views",self.list_view_id.get()
 			c.stop()
 	
 AutoForm.hooks addListItem:

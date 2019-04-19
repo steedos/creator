@@ -6,7 +6,7 @@ Package.describe({
 });
 
 Npm.depends({
-	'request': '2.81.0',
+	'request': '2.88.0',
 	'base-64': '0.1.0',
 	"node-schedule": "1.1.1",
 	"wechat-auth": "1.1.2",
@@ -49,6 +49,9 @@ Package.onUse(function (api) {
 	api.addFiles('server/routes/third_party_push.coffee', 'server');
 
 	api.addFiles('server/weixin_auth_init.coffee', 'server');
+
+	api.addFiles('server/routes/account_binding.coffee', 'server');
+	api.addFiles('server/routes/account_binding_use_phone.coffee', 'server');
 
 	api.export(['wxAuth'], ['server']);
 });

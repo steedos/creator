@@ -5,19 +5,36 @@ Template.creator_list_wrapper.onRendered ->
 		if Session.get("list_view_id")
 			self.$(".btn-filter-list").removeClass("slds-is-selected")
 			self.$(".filter-list-container").addClass("slds-hide")
+			self.$("#grid-search").val('')
 
 	self.autorun ->
 		if Session.get("list_view_id")
+			Session.set("standard_query", null)
 			list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
 			if list_view_obj
 				if list_view_obj.filter_scope
 					Session.set("filter_scope", list_view_obj.filter_scope)
+				else
+					Session.set("filter_scope", null)
 				if list_view_obj.filters
 					Session.set("filter_items", list_view_obj.filters)
+				else
+					Session.set("filter_items", null)
+			else
+				Session.set("filter_scope", null)
+				Session.set("filter_items", null)
+
 
 Template.creator_list_wrapper.helpers Creator.helpers
 
+isCalendarView = ()->
+	view = Creator.getListView(Session.get "object_name", Session.get("list_view_id"))
+	return view?.type == 'calendar'
+
 Template.creator_list_wrapper.helpers
+
+	isCalendarView: ()->
+		return isCalendarView()
 
 	object_listviews_fields: ()->
 		listview_fields = Creator.getObject("object_listviews").fields
@@ -36,8 +53,13 @@ Template.creator_list_wrapper.helpers
 	recordsTotalCount: ()->
 		return Template.instance().recordsTotal.get()
 	
+	sidebar_data: ()->
+		object_name = Session.get "object_name"
+		return Creator.getObject(object_name)?.sidebar
+	
 	list_data: ()->
-		return {total: Template.instance().recordsTotal}
+		object_name = Session.get "object_name"
+		return {object_name: object_name, total: Template.instance().recordsTotal}
 
 	list_views: ()->
 		Session.get("change_list_views")
@@ -81,7 +103,10 @@ Template.creator_list_wrapper.helpers
 
 	actions: ()->
 		actions = Creator.getActions()
+		isCalendar = isCalendarView()
 		actions = _.filter actions, (action)->
+			if isCalendar && action.todo == "standard_query"
+				return false
 			if action.on == "list"
 				if typeof action.visible == "function"
 					return action.visible()
@@ -103,13 +128,12 @@ Template.creator_list_wrapper.helpers
 			return true
 		return false
 
-	is_filter_list_disabled: ()->
-		list_view = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
-		if !list_view or list_view.owner != Meteor.userId()
-			return "disabled"
-
 	is_filter_changed: ()->
 		list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+		is_filter_list_disabled = !list_view_obj or list_view_obj.owner != Meteor.userId()
+		if is_filter_list_disabled
+			# 只读视图不能存在到数据库
+			return false
 		if list_view_obj
 			original_filter_scope = list_view_obj.filter_scope
 			original_filter_items = list_view_obj.filters
@@ -137,6 +161,20 @@ Template.creator_list_wrapper.helpers
 			list_views = Creator.getListViews()
 			Session.set("list_view_id", list_views[0]._id)
 
+	isTree: ()->
+		objectName = Session.get("object_name")
+		object = Creator.getObject(objectName)
+		return object.enable_tree
+
+transformFilters = (filters)->
+	_filters = []
+	_.each filters, (f)->
+		if _.isArray(f) && f.length == 3
+			_filters.push {field: f[0], operation: f[1], value: f[2]}
+		else
+			_filters.push f
+	return _filters
+
 Template.creator_list_wrapper.events
 
 	'click .list-action-custom': (event) ->
@@ -146,7 +184,10 @@ Template.creator_list_wrapper.events
 		Session.set("action_fields", undefined)
 		Session.set("action_collection", "Creator.Collections.#{objectName}")
 		Session.set("action_collection_name", collection_name)
-		Session.set("action_save_and_insert", true)
+		if isCalendarView()
+			Session.set("action_save_and_insert", false)
+		else
+			Session.set("action_save_and_insert", true)
 		Creator.executeAction objectName, this
 
 	'click .export-data-grid': (event, template)->
@@ -163,6 +204,23 @@ Template.creator_list_wrapper.events
 	'click .add-list-view': (event, template)->
 		$(".btn-add-list-view").click()
 
+	'click .copy-list-view': (event, template)->
+
+		current_list_view = _.clone(Creator.getListView(Session.get("object_name"), Session.get("list_view_id")))
+
+		delete current_list_view._id
+
+		delete current_list_view.name
+
+		delete current_list_view.label
+
+		if current_list_view.filters
+			current_list_view.filters = transformFilters(current_list_view.filters)
+
+		Session.set "cmDoc", current_list_view
+
+		$(".btn-add-list-view").click()
+
 	'click .reset-column-width': (event, template)->
 		list_view_id = Session.get("list_view_id")
 		object_name = Session.get("object_name")
@@ -170,6 +228,8 @@ Template.creator_list_wrapper.events
 		column_width = {}
 		_.each grid_settings?.settings[list_view_id]?.column_width,(val, key)->
 			if key == "_id_checkbox"
+				column_width[key] = 60
+			else if key == '_index'
 				column_width[key] = 60
 			else if key == '_id_actions'
 				column_width[key] = 46
@@ -238,7 +298,30 @@ Template.creator_list_wrapper.events
 
 	'click .btn-refresh': (event, template)->
 		$(".slds-icon-standard-refresh", event.currentTarget).animateCss("rotate")
-		Template["creator_#{FlowRouter.getParam('template')}"]?.refresh()
+		dxDataGridInstance = $(event.currentTarget).closest(".filter-list-wraper").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
+		Template["creator_#{FlowRouter.getParam('template')}"]?.refresh(dxDataGridInstance)
+
+	'keydown input#grid-search': (event, template)->
+		if event.keyCode == "13" or event.key == "Enter"
+			searchKey = $(event.currentTarget).val().trim()
+			object_name = Session.get("object_name")
+			obj = Creator.getObject(object_name)
+			if searchKey
+				if obj.enable_tree
+					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText(searchKey)
+				else
+					obj_fields = obj.fields
+					query = {}
+					_.each obj_fields, (field,field_name)->
+						if field.searchable || field_name == obj.NAME_FIELD_KEY
+							query[field_name] = searchKey
+					standard_query = object_name: object_name, query: query, is_mini: true
+					Session.set 'standard_query', standard_query
+			else
+				if obj.enable_tree
+					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText()
+				else
+					Session.set 'standard_query', null
 
 
 Template.creator_list_wrapper.onCreated ->
@@ -252,6 +335,9 @@ Template.creator_list_wrapper.onDestroyed ->
 
 AutoForm.hooks addListView:
 	onSuccess: (formType,result)->
+		app_id = Session.get("app_id")
+		object_name = Session.get("object_name")
 		list_view_id = result._id
-		Session.set("list_view_id", list_view_id)
+		url = "/app/" + app_id + "/" + object_name + "/grid/" + list_view_id
+		FlowRouter.go url
 			

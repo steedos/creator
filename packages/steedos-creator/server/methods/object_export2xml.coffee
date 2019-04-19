@@ -1,7 +1,7 @@
-xml2js = Npm.require 'xml2js'
-fs = Npm.require 'fs'
-path = Npm.require 'path'
-mkdirp = Npm.require 'mkdirp'
+xml2js = require 'xml2js'
+fs = require 'fs'
+path = require 'path'
+mkdirp = require 'mkdirp'
 
 logger = new Logger 'Export_TO_XML'
 
@@ -100,7 +100,7 @@ _mixRelatedData = (obj,objName) ->
 
 		# 根据找出的关联字段，查子表数据
 		if related_field_name
-			relatedCollection = Creator.Collections[relatedObjName]
+			relatedCollection = Creator.getCollection(relatedObjName)
 			# 获取到所有的数据
 			relatedRecordList = relatedCollection.find({"#{related_field_name}":obj._id}).fetch()
 			# 循环每一条数据
@@ -125,7 +125,7 @@ Creator.Export2xml = (objName, recordList) ->
 	# objName = "archive_records"
 
 	# 查找对象数据
-	collection = Creator.Collections[objName]
+	collection = Creator.getCollection(objName)
 	# 测试数据
 	recordList = collection.find({}).fetch()
 

@@ -12,15 +12,19 @@ Meteor.startup ->
 	# 		Creator.subs["objectRecentViewed"].subscribe "object_recent_viewed", Session.get("object_name")
 
 	Tracker.autorun (c)->
+		if Session.get("spaceId")
+			Creator.subs["Creator"].subscribe 'subCompany', Session.get('spaceId')
+
+	Tracker.autorun (c)->
 		if Session.get("object_name") and Session.get("spaceId")
 			Creator.subs["CreatorListViews"].subscribe "object_listviews", Session.get("object_name"), Session.get("spaceId")
 
 	Tracker.autorun (c)->
 		if Creator.subs["CreatorListViews"].ready() && Creator.bootstrapLoaded.get()
 			object_listViews = Creator.getCollection("object_listviews").find({space: Session.get("spaceId"), object_name: Session.get("object_name")})
-			if !Creator.Objects[Session.get("object_name")]
+			if !Creator.getObject(Session.get("object_name"))
 				return
-			list_views = Creator.Objects[Session.get("object_name")].list_views
+			list_views = Creator.getObject(Session.get("object_name")).list_views
 			list_views_byname = Creator.getObject(Session.get("object_name")).list_views
 			defaultColumns = Creator.getObjectDefaultColumns(Session.get("object_name"))
 			object_listViews.forEach (listview)->
@@ -57,10 +61,10 @@ Meteor.startup ->
 Meteor.startup ->
 	Tracker.autorun (c)->
 		if Session.get("object_name") and Session.get("record_id")
-			Creator.subs["CreatorRecord"].subscribe "creator_object_record", Session.get("object_name"), Session.get("record_id") 
+			Creator.subs["CreatorRecord"].subscribe "creator_object_record", Session.get("object_name"), Session.get("record_id"), Session.get('spaceId')
 
 	Tracker.autorun (c)->
 		if Session.get("action_object_name") and Session.get("action_record_id")
-			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id")
+			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), Session.get('spaceId')
 
 
