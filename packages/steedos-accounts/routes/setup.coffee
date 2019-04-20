@@ -16,10 +16,10 @@ Setup.clearAuthCookies = (req, res) ->
 		else if req.headers.referer
 			uri = new URI(req.headers.referer)
 
-		cookies.set "X-User-Id", "", 
+		cookies.set "X-User-Id", "",
 			domain: uri?.domain(),
 			overwrite: true
-		cookies.set "X-Auth-Token", "", 
+		cookies.set "X-Auth-Token", "",
 			domain: uri?.domain(),
 			overwrite: true
 
@@ -28,12 +28,12 @@ Setup.setAuthCookies = (req, res, userId, authToken) ->
 		# set cookie to response
 		# maxAge 3 month
 		# uri = new URI(req.headers.origin);
-		cookies.set "X-User-Id", userId, 
+		cookies.set "X-User-Id", userId,
 			# domain: uri.domain(),
 			maxAge: 90*60*60*24*1000,
 			httpOnly: false
 			overwrite: true
-		cookies.set "X-Auth-Token", authToken, 
+		cookies.set "X-Auth-Token", authToken,
 			# domain: uri.domain(),
 			maxAge: 90*60*60*24*1000,
 			httpOnly: false
@@ -62,12 +62,12 @@ JsonRoutes.add "post", "/api/setup/validate", (req, res, next) ->
 		if user
 			Setup.setAuthCookies(req, res, userId, authToken)
 
-			JsonRoutes.sendResult res, 
-				data: 
+			JsonRoutes.sendResult res,
+				data:
 					userId: user._id
 					authToken: authToken
 					apps: []
-					dsInfo: 
+					dsInfo:
 						dsid: user._id
 						steedosId: user.steedos_id
 						name: user.name
@@ -84,11 +84,11 @@ JsonRoutes.add "post", "/api/setup/validate", (req, res, next) ->
 			return
 
 
-	JsonRoutes.sendResult res, 
+	JsonRoutes.sendResult res,
 		code: 401,
-		data: 
-			"error": "Validate Request -- Missing X-Auth-Token", 
-			"instance": "1329598861", 
+		data:
+			"error": "Validate Request -- Missing X-Auth-Token",
+			"instance": "1329598861",
 			"success": false
 
 
@@ -119,7 +119,7 @@ JsonRoutes.add "post", "/api/setup/login", (req, res, next) ->
 		res.end();
 		return
 
-	if (!bcryptCompare(bcryptPassword, user.services.password.bcrypt)) 
+	if (!bcryptCompare(bcryptPassword, user.services.password.bcrypt))
 		res.statusCode = 401;
 		res.end();
 		return
@@ -147,12 +147,12 @@ JsonRoutes.add "post", "/api/setup/login", (req, res, next) ->
 	# maxAge 3 month
 	Setup.setAuthCookies(req, res, user._id, token)
 
-	JsonRoutes.sendResult res, 
-		data: 
+	JsonRoutes.sendResult res,
+		data:
 			userId: user._id
 			authToken: token
 			apps: []
-			dsInfo: 
+			dsInfo:
 				dsid: user._id
 				steedosId: user.steedos_id
 				name: user.name
@@ -167,3 +167,50 @@ JsonRoutes.add "post", "/api/setup/login", (req, res, next) ->
 			webservices:
 				Steedos.settings.webservices
 
+# JWT
+JsonRoutes.add "post", "/api/setup/jwt/validate", (req, res, next) ->
+
+
+
+	JsonRoutes.sendResult res,
+		code: 401,
+		data:
+			"error": "Validate Request -- Missing X-Auth-Token",
+			"instance": "1329598861",
+			"success": false
+
+
+JsonRoutes.add "post", "/api/setup/jwt/logout", (req, res, next) ->
+
+
+	res.end();
+
+
+JsonRoutes.add "post", "/api/setup/jwt/login", (req, res, next) ->
+
+	username = req.body["username"]
+	password = req.body["password"]
+
+	bcryptPassword = SHA256(password);
+
+	user = Meteor.users.findOne
+		"emails.address": username
+
+	if !user
+		res.statusCode = 401;
+		res.end();
+		return
+
+	if (!bcryptCompare(bcryptPassword, user.services.password.bcrypt))
+		res.statusCode = 401;
+		res.end();
+		return
+
+	jwt = Npm.require('jsonwebtoken')
+	secret = 'shhhhh'
+	token = jwt.sign({ userId: user._id }, secret)
+
+	JsonRoutes.sendResult res,
+		data:
+			token: token
+			userId: user._id

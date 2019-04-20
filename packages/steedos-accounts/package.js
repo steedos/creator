@@ -9,7 +9,8 @@ Package.describe({
 Npm.depends({
 	cookies: "0.6.1",
 	phone: "1.0.3",
-	sha256: "0.2.0"
+	sha256: "0.2.0",
+	jsonwebtoken: "8.5.1"
 });
 
 Package.onUse(function(api) {
@@ -54,7 +55,7 @@ Package.onUse(function(api) {
 	api.addFiles('lib/accounts.coffee');
 
 	api.addFiles('routes/setup.coffee', 'server');
-	
+
     api.addFiles('password_server.js', 'server');
     api.addFiles('password_client.js', 'client');
 

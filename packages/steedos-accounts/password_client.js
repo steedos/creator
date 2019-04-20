@@ -49,20 +49,34 @@ var srpUpgradePath = function (options, callback) {
  * @importFromPackage meteor
  */
 Steedos.loginWithPassword = function (selector, password, callback) {
-  if (typeof selector === 'string'){
-    if (selector.indexOf('@') === -1){
-      if (/^\+?\d+$/g.test(selector)){
-        selector = {phone: selector};
-      }
-      else{
-        selector = {username: selector};
-      }
-    }
-    else {
-      selector = {email: selector};
-    }
-  }
+  // if (typeof selector === 'string'){
+  //   if (selector.indexOf('@') === -1){
+  //     if (/^\+?\d+$/g.test(selector)){
+  //       selector = {phone: selector};
+  //     }
+  //     else{
+  //       selector = {username: selector};
+  //     }
+  //   }
+  //   else {
+  //     selector = {email: selector};
+  //   }
+  // }
 
+  $.ajax({
+    type: "POST",
+    url: Steedos.absoluteUrl("api/setup/jwt/login"),
+    contentType: "application/json",
+    dataType: 'json',
+    data: JSON.stringify({username: selector, password: password}),
+    xhrFields: {
+      withCredentials: true
+    },
+    crossDomain: true
+  }).done(function(data) {
+    Meteor._localStorage.setItem('jsonwebtoken', data.token);
+  })
+  /*
   Accounts.callLoginMethod({
     methodArguments: [{
       user: selector,
@@ -96,4 +110,6 @@ Steedos.loginWithPassword = function (selector, password, callback) {
       }
     }
   });
+  */
+
 };
