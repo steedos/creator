@@ -41,6 +41,8 @@ Creator.Object = (options)->
 	self.enable_chatter = options.enable_chatter
 	self.enable_trash = options.enable_trash
 	self.enable_space_global = options.enable_space_global
+	if options.database_name
+		self.database_name = options.database_name
 	if (!options.fields)
 		throw new Error('Creator.Object options must specify name');
 
@@ -50,10 +52,11 @@ Creator.Object = (options)->
 		if field_name == 'name' || field.is_name
 			self.NAME_FIELD_KEY = field_name
 
-	_.each Creator.baseObject.fields, (field, field_name)->
-		if !self.fields[field_name]
-			self.fields[field_name] = {}
-		self.fields[field_name] = _.extend(_.clone(field), self.fields[field_name])
+	if !options.database_name || options.database_name == 'meteor-mongo'
+		_.each Creator.baseObject.fields, (field, field_name)->
+			if !self.fields[field_name]
+				self.fields[field_name] = {}
+			self.fields[field_name] = _.extend(_.clone(field), self.fields[field_name])
 
 	self.list_views = {}
 	defaultColumns = Creator.getObjectDefaultColumns(self.name)
@@ -195,6 +198,13 @@ Creator.Object.prototype.i18n = ()->
 		else
 			item.label = t(i18n_key)
 
+
+Creator.getObjectODataRouterPrefix = (object)->
+	if object
+		if !object.database_name || object.database_name == 'meteor-mongo'
+			return "/api/odata/v4"
+		else
+			return "/api/odata/#{object.database_name}"
 
 if Meteor.isClient
 

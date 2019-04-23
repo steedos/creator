@@ -100,10 +100,10 @@ _itemClick = (e, curObjectName, list_view_id)->
 		showTitle: false
 		usePopover: true
 		onItemClick: (value)->
+			object = Creator.getObject(objectName)
 			action = value.itemData.action
 			recordId = value.itemData.record._id
 			objectName = value.itemData.object_name
-			object = Creator.getObject(objectName)
 			collectionName = object.label
 			name_field_key = object.NAME_FIELD_KEY
 			if objectName == "organizations"
@@ -339,7 +339,6 @@ Template.creator_grid.onRendered ->
 		record_id = Session.get("record_id")
 
 		listTreeCompany = Session.get('listTreeCompany')
-
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
 				if Creator.getListViewIsRecent(object_name, list_view_id)
@@ -402,13 +401,12 @@ Template.creator_grid.onRendered ->
 						filters: _filters
 
 				if Creator.getListViewIsRecent(object_name, list_view_id)
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
+					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{object_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 				else
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{object_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
-
 				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
 					if filter
@@ -417,7 +415,7 @@ Template.creator_grid.onRendered ->
 						filter = standardQuery
 
 				if !filter
-					filter = ["_id", "<>", -1]
+					filter = ["1", "<>", -1]
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
@@ -450,7 +448,7 @@ Template.creator_grid.onRendered ->
 				else
 					return 0
 
-			extra_columns = ["owner", "company_id", "locked"]
+			extra_columns = _.intersection(["owner", "company_id", "locked"], _.keys(curObject.fields));
 			if !is_related and curObject.enable_tree
 				extra_columns.push("parent")
 				extra_columns.push("children")
@@ -607,6 +605,7 @@ Template.creator_grid.onRendered ->
 								if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 									error.message = t "creator_odata_unexpected_character"
 							toastr.error(error.message)
+							console.error('errorHandler', error)
 						fieldTypes: {
 							'_id': 'String'
 						}
@@ -643,7 +642,7 @@ Template.creator_grid.onRendered ->
 										r.values[index] = val
 				onCellClick: (e)->
 					if e.column?.dataField ==  "_id_actions"
-						_itemClick.call(self, e, curObjectName)
+						_itemClick.call(self, e, curObjectName, list_view_id)
 
 				onContentReady: (e)->
 					if self.data.total
@@ -722,7 +721,6 @@ Template.creator_grid.onRendered ->
 					# console.log("dxOptions.dataSource.filter=======", dxOptions.dataSource.filter);
 					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 					# self.dxDataGridInstance.pageSize(pageSize)
-
 Template.creator_grid.helpers Creator.helpers
 
 Template.creator_grid.helpers
@@ -757,7 +755,8 @@ Template.creator_grid.events
 			field = field.join(",")
 
 		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else (template.data?.object_name || Session.get("object_name"))
-		collection_name = Creator.getObject(objectName).label
+		object = Creator.getObject(objectName)
+		collection_name = object.label
 		record = Creator.odata.get(objectName, this._id)
 		if record
 			Session.set("cmFullScreen", full_screen)

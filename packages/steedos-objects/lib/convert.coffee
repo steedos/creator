@@ -151,7 +151,7 @@
 					field._filtersFunction = filtersFunction.toString()
 			else
 
-				optionsFunction = field._optionsFunction
+				optionsFunction = field._optionsFunction || field.optionsFunction
 				reference_to = field._reference_to
 				createFunction = field._createFunction
 				beforeOpenFunction = field._beforeOpenFunction

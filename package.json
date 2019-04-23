@@ -6,8 +6,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@steedos/core": "1.1.10",
-    "@steedos/objectql": "0.0.3",
+    "@steedos/core": "file:../object-server/packages/core",
+    "@steedos/objectql": "file:../object-server/packages/objectql",
     "aliyun-sdk": "^1.11.12",
     "aws-sdk": "^2.0.23",
     "basic-auth": "^2.0.1",

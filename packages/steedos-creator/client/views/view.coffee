@@ -1,5 +1,27 @@
+loadRecord = (template, object_name, record_id)->
+	object = Creator.getObject(object_name)
+	record = Creator.odata.get(object_name, record_id)
+	template.record.set(record)
+
+
 Template.creator_view.onCreated ->
 	this.recordsTotal = new ReactiveVar({})
+	this.recordLoad = new ReactiveVar(false)
+	this.record = new ReactiveVar()
+	object_name = Session.get "object_name"
+	object = Creator.getObject(object_name)
+	template = Template.instance()
+	if object.database_name && object.database_name != 'meteor-mongo'
+		AutoForm.hooks creatorEditForm:
+			onSuccess: (formType,result)->
+				loadRecord(template, Session.get("object_name"), Session.get("record_id"))
+				$('#afModal').modal('hide')
+		,true
+		AutoForm.hooks creatorCellEditForm:
+			onSuccess: (formType,result)->
+				loadRecord(template, Session.get("object_name"), Session.get("record_id"))
+				$('#afModal').modal('hide')
+		,true
 
 Template.creator_view.onRendered ->
 	this.autorun ->
@@ -17,14 +39,22 @@ Template.creator_view.onRendered ->
 	this.autorun ->
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		object_fields = Creator.getObject(object_name).fields
+		object = Creator.getObject(object_name)
+		object_fields = object.fields
 		if object_name and record_id
-			fields = Creator.getFields(object_name)
-			ref_fields = {}
-			_.each fields, (f)->
-				if f.indexOf(".")  < 0
-					ref_fields[f] = 1
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
+			if !object.database_name || !object.database_name == 'meteor-mongo'
+				fields = Creator.getFields(object_name)
+				ref_fields = {}
+				_.each fields, (f)->
+					if f.indexOf(".")  < 0
+						ref_fields[f] = 1
+				Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
+			else
+				loadRecord(Template.instance(), object_name, record_id)
+
+	this.autorun ->
+		if Creator.subs["Creator"].ready()
+			Template.instance().recordLoad.set(true)
 
 Template.creator_view.helpers Creator.helpers
 
@@ -327,15 +357,16 @@ Template.creator_view.helpers
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
 	show_chatter: ()->
-		return Creator.subs["Creator"].ready() && Creator.getObjectRecord()
+		return Template.instance().recordLoad && Creator.getObjectRecord()
 
 Template.creator_view.events
 
 	'click .record-action-custom': (event, template) ->
+		console.log('click action');
 		record = Creator.getObjectRecord()
-		recordId = record._id
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)
+		recordId = record._id
 		collection_name = object.label
 		Session.set("action_fields", undefined)
 		Session.set("action_collection", "Creator.Collections.#{object._collection_name}")
@@ -343,7 +374,7 @@ Template.creator_view.events
 		Session.set("action_save_and_insert", true)
 		if this.todo == "standard_delete"
 			action_record_title = record[object.NAME_FIELD_KEY]
-			Creator.executeAction objectName, this, recordId, action_record_title
+			Creator.executeAction objectName, this, recordId, action_record_title, Session.get("list_view_id")
 		else
 			Creator.executeAction objectName, this, recordId, $(event.currentTarget)
 

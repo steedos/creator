@@ -34,6 +34,7 @@ oDataOperation = (type, url, data, object_name)->
 			request.setRequestHeader 'X-User-Id', Meteor.userId()
 			request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
 		success: (data) ->
+			console.log('oDataOperation success');
 			if Session.get("cmOperation") == "insert"
 				_id = data.value[0]._id
 			else if Session.get("cmOperation") == "update"
@@ -45,6 +46,7 @@ oDataOperation = (type, url, data, object_name)->
 			self.done(null, data)
 		error: (jqXHR, textStatus, errorThrown) ->
 			# console.log(errorThrown);
+			console.log('oDataOperation error');
 			self.done(jqXHR.responseJSON.error)
 
 getObjectName = (collectionName)->
@@ -55,7 +57,8 @@ getSimpleSchema = (collectionName)->
 		object_name = getObjectName collectionName
 		object_fields = Creator.getObject(object_name).fields
 		_fields = Creator.getFields(object_name)
-		schema = collectionObj("Creator.Collections."+Creator.getObject(object_name)._collection_name).simpleSchema()._schema
+		#schema = collectionObj("Creator.Collections."+Creator.getObject(object_name)._collection_name).simpleSchema()._schema
+		schema = Creator.Collections[Creator.getObject(object_name)._collection_name].simpleSchema()._schema
 		fields = Session.get("cmFields")
 
 		final_schema = {}
@@ -377,7 +380,7 @@ helpers =
 				hiddenFields: hiddenFields
 				disabledFields: disabledFields
 
-			console.log finalFields
+#			console.log finalFields
 
 			return finalFields
 
@@ -561,7 +564,8 @@ Template.CreatorAfModal.events
 					userId = Meteor.userId()
 					cmCollection = Session.get 'cmCollection'
 					object_name = getObjectName(cmCollection)
-					triggers = Creator.getObject(object_name).triggers
+					object = Creator.getObject(object_name)
+					triggers = object.triggers
 
 					self = this
 					urls = []
@@ -569,7 +573,7 @@ Template.CreatorAfModal.events
 					if Session.get("cmOperation") == "insert"
 						data = insertDoc
 						type = "post"
-						urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}")
+						urls.push Steedos.absoluteUrl("#{Creator.getObjectODataRouterPrefix(object)}/#{Steedos.spaceId()}/#{object_name}")
 						delete data._object_name
 					if Session.get("cmOperation") == "update"
 						if Session.get("cmMeteorMethod")
@@ -581,6 +585,9 @@ Template.CreatorAfModal.events
 						else
 							_id = Session.get("cmDoc")._id
 
+						# insertDoc里面的值是最全最精确的
+						updateDoc["$set"] = insertDoc
+
 						if updateDoc["$set"]
 							delete updateDoc["$set"]._ids
 							delete updateDoc["$set"]._object_name
@@ -588,9 +595,6 @@ Template.CreatorAfModal.events
 						if updateDoc["$unset"]
 							delete updateDoc["$unset"]._ids
 							delete updateDoc["$unset"]._object_name
-
-						# insertDoc里面的值是最全最精确的
-						updateDoc["$set"] = insertDoc
 
 						if updateDoc.$unset
 							_.each updateDoc.$unset, (v, k)->
@@ -603,7 +607,7 @@ Template.CreatorAfModal.events
 
 						_ids = _id.split(",")
 						_.each _ids, (id)->
-							urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{id}")
+							urls.push Steedos.absoluteUrl("#{Creator.getObjectODataRouterPrefix(object)}/#{Steedos.spaceId()}/#{object_name}/#{id}")
 						data = updateDoc
 						type = "put"
 
@@ -625,6 +629,7 @@ Template.CreatorAfModal.events
 					return false
 
 				onSuccess: (operation,result)->
+					console.log('onSuccess hide......');
 					$('#afModal').modal 'hide'
 					# if result.type == "post"
 					# 	app_id = Session.get("app_id")

@@ -109,7 +109,11 @@ Creator.getObjectRecord = (object_name, record_id)->
 		record_id = Session.get("record_id")
 	collection = Creator.getCollection(object_name)
 	if collection
-		return collection.findOne(record_id)
+		record = collection.findOne(record_id)
+		if Meteor.isClient && !record
+			return Template.instance()?.record.get()
+
+		return record
 
 Creator.getApp = (app_id)->
 	if !app_id

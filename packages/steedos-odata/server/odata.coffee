@@ -1,9 +1,15 @@
 Meteor.startup ->
 	MeteorODataRouter = require('@steedos/core').MeteorODataRouter;
+	ODataRouter = require('@steedos/core').ODataRouter
 	express = require('express');
 	app = express();
 	app.use('/api/odata/v4', MeteorODataRouter);
 	WebApp.connectHandlers.use(app);
+	_.each Creator.steedosSchema.getDataSources(), (datasource, name)->
+		if(name != 'default')
+			otherApp = express();
+			otherApp.use("/api/odata/#{name}", ODataRouter);
+			WebApp.connectHandlers.use(otherApp);
 
 # 	odataV4Mongodb = require 'odata-v4-mongodb'
 # 	querystring = require 'querystring'
