@@ -12,14 +12,12 @@ Meteor.startup ->
 				newObjects[key] = obj
 			objectsRolesPermission[key] = obj.permission_set
 
-		Creator.steedosSchema = new objectql.SteedosSchema({
-			datasources: {
-				default: {
-					driver: 'meteor-mongo'
-					objects: newObjects
-					objectsRolesPermission: objectsRolesPermission
-				}
-			}
+		Creator.steedosSchema = objectql.getSteedosSchema()
+
+		Creator.steedosSchema.addDataSource('default',{
+			driver: 'meteor-mongo'
+			objects: newObjects
+			objectsRolesPermission: objectsRolesPermission
 			getRoles: (userId)->
 				# TODO 获取用户角色
 				return ['admin']
