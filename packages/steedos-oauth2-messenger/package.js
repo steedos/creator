@@ -1,5 +1,5 @@
 Package.describe({
-	name: 'steedos:oauth2-client',
+	name: 'steedos:oauth2-messenger',
 	version: '0.0.1',
 	summary: '',
 	git: '',
@@ -17,9 +17,6 @@ Package.onUse(function(api) {
 	api.use('simple:json-routes@2.1.0');
 	api.use('ddp-common');
 	api.use(['webapp'], 'server');
-
-
-	api.addFiles('checkNpm.js', 'server');
 
 
 	api.addFiles('server/mattermostRouter.coffee', 'server');
