@@ -56,7 +56,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 	isAsync = callback and _.isFunction(callback)
 	if is_ajax
 		if object_name
-			url = Steedos.absoluteUrl "/api/odata/v4/#{spaceId}/#{object_name}"
+			url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}"
 			$.ajax
 				type: "get"
 				url: url
