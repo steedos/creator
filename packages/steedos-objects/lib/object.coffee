@@ -41,6 +41,7 @@ Creator.Object = (options)->
 	self.enable_chatter = options.enable_chatter
 	self.enable_trash = options.enable_trash
 	self.enable_space_global = options.enable_space_global
+	self.idFieldName = '_id'
 	if options.database_name
 		self.database_name = options.database_name
 	if (!options.fields)
@@ -51,6 +52,8 @@ Creator.Object = (options)->
 	_.each self.fields, (field, field_name)->
 		if field_name == 'name' || field.is_name
 			self.NAME_FIELD_KEY = field_name
+		if field.primary
+			self.idFieldName = field_name
 
 	if !options.database_name || options.database_name == 'meteor-mongo'
 		_.each Creator.baseObject.fields, (field, field_name)->

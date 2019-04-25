@@ -342,11 +342,11 @@ Template.creator_grid.onRendered ->
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
 				if Creator.getListViewIsRecent(object_name, list_view_id)
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
+					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{related_object_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 				else
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
+					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{related_object_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
 				filter_logic = Session.get("filter_logic")
@@ -415,7 +415,7 @@ Template.creator_grid.onRendered ->
 						filter = standardQuery
 
 				if !filter
-					filter = ["1", "<>", -1]
+					filter = [creator_obj.idFieldName, "<>", -1]
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
