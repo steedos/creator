@@ -1,5 +1,5 @@
 Creator.odata = {}
-Creator.odata.get = (object_name, record_id, select_fields, callback)->
+Creator.odata.get = (object_name, record_id, select_fields, expand, callback)->
 	result = null
 	isAsync = callback and _.isFunction(callback)
 	spaceId = Steedos.spaceId()
@@ -11,6 +11,8 @@ Creator.odata.get = (object_name, record_id, select_fields, callback)->
 		if select_fields
 			request_data = 
 				"$select": select_fields
+		if expand
+			request_data["$expand"] = expand
 		$.ajax
 			type: "get"
 			url: url

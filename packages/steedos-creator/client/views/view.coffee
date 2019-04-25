@@ -1,6 +1,41 @@
+_expandFields = (object_name, columns)->
+	expand_fields = []
+	fields = Creator.getObject(object_name).fields
+	_.each columns, (n)->
+		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+			if fields[n].reference_to
+				ref = fields[n].reference_to
+				if _.isFunction(ref)
+					ref = ref()
+			else
+				ref = fields[n].optionsFunction({}).getProperty("value")
+
+			if !_.isArray(ref)
+				ref = [ref]
+
+			ref = _.map ref, (o)->
+				key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
+				return key
+
+			ref = _.compact(ref)
+
+			ref = _.uniq(ref)
+
+			ref = ref.join(",")
+
+			if ref
+				expand_fields.push(n + "($select=" + ref + ")")
+	# expand_fields.push n + "($select=name)"
+	return expand_fields
+
 loadRecord = (template, object_name, record_id)->
 	object = Creator.getObject(object_name)
-	record = Creator.odata.get(object_name, record_id)
+
+	_fields = object.fields
+
+	_keys = _.keys(_fields)
+	expand = _expandFields(object_name, _keys)
+	record = Creator.odata.get(object_name, record_id, _keys.join(","), expand.join(","))
 	template.record.set(record)
 
 
@@ -8,10 +43,12 @@ Template.creator_view.onCreated ->
 	this.recordsTotal = new ReactiveVar({})
 	this.recordLoad = new ReactiveVar(false)
 	this.record = new ReactiveVar()
+	this.agreement = new ReactiveVar()
 	object_name = Session.get "object_name"
 	object = Creator.getObject(object_name)
 	template = Template.instance()
 	if object.database_name && object.database_name != 'meteor-mongo'
+		this.agreement.set('odata')
 		AutoForm.hooks creatorEditForm:
 			onSuccess: (formType,result)->
 				loadRecord(template, Session.get("object_name"), Session.get("record_id"))
@@ -22,6 +59,8 @@ Template.creator_view.onCreated ->
 				loadRecord(template, Session.get("object_name"), Session.get("record_id"))
 				$('#afModal').modal('hide')
 		,true
+	else
+		this.agreement.set('subscribe')
 
 Template.creator_view.onRendered ->
 	this.autorun ->
@@ -357,7 +396,10 @@ Template.creator_view.helpers
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
 	show_chatter: ()->
-		return Template.instance().recordLoad && Creator.getObjectRecord()
+		return Template.instance().recordLoad.get() && Creator.getObjectRecord()
+
+	agreement: ()->
+		return Template.instance().agreement.get()
 
 Template.creator_view.events
 
