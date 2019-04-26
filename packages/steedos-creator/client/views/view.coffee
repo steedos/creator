@@ -113,15 +113,16 @@ Template.creator_view.helpers
 				if !fieldKey
 					return
 				field = _object.fields[fieldKey]
-				if _object.schema._schema[fieldKey]?.type.name != 'Object'
-					r = true;
-				if field.type == 'lookup' || field.type == 'master_detail'
-					reference_to = field.reference_to
-					if _.isFunction(reference_to)
-						reference_to = reference_to()
-					if _.isArray(reference_to)
+				if field
+					if _object.schema._schema[fieldKey]?.type.name != 'Object'
 						r = true;
-				return r;
+					if field.type == 'lookup' || field.type == 'master_detail'
+						reference_to = field.reference_to
+						if _.isFunction(reference_to)
+							reference_to = reference_to()
+						if _.isArray(reference_to)
+							r = true;
+					return r;
 		return r;
 
 	isObjectField: (fieldKey)->

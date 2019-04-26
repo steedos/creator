@@ -156,9 +156,8 @@ Template.creator_table_cell.helpers
 						val = if val then [val] else []
 					_.each val, (v)->
 						reference_to = v["reference_to._o"] || reference_to
-						reference_to_object_name_field_key = Creator.getObject(reference_to)?.NAME_FIELD_KEY
 						href = Creator.getObjectUrl(reference_to, v._id)
-						data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
+						data.push {reference_to: reference_to, rid: v._id, value: v['_NAME_FIELD_VALUE'], href: href, id: this._id}
 
 				else
 					if _.isArray(reference_to) && _.isObject(val)
@@ -328,5 +327,5 @@ Template.creator_table_cell.helpers
 		return this.type is type
 
 	isExtraField: () ->
-		fieldName = this.field.name
+		fieldName = this.field?.name
 		return fieldName == "created_by" or fieldName == "modified_by"

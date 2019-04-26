@@ -231,7 +231,8 @@ _expandFields = (object_name, columns)->
 			ref = ref.join(",")
 
 			if ref
-				expand_fields.push(n + "($select=" + ref + ")")
+#				expand_fields.push(n + "($select=" + ref + ")")
+				expand_fields.push(n)
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
 
