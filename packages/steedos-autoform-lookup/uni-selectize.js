@@ -562,9 +562,10 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 			self.initialized.set(1);
 		}, 1);
 		if(searchVal.values.length > 0){
-			DataSource.Method.lookup_options(methodName, {params: searchVal.params, values: searchVal.values}, function (err, valueOptions) {
-				self.addItems(valueOptions, values);
-			});
+			// DataSource.Method.lookup_options(methodName, {params: searchVal.params, values: searchVal.values}, function (err, valueOptions) {
+			// 	self.addItems(valueOptions, values);
+			// });
+			self.addItems(options, values);
 		}
 
 	}else{
