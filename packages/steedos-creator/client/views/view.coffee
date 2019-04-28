@@ -47,18 +47,14 @@ Template.creator_view.onCreated ->
 	object_name = Session.get "object_name"
 	object = Creator.getObject(object_name)
 	template = Template.instance()
+	this.onEditSuccess = onEditSuccess = (formType,result)->
+		loadRecord(template, Session.get("object_name"), Session.get("record_id"))
+		$('#afModal').modal('hide')
 	if object.database_name && object.database_name != 'meteor-mongo'
 		this.agreement.set('odata')
 		AutoForm.hooks creatorEditForm:
-			onSuccess: (formType,result)->
-				loadRecord(template, Session.get("object_name"), Session.get("record_id"))
-				$('#afModal').modal('hide')
-		,true
-		AutoForm.hooks creatorCellEditForm:
-			onSuccess: (formType,result)->
-				loadRecord(template, Session.get("object_name"), Session.get("record_id"))
-				$('#afModal').modal('hide')
-		,true
+			onSuccess: onEditSuccess
+		,false
 	else
 		this.agreement.set('subscribe')
 
@@ -608,3 +604,10 @@ Template.creator_view.events
 					return
 			i++
 		$(event.target).val("")
+
+Template.creator_view.onDestroyed ()->
+	self = this
+	_.each(AutoForm._hooks.creatorEditForm.onSuccess, (fn, index)->
+		if fn == self.onEditSuccess
+			delete AutoForm._hooks.creatorEditForm.onSuccess[index]
+	)

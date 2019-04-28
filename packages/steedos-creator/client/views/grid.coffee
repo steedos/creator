@@ -416,7 +416,7 @@ Template.creator_grid.onRendered ->
 						filter = standardQuery
 
 				if !filter
-					filter = [creator_obj.idFieldName, "<>", -1]
+					filter = [creator_obj.idFieldName, "<>", "-1"]
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
 					filter = [ filter, "and", listTreeFilter ]
