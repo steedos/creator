@@ -50,9 +50,11 @@ DataSource.Odata.lookup_options = (options)->
 
 		odataOptions = {
 			$top: options_limit,
-			$orderby: 'created desc',
 			$select: "#{name_field_key}"
 		};
+
+		if !object.database_name || object.database_name == 'meteor-mongo'
+			odataOptions.$orderby = 'created desc'
 
 		orderby = []
 		if sort && _.isObject(sort)
