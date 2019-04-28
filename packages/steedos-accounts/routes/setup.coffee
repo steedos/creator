@@ -56,17 +56,11 @@ JsonRoutes.add "post", "/api/setup/validate", (req, res, next) ->
 
 	if userId and authToken
 		steedosAuth = require("@steedos/auth");
-		console.log('steedosAuth.getSessionFromCache(authToken): ', steedosAuth.getSessionFromCache(authToken))
 
-		if steedosAuth.getSessionFromCache(authToken)
-			user = steedosAuth.getSessionFromCache(authToken)
-
-		else
-			hashedToken = Accounts._hashLoginToken(authToken)
-			user = Meteor.users.findOne
-				_id: userId,
-				"services.resume.loginTokens.hashedToken": hashedToken
-			steedosAuth.addSessionToCache(authToken, {name: user.name, userId: user._id, steedos_id: user.steedos_id, email: user.email, token: authToken})
+		user = Meteor.wrapAsync((userId, authToken, cb)->
+			steedosAuth.getSession(userId, authToken).then (resolve, reject)->
+				cb(reject, resolve)
+		)(userId, authToken)
 
 		if user
 			Setup.setAuthCookies(req, res, userId, authToken)
