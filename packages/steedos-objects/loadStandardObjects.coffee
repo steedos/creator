@@ -23,6 +23,47 @@ Meteor.startup ->
 				return ['admin']
 		})
 
+		#### 测试代码开始 TODO:remove ####
+		path =require('path')
+		testRootDir = path.resolve('../../../../../test')
+		console.log('testRootDir', testRootDir);
+		Creator.steedosSchema.addDataSource('mall', {
+			driver: "sqlite",
+			url: path.join(testRootDir, 'mall.db'),
+			objectFiles: [path.join(testRootDir, 'mall')]
+		})
+
+		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mall'))
+
+		Creator.steedosSchema.getDataSource('mall').createTables()
+
+		Creator.steedosSchema.addDataSource('stock', {
+			driver: "sqlserver",
+			options: {
+				tdsVersion: "7_2"
+			},
+			url: "mssql://sa:hotoainc.@192.168.0.190/hotoa_main_stock",
+			objectFiles: [path.join(testRootDir, 'stock')]
+		})
+
+		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'stock'))
+
+		Creator.steedosSchema.getDataSource('stock').createTables()
+
+		Creator.steedosSchema.addDataSource('pdrq', {
+			driver: "sqlserver",
+			options: {
+				tdsVersion: "7_2"
+			},
+			url: "mssql://sa:hotoainc.@192.168.0.235/hotoa_main_svn",
+			objectFiles: [path.join(testRootDir, 'pdrq_contracts')]
+		})
+
+		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'pdrq_contracts'))
+
+		Creator.steedosSchema.getDataSource('pdrq').createTables()
+
+		#### 测试代码结束 ####
 		express = require('express');
 		graphqlHTTP = require('express-graphql');
 		Cookies = require("cookies");
