@@ -415,17 +415,23 @@ Template.creator_grid.onRendered ->
 					else
 						filter = standardQuery
 
-				if !filter
-					filter = [creator_obj.idFieldName, "<>", "-1"]
+#				if !filter
+#					filter = [creator_obj.idFieldName, "<>", "-1"]
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
-					filter = [ filter, "and", listTreeFilter ]
+					if filter
+						filter = [ filter, "and", listTreeFilter ]
+					else
+						filter = listTreeFilter
 
 				unless is_related
 					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
 					sidebarFilter = Session.get("grid_sidebar_filters")
 					if sidebarFilter and sidebarFilter.length
-						filter = [ filter, "and", sidebarFilter ]
+						if filter
+							filter = [ filter, "and", sidebarFilter ]
+						else
+							filter = sidebarFilter
 
 			selectColumns = Tracker.nonreactive ()->
 				grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
