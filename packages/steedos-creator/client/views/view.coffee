@@ -71,21 +71,20 @@ Template.creator_view.onRendered ->
 			$(".creator-view-tabs-content").removeClass("slds-show").addClass("slds-hide")
 			$("#creator-quick-form").addClass("slds-show")
 
-	this.autorun ->
-		object_name = Session.get "object_name"
-		record_id = Session.get "record_id"
-		object = Creator.getObject(object_name)
-		object_fields = object.fields
-		if object_name and record_id
-			if !object.database_name || !object.database_name == 'meteor-mongo'
-				fields = Creator.getFields(object_name)
-				ref_fields = {}
-				_.each fields, (f)->
-					if f.indexOf(".")  < 0
-						ref_fields[f] = 1
-				Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
-			else
-				loadRecord(Template.instance(), object_name, record_id)
+	object_name = Session.get "object_name"
+	record_id = Session.get "record_id"
+	object = Creator.getObject(object_name)
+	object_fields = object.fields
+	if object_name and record_id
+		if !object.database_name || !object.database_name == 'meteor-mongo'
+			fields = Creator.getFields(object_name)
+			ref_fields = {}
+			_.each fields, (f)->
+				if f.indexOf(".")  < 0
+					ref_fields[f] = 1
+			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
+		else
+			loadRecord(Template.instance(), object_name, record_id)
 
 	this.autorun ->
 		if Creator.subs["Creator"].ready()
