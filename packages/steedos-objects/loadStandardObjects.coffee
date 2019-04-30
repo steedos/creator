@@ -42,6 +42,7 @@ Meteor.startup ->
 			driver: "sqlserver",
 			options: {
 				tdsVersion: "7_2"
+				useUTC: true
 			},
 			url: "mssql://sa:hotoainc.@192.168.0.190/hotoa_main_stock",
 			objectFiles: [path.join(testRootDir, 'stock')]
@@ -55,6 +56,7 @@ Meteor.startup ->
 			driver: "sqlserver",
 			options: {
 				tdsVersion: "7_2"
+				useUTC: true
 			},
 			url: "mssql://sa:hotoainc.@192.168.0.235/hotoa_main_svn",
 			objectFiles: [path.join(testRootDir, 'pdrq_contracts')]
