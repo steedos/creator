@@ -31,7 +31,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 		if name != 'default'
 			datasourceObjects = datasource.getObjects()
 			_.each(datasourceObjects, (v, k)->
-				_obj = v.toConfig()
+				_obj = Creator.convertObject(v.toConfig())
 				_obj.name = "#{name}.#{k}"
 				_obj.database_name = name
 				_obj.permissions = permissions(v, userId)

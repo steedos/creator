@@ -24,8 +24,10 @@ _expandFields = (object_name, columns)->
 			ref = ref.join(",")
 
 			if ref
-				expand_fields.push(n + "($select=" + ref + ")")
-	# expand_fields.push n + "($select=name)"
+				if n.indexOf(".") < 0
+					expand_fields.push(n)
+				else
+					expand_fields.push(n.replace('.', '/'))
 	return expand_fields
 
 loadRecord = (template, object_name, record_id)->
@@ -34,7 +36,12 @@ loadRecord = (template, object_name, record_id)->
 	_fields = object.fields
 
 	_keys = _.keys(_fields)
-	expand = _expandFields(object_name, _keys)
+	_keys = _keys.filter (k)->
+		if k.indexOf(".") < 0
+			return true
+		else
+			return false
+	expand = _expandFields(object_name, _.keys(_fields))
 	record = Creator.odata.get(object_name, record_id, _keys.join(","), expand.join(","))
 	template.record.set(record)
 
@@ -527,14 +534,22 @@ Template.creator_view.events
 		object_name = this.object_name
 		collection_name = Creator.getObject(object_name).label
 		doc = this.doc
-
 		if doc
 			Session.set("cmFullScreen", full_screen)
 			Session.set("action_fields", field)
 			Session.set("action_collection", "Creator.Collections.#{Creator.getObject(object_name)._collection_name}")
 			Session.set("action_collection_name", collection_name)
 			Session.set("action_save_and_insert", false)
-			Session.set 'cmDoc', doc
+			cmDoc = {}
+			_.each doc, (v, k)->
+				if(_.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
+					cmDoc[k] = {}
+					_.each _.keys(v), (_sk)->
+						cmDoc[k][_sk] = _.pluck(doc[k][_sk], "_id")
+				else
+					cmDoc[k] =v
+
+			Session.set 'cmDoc', cmDoc
 
 			Meteor.defer ()->
 				$(".btn.creator-edit").click()
