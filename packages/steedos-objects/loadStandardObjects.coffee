@@ -5,6 +5,7 @@ steedosCord.getObjectConfigManager().loadStandardObjects()
 Meteor.startup ->
 	try
 		objectql = require("@steedos/objectql")
+		steedosAuth = require("@steedos/auth")
 		newObjects = {}
 		objectsRolesPermission = {}
 		_.each Creator.Objects, (obj, key)->
@@ -75,11 +76,10 @@ Meteor.startup ->
 			authToken = req.headers['x-auth-token'] || cookies.get("X-Auth-Token")
 			user = null
 			if userId and authToken
-				searchQuery = {}
-				searchQuery['services.resume.loginTokens.hashedToken'] = Accounts._hashLoginToken authToken
-				user = Meteor.users.findOne
-					'_id': userId
-					searchQuery
+				user = Meteor.wrapAsync((userId, authToken, cb)->
+					steedosAuth.getSession(userId, authToken).then (resolve, reject)->
+						cb(reject, resolve)
+				)(userId, authToken)
 
 			if user
 				next();
