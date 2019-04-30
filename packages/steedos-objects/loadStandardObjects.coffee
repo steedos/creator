@@ -63,6 +63,16 @@ Meteor.startup ->
 
 		Creator.steedosSchema.getDataSource('pdrq').createTables()
 
+		Creator.steedosSchema.addDataSource('mongo', {
+			driver: "mongo"
+			url: "mongodb://127.0.0.1/mongo",
+			objectFiles: [path.join(testRootDir, 'mongo')]
+		})
+
+		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
+
+		Creator.steedosSchema.getDataSource('mongo').createTables()
+
 		#### 测试代码结束 ####
 		express = require('express');
 		graphqlHTTP = require('express-graphql');
