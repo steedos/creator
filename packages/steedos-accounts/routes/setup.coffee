@@ -3,6 +3,7 @@ bcrypt = NpmModuleBcrypt;
 bcryptHash = Meteor.wrapAsync(bcrypt.hash);
 bcryptCompare = Meteor.wrapAsync(bcrypt.compare);
 SHA256 = require("sha256")
+steedosAuth = require("@steedos/auth");
 
 
 Setup.clearAuthCookies = (req, res) ->
@@ -46,24 +47,21 @@ JsonRoutes.add "post", "/api/setup/validate", (req, res, next) ->
 
 	# first check request body
 	if req.body
-		userId = req.body["X-User-Id"]
 		authToken = req.body["X-Auth-Token"]
 
 	# then check cookie
-	if !userId or !authToken
-		userId = cookies.get("X-User-Id")
+	if !authToken
 		authToken = cookies.get("X-Auth-Token")
 
-	if userId and authToken
-		steedosAuth = require("@steedos/auth");
+	if authToken
 
-		user = Meteor.wrapAsync((userId, authToken, cb)->
-			steedosAuth.getSession(userId, authToken).then (resolve, reject)->
+		user = Meteor.wrapAsync((authToken, cb)->
+			steedosAuth.getSession(authToken).then (resolve, reject)->
 				cb(reject, resolve)
-		)(userId, authToken)
+		)(authToken)
 
 		if user
-			Setup.setAuthCookies(req, res, userId, authToken)
+			Setup.setAuthCookies(req, res, user.userId, authToken)
 
 			JsonRoutes.sendResult res,
 				data:

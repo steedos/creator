@@ -84,14 +84,16 @@ Meteor.startup ->
 		router = express.Router();
 		router.use((req, res, next)->
 			cookies = new Cookies(req, res)
-			userId = req.headers['x-user-id'] || cookies.get("X-User-Id")
 			authToken = req.headers['x-auth-token'] || cookies.get("X-Auth-Token")
+			if !authToken && req.headers.authorization && req.headers.authorization.split(' ')[0] == 'Bearer'
+				authToken = req.headers.authorization.split(' ')[1]
+
 			user = null
-			if userId and authToken
-				user = Meteor.wrapAsync((userId, authToken, cb)->
-					steedosAuth.getSession(userId, authToken).then (resolve, reject)->
+			if authToken
+				user = Meteor.wrapAsync((authToken, cb)->
+					steedosAuth.getSession(authToken).then (resolve, reject)->
 						cb(reject, resolve)
-				)(userId, authToken)
+				)(authToken)
 
 			if user
 				next();
