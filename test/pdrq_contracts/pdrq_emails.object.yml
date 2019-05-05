@@ -7,7 +7,7 @@ fields:
     primary: true
     generated: true
     label: 邮件ID
-    omit: true
+#    omit: true
   subject:
     type: text
     label: 主题

@@ -17,7 +17,7 @@ fields:
     label: 合同Id
     primary: true
     generated: true
-    omit: true
+#    omit: true
   id:
     type: text
     label: 合同编号
