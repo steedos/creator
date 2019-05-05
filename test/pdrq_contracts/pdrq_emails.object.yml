@@ -6,6 +6,7 @@ fields:
     type: number
     primary: true
     label: 邮件ID
+    omit: true
   subject:
     type: text
     label: 主题
