@@ -552,7 +552,7 @@ Template.creator_view.events
 							cmDoc[k] =  _.pluck(doc[k], "_id")
 						else
 							cmDoc[k] = doc[k]?._id
-					else if(_.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
+					else if( v && _.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
 						cmDoc[k] = {}
 						_.each _.keys(v), (_sk)->
 							cmDoc[k][_sk] = _.pluck(doc[k][_sk], "_id")
