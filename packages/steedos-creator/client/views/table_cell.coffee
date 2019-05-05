@@ -240,7 +240,7 @@ Template.creator_table_cell.helpers
 				val = val.replace(/ /g, '&nbsp;');
 			data.push {value: val, id: this._id, type: _field.type}
 		else
-			if (val instanceof Date)
+			if (val && ["datetime", "date"].indexOf(_field.type) >= 0)
 				if this.agreement == "odata"
 					# 老的datatable列表界面，现在没有在用了，都用DevExtreme的grid列表代替了
 					if _field.type == "datetime"
