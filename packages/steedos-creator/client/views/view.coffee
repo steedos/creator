@@ -22,12 +22,13 @@ _expandFields = (object_name, columns)->
 			ref = _.uniq(ref)
 
 			ref = ref.join(",")
-
-			if ref
+			if ref && n.indexOf("$") < 0
 				if n.indexOf(".") < 0
 					expand_fields.push(n)
 				else
 					expand_fields.push(n.replace('.', '/'))
+#		else if fields[n].type == 'grid'
+#			expand_fields.push(n)
 	return expand_fields
 
 loadRecord = (template, object_name, record_id)->
@@ -541,14 +542,22 @@ Template.creator_view.events
 			Session.set("action_collection_name", collection_name)
 			Session.set("action_save_and_insert", false)
 			cmDoc = {}
+			objectFields = Creator.getObject(object_name).fields
 			_.each doc, (v, k)->
-				if(_.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
-					cmDoc[k] = {}
-					_.each _.keys(v), (_sk)->
-						cmDoc[k][_sk] = _.pluck(doc[k][_sk], "_id")
-				else
+				if template.agreement.get() == 'subscribe'
 					cmDoc[k] =v
-
+				else
+					if objectFields[k]?.type == 'lookup' && objectFields[k]?.reference_to
+						if objectFields[k].multiple
+							cmDoc[k] =  _.pluck(doc[k], "_id")
+						else
+							cmDoc[k] = doc[k]?._id
+					else if(_.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
+						cmDoc[k] = {}
+						_.each _.keys(v), (_sk)->
+							cmDoc[k][_sk] = _.pluck(doc[k][_sk], "_id")
+					else
+						cmDoc[k] =v
 			Session.set 'cmDoc', cmDoc
 
 			Meteor.defer ()->

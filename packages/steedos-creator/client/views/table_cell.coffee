@@ -27,7 +27,8 @@ Template.creator_table_cell.onRendered ->
 		object_name = self.data.object_name
 		this_object = Creator.getObject(object_name)
 		record_id = self.data._id
-		record = Creator.getCollection(object_name).findOne(record_id)
+#		record = Creator.getCollection(object_name).findOne(record_id)
+		record = self.data.doc
 		if record
 			if  _field?.type == "grid"
 				val = _field.name.split('.').reduce (o, x) ->

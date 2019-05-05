@@ -5,3 +5,4 @@ icon_slds: thanks
 is_creator: true
 objects:
   - mongo.mongo_apps
+  - mongo.mongo_object_workflows
