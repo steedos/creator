@@ -6,6 +6,7 @@ fields:
   recid: 
     type: number
     primary: true
+    generated: true
     searchable: true
     sortable: true
     label: Id

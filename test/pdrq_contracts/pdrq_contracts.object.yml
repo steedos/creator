@@ -16,6 +16,7 @@ fields:
     type: number
     label: 合同Id
     primary: true
+    generated: true
     omit: true
   id:
     type: text

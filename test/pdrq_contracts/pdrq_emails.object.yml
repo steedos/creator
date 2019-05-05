@@ -5,6 +5,7 @@ fields:
   emailId: 
     type: number
     primary: true
+    generated: true
     label: 邮件ID
     omit: true
   subject:
