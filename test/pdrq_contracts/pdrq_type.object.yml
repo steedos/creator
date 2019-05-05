@@ -9,6 +9,7 @@ fields:
     searchable: true
     sortable: true
     label: Id
+    omit: true
   id:
     type: text
     label: 编号
