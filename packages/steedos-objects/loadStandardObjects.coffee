@@ -76,14 +76,10 @@ Meteor.startup ->
 		#### 测试代码结束 ####
 		express = require('express');
 		graphqlHTTP = require('express-graphql');
-		Cookies = require("cookies");
 		app = express();
 		router = express.Router();
 		router.use((req, res, next)->
-			cookies = new Cookies(req, res)
-			authToken = req.headers['x-auth-token'] || cookies.get("X-Auth-Token")
-			if !authToken && req.headers.authorization && req.headers.authorization.split(' ')[0] == 'Bearer'
-				authToken = req.headers.authorization.split(' ')[1]
+			authToken = authToken = Steedos.getAuthToken(req, res)
 
 			user = null
 			if authToken
@@ -93,6 +89,7 @@ Meteor.startup ->
 				)(authToken)
 
 			if user
+				req.userSession = user
 				next();
 			else
 				res.status(401).send({ errors: [{ 'message': 'You must be logged in to do this.' }] });
