@@ -44,7 +44,7 @@ _itemClick = (e, object_name, dxSearchGridInstance)->
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"
 
-	actionSheet = $(".action-sheet").dxActionSheet(actionSheetOption).dxActionSheet("instance")
+	actionSheet = $(".action-sheet-#{object_name.replace(/./g, '-')}").dxActionSheet(actionSheetOption).dxActionSheet("instance")
 	
 	actionSheet.option("target", e.event.target);
 	actionSheet.option("visible", true);
