@@ -9,7 +9,7 @@ Creator.odata.get = (object_name, record_id, select_fields, expand, callback)->
 		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}/#{record_id}"
 		request_data = {}
 		if select_fields
-			request_data = 
+			request_data =
 				"$select": select_fields
 		if expand
 			request_data["$expand"] = expand
@@ -23,6 +23,7 @@ Creator.odata.get = (object_name, record_id, select_fields, expand, callback)->
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+				request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 			success: (data) ->
 				result = data
 				if isAsync
@@ -45,7 +46,7 @@ Creator.odata.get = (object_name, record_id, select_fields, expand, callback)->
 					toastr?.error?("未找到记录")
 				if isAsync
 					callback(false, error)
-				
+
 	else
 		toastr.error("未找到记录")
 	return result
@@ -69,6 +70,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 				beforeSend: (request) ->
 					request.setRequestHeader('X-User-Id', Meteor.userId())
 					request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+					request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 				error: (jqXHR, textStatus, errorThrown) ->
 					error = jqXHR.responseJSON
 					console.error error
@@ -129,7 +131,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 					if isAsync
 						callback(false, error)
 				)
-	
+
 
 Creator.odata.queryCount = (object_name, options, callback)->
 	result = null
@@ -194,6 +196,7 @@ Creator.odata.delete = (object_name,record_id,callback)->
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+				request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 
 			success: (data) ->
 				if callback and typeof callback == "function"
@@ -232,6 +235,7 @@ Creator.odata.update = (object_name,record_id,doc,callback)->
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+				request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 
 			success: (data) ->
 				if callback and typeof callback == "function"
@@ -264,6 +268,7 @@ Creator.odata.insert = (object_name,doc)->
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+				request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 
 			# success: (data) ->
 			# 	if callback and typeof callback == "function"

@@ -10,6 +10,7 @@ oDataOperation = (type, url, data, object_name, operation)->
 		beforeSend: (request) ->
 			request.setRequestHeader 'X-User-Id', Meteor.userId()
 			request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
+			request.setRequestHeader 'X-Space-Id', Steedos.spaceId()
 		success: (data) ->
 			if operation == "insert"
 				value = data.value[0]
