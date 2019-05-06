@@ -19,9 +19,6 @@ Meteor.startup ->
 			driver: 'meteor-mongo'
 			objects: newObjects
 			objectsRolesPermission: objectsRolesPermission
-			getRoles: (userId)->
-				# TODO 获取用户角色
-				return ['admin']
 		})
 
 		#### 测试代码开始 TODO:remove ####
