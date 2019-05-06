@@ -89,7 +89,8 @@ Meteor.startup ->
 				)(authToken)
 
 			if user
-				req.userSession = user
+				# 暂不启用权限校验
+				# req.userSession = user
 				next();
 			else
 				res.status(401).send({ errors: [{ 'message': 'You must be logged in to do this.' }] });
