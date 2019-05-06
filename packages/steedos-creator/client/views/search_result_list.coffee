@@ -197,8 +197,9 @@ Template.search_result_list.onRendered ->
 			onCellClick: (e)->
 				if e.column?.dataField ==  "_id_actions"
 					_itemClick(e, object_name, self.dxSearchGridInstance)
-
-		self.dxSearchGridInstance = self.$(".search-gridContainer-#{object_name}").dxDataGrid(dxOptions).dxDataGrid('instance')
+		module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+			DevExpress.ui.dxDataGrid = dxDataGrid;
+			self.dxSearchGridInstance = self.$(".search-gridContainer-#{object_name}").dxDataGrid(dxOptions).dxDataGrid('instance')
 
 Template.search_result_list.helpers 
 	object_name: ()->
