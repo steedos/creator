@@ -89,7 +89,7 @@ Meteor.startup ->
 				)(authToken)
 
 			if user
-				# 暂不启用权限校验
+				# 因为没有spaceId,无法获取roles，暂不启用权限校验
 				# req.userSession = user
 				next();
 			else
