@@ -70,7 +70,7 @@
 "@steedos/auth@file:../object-server/packages/auth":
   version "1.0.1"
   dependencies:
-    "@steedos/objectql" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-auth-1.0.1-e292351c-8ac0-40f2-bf6a-cfa6ad319c6f-1557128068161/node_modules/@steedos/objectql"
+    "@steedos/objectql" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-auth-1.0.1-ade6e328-2185-4a8a-8c36-05637bba5183-1557211154719/node_modules/@steedos/objectql"
 
 "@steedos/core@file:../object-server/packages/core":
   version "1.1.10"
@@ -78,7 +78,7 @@
     "@salesforce/dev-config" "^1.4.4"
     "@salesforce/kit" "^1.0.4"
     "@salesforce/ts-types" "^1.1.1"
-    "@steedos/auth" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-core-1.1.10-99a21f4f-8085-49cd-85c3-1c19c039858e-1557128069689/node_modules/@steedos/auth"
+    "@steedos/auth" "file:../../../AppData/Local/Yarn/Cache/v4/npm-@steedos-core-1.1.10-bdb32c5b-87a7-4483-b140-da759a6c282b-1557211154898/node_modules/@steedos/auth"
     "@types/express" "^4.16.1"
     "@types/mongodb" "^3.1.22"
     "@types/node" "^11.10.4"
