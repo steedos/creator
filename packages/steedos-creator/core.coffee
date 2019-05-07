@@ -111,7 +111,7 @@ Creator.getObjectRecord = (object_name, record_id)->
 	if collection
 		record = collection.findOne(record_id)
 		if Meteor.isClient && !record
-			return Template.instance()?.record.get()
+			return Template.instance()?.record?.get()
 
 		return record
 
