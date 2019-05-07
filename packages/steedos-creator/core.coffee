@@ -228,7 +228,7 @@ options参数：
 extend为true时，后端需要额外传入userId及spaceId用于抓取Creator.USER_CONTEXT对应的值
 ###
 Creator.formatFiltersToMongo = (filters, options)->
-	unless filters.length
+	unless filters?.length
 		return
 	# 当filters不是[Array]类型而是[Object]类型时，进行格式转换
 	unless filters[0] instanceof Array
@@ -352,7 +352,7 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 			logicTempFilters.push("or")
 		logicTempFilters.pop()
 		filters = logicTempFilters
-	
+
 	object_fields = Creator.getObject(object_name).fields
 
 	selector = []
@@ -370,7 +370,7 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 					return null
 			else
 				return null
-		
+
 		if filters_loop.length == 1
 			# 只有一个元素，进一步解析其内容
 			tempLooperResult = filtersLooper(filters_loop[0])

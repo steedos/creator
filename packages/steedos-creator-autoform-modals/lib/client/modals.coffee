@@ -33,6 +33,7 @@ oDataOperation = (type, url, data, object_name)->
 		beforeSend: (request) ->
 			request.setRequestHeader 'X-User-Id', Meteor.userId()
 			request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
+			request.setRequestHeader 'X-Space-Id', Steedos.spaceId()
 		success: (data) ->
 			console.log('oDataOperation success');
 			if Session.get("cmOperation") == "insert"
@@ -78,20 +79,20 @@ getSimpleSchema = (collectionName)->
 
 		if Session.get 'cmMeteorMethod'
 			#新增_ids虚拟字段，以实现条记录同时更新
-			final_schema._ids = 
+			final_schema._ids =
 				type: String
 				optional: true
 				autoform:
 					type: "hidden"
 			#新增_object_name虚拟字段，以让后台method知道更新哪个表
-			final_schema._object_name = 
+			final_schema._object_name =
 				type: String
 				optional: true
 				autoform:
 					type: "hidden"
 					defaultValue: ->
 						return getObjectName collectionName
-		
+
 	return new SimpleSchema(final_schema)
 
 
@@ -117,7 +118,7 @@ Template.CreatorAutoformModals.rendered = ->
 		if Steedos?.setModalMaxHeight
 			Steedos.setModalMaxHeight()
 		$(window).bind 'keyup', onEscKey
-		
+
 		setTimeout ->
 			$("#afModal .form-control:first").focus()
 		, 100
@@ -161,7 +162,7 @@ Template.CreatorAutoformModals.rendered = ->
 
 		AutoForm.resetForm(Session.get('cmFormId') or defaultFormId)
 
-		# 如果用户操作为保存并新建 再次触发一次点击事件 
+		# 如果用户操作为保存并新建 再次触发一次点击事件
 		if Session.get 'cmShowAgain'
 			keyPress = Session.get 'cmPressKey'
 			keyPress = '.' + keyPress.replace(/\s+/ig, '.')
@@ -193,7 +194,7 @@ Template.CreatorAutoformModals.events
 		url = Meteor.absoluteUrl()
 		_id = Session.get('cmDoc')._id
 		url = Steedos.absoluteUrl "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{_id}"
-		
+
 		$.ajax
 			type: "delete"
 			url: url
@@ -202,6 +203,7 @@ Template.CreatorAutoformModals.events
 			beforeSend: (request) ->
 				request.setRequestHeader('X-User-Id', Meteor.userId())
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
+				request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 
 			success: (data) ->
 				$('#afModal').modal 'hide'
@@ -220,7 +222,7 @@ Template.CreatorAutoformModals.events
 		formId = Session.get('cmFormId') or defaultFormId
 		$("#"+formId, "#afModal").submit()
 		Session.set 'cmShowAgain', true
-	
+
 	'click .group-section-control': (event, template) ->
 		event.preventDefault()
 		event.stopPropagation()
@@ -308,7 +310,7 @@ helpers =
 
 	cmTargetIds: ()->
 		Session.get('cmTargetIds')
-	
+
 	schema: ()->
 		cmCollection = Session.get 'cmCollection'
 		return getSimpleSchema(cmCollection)
@@ -325,7 +327,7 @@ helpers =
 			permission_fields = _.clone(Creator.getFields(object_name))
 			unless permission_fields
 				permission_fields = []
-			
+
 			if Session.get 'cmMeteorMethod'
 				permission_fields.push "_ids"
 				permission_fields.push "_object_name"
@@ -336,14 +338,14 @@ helpers =
 				firstLevelKeys = _.intersection(firstLevelKeys, cmFields)
 			if Session.get 'cmOmitFields'
 				firstLevelKeys = _.difference firstLevelKeys, [Session.get('cmOmitFields')]
-			
+
 			_.each schema, (value, key) ->
 				if (_.indexOf firstLevelKeys, key) > -1
 					if !value.autoform?.omit
 						keys.push key
 
 			if keys.length == 1
-				finalFields = 
+				finalFields =
 					grouplessFields: [keys]
 				return finalFields
 
@@ -374,7 +376,7 @@ helpers =
 					name: fieldGroupName
 					fields: fieldsForGroup
 
-			finalFields = 
+			finalFields =
 				grouplessFields: grouplessFields
 				groupFields: fieldGroups
 				hiddenFields: hiddenFields
@@ -425,7 +427,7 @@ helpers =
 			object_name = getObjectName(cmCollection)
 			fields = Creator.getObject(object_name).fields
 			return fields[key]?.inlineHelpText
-	
+
 Template.CreatorAutoformModals.helpers helpers
 
 Template.CreatorFormField.helpers helpers
@@ -441,7 +443,7 @@ Template.CreatorFormField.onRendered ->
 		"""
 		$(".control-label", $(this)).after(html)
 
-	
+
 	self.$(".info-popover").each ->
 		_id = $("~ .form-group .help-info", $(this)).attr("id");
 		$(this).dxPopover
@@ -581,7 +583,7 @@ Template.CreatorAfModal.events
 								_id = updateDoc["$set"]._ids || Session.get("cmDoc")._id
 							else
 								_id = Session.get("cmDoc")._id
-							
+
 						else
 							_id = Session.get("cmDoc")._id
 
@@ -621,7 +623,7 @@ Template.CreatorAfModal.events
 							_.each triggers, (trigger, key)->
 								if trigger.on == "client" and (trigger.when == "before.update" or trigger.when == "after.update")
 									trigger.todo.apply({object_name: object_name},[userId, data])
-					
+
 
 					_.each urls, (url)->
 						oDataOperation.call(self, type, url, data, object_name)
@@ -637,7 +639,7 @@ Template.CreatorAfModal.events
 					# 	record_id = result._id
 					# 	url = "/app/#{app_id}/#{object_name}/view/#{record_id}"
 					# 	FlowRouter.go url
-				
+
 				onError: (operation,error) ->
 					console.error error
 					if error.reason
