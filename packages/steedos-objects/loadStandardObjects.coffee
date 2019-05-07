@@ -41,7 +41,7 @@ Meteor.startup ->
 				tdsVersion: "7_2"
 				useUTC: true
 			},
-			url: "mssql://sa:hotoainc.@192.168.0.190/hotoa_main_stock",
+			url: Meteor.settings.datasource.stock.url,
 			objectFiles: [path.join(testRootDir, 'stock')]
 		})
 
@@ -55,7 +55,7 @@ Meteor.startup ->
 				tdsVersion: "7_2"
 				useUTC: true
 			},
-			url: "mssql://sa:hotoainc.@192.168.0.235/hotoa_main_svn",
+			url: Meteor.settings.datasource.pdrq.url,
 			objectFiles: [path.join(testRootDir, 'pdrq_contracts')]
 		})
 
