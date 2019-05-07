@@ -14,6 +14,7 @@ fields:
     searchable: true
     sortable: true
     is_name: true
+    group: '分组测试'
   startDate:
     type: datetime
     label: 日期
