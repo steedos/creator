@@ -550,6 +550,9 @@ Template.creator_grid.onRendered ->
 			# 对于a.b的字段，发送odata请求时需要转换为a/b
 			selectColumns = selectColumns.map (n)->
 				return n.replace(".", "/");
+			if !filter
+				# filter 为undefined时要设置为空，否则dxDataGrid控件会使用上次使用过的filter
+				filter = null
 			dxOptions =
 				paging:
 					pageSize: pageSize
