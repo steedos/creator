@@ -9,7 +9,6 @@ fields:
   id: 
     type: text
     primary: true
-    generated: true
   message:
     type: text
     label: 内容

@@ -5,7 +5,6 @@ fields:
   id: 
     type: text
     primary: true
-    generated: true
   username:
     type: text
     label: 用户名
