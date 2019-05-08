@@ -35,33 +35,35 @@ Meteor.startup ->
 
 		Creator.steedosSchema.getDataSource('mall').createTables()
 
-		Creator.steedosSchema.addDataSource('stock', {
-			driver: "sqlserver",
-			options: {
-				tdsVersion: "7_2"
-				useUTC: true
-			},
-			url: Meteor.settings.datasource.stock.url,
-			objectFiles: [path.join(testRootDir, 'stock')]
-		})
+		if Meteor.settings.datasource?.stock?.url
+			Creator.steedosSchema.addDataSource('stock', {
+				driver: "sqlserver",
+				options: {
+					tdsVersion: "7_2"
+					useUTC: true
+				},
+				url: Meteor.settings.datasource.stock.url,
+				objectFiles: [path.join(testRootDir, 'stock')]
+			})
 
-		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'stock'))
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'stock'))
 
-		Creator.steedosSchema.getDataSource('stock').createTables()
+			Creator.steedosSchema.getDataSource('stock').createTables()
 
-		Creator.steedosSchema.addDataSource('pdrq', {
-			driver: "sqlserver",
-			options: {
-				tdsVersion: "7_2"
-				useUTC: true
-			},
-			url: Meteor.settings.datasource.pdrq.url,
-			objectFiles: [path.join(testRootDir, 'pdrq_contracts')]
-		})
+		if Meteor.settings.datasource?.pdrq?.url
+			Creator.steedosSchema.addDataSource('pdrq', {
+				driver: "sqlserver",
+				options: {
+					tdsVersion: "7_2"
+					useUTC: true
+				},
+				url: Meteor.settings.datasource.pdrq.url,
+				objectFiles: [path.join(testRootDir, 'pdrq_contracts')]
+			})
 
-		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'pdrq_contracts'))
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'pdrq_contracts'))
 
-		Creator.steedosSchema.getDataSource('pdrq').createTables()
+			Creator.steedosSchema.getDataSource('pdrq').createTables()
 
 		Creator.steedosSchema.addDataSource('mongo', {
 			driver: "mongo"
@@ -72,6 +74,17 @@ Meteor.startup ->
 		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
 
 		Creator.steedosSchema.getDataSource('mongo').createTables()
+		
+		if Meteor.settings.datasource?.mattermost?.url
+			Creator.steedosSchema.addDataSource('mattermost', {
+				driver: "postgres",
+				url: Meteor.settings.datasource.mattermost.url,
+				objectFiles: [path.join(testRootDir, 'mattermost')]
+			})
+
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mattermost'))
+
+			Creator.steedosSchema.getDataSource('mattermost').createTables()
 
 		#### 测试代码结束 ####
 		express = require('express');
