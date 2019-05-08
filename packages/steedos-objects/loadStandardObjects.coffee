@@ -85,6 +85,17 @@ Meteor.startup ->
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mattermost'))
 
 			Creator.steedosSchema.getDataSource('mattermost').createTables()
+		
+		if Meteor.settings.datasource?.test_postgres?.url
+			Creator.steedosSchema.addDataSource('test_postgres', {
+				driver: "postgres",
+				url: Meteor.settings.datasource.test_postgres.url,
+				objectFiles: [path.join(testRootDir, 'test_postgres')]
+			})
+
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'test_postgres'))
+
+			Creator.steedosSchema.getDataSource('test_postgres').createTables()
 
 		#### 测试代码结束 ####
 		express = require('express');
