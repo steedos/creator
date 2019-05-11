@@ -325,7 +325,7 @@ Template.creator_view.helpers
 		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
 			return true
 		record = Creator.getObjectRecord()
-		return !record.locked
+		return !record?.locked
 
 	detail_info_visible: ()->
 		return Session.get("detail_info_visible")
