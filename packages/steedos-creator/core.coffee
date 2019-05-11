@@ -600,6 +600,10 @@ Creator.getActions = (object_name, spaceId, userId)->
 	disabled_actions = permissions.disabled_actions
 	actions = _.sortBy(_.values(obj.actions) , 'sort');
 
+	_.each actions, (action)->
+		if Steedos.isMobile() && action.on == "record" && action.name != 'standard_edit'
+			action.on = 'record_more'
+
 	actions = _.filter actions, (action)->
 		return _.indexOf(disabled_actions, action.name) < 0
 
