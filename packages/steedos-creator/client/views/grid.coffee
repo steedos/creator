@@ -253,7 +253,6 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	else
 		#默认读取default view的sort配置
 		list_view_sort = column_default_sort
-
 	result = columns.map (n,i)->
 		field = object.fields[n]
 		columnItem =
@@ -432,7 +431,7 @@ Template.creator_grid.onRendered ->
 							filter = [ filter, "and", sidebarFilter ]
 						else
 							filter = sidebarFilter
-			if Steedos.isMobile()
+			if Steedos.isMobile() && curObject.NAME_FIELD_KEY
 				selectColumns = [curObject.NAME_FIELD_KEY]
 			else
 				selectColumns = Tracker.nonreactive ()->
