@@ -99,8 +99,5 @@ JsonRoutes.add "get", "/api/setup/sso/:app_id", (req, res, next) ->
 	res.end()
 	return
 
-
-
-
-
-
+# get '/api/jwt/sso'
+WebApp.connectHandlers.use(require('@steedos/auth').jwtApp)
