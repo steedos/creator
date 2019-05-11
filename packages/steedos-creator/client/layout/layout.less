@@ -25,3 +25,55 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .creatorHeader{
+        display: none !important;
+    }
+    .creator-content-wrapper{
+        top: 50px !important;
+    }
+
+    .grid-info-actions{
+        display: none !important;
+    }
+
+    .grid-actions{
+        display: none !important;
+    }
+
+    [class*="list-action-custom-"]{
+        display: none;
+    }
+
+    .list-action-custom-standard_new{
+        display: flex !important;
+        border-radius: 0 0 0 0 !important;
+    }
+
+    .tabular_info{
+        display: none !important;
+    }
+
+    .grid-search-div{
+        width: 100%;
+        >div{
+            width: 100%;
+            .search-in-list{
+                width: 100%;
+                margin: 0;
+            }
+        }
+    }
+
+    .creator_view{
+        .slds-page-header_bleed{
+            .slds-media__figure{
+                display: none !important;
+            }
+        }
+        .crm-breadcrumb-item{
+            display: none !important;
+        }
+    }
+}
