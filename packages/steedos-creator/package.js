@@ -129,6 +129,14 @@ Package.onUse(function (api) {
 
 	api.addFiles('client/views/_helpers.coffee', 'client');
 
+	api.addFiles('client/layout/sidebar_left.html', 'client');
+	api.addFiles('client/layout/sidebar_left.less', 'client');
+	api.addFiles('client/layout/sidebar_left.coffee', 'client');
+
+	api.addFiles('client/layout/mobile_header.html', 'client');
+	api.addFiles('client/layout/mobile_header.less', 'client');
+	api.addFiles('client/layout/mobile_header.coffee', 'client');
+
 	api.addFiles('client/layout/layout.html', 'client');
 	api.addFiles('client/layout/layout.less', 'client');
 	api.addFiles('client/layout/layout.coffee', 'client');
