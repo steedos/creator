@@ -8,7 +8,10 @@ Template.object_list_modal.helpers
 			return Creator.getRelativeUrl(this.url);
 		else if this._id
 			return Creator.getRelativeUrl("/app/#{this._id}/");
-
+	isActive: ()->
+		if this._id == Session.get("app_id")
+			return true;
+		return false;
 
 Template.object_list_modal.events
 	"click .app-item": (event, template) ->
