@@ -43,10 +43,14 @@ if Meteor.isClient
 
 		"standard_edit": (object_name, record_id, fields)->
 			if record_id
-				if Steedos.isMobile()
-					record = Creator.getObjectRecord(object_name, record_id)
-					Session.set 'cmDoc', record
-					Session.set 'reload_dxlist', false
+				if Steedos.isMobile() && false
+#					record = Creator.getObjectRecord(object_name, record_id)
+#					Session.set 'cmDoc', record
+#					Session.set 'reload_dxlist', false
+					Session.set 'action_object_name', object_name
+					Session.set 'action_record_id', record_id
+					if this.record
+						Session.set 'cmDoc', this.record
 					Meteor.defer ()->
 						$(".btn-edit-record").click()
 				else

@@ -4,7 +4,7 @@ Creator.getLayout = (app_id)->
 	if app_id == "steedos"
 		return "steedosLayout"
 	else
-		if Steedos.isMobile()
+		if Steedos.isMobile() && false
 			return "creatorMobileLayout"
 		else
 			return "creatorLayout"
