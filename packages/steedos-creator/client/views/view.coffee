@@ -31,7 +31,7 @@ _expandFields = (object_name, columns)->
 #			expand_fields.push(n)
 	return expand_fields
 
-loadRecord = (template, object_name, record_id)->
+loadRecordFromOdata = (template, object_name, record_id)->
 	object = Creator.getObject(object_name)
 
 	_fields = object.fields
@@ -56,7 +56,7 @@ Template.creator_view.onCreated ->
 	object = Creator.getObject(object_name)
 	template = Template.instance()
 	this.onEditSuccess = onEditSuccess = (formType,result)->
-		loadRecord(template, Session.get("object_name"), Session.get("record_id"))
+		loadRecordFromOdata(template, Session.get("object_name"), Session.get("record_id"))
 		$('#afModal').modal('hide')
 	if object.database_name && object.database_name != 'meteor-mongo'
 		this.agreement.set('odata')
@@ -65,6 +65,22 @@ Template.creator_view.onCreated ->
 		,false
 	else
 		this.agreement.set('subscribe')
+
+loadRecord = ()->
+	object_name = Session.get "object_name"
+	record_id = Session.get "record_id"
+	object = Creator.getObject(object_name)
+	object_fields = object.fields
+	if object_name and record_id
+		if !object.database_name || !object.database_name == 'meteor-mongo'
+			fields = Creator.getFields(object_name)
+			ref_fields = {}
+			_.each fields, (f)->
+				if f.indexOf(".")  < 0
+					ref_fields[f] = 1
+			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
+		else
+			loadRecordFromOdata(Template.instance(), object_name, record_id)
 
 Template.creator_view.onRendered ->
 	this.autorun ->
@@ -79,20 +95,11 @@ Template.creator_view.onRendered ->
 			$(".creator-view-tabs-content").removeClass("slds-show").addClass("slds-hide")
 			$("#creator-quick-form").addClass("slds-show")
 
-	object_name = Session.get "object_name"
-	record_id = Session.get "record_id"
-	object = Creator.getObject(object_name)
-	object_fields = object.fields
-	if object_name and record_id
-		if !object.database_name || !object.database_name == 'meteor-mongo'
-			fields = Creator.getFields(object_name)
-			ref_fields = {}
-			_.each fields, (f)->
-				if f.indexOf(".")  < 0
-					ref_fields[f] = 1
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_" + object_name, [record_id], ref_fields, Session.get("spaceId")
-		else
-			loadRecord(Template.instance(), object_name, record_id)
+	if Steedos.isMobile()
+		this.autorun ->
+			loadRecord()
+	else
+		loadRecord()
 
 	this.autorun ->
 		if Creator.subs["Creator"].ready()

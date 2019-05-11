@@ -87,6 +87,8 @@ Template.creator_table_cell.helpers Creator.helpers
 
 Template.creator_table_cell.helpers
 	openWindow: ()->
+		if Steedos.isMobile()
+			return false
 		if Template.instance().data?.open_window || Template.instance().data?.is_related
 			return true
 		object_name = this.object_name
