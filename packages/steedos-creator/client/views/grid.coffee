@@ -432,18 +432,20 @@ Template.creator_grid.onRendered ->
 							filter = [ filter, "and", sidebarFilter ]
 						else
 							filter = sidebarFilter
-
-			selectColumns = Tracker.nonreactive ()->
-				grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
-				if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
-					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-				if settingColumns
-					defaultColumns = _fields(curObjectName, list_view_id)
-					selectColumns = _.intersection(settingColumns, defaultColumns)
-					selectColumns = _.union(selectColumns, defaultColumns)
-				else
-					selectColumns = _fields(curObjectName, list_view_id)
-				return selectColumns
+			if Steedos.isMobile()
+				selectColumns = [curObject.NAME_FIELD_KEY]
+			else
+				selectColumns = Tracker.nonreactive ()->
+					grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
+					if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
+						settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
+					if settingColumns
+						defaultColumns = _fields(curObjectName, list_view_id)
+						selectColumns = _.intersection(settingColumns, defaultColumns)
+						selectColumns = _.union(selectColumns, defaultColumns)
+					else
+						selectColumns = _fields(curObjectName, list_view_id)
+					return selectColumns
 
 			pageIndex = Tracker.nonreactive ()->
 				if Session.get("page_index")
