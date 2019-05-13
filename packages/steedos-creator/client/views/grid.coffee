@@ -520,25 +520,25 @@ Template.creator_grid.onRendered ->
 						cellTemplate: (container, options) ->
 							Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 
-				showColumns.splice 0, 0,
-					dataField: "_index"
-					width: 50
-					allowResizing: false
-					alignment: "right"
-					allowExporting: true
-					allowSorting: false
-					allowReordering: false
-					caption: ""
-					cellTemplate: (container, options) ->
-						pageSize = self.dxDataGridInstance.pageSize()
-						pageIndex = self.dxDataGridInstance.pageIndex()
-						htmlText = options.rowIndex + 1 + pageSize * pageIndex
-						if needToShowLinkForIndexColumn
-							href = Creator.getObjectUrl(curObjectName, options.data._id)
-							htmlText = "<a href=\"#{href}\" class=\"grid-index-link\">#{htmlText}</a>"
-							$("<div>").append(htmlText).appendTo(container)
-						else
-							$("<div>").append(htmlText).appendTo(container)
+					showColumns.splice 0, 0,
+						dataField: "_index"
+						width: 50
+						allowResizing: false
+						alignment: "right"
+						allowExporting: true
+						allowSorting: false
+						allowReordering: false
+						caption: ""
+						cellTemplate: (container, options) ->
+							pageSize = self.dxDataGridInstance.pageSize()
+							pageIndex = self.dxDataGridInstance.pageIndex()
+							htmlText = options.rowIndex + 1 + pageSize * pageIndex
+							if needToShowLinkForIndexColumn
+								href = Creator.getObjectUrl(curObjectName, options.data._id)
+								htmlText = "<a href=\"#{href}\" class=\"grid-index-link\">#{htmlText}</a>"
+								$("<div>").append(htmlText).appendTo(container)
+							else
+								$("<div>").append(htmlText).appendTo(container)
 			_.every showColumns, (n)->
 				n.sortingMethod = Creator.sortingMethod
 			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
