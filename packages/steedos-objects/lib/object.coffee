@@ -1,6 +1,11 @@
 
 Creator.objectsByName = {}   # 此对象只能在确保所有Object初始化完成后调用， 否则获取到的object不全
 
+Creator.formatObjectName = (object_name)->
+	if object_name.startsWith('cfs.files.')
+		object_name = object_name.replace(new RegExp('\\.', 'g'), '_')
+	return object_name
+
 Creator.Object = (options)->
 	self = this
 	if (!options.name)

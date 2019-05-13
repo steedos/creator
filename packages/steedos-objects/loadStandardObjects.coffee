@@ -9,7 +9,14 @@ Meteor.startup ->
 		newObjects = {}
 		objectsRolesPermission = {}
 		_.each Creator.Objects, (obj, key)->
-			if /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(key)
+			#TODO 附件cfs.files.xxxx
+			if /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(key) == false
+				_obj = _.clone(obj)
+				_obj.tableName = _.clone(key)
+				_key = key.replace(new RegExp('\\.', 'g'), '_')
+				_obj.name = _key
+				newObjects[_key] = _obj
+			else
 				newObjects[key] = obj
 			objectsRolesPermission[key] = obj.permission_set
 
@@ -74,7 +81,6 @@ Meteor.startup ->
 		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
 
 		Creator.steedosSchema.getDataSource('mongo').createTables()
-		
 		if Meteor.settings.datasource?.mattermost?.url
 			Creator.steedosSchema.addDataSource('mattermost', {
 				driver: "postgres",
@@ -85,7 +91,6 @@ Meteor.startup ->
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mattermost'))
 
 			Creator.steedosSchema.getDataSource('mattermost').createTables()
-		
 		if Meteor.settings.datasource?.test_postgres?.url
 			Creator.steedosSchema.addDataSource('test_postgres', {
 				driver: "postgres",

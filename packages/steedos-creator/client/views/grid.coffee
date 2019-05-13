@@ -341,12 +341,13 @@ Template.creator_grid.onRendered ->
 		listTreeCompany = Session.get('listTreeCompany')
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
+				_obj_name = Creator.formatObjectName(related_object_name)
 				if Creator.getListViewIsRecent(object_name, list_view_id)
-					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{related_object_name}/recent"
+					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 				else
-					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{related_object_name}"
+					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
 				filter_logic = Session.get("filter_logic")
@@ -399,13 +400,13 @@ Template.creator_grid.onRendered ->
 						filter_logic: filter_logic
 						filter_scope: filter_scope
 						filters: _filters
-
+				_obj_name = Creator.formatObjectName(object_name)
 				if Creator.getListViewIsRecent(object_name, list_view_id)
-					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{object_name}/recent"
+					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 				else
-					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{object_name}"
+					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length

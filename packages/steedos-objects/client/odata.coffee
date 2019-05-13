@@ -1,12 +1,13 @@
 Creator.odata = {}
 Creator.odata.get = (object_name, record_id, select_fields, expand, callback)->
+	_object_name = Creator.formatObjectName(object_name)
 	result = null
 	isAsync = callback and _.isFunction(callback)
 	spaceId = Steedos.spaceId()
 	unless spaceId
 		return
 	if object_name and record_id
-		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}/#{record_id}"
+		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}/#{record_id}"
 		request_data = {}
 		if select_fields
 			request_data =
@@ -52,6 +53,7 @@ Creator.odata.get = (object_name, record_id, select_fields, expand, callback)->
 	return result
 
 Creator.odata.query = (object_name, options, is_ajax, callback)->
+	_object_name = Creator.formatObjectName(object_name)
 	result = null
 	spaceId = Steedos.spaceId()
 	unless spaceId
@@ -59,7 +61,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 	isAsync = callback and _.isFunction(callback)
 	if is_ajax
 		if object_name
-			url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}"
+			url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}"
 			$.ajax
 				type: "get"
 				url: url
@@ -89,7 +91,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 		return result
 	else
 		if object_name
-			url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}"
+			url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}"
 			options.store = new DevExpress.data.ODataStore({
 				type: "odata"
 				version: 4
@@ -134,6 +136,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 
 
 Creator.odata.queryCount = (object_name, options, callback)->
+	_object_name = Creator.formatObjectName(object_name)
 	result = null
 	spaceId = Steedos.spaceId()
 	unless spaceId
@@ -141,7 +144,7 @@ Creator.odata.queryCount = (object_name, options, callback)->
 	unless callback and _.isFunction(callback)
 		return
 	if object_name
-		url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}"
+		url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}"
 		store = new DevExpress.data.ODataStore({
 			type: "odata"
 			version: 4
@@ -182,12 +185,13 @@ Creator.odata.queryCount = (object_name, options, callback)->
 			)
 
 Creator.odata.delete = (object_name,record_id,callback)->
+	_object_name = Creator.formatObjectName(object_name)
 	console.log('odata.delete...');
 	spaceId = Steedos.spaceId()
 	unless spaceId
 		return
 	if object_name and record_id
-		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}/#{record_id}"
+		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}/#{record_id}"
 		$.ajax
 			type: "delete"
 			url: url
@@ -218,11 +222,12 @@ Creator.odata.delete = (object_name,record_id,callback)->
 					toastr?.error?(error)
 
 Creator.odata.update = (object_name,record_id,doc,callback)->
+	_object_name = Creator.formatObjectName(object_name)
 	spaceId = Steedos.spaceId()
 	unless spaceId
 		return
 	if object_name and record_id
-		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}/#{record_id}"
+		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}/#{record_id}"
 		data = {}
 		data['$set'] = doc
 		$.ajax
@@ -253,11 +258,12 @@ Creator.odata.update = (object_name,record_id,doc,callback)->
 				else
 					toastr?.error?(error)
 Creator.odata.insert = (object_name,doc)->
+	_object_name = Creator.formatObjectName(object_name)
 	spaceId = Steedos.spaceId()
 	unless spaceId
 		return
 	if object_name
-		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{object_name}"
+		url = Steedos.absoluteUrl "#{Creator.getObjectODataRouterPrefix(Creator.getObject(object_name))}/#{spaceId}/#{_object_name}"
 		$.ajax
 			type: "post"
 			url: url
