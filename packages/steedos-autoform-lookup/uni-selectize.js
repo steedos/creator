@@ -557,6 +557,21 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 		if (params) {
 			self.removeUnusedItems(options);
 		}
+
+		if(_.isNumber(values)){
+			values = values.toString()
+		}
+
+		if(_.isArray(values)){
+			values.map( function(v){
+				if(_.isNumber(values)){
+					return v.toString()
+				}else{
+					return v
+				}
+			})
+		}
+
 		self.addItems(options, values);
 		Meteor.setTimeout(function () {
 			self.initialized.set(1);
