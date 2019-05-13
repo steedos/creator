@@ -476,7 +476,7 @@ Template.creator_grid.onRendered ->
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
 			actions = Creator.getActions(curObjectName)
-			if actions.length
+			if !Steedos.isMobile() && actions.length
 				showColumns.push
 					dataField: "_id_actions"
 					width: 46
@@ -802,6 +802,10 @@ Template.creator_grid.events
 		page_index = Template.instance().dxDataGridInstance.pageIndex()
 		object_name = Session.get("object_name")
 		Session.set 'page_index', {object_name: object_name, page_index: page_index}
+
+	'click .dx-datagrid-table .dx-row-lines': (event, template)->
+		if Steedos.isMobile()
+			FlowRouter.go($("a", event.currentTarget).attr('href'))
 
 Template.creator_grid.onCreated ->
 	self = this
