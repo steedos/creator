@@ -32,6 +32,20 @@
     }
     .creator-content-wrapper{
         top: 50px !important;
+        padding: 0px !important;
+
+        .creator_view{
+            padding: 0px !important;
+            .slds-page-header{
+                border-radius: 0px !important;
+                border: 0px !important;
+            }
+            .slds-card{
+                border-radius: 0px !important;
+                border-left: 0px !important;
+                border-right: 0px !important;
+            }
+        }
     }
 
     .grid-info-actions{
@@ -94,4 +108,51 @@
             top: 80px !important;
         }
     }
+
+    .creator-list-wrapper{
+        padding: 0 !important;
+    }
+
+    .listViewManager{
+
+        .dx-datagrid-headers{
+            display: none !important;
+        }
+
+        .slds-page-header--object-home{
+            border: 0px !important;
+            border-radius: 0px !important;
+            padding: 7px !important;
+            border-bottom: 1px solid #dddbda !important;
+        }
+
+        .list-table-container{
+            border-bottom-right-radius: 0px !important;
+            border-bottom-left-radius: 0px !important;
+        }
+
+        .dx-datagrid-pager{
+            .dx-page-sizes{
+                display: none !important;
+            }
+        }
+
+        .slds-cell-edit{
+            padding: 7px 7px !important;
+
+            .table-cell-edit{
+                display: none !important;
+            }
+
+            .field-text:after{
+                content: '\f010';
+                display: block;
+                width: 21px;
+                font-family: DXIcons;
+                opacity: .3;
+                font-size: 21px;
+            }
+        }
+    }
+
 }
