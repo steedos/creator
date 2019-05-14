@@ -281,20 +281,6 @@ Creator.Objects.contracts =
 			allowRead: true
 			modifyAllRecords: true
 			viewAllRecords: true
-		workflow_admin:
-			allowCreate: true
-			allowDelete: true
-			allowEdit: true
-			allowRead: true
-			modifyAllRecords: false
-			viewAllRecords: false
-			modifyCompanyRecords: true
-			viewCompanyRecords: true
-			disabled_list_views: []
-			disabled_actions: []
-			unreadable_fields: []
-			uneditable_fields: []
-			unrelated_objects: []
 
 if Meteor.isServer
 
