@@ -184,9 +184,9 @@ Package.onUse(function (api) {
 	// api.addFiles('client/mobile/mobile_report.coffee', 'client');
 	api.addFiles('client/mobile/switch_space.html', 'client');
 	api.addFiles('client/mobile/switch_space.coffee', 'client');
-	api.addFiles('client/mobile/object_list.html', 'client');
-	api.addFiles('client/mobile/object_list.coffee', 'client');
-	api.addFiles('client/mobile/object_list.less', 'client');
+	api.addFiles('client/mobile/apps_modal.html', 'client');
+	api.addFiles('client/mobile/apps_modal.coffee', 'client');
+	api.addFiles('client/mobile/apps_modal.less', 'client');
 
 	api.addFiles('client/views/calendarNew.less', 'client');
 	api.addFiles('client/views/calendarNew.html', 'client');

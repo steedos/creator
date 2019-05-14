@@ -37,7 +37,7 @@ Template.creatorSidebarLeft.helpers
 
 Template.creatorSidebarLeft.events
 	"click #sidebarSwitcherButton": (e, t)->
-		Modal.show("object_list_modal")
+		Modal.show("mobile_apps_modal")
 	"click .settings-btn": (e, t)->
 		console.log('click .settings-btn');
 		FlowRouter.go '/user_settings'
