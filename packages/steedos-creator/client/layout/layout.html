@@ -1,17 +1,17 @@
 <template name="creatorLayout">
 	{{#unless isloading}}
 	<div class="steedos layout-top-nav skin-blue-light">
-		{{#if isMobile}}
-			{{> creatorMobileHeader}}
-		{{else}}
-			{{#unless hiddenHeader}}
+		{{#unless hiddenHeader}}
+			{{#if isMobile}}
+				{{> creatorMobileHeader}}
+			{{else}}
 				{{> creatorHeader}}
-			{{/unless}}
-		{{/if}}
+			{{/if}}
+		{{/unless}}
 
 		{{> creatorSidebarLeft}}
 
-		<div class="creator-content-wrapper {{#if split}}split{{/if}}" style="{{#if hiddenHeader}}top: 0px;{{/if}}">
+		<div class="creator-content-wrapper {{#if split}}split{{/if}}" style="{{#if hiddenHeader}}top: 0px !important;{{/if}}">
 			{{#if split}}
 				<div class="split-left">
 					{{> Template.dynamic template="creatorSidebar"}}

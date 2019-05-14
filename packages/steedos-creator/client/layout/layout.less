@@ -31,9 +31,9 @@
         display: none !important;
     }
     .creator-content-wrapper{
+        //z-index: 1040;
         top: 50px !important;
         padding: 0px !important;
-
         .creator_view{
             padding: 0px !important;
             .slds-page-header{
@@ -44,6 +44,57 @@
                 border-radius: 0px !important;
                 border-left: 0px !important;
                 border-right: 0px !important;
+            }
+
+            .actionsContainer{
+                position: fixed;
+                right: 9px;
+                top: 9px;
+                //z-index: 1060;
+            }
+
+            .record-action-custom{
+                color: #ffffff;
+                border: 0px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                margin-right: 7px;
+                width: 32px;
+                height: 32px;
+                padding: 0px;
+
+                .slds-button__icon_edit{
+                    color: #ffffff;
+                }
+            }
+
+            .slds-button_icon-border-filled{
+                border: 0px;
+                color: #ffffff;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+
+            .slds-page-header_bleed{
+                padding: 0px;
+            }
+
+            #creator-quick-form{
+                margin-top: 0px;
+                padding: 7px;
+                margin: 0px !important;
+            }
+
+            .row-main{
+                margin-top: 0px;
+                .related-object-tabular{
+                    margin-top: 7px !important;
+                    .slds-card__header{
+                        padding-top: 7px;
+                        margin-bottom: 7px;
+                    }
+                }
             }
         }
     }
@@ -82,6 +133,14 @@
     /*详细界面*/
     .creator_view{
         .slds-page-header_bleed{
+            >.slds-grid:first-child{
+                //position: sticky; 详细页面标题不需要固定
+                top: 0px;
+                //z-index: 1050;
+                background: #f3f2f2;
+                width: 100%;
+                padding: 7px;
+            }
             .slds-media__figure{
                 display: none !important;
             }
@@ -158,6 +217,12 @@
     .creator-modal{
         .slds-modal__header{
             padding: 0.5rem;
+        }
+
+        .slds-modal__content:last-child{
+            border-bottom-right-radius: 0px !important;
+            border-bottom-left-radius: 0px !important;
+            //box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);
         }
     }
 
