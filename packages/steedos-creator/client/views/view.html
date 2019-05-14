@@ -41,7 +41,11 @@
 												{{this.label}}
 												<input type="file" name="file" class="input-file-upload" data-parent="{{record._id}}" data-target-object-name="cfs-files-filerecord">
 											{{else}}
-												<div class="slds-truncate" title="{{this.label}}">{{this.label}}</div>
+												{{#if showEditIcon}}
+													{{> steedos_button_icon class="slds-button__icon" source="utility-sprite" name="edit"}}
+												{{else}}
+													<div class="slds-truncate" title="{{this.label}}">{{this.label}}</div>
+												{{/if}}
 											{{/if}}
 										</a>
 									</li>

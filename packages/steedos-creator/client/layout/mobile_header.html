@@ -6,11 +6,11 @@
 					<div class="container-fluid theme">
 						<div class="navbar-header">
 							{{#if isInDetail}}
-								<div id="sidebarCollapse" class="sidebar-collapse">
-									<span class="fa fa-2x fa-angle-left"></span>
-								</div>
+								<button type="button" class="navbar-toggle sidebar-collapse" id="sidebarCollapse">
+									{{> steedos_button_icon class="slds-button__icon" source="utility-sprite" name="chevronleft"}}
+								</button>
 								<div class="navbar-brand">
-									<div class="MenuWrapper ">
+									<div class="MenuWrapper detail-title">
 										<a>
 											<span class="heading">{{_ headerTitle}}</span>
 										</a>
@@ -18,7 +18,10 @@
 								</div>
 							{{else}}
 								<button type="button" class="navbar-toggle sidebar-show">
+									{{!--
 									{{> steedos_button_icon class="slds-button__icon" source="utility-sprite" name="rows"}}
+									--}}
+									{{> steedos_button_icon class="slds-button__icon" source="utility-sprite" name="chevronleft"}}
 								</button>
 								<div class="navbar-brand">
 									<div class="MenuWrapper ">

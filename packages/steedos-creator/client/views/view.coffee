@@ -412,6 +412,9 @@ Template.creator_view.helpers
 	agreement: ()->
 		return Template.instance().agreement.get()
 
+	showEditIcon: ()->
+		return Steedos.isMobile() && this.name == 'standard_edit'
+
 Template.creator_view.events
 
 	'click .record-action-custom': (event, template) ->
