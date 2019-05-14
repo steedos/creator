@@ -82,6 +82,8 @@
     "xlsx": "0.10.6"
   },
   "resolutions": {
-    "graphql": "^14.1.1"
+    "graphql": "^14.1.1",
+    "@steedos/objectql": "file:../object-server/packages/objectql",
+    "@steedos/auth": "file:../object-server/packages/auth"
   }
 }
