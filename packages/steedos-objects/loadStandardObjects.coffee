@@ -3,6 +3,13 @@ steedosCord.getObjectConfigManager().loadStandardObjects()
 # Creator.Objects = steedosCord.Objects
 # Creator.Reports = steedosCord.Reports
 Meteor.startup ->
+	SimpleSchema.extendOptions({filtersFunction: Match.Optional(Match.OneOf(Function, String))})
+	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
+	SimpleSchema.extendOptions({createFunction: Match.Optional(Match.OneOf(Function, String))})
+	_.each Creator.Objects, (obj, object_name)->
+		Creator.loadObjects obj, object_name
+
+Meteor.startup ->
 	try
 		objectql = require("@steedos/objectql")
 		steedosAuth = require("@steedos/auth")
@@ -19,6 +26,24 @@ Meteor.startup ->
 			else
 				newObjects[key] = obj
 			objectsRolesPermission[key] = obj.permission_set
+
+			Creator.getCollection('permission_objects').find({ object_name: key }).forEach (po)->
+				permission_set = Creator.getCollection('permission_set').findOne(po.permission_set_id, { fields: { name: 1 } })
+				objectsRolesPermission[key][permission_set.name] = {
+					allowCreate: po.allowCreate
+					allowDelete: po.allowDelete
+					allowEdit: po.allowEdit
+					allowRead: po.allowRead
+					modifyAllRecords: po.modifyAllRecords
+					viewAllRecords: po.viewAllRecords
+					modifyCompanyRecords: po.modifyCompanyRecords
+					viewCompanyRecords: po.viewCompanyRecords
+					disabled_list_views: po.disabled_list_views
+					disabled_actions: po.disabled_actions
+					unreadable_fields: po.unreadable_fields
+					uneditable_fields: po.uneditable_fields
+					unrelated_objects: po.unrelated_objects
+				}
 
 		Creator.steedosSchema = objectql.getSteedosSchema()
 

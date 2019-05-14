@@ -13,10 +13,6 @@ Meteor.startup ->
 	SimpleSchema.extendOptions({optionsFunction: Match.Optional(Match.OneOf(Function, String))})
 	SimpleSchema.extendOptions({createFunction: Match.Optional(Match.OneOf(Function, String))})
 
-	if Meteor.isServer
-		_.each Creator.Objects, (obj, object_name)->
-			Creator.loadObjects obj, object_name
-
 # Creator.fiberLoadObjects 供steedos-cli项目使用
 if Meteor.isServer
 	Fiber = require('fibers')
