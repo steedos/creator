@@ -250,17 +250,21 @@ Creator.Objects.contracts =
 #			operation: 'sum'
 
 	list_views:
-			recent:
-				label: "最近查看"
-				filter_scope: "space"
 			all:
 				label: "所有合同"
 				columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
 				filter_scope: "space"
 				filter_fields: ["company_id", "contract_type", "signed_date", "account", "contract_state"]
+			recent:
+				label: "最近查看"
+				filter_scope: "space"
+				columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
+				filter_fields: ["company_id", "contract_type", "signed_date", "account", "contract_state"]
 			mine:
 				label: "我的合同"
 				filter_scope: "mine"
+				columns: ["no", "name", "account", "company_id", "amount", "signed_date",  "contract_state"]
+				filter_fields: ["company_id", "contract_type", "signed_date", "account", "contract_state"]
 
 	permission_set:
 		user:
