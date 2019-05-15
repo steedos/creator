@@ -106,6 +106,7 @@ Meteor.startup ->
 		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
 
 		Creator.steedosSchema.getDataSource('mongo').createTables()
+		
 		if Meteor.settings.datasource?.mattermost?.url
 			Creator.steedosSchema.addDataSource('mattermost', {
 				driver: "postgres",
@@ -116,6 +117,7 @@ Meteor.startup ->
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mattermost'))
 
 			Creator.steedosSchema.getDataSource('mattermost').createTables()
+		
 		if Meteor.settings.datasource?.test_postgres?.url
 			Creator.steedosSchema.addDataSource('test_postgres', {
 				driver: "postgres",
@@ -126,6 +128,20 @@ Meteor.startup ->
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'test_postgres'))
 
 			Creator.steedosSchema.getDataSource('test_postgres').createTables()
+			
+		if Meteor.settings.datasource?.oracle_qhd?.connectString
+			Creator.steedosSchema.addDataSource('oracle_qhd', {
+				driver: "oracle",
+				connectString: Meteor.settings.datasource.oracle_qhd.connectString,
+				username: Meteor.settings.datasource.oracle_qhd.username,
+				password: Meteor.settings.datasource.oracle_qhd.password,
+				database: Meteor.settings.datasource.oracle_qhd.database,
+				objectFiles: [path.join(testRootDir, 'oracle_qhd')]
+			})
+
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'oracle_qhd'))
+
+			Creator.steedosSchema.getDataSource('oracle_qhd').createTables()
 
 		#### 测试代码结束 ####
 		express = require('express');
