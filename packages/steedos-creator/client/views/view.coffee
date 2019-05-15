@@ -549,32 +549,32 @@ Template.creator_view.events
 			field = field.join(",")
 		object_name = this.object_name
 		collection_name = Creator.getObject(object_name).label
-		doc = this.doc
+		doc = Creator.odata.get(object_name, Session.get("record_id"))
 		if doc
 			Session.set("cmFullScreen", full_screen)
 			Session.set("action_fields", field)
 			Session.set("action_collection", "Creator.Collections.#{Creator.getObject(object_name)._collection_name}")
 			Session.set("action_collection_name", collection_name)
 			Session.set("action_save_and_insert", false)
-			cmDoc = {}
-			objectFields = Creator.getObject(object_name).fields
-			_.each doc, (v, k)->
-				if template.agreement.get() == 'subscribe'
-					cmDoc[k] =v
-				else
-					if (objectFields[k]?.type == 'lookup' || objectFields[k]?.type == 'master_detail') && objectFields[k]?.reference_to
-						if objectFields[k].multiple
-							cmDoc[k] =  _.pluck(doc[k], "_id")
-						else
-							cmDoc[k] = doc[k]?._id
-					else if( v && _.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
-						cmDoc[k] = {}
-						_.each _.keys(v), (_sk)->
-							cmDoc[k][_sk] = _.pluck(doc[k][_sk], "_id")
-					else
-						cmDoc[k] =v
-			Session.set 'cmDoc', cmDoc
-
+#			cmDoc = {}
+#			objectFields = Creator.getObject(object_name).fields
+#			_.each doc, (v, k)->
+#				if template.agreement.get() == 'subscribe'
+#					cmDoc[k] =v
+#				else
+#					if (objectFields[k]?.type == 'lookup' || objectFields[k]?.type == 'master_detail') && objectFields[k]?.reference_to
+#						if objectFields[k].multiple
+#							cmDoc[k] =  _.pluck(doc[k], "_id")
+#						else
+#							cmDoc[k] = doc[k]?._id
+#					else if( v && _.keys(v).length > 0 && !_.isArray(v) && _.isObject(v))
+#						cmDoc[k] = {}
+#						_.each _.keys(v), (_sk)->
+#							cmDoc[k][_sk] = _.pluck(doc[k][_sk], "_id")
+#					else
+#						cmDoc[k] =v
+#			Session.set 'cmDoc', cmDoc
+			Session.set 'cmDoc', doc
 			Meteor.defer ()->
 				$(".btn.creator-edit").click()
 
