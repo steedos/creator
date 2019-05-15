@@ -44,6 +44,26 @@
 						</button>
 					</li>
 				{{/if}}
+				{{#if isNode}}
+					<li class="history-back slds-dropdown-trigger slds-dropdown-trigger_click slds-p-horizontal_xxx-small">
+						<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
+								title="点击可后退">
+							{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="back"}}
+						</button>
+					</li>
+					<li class="history-forward slds-dropdown-trigger slds-dropdown-trigger_click slds-p-horizontal_xxx-small">
+						<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
+								title="点击可前进">
+							{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="forward"}}
+						</button>
+					</li>
+					<li class="refresh slds-dropdown-trigger slds-dropdown-trigger_click slds-p-horizontal_xxx-small">
+						<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
+								title="重新加载此页面">
+							{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="refresh"}}
+						</button>
+					</li>
+				{{/if}}
 				<li class="slds-hide slds-dropdown-trigger slds-dropdown-trigger_click">
 					<button class="creator-button-help slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
 							title="Help and Training">
