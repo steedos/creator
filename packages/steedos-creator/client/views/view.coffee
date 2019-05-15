@@ -562,7 +562,7 @@ Template.creator_view.events
 				if template.agreement.get() == 'subscribe'
 					cmDoc[k] =v
 				else
-					if objectFields[k]?.type == 'lookup' && objectFields[k]?.reference_to
+					if (objectFields[k]?.type == 'lookup' || objectFields[k]?.type == 'master_detail') && objectFields[k]?.reference_to
 						if objectFields[k].multiple
 							cmDoc[k] =  _.pluck(doc[k], "_id")
 						else
