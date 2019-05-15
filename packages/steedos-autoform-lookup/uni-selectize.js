@@ -553,13 +553,13 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 	// self.loading.set(true);
 
 	if(self.dataSourceType != 'method'){
-		var options = DataSource.Odata.lookup_options(searchVal);
-		if (params) {
-			self.removeUnusedItems(options);
-		}
 
 		if(_.isNumber(values)){
 			values = values.toString()
+		}
+
+		if(_.isString(values)){
+			values = [values]
 		}
 
 		if(_.isArray(values)){
@@ -570,6 +570,13 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
 					return v
 				}
 			})
+		}
+
+		searchVal.values = values || [];
+
+		var options = DataSource.Odata.lookup_options(searchVal);
+		if (params) {
+			self.removeUnusedItems(options);
 		}
 
 		self.addItems(options, values);
