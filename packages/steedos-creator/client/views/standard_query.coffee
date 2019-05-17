@@ -66,6 +66,7 @@ Template.standard_query_modal.helpers
 					schema[field + "_endLine"].autoform.disabled = false
 					schema[field + "_endLine"].autoform.omit = false
 					schema[field + "_endLine"].autoform.is_range = false
+					schema[field + "_endLine"].autoform.label = '至'
 
 					if object_fields[field].type == 'date'
 						schema[field + "_endLine"].autoform.outFormat = 'yyyy-MM-ddT23:59:59.000Z';
