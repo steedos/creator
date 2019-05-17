@@ -150,6 +150,7 @@ Meteor.startup ->
 				username: Meteor.settings.datasource.test_mysql.username,
 				password: Meteor.settings.datasource.test_mysql.password,
 				database: Meteor.settings.datasource.test_mysql.database,
+				timezone: 'Z',
 				objectFiles: [path.join(testRootDir, 'test_mysql')]
 			})
 
