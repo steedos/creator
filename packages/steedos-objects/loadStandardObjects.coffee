@@ -142,6 +142,20 @@ Meteor.startup ->
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'oracle_qhd'))
 
 			Creator.steedosSchema.getDataSource('oracle_qhd').createTables()
+			
+		if Meteor.settings.datasource?.test_mysql?.host
+			Creator.steedosSchema.addDataSource('test_mysql', {
+				driver: "mysql",
+				host: Meteor.settings.datasource.test_mysql.host,
+				username: Meteor.settings.datasource.test_mysql.username,
+				password: Meteor.settings.datasource.test_mysql.password,
+				database: Meteor.settings.datasource.test_mysql.database,
+				objectFiles: [path.join(testRootDir, 'test_mysql')]
+			})
+
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'test_mysql'))
+
+			Creator.steedosSchema.getDataSource('test_mysql').createTables()
 
 		#### 测试代码结束 ####
 		express = require('express');
