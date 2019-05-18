@@ -1,10 +1,10 @@
 Template.standard_query_modal.onCreated ->
 	this.modalValue = new ReactiveVar()
-	standard_query = Session.get("standard_query")
-	if standard_query and standard_query.object_name == Session.get("object_name")
-		standard_query.query = {}
-		Session.set "standard_query", standard_query
-		this.modalValue.set(standard_query.query)
+#	standard_query = Session.get("standard_query")
+#	if standard_query and standard_query.object_name == Session.get("object_name")
+#		standard_query.query = {}
+#		Session.set "standard_query", standard_query
+	this.modalValue.set(Session.get("standard_query")?.query)
 
 Template.standard_query_modal.onRendered ->
 	this.$("input[type='number']").val("")
