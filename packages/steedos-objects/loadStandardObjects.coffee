@@ -65,7 +65,7 @@ Meteor.startup ->
 
 		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mall'))
 
-		Creator.steedosSchema.getDataSource('mall').createTables()
+		Creator.steedosSchema.getDataSource('mall').init()
 
 		if Meteor.settings.datasource?.stock?.url
 			Creator.steedosSchema.addDataSource('stock', {
@@ -79,7 +79,7 @@ Meteor.startup ->
 
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'stock'))
 
-			Creator.steedosSchema.getDataSource('stock').createTables()
+			Creator.steedosSchema.getDataSource('stock').init()
 
 		if Meteor.settings.datasource?.pdrq?.url
 			Creator.steedosSchema.addDataSource('pdrq', {
@@ -93,7 +93,7 @@ Meteor.startup ->
 
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'pdrq_contracts'))
 
-			Creator.steedosSchema.getDataSource('pdrq').createTables()
+			Creator.steedosSchema.getDataSource('pdrq').init()
 
 		Creator.steedosSchema.addDataSource('mongo', {
 			driver: "mongo"
@@ -103,7 +103,7 @@ Meteor.startup ->
 
 		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
 
-		Creator.steedosSchema.getDataSource('mongo').createTables()
+		Creator.steedosSchema.getDataSource('mongo').init()
 		
 		if Meteor.settings.datasource?.mattermost?.url
 			Creator.steedosSchema.addDataSource('mattermost', {
@@ -114,7 +114,7 @@ Meteor.startup ->
 
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mattermost'))
 
-			Creator.steedosSchema.getDataSource('mattermost').createTables()
+			Creator.steedosSchema.getDataSource('mattermost').init()
 		
 		if Meteor.settings.datasource?.test_postgres?.url
 			Creator.steedosSchema.addDataSource('test_postgres', {
@@ -125,7 +125,7 @@ Meteor.startup ->
 
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'test_postgres'))
 
-			Creator.steedosSchema.getDataSource('test_postgres').createTables()
+			Creator.steedosSchema.getDataSource('test_postgres').init()
 			
 		if Meteor.settings.datasource?.oracle_qhd?.connectString
 			Creator.steedosSchema.addDataSource('oracle_qhd', {
@@ -139,7 +139,7 @@ Meteor.startup ->
 
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'oracle_qhd'))
 
-			Creator.steedosSchema.getDataSource('oracle_qhd').createTables()
+			Creator.steedosSchema.getDataSource('oracle_qhd').init()
 			
 		if Meteor.settings.datasource?.test_mysql?.host
 			Creator.steedosSchema.addDataSource('test_mysql', {
@@ -154,7 +154,7 @@ Meteor.startup ->
 
 			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'test_mysql'))
 
-			Creator.steedosSchema.getDataSource('test_mysql').createTables()
+			Creator.steedosSchema.getDataSource('test_mysql').init()
 
 		#### 测试代码结束 ####
 		express = require('express');
