@@ -71,7 +71,6 @@ Meteor.startup ->
 			Creator.steedosSchema.addDataSource('stock', {
 				driver: "sqlserver",
 				options: {
-					tdsVersion: "7_2"
 					useUTC: true
 				},
 				url: Meteor.settings.datasource.stock.url,
@@ -86,7 +85,6 @@ Meteor.startup ->
 			Creator.steedosSchema.addDataSource('pdrq', {
 				driver: "sqlserver",
 				options: {
-					tdsVersion: "7_2"
 					useUTC: true
 				},
 				url: Meteor.settings.datasource.pdrq.url,
