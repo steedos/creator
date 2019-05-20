@@ -57,15 +57,17 @@ Meteor.startup ->
 		path =require('path')
 		testRootDir = path.resolve('../../../../../test')
 		console.log('testRootDir', testRootDir);
-		Creator.steedosSchema.addDataSource('mall', {
-			driver: "sqlite",
-			url: path.join(testRootDir, 'mall.db'),
-			objectFiles: [path.join(testRootDir, 'mall')]
-		})
+		
+		if Meteor.settings.datasource?.mall?.url
+			Creator.steedosSchema.addDataSource('mall', {
+				driver: "sqlite",
+				url: path.join(testRootDir, Meteor.settings.datasource?.mall?.url),
+				objectFiles: [path.join(testRootDir, 'mall')]
+			})
 
-		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mall'))
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mall'))
 
-		Creator.steedosSchema.getDataSource('mall').init()
+			Creator.steedosSchema.getDataSource('mall').init()
 
 		if Meteor.settings.datasource?.stock?.url
 			Creator.steedosSchema.addDataSource('stock', {
