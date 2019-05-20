@@ -95,15 +95,16 @@ Meteor.startup ->
 
 			Creator.steedosSchema.getDataSource('pdrq').init()
 
-		Creator.steedosSchema.addDataSource('mongo', {
-			driver: "mongo"
-			url: "mongodb://127.0.0.1/mongo",
-			objectFiles: [path.join(testRootDir, 'mongo')]
-		})
+		if Meteor.settings.datasource?.mongo?.url
+			Creator.steedosSchema.addDataSource('mongo', {
+				driver: "mongo"
+				url: Meteor.settings.datasource?.mongo?.url,
+				objectFiles: [path.join(testRootDir, 'mongo')]
+			})
 
-		Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
+			Creator.steedosSchema.useAppFile(path.join(testRootDir, 'mongo'))
 
-		Creator.steedosSchema.getDataSource('mongo').init()
+			Creator.steedosSchema.getDataSource('mongo').init()
 		
 		if Meteor.settings.datasource?.mattermost?.url
 			Creator.steedosSchema.addDataSource('mattermost', {
