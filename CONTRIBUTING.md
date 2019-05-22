@@ -19,20 +19,20 @@ export MONGO_URL=mongodb://127.0.0.1/steedos/
 
 ### 编译并运行
 ```
+export TOOL_NODE_FLAGS="--max-old-space-size=3800"
 yarn run build
 cd .dist
 yarn
 yarn start
 ```
 
-### 编译并发布版本
+### 发布版本
 **版本发布前准备**
 - 需先修改 .dist/package.json 中的版本号。
 - 因为要发布空的steedos-server，需先修改 .meteor/packages，注释app相关的package
 
 **发布脚本**
 ```
-yarn run build 
 yarn run login
 yarn run pub
 ```
