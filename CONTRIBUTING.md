@@ -14,7 +14,7 @@
 - 启动MongoDB服务
 - 设定环境变量
 ```
-export MONGO_URL=mongodb://127.0.0.1/steedos/
+export MONGO_URL=mongodb://127.0.0.1/steedos
 ```
 
 ### 编译并运行
