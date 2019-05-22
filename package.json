@@ -5,13 +5,12 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "aliyun-sdk": "^1.11.12",
     "@babel/runtime": "^7.2.0",
     "@steedos/auth": "file:../object-server/packages/auth",
     "@steedos/core": "file:../object-server/packages/core",
     "@steedos/oauth2-messenger": "1.0.0",
     "@steedos/objectql": "file:../object-server/packages/objectql",
-    "aliyun-sdk": "^1.11.12",
-    "aws-sdk": "^2.0.23",
     "basic-auth": "^2.0.1",
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
