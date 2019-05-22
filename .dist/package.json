@@ -14,9 +14,13 @@
     "/bundle/programs/web.cordova",
     "/package.json"
   ],
+  "scripts": {
+    "start": "node server"
+  },
   "dependencies": {
-    "@steedos/meteor-bundle-dependencies": "0.0.3",
     "@babel/runtime": "^7.2.0",
+    "@steedos/meteor-bundle-dependencies": "0.0.3",
+    "@steedos/meteor-bundle-runner": "^1.1.5",
     "basic-auth": "^2.0.1",
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",

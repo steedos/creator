@@ -9,8 +9,18 @@
 - 使用浏览器访问 https://localhost:3000
 - 点击创建企业，注册企业账户
 
+### 编译并运行
+```
+yarn run build
+cd .dist
+yarn
+yarn start
+```
+
 ### 编译并发布版本
-- yarn run build (编译 creator)
-- yarn run login (登录npm发布账户)
-- 修改 .dist/package.json 中的版本号
-- yarn run pub (发布到npm)
+*注意：版本发布前，需先修改 .dist/package.json 中的版本号。*
+```
+yarn run build 
+yarn run login
+yarn run pub
+```
