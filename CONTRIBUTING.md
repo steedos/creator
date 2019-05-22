@@ -9,6 +9,14 @@
 - 使用浏览器访问 https://localhost:3000
 - 点击创建企业，注册企业账户
 
+### 安装MongoDB数据库
+- [安装MongoDB](https://docs.mongodb.com/manual/administration/install-community/)
+- 启动MongoDB服务
+- 设定环境变量
+```
+export MONGO_URL=mongodb://127.0.0.1/steedos/
+```
+
 ### 编译并运行
 ```
 yarn run build
@@ -20,7 +28,7 @@ yarn start
 ### 编译并发布版本
 **版本发布前准备**
 - 需先修改 .dist/package.json 中的版本号。
-- 因为要发布空的creator-server，需先修改 .meteor/packages，注释app相关的package
+- 因为要发布空的steedos-server，需先修改 .meteor/packages，注释app相关的package
 
 **发布脚本**
 ```
