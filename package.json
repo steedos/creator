@@ -10,10 +10,10 @@
   "dependencies": {
     "aliyun-sdk": "^1.11.12",
     "@babel/runtime": "^7.2.0",
-    "@steedos/auth": "file:../object-server/packages/auth",
-    "@steedos/core": "file:../object-server/packages/core",
+    "@steedos/auth": "^1.0.4",
+    "@steedos/core": "^1.1.13",
     "@steedos/oauth2-messenger": "1.0.0",
-    "@steedos/objectql": "file:../object-server/packages/objectql",
+    "@steedos/objectql": "^0.0.6",
     "basic-auth": "^2.0.1",
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
