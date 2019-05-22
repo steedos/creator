@@ -2,7 +2,10 @@
   "name": "steedos",
   "private": true,
   "scripts": {
-    "start": "meteor run"
+    "start": "meteor run",
+    "build": "meteor build --directory .dist --server-only",
+    "login": "npm login --registry https://registry.npmjs.org",
+    "pub": "cd .dist && npm publish --registry https://registry.npmjs.org"
   },
   "dependencies": {
     "aliyun-sdk": "^1.11.12",
