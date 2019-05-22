@@ -18,7 +18,11 @@ yarn start
 ```
 
 ### 编译并发布版本
-*注意：版本发布前，需先修改 .dist/package.json 中的版本号。*
+**版本发布前准备**
+- 需先修改 .dist/package.json 中的版本号。
+- 因为要发布空的creator-server，需先修改 .meteor/packages，注释app相关的package
+
+**发布脚本**
 ```
 yarn run build 
 yarn run login
