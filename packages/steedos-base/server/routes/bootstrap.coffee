@@ -46,8 +46,8 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 				_obj.permissions = permissions(v, userSession)
 				result.objects[_obj.name] = _obj
 			)
-
-	result.apps = _.extend result.apps, Creator.steedosSchema.getAppsConfig()
+	_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
+		result.apps = _.extend result.apps, datasource.getAppsConfig()
 
 	JsonRoutes.sendResult res,
 		code: 200,

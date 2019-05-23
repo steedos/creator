@@ -4,9 +4,9 @@ description: 浦东燃气合同系统
 icon_slds: thanks
 is_creator: true
 objects: 
-  - pdrq.pdrq_contracts
-  - pdrq.contractCompany
-  - pdrq.contractState
-  - pdrq.type
-  - pdrq.typeDetail
-  - pdrq.emails
+  - pdrq_contracts
+  - contractCompany
+  - contractState
+  - type
+  - typeDetail
+  - emails

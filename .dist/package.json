@@ -23,7 +23,7 @@
     "@steedos/auth": "^1.0.4",
     "@steedos/core": "^1.1.13",
     "@steedos/oauth2-messenger": "1.0.0",
-    "@steedos/objectql": "^0.0.7",
+    "@steedos/objectql": "^0.0.8",
     "@steedos/meteor-bundle-dependencies": "0.0.3",
     "@steedos/meteor-bundle-runner": "^1.1.5",
     "basic-auth": "^2.0.1",
@@ -86,7 +86,7 @@
   },
   "resolutions": {
     "graphql": "^14.1.1",
-    "@steedos/objectql": "^0.0.7",
+    "@steedos/objectql": "^0.0.8",
     "@steedos/auth": "^1.0.4"
   }
 }

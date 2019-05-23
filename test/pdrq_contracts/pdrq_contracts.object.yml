@@ -43,11 +43,11 @@ fields:
     label: 是否招投标
   contractTypedetail:
     type: lookup
-    reference_to: pdrq.typeDetail
+    reference_to: typeDetail
     label: 合同性质
   contractType:
     type: lookup
-    reference_to: pdrq.type
+    reference_to: type
     label: 合同类型
   startDate:
     type: date
@@ -66,14 +66,14 @@ fields:
     label: 未结金额
   contractState:
     type: lookup
-    reference_to: pdrq.contractState
+    reference_to: contractState
     label: 合同履行状态
   remarks:
     type: textarea
     label: 备注
   company:
     type: lookup
-    reference_to: pdrq.contractCompany
+    reference_to: contractCompany
     label: 所属部门
   signedDate:
     type: date
@@ -93,6 +93,10 @@ fields:
   settlementMethod:
     type: text
     label: 合同结算方式
+  stock:
+    type: lookup
+    label: 股票信息
+    reference_to: 'stock.stock_info'
 list_views:
   all:
     label: 全部

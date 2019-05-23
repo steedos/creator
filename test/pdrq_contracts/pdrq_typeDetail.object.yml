@@ -27,7 +27,7 @@ fields:
     label: 描述
   company:
     type: master_detail
-    reference_to: pdrq.contractCompany
+    reference_to: contractCompany
     label: 所属部门
 list_views:
   all:
