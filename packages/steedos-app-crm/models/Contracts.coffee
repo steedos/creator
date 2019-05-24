@@ -234,14 +234,15 @@ Creator.Objects.contracts =
 			label: "质保期"
 			# group:"合同金额"
 
-
-
 		fileid:
 			type: "text"
 			label: "申请单id"
 			hidden: true
 
-		
+		contract_id:
+			type: "text"
+			label: "老合同id"
+			hidden: true
 
 #		st:
 #			type: 'summary'
