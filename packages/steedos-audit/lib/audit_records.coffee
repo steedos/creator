@@ -233,6 +233,7 @@ updateRecord = (userId, object_name, new_doc, previous_doc, modifier)->
 			collection.insert doc
 
 Creator.AuditRecords.add = (action, userId, object_name, new_doc, previous_doc, modifier)->
+	console.log('Creator.AuditRecords.add run...');
 	if action == 'update'
 		updateRecord(userId, object_name, new_doc, previous_doc, modifier)
 	else if action == 'insert'

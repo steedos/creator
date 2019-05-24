@@ -37,7 +37,7 @@ Creator.Objects.chat_messages =
 				object_name = doc.related_to?.o
 				_id = doc.related_to?.ids[0]
 				if object_name and _id
-					Creator.getCollection(object_name, doc.space).direct.update({_id: _id}, {$inc: {message_count: 1}})
+					Creator.getCollection(object_name, doc.space).direct.update({_id: _id}, {$inc: {message_count: 1}}, {filter: false, validate: false})
 
 	permission_set:
 		user:

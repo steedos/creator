@@ -49,6 +49,8 @@ Creator.Object = (options)->
 	self.idFieldName = '_id'
 	if options.database_name
 		self.database_name = options.database_name
+	if options.database_driver
+		self.database_driver = options.database_driver
 	if (!options.fields)
 		throw new Error('Creator.Object options must specify name');
 
@@ -60,7 +62,7 @@ Creator.Object = (options)->
 		if field.primary
 			self.idFieldName = field_name
 
-	if !options.database_name || options.database_name == 'meteor-mongo'
+	if !options.database_driver || options.database_driver == 'meteor-mongo'
 		_.each Creator.baseObject.fields, (field, field_name)->
 			if !self.fields[field_name]
 				self.fields[field_name] = {}
@@ -148,7 +150,6 @@ Creator.Object = (options)->
 					field.hidden = true
 	else
 		self.permissions = null
-
 	_db = Creator.createCollection(options)
 
 	Creator.Collections[_db._name] = _db
@@ -170,9 +171,10 @@ Creator.Object = (options)->
 	if _.contains(["flows", "forms", "instances", "organizations"], self.name)
 		if Meteor.isClient
 			_db.attachSchema(self.schema, {replace: true})
-
-	Creator.objectsByName[self._collection_name] = self
-
+	if !options.database_name
+		Creator.objectsByName[self._collection_name] = self
+	else
+		Creator.objectsByName[options.name] = self
 	return self
 
 Creator.Object.prototype.i18n = ()->
@@ -209,7 +211,7 @@ Creator.Object.prototype.i18n = ()->
 
 Creator.getObjectODataRouterPrefix = (object)->
 	if object
-		if !object.database_name || object.database_name == 'meteor-mongo'
+		if !object.database_name || object.database_name == 'default'
 			return "/api/odata/v4"
 		else
 			return "/api/odata/#{object.database_name}"
@@ -222,8 +224,8 @@ if Meteor.isClient
 				_.each Creator.objectsByName, (object, object_name)->
 					object.i18n()
 
-Meteor.startup ->
-	if !Creator.bootstrapLoaded && Creator.Objects
-		_.each Creator.Objects, (object)->
-			new Creator.Object(object)
+	Meteor.startup ->
+		if !Creator.bootstrapLoaded && Creator.Objects
+			_.each Creator.Objects, (object)->
+				new Creator.Object(object)
 

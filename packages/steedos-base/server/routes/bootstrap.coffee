@@ -43,6 +43,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 				_obj = Creator.convertObject(v.toConfig())
 				_obj.name = "#{name}.#{k}"
 				_obj.database_name = name
+				_obj.database_driver = datasource.driver
 				_obj.permissions = permissions(v, userSession)
 				result.objects[_obj.name] = _obj
 			)

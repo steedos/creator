@@ -33,8 +33,8 @@ Creator.loadObjects = (obj, object_name)->
 
 	Creator.convertObject(obj)
 	new Creator.Object(obj);
-
-	Creator.initTriggers(object_name)
+	if !obj.database_name
+		Creator.initTriggers(object_name)
 	Creator.initListViews(object_name)
 	return obj
 

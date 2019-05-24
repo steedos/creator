@@ -20,9 +20,10 @@ Creator.createCollection = (object)->
 	if Creator.Collections[collection_key]
 		return Creator.Collections[collection_key]
 	else
+		table_name = object.tableName || collection_key
 		if object.custom
-			return new Meteor.Collection(collection_key, Creator._CREATOR_DATASOURCE)
+			return new Meteor.Collection(table_name, Creator._CREATOR_DATASOURCE)
 		else
-			return new Meteor.Collection(collection_key)
+			return new Meteor.Collection(table_name)
 
 
