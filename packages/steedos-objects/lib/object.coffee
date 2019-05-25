@@ -10,12 +10,6 @@ Creator.Object = (options)->
 	self = this
 	if (!options.name)
 		throw new Error('Creator.Object options must specify name');
-	unless options.permission_set
-		options.permission_set = {}
-	if !(options.permission_set?.admin)
-		options.permission_set.admin = {}
-	if !(options.permission_set?.user)
-		options.permission_set.user = {}
 
 	self._id = options._id || options.name
 	self.space = options.space
@@ -117,7 +111,12 @@ Creator.Object = (options)->
 	# 	if self.fields
 	# 		self.permission_set[item_name].readable_fields = defaultReadableFields
 	# 		self.permission_set[item_name].editable_fields = defaultEditableFields
-
+	unless options.permission_set
+		options.permission_set = {}
+	if !(options.permission_set?.admin)
+		options.permission_set.admin = _.clone(self.permission_set["admin"])
+	if !(options.permission_set?.user)
+		options.permission_set.user = _.clone(self.permission_set["user"])
 	_.each options.permission_set, (item, item_name)->
 		if !self.permission_set[item_name]
 			self.permission_set[item_name] = {}
