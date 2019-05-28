@@ -861,3 +861,15 @@ Creator.getDBApps = (space_id)->
 
 	return dbApps
 
+if Meteor.isClient
+	Meteor.autorun ()->
+		if Session.get('current_app_id')
+			sessionStorage.setItem('current_app_id', Session.get('current_app_id'))
+#		else
+#			console.log('remove current_app_id...');
+#			sessionStorage.removeItem('current_app_id')
+	Steedos.getCurrentAppId = ()->
+		if Session.get('current_app_id')
+			return Session.get('current_app_id')
+		else
+			return sessionStorage.getItem('current_app_id');
