@@ -106,6 +106,11 @@ Creator.Objects.instances =
 			type: "string"
 			label:"流程分类"
 			hidden: true
+		category:
+			label: '流程分类'
+			type: "lookup"
+			reference_to: "categories"
+			hidden: true
 		state:
 			label:"审批单状态"
 			type: "select"
@@ -483,4 +488,8 @@ if Meteor.isServer
 	# 全文检索同步字段
 	db.instances._ensureIndex({
 		"is_recorded": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"category": 1
 	},{background: true})
