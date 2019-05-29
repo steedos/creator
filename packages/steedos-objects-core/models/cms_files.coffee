@@ -93,7 +93,12 @@ Creator.Objects.cms_files =
 					object_name = Session.get('object_name')
 					record_id = Session.get("record_id")
 
-				record = Creator.getObjectRecord(object_name, record_id, 'owner,company_id,locked')
+				object_fields_keys = _.keys(Creator.getObject(object_name, Session.get("spaceId"))?.fields || {}) || []
+				select = _.intersection(object_fields_keys, ['owner','company_id', 'locked']) || []
+				if select.length > 0
+					record = Creator.getObjectRecord(object_name, record_id, select.join(','))
+				else
+					record = {}
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
@@ -119,8 +124,13 @@ Creator.Objects.cms_files =
 					# 其他记录详细界面的相关文件列表编辑
 					object_name = Session.get('object_name')
 					record_id = Session.get("record_id")
-				
-				record = Creator.getObjectRecord(object_name, record_id, 'owner,company_id,locked')
+
+				object_fields_keys = _.keys(Creator.getObject(object_name, Session.get("spaceId"))?.fields || {}) || []
+				select = _.intersection(object_fields_keys, ['owner','company_id', 'locked']) || []
+				if select.length > 0
+					record = Creator.getObjectRecord(object_name, record_id, select.join(','))
+				else
+					record = {}
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
@@ -174,7 +184,12 @@ Creator.Objects.cms_files =
 					object_name = Session.get('object_name')
 					record_id = Session.get("record_id")
 
-				record = Creator.getObjectRecord(object_name, record_id, 'owner,company_id,locked')
+				object_fields_keys = _.keys(Creator.getObject(object_name, Session.get("spaceId"))?.fields || {}) || []
+				select = _.intersection(object_fields_keys, ['owner','company_id', 'locked']) || []
+				if select.length > 0
+					record = Creator.getObjectRecord(object_name, record_id, select.join(','))
+				else
+					record = {}
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
