@@ -62,9 +62,6 @@ Template.creator_view.onCreated ->
 	AutoForm.hooks creatorEditForm:
 		onSuccess: onEditSuccess
 	,false
-	this.autorun ->
-		if Session.get("record_id")
-			Tracker.nonreactive(loadRecord)
 #	if object.database_name && object.database_name != 'meteor-mongo'
 #		this.agreement.set('odata')
 #		AutoForm.hooks creatorEditForm:
@@ -107,7 +104,9 @@ Template.creator_view.onRendered ->
 		this.autorun ->
 			loadRecord()
 	else
-		loadRecord()
+		this.autorun ->
+			if Session.get("record_id")
+				Tracker.nonreactive(loadRecord)
 
 	this.autorun ->
 		if Creator.subs["Creator"].ready()
