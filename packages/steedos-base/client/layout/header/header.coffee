@@ -4,18 +4,20 @@ Template.steedosHeader.helpers
 
 		if appId == "workflow"
 			if workflow_categories.length > 0
-				return Steedos.getWorkflowCategoriesBadge(workflow_categories, Steedos.getSpaceId())
+				return ''
+#				return Steedos.getWorkflowCategoriesBadge(workflow_categories, Steedos.getSpaceId())
 			return Steedos.getBadge("workflow")
 		else if appId == "cms"
 			return Steedos.getBadge("cms")
-		
+
 		appUrl = db.apps.findOne(appId).url
 		if appUrl == "/calendar"
 			return Steedos.getBadge(appId)
 		else if /^\/?workflow\b/.test(appUrl)
 			# 如果appId不为workflow，但是url为/workflow格式则按workflow这个app来显示badge
 			if workflow_categories.length > 0
-				return Steedos.getWorkflowCategoriesBadge(workflow_categories, Steedos.getSpaceId())
+				return ''
+#				return Steedos.getWorkflowCategoriesBadge(workflow_categories, Steedos.getSpaceId())
 			return Steedos.getBadge("workflow")
 		return ""
 
