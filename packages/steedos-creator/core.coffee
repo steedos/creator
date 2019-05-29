@@ -104,13 +104,20 @@ Creator.getObjectFilterFieldOptions = (object_name)->
 
 	return _options
 
-Creator.getObjectRecord = (object_name, record_id)->
+Creator.getObjectRecord = (object_name, record_id, select_fields, expand)->
 
-	if Meteor.isClient && Template.instance()?.record
-		return Template.instance()?.record?.get()
+	if !object_name
+		object_name = Session.get("object_name")
 
 	if !record_id
 		record_id = Session.get("record_id")
+	if Meteor.isClient
+		if object_name == Session.get("object_name") &&  record_id == Session.get("record_id")
+			if Template.instance()?.record
+				return Template.instance()?.record?.get()
+		else
+			return Creator.odata.get(object_name, record_id, select_fields, expand)
+
 	collection = Creator.getCollection(object_name)
 	if collection
 		record = collection.findOne(record_id)

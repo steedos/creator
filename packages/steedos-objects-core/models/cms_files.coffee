@@ -86,14 +86,14 @@ Creator.Objects.cms_files =
 					unless fileRecord
 						# 如果fileRecord为空说明是在文件列表界面
 						return false
-					object_name = fileRecord.parent.o
-					record_id = fileRecord.parent.ids[0]
+					object_name = fileRecord.parent['reference_to._o']
+					record_id = fileRecord.parent._id
 				else
 					# 其他记录详细界面的相关文件列表编辑
 					object_name = Session.get('object_name')
 					record_id = Session.get("record_id")
-				
-				record = Creator.getObjectRecord(object_name, record_id)
+
+				record = Creator.getObjectRecord(object_name, record_id, 'owner,company_id,locked')
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
@@ -113,14 +113,14 @@ Creator.Objects.cms_files =
 					unless fileRecord
 						# 如果fileRecord为空说明是在文件列表界面
 						return false
-					object_name = fileRecord.parent.o
-					record_id = fileRecord.parent.ids[0]
+					object_name = fileRecord.parent['reference_to._o']
+					record_id = fileRecord.parent._id
 				else
 					# 其他记录详细界面的相关文件列表编辑
 					object_name = Session.get('object_name')
 					record_id = Session.get("record_id")
 				
-				record = Creator.getObjectRecord(object_name, record_id)
+				record = Creator.getObjectRecord(object_name, record_id, 'owner,company_id,locked')
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
@@ -167,14 +167,14 @@ Creator.Objects.cms_files =
 					unless fileRecord
 						# 如果fileRecord为空说明是在文件列表界面
 						return false
-					object_name = fileRecord.parent.o
-					record_id = fileRecord.parent.ids[0]
+					object_name = fileRecord.parent['reference_to._o']
+					record_id = fileRecord.parent._id
 				else
 					# 其他记录详细界面的相关文件列表编辑
 					object_name = Session.get('object_name')
 					record_id = Session.get("record_id")
-				
-				record = Creator.getObjectRecord(object_name, record_id)
+
+				record = Creator.getObjectRecord(object_name, record_id, 'owner,company_id,locked')
 				record_permissions = Creator.getRecordPermissions object_name, record, Meteor.userId()
 				if record_permissions
 					perms = record_permissions
