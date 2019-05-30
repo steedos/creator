@@ -12,8 +12,17 @@ Template.creator_list_wrapper.onRendered ->
 	self.autorun ->
 		if Session.get("list_view_id") && self.rendered
 			Session.set("standard_query", null)
-			list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+	self.autorun ->
+		list_view_id = Session.get("list_view_id")
+		object_name = Session.get("object_name")
+		if list_view_id
+			list_view_obj = Creator.Collections.object_listviews.findOne(list_view_id)
 			if list_view_obj
+				filter_target = Tracker.nonreactive ->
+					return Session.get("filter_target")
+				if filter_target?.list_view_id == list_view_id and filter_target?.object_name == object_name
+					# 过滤条件关联的视图及对象未发生变化时，不从数据库中重载过滤条件到Session，以允许界面跳转时过滤条件保持不变
+					return
 				if list_view_obj.filter_scope
 					Session.set("filter_scope", list_view_obj.filter_scope)
 				else
@@ -25,6 +34,21 @@ Template.creator_list_wrapper.onRendered ->
 			else
 				Session.set("filter_scope", null)
 				Session.set("filter_items", null)
+				
+	self.autorun ->
+		# 同步标记过滤条件关联的视图及对象
+		filter_items = Session.get("filter_items")
+		filter_scope = Session.get("filter_scope")
+		if filter_items or filter_scope
+			list_view_id = Tracker.nonreactive ->
+				return Session.get("list_view_id")
+			object_name = Tracker.nonreactive ->
+				return Session.get("object_name")
+			Session.set("filter_target", {
+				list_view_id: list_view_id,
+				object_name: object_name
+			});
+
 	self.rendered = true
 
 

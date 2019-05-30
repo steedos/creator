@@ -806,9 +806,6 @@ Template.creator_grid.events
 		Session.set 'page_index', {object_name: object_name, page_index: page_index}
 
 Template.creator_grid.onCreated ->
-	# 在新的列表界面，过滤条件需要清空，否则可以保持了上一个界面的过滤条件
-	Session.set("filter_scope", null)
-	Session.set("filter_items", null)
 	self = this
 	self.list_view_id = Session.get("list_view_id")
 	AutoForm.hooks creatorAddForm:
