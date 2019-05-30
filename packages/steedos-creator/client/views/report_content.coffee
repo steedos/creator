@@ -994,3 +994,8 @@ Template.creator_report_content.onCreated ->
 		self.is_chart_open.set(false)
 	Template.creator_report_content.getReportContent = getReportContent.bind(this.data)
 	Template.creator_report_content.renderReport = renderReport.bind(this.data)
+
+Template.creator_report_content.onDestroyed ->
+	# 离开报表详细界面时清除过滤条件，以防止返回列表后条件不变
+	Session.set("filter_scope", null)
+	Session.set("filter_items", null)
