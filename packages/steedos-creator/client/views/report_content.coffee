@@ -989,6 +989,9 @@ Template.creator_report_content.onRendered ->
 
 
 Template.creator_report_content.onCreated ->
+	# 在新的报表界面，过滤条件需要清空，否则可以保持了上一个界面的过滤条件
+	Session.set("filter_scope", null)
+	Session.set("filter_items", null)
 	self = this.data
 	Tracker.nonreactive ()->
 		self.is_chart_open.set(false)
