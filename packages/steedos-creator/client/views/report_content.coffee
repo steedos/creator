@@ -548,10 +548,15 @@ renderSummaryReport = (reportObject)->
 					if relate_valueField?.type == "number" or relate_valueField?.type == "currency"
 						operation = "sum"
 			caption = "#{getSummaryTypeLabel operation}: {0}"
+			if operation != "count"
+				format = 
+					type: "fixedPoint"
+					precision: 2
 			summaryItem = 
 				displayFormat: caption
 				column: value
 				summaryType: operation
+				format: format
 			# sum统计统一设置为在分组统计中按列对齐，其他比如计数统计向左对齐
 			if ["sum"].indexOf(operation) > -1
 				summaryItem.alignByColumn = true
@@ -763,11 +768,16 @@ renderMatrixReport = (reportObject)->
 			unless caption
 				caption = objectName + "_" + value
 			caption = "#{getSummaryTypeLabel operation} #{caption}"
+			if operation != "count"
+				format = 
+					type: "fixedPoint"
+					precision: 2
 			reportFields.push 
 				caption: caption
 				dataField: value
 				# dataType: valueField.type
 				summaryType: operation
+				format: format
 				area: 'data'
 	_.each reportObject.fields, (item)->
 		# itemFieldKey = item.replace(/\./g,"*%*")
