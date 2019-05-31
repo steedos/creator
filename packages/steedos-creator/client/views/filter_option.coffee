@@ -162,7 +162,6 @@ Template.filter_option.helpers
 
 	isBetweenOperation: ()->
 		filter_item_operation = Template.instance().filter_item_operation.get()
-		console.log("filter_item_operation==========", filter_item_operation);
 		return Creator.isBetweenFilterOperation(filter_item_operation)
 
 Template.filter_option.events 
