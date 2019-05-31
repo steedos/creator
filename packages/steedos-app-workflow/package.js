@@ -74,6 +74,11 @@ Package.onUse(function(api) {
 	api.addFiles('client/copy_flow_modal.html', 'client');
 	api.addFiles('client/copy_flow_modal.coffee', 'client');
 
+	api.addFiles('client/views/flow/distribute_edit_flow_modal.html', 'client');
+	api.addFiles('client/views/flow/distribute_edit_flow_modal.coffee', 'client');
+	api.addFiles('client/views/flow/distribute_edit_flow_modal.less', 'client');
+	api.addFiles('server/methods/distribute.coffee', 'server');
+
 	api.addFiles('server/lib/workflow_manager.js', 'server');
 	api.addFiles('server/lib/uuflow_manager.coffee', 'server');
 	api.addFiles('server/lib/push_manager.coffee', 'server');
