@@ -556,7 +556,7 @@ renderSummaryReport = (reportObject)->
 				displayFormat: caption
 				column: value
 				summaryType: operation
-				format: format
+				valueFormat: format
 			# sum统计统一设置为在分组统计中按列对齐，其他比如计数统计向左对齐
 			if ["sum"].indexOf(operation) > -1
 				summaryItem.alignByColumn = true
