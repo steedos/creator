@@ -24,9 +24,12 @@ oDataOperation = (type, url, data, object_name, operation)->
 		error: (jqXHR, textStatus, errorThrown) ->
 			self.done(jqXHR.responseJSON)
 
+getObjectName = (collectionName)->
+	return collectionName.replace(/Creator.Collections./, "")
 
-getSimpleSchema = (object_name)->
-	if object_name
+getSimpleSchema = (collectionName)->
+	if collectionName
+		object_name = getObjectName collectionName
 		object_fields = Creator.getObject(object_name).fields
 		_fields = Creator.getFields(object_name)
 		schema = Creator.getObject(object_name).schema._schema
@@ -178,6 +181,9 @@ Template.CreatorObjectModal.onRendered ()->
 
 
 Template.CreatorObjectModal.helpers
+	schema: ()->
+		collection = Template.instance().data.collection
+		return getSimpleSchema(collection)
 	title: ()->
 		data_title = Template.instance().data.title
 		if data_title

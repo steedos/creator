@@ -124,7 +124,7 @@ Creator.getObjectSchema = (obj) ->
 									fs.createFunction = (lookup_field)->
 										Modal.show("CreatorObjectModal", {
 											collection: "Creator.Collections.#{Creator.getCollection(field.reference_to)._name}",
-											formId: "new#{field.reference_to}",
+											formId: "new#{field.reference_to.replace('.','_')}",
 											object_name: "#{field.reference_to}",
 											operation: "insert",
 											onSuccess: (operation, result)->
