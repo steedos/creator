@@ -11,7 +11,7 @@
     "aliyun-sdk": "^1.11.12",
     "@babel/runtime": "^7.2.0",
     "@steedos/auth": "^1.0.4",
-    "@steedos/core": "^1.1.15",
+    "@steedos/core": "^1.1.16",
     "@steedos/oauth2-messenger": "1.0.0",
     "@steedos/objectql": "^0.0.11",
     "basic-auth": "^2.0.1",
