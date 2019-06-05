@@ -382,7 +382,7 @@ InstanceRecordQueue.Configure = function (options) {
 		var values = ins.values,
 			spaceId = ins.space;
 
-		if (records) {
+		if (records && !_.isEmpty(records)) {
 			// 此情况属于从creator中发起审批
 			var objectName = records[0].o;
 			var ow = Creator.getCollection('object_workflows').findOne({
