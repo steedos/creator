@@ -572,6 +572,15 @@ Template.CreatorAfModal.events
 					self = this
 					urls = []
 
+					cmCollection = Session.get 'cmCollection'
+					if cmCollection
+						schemaInstance = getSimpleSchema(cmCollection)
+						schema = schemaInstance._schema
+						disabledFields = Creator.getDisabledFields(schema)
+						console.log('disabledFields', disabledFields);
+						_.each disabledFields, (disabledField)->
+							delete insertDoc[disabledField]
+
 					if Session.get("cmOperation") == "insert"
 						data = insertDoc
 						type = "post"
