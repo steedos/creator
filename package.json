@@ -87,7 +87,7 @@
   },
   "resolutions": {
     "graphql": "^14.1.1",
-    "@steedos/objectql": "^0.0.12",
+    "@steedos/objectql": "^0.0.15",
     "@steedos/auth": "^1.0.4"
   }
 }
