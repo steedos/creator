@@ -189,3 +189,5 @@ steedos:app-meeting
 steedos:app-projects
 
 steedos:oauth2-messenger
+
+steedos:object-webhooks-queue

@@ -17,7 +17,8 @@
         "is_group_company": true // 是否开启集团功能
     },
     "cron": {
-        "instancerecordqueue_interval": 10000 // creator同步instance到record队列执行间隔
+        "instancerecordqueue_interval": 10000, // creator同步instance到record队列执行间隔
+        "objectwebhooksqueue_interval": 10000 // creator发推送到mattermost队列执行间隔
     },
     "cfs": {
         "aliyun": {
