@@ -221,5 +221,7 @@ underscore@1.0.10
 underscorestring:underscore.string@3.3.4
 universe:i18n@1.20.0
 url@1.2.0
+vazco:universe-autoform-select@0.3.10
+vazco:universe-selectize@0.1.23
 webapp@1.7.2
 webapp-hashing@1.0.9
