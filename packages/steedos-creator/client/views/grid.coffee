@@ -819,7 +819,10 @@ Template.creator_grid.events
 
 	'click .dx-datagrid-table .dx-row-lines': (event, template)->
 		if Steedos.isMobile()
-			FlowRouter.go($("a", event.currentTarget).attr('href'))
+			herf = $("a", event.currentTarget).attr('href')
+			if herf.startsWith(__meteor_runtime_config__.ROOT_URL_PATH_PREFIX)
+				herf = herf.replace(__meteor_runtime_config__.ROOT_URL_PATH_PREFIX,'')
+			FlowRouter.go(herf)
 
 Template.creator_grid.onCreated ->
 	self = this
