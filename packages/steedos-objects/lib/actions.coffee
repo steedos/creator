@@ -39,6 +39,8 @@ if Meteor.isClient
 		"standard_new": (object_name, record_id, fields)->
 			ids = Creator.TabularSelectedIds[object_name]
 			if ids?.length
+				# 列表有选中项时，取第一个选中项，复制其内容到新建窗口中
+				# 这的第一个指的是第一次勾选的选中项，而不是列表中已勾选的第一项
 				record_id = ids[0]
 				doc = Creator.odata.get(object_name, record_id)
 				Session.set 'cmDoc', doc
