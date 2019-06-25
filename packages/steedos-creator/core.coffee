@@ -63,6 +63,8 @@ Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_na
 
 Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide)->
 	_options = []
+	unless object_name
+		return _options
 	_object = Creator.getObject(object_name)
 	fields = _object?.fields
 	icon = _object?.icon
@@ -73,17 +75,22 @@ Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide)->
 			_options.push {label: "#{f.label || k}", value: "#{k}", icon: icon}
 		else
 			_options.push {label: f.label || k, value: k, icon: icon}
-			if is_deep
-				if (f.type == "lookup" || f.type == "master_detail") && f.reference_to
-					r_object = Creator.getObject(f.reference_to)
-					if r_object
-						_.forEach r_object.fields, (f2, k2)->
-							_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
+	if is_deep
+		_.forEach fields, (f, k)->
+			if is_skip_hide and f.hidden
+				return
+			if (f.type == "lookup" || f.type == "master_detail") && f.reference_to
+				r_object = Creator.getObject(f.reference_to)
+				if r_object
+					_.forEach r_object.fields, (f2, k2)->
+						_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
 	return _options
 
 # 统一为对象object_name提供可用于过虑器过虑字段
 Creator.getObjectFilterFieldOptions = (object_name)->
 	_options = []
+	unless object_name
+		return _options
 	_object = Creator.getObject(object_name)
 	fields = _object?.fields
 	permission_fields = Creator.getFields(object_name)
@@ -126,7 +133,7 @@ Creator.getAppObjectNames = (app_id)->
 Creator.getVisibleApps = (includeAdmin)->
 	apps = []
 	_.each Creator.Apps, (v, k)->
-		if v.visible != false or (includeAdmin and v._id == "admin")
+		if (v.visible != false and v._id != "admin") or (includeAdmin and v._id == "admin")
 			apps.push v
 	return apps;
 
@@ -616,7 +623,12 @@ Creator.getListViews = (object_name, spaceId, userId)->
 
 	list_views = []
 
+	isMobile = Steedos.isMobile()
+
 	_.each object.list_views, (item, item_name)->
+		if isMobile and item.type == "calendar"
+			# 手机上先不显示日历视图
+			return
 		if item_name != "default"
 			if _.indexOf(disabled_list_views, item_name) < 0 || item.owner == userId
 				list_views.push item
@@ -756,21 +768,6 @@ Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 				i += 2
 
 	return fields
-
-
-Creator.getDBApps = (space_id)->
-	dbApps = {}
-	Creator.Collections["apps"].find({space: space_id,is_creator:true,visible:true}, {
-		fields: {
-			created: 0,
-			created_by: 0,
-			modified: 0,
-			modified_by: 0
-		}
-	}).forEach (app)->
-		dbApps[app._id] = app
-
-	return dbApps
 
 # END
 

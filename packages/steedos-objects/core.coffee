@@ -29,6 +29,14 @@ Meteor.startup ->
 		_.each Creator.Objects, (obj, object_name)->
 			Creator.loadObjects obj, object_name
 
+# Creator.fiberLoadObjects 供steedos-cli项目使用
+if Meteor.isServer
+	Fiber = require('fibers')
+	Creator.fiberLoadObjects = (obj, object_name)->
+		Fiber(()->
+			Creator.loadObjects(obj, object_name)
+		).run()
+
 Creator.loadObjects = (obj, object_name)->
 	if !object_name
 		object_name = obj.name
@@ -322,4 +330,9 @@ Creator.processPermissions = (po)->
 		po.viewCompanyRecords = true
 	return po
 
-
+if Meteor.isServer
+	if process.env.STEEDOS_STORAGE_DIR
+		Creator.steedosStorageDir = process.env.STEEDOS_STORAGE_DIR
+	else
+		path = require('path')
+		Creator.steedosStorageDir = path.resolve(path.join(__meteor_bootstrap__.serverDir, '../../../cfs'))

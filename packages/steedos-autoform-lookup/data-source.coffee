@@ -25,7 +25,16 @@ DataSource.Odata.lookup_options = (options)->
 		options_limit = options?.options_limit || 10
 
 		filters = []
-
+		console.log('options.filterQuery', options.filterQuery);
+		if !_.isEmpty(options.filterQuery)
+			if(!_.isString(options.filterQuery) && !_.isArray(options.filterQuery))
+				_fqstring = [];
+				_.each(options.filterQuery, (v, k)->
+					_fqstring.push("(#{k} #{_.keys(v)[0]} '#{_.values(v)[0]}')")
+				)
+				filters.push "(#{_fqstring.join(' and ')})"
+			else
+				filters.push(options.filterQuery)
 		searchFilter = ""
 		valueFilter = []
 		selectedFilter = []

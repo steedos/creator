@@ -18,6 +18,7 @@ Creator.Objects.objects =
 			regEx: SimpleSchema.RegEx.code
 		label:
 			type: "text"
+			required: true
 		icon:
 			type: "lookup"
 			optionsFunction: ()->
@@ -53,6 +54,9 @@ Creator.Objects.objects =
 			type: "boolean"
 		enable_trash:
 			type: "boolean"
+		enable_space_global:
+			type: "boolean"
+			defaultValue: false
 		is_view:
 			type: 'boolean'
 			defaultValue: false

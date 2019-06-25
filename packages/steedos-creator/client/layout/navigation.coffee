@@ -7,7 +7,9 @@ Template.creatorNavigation.helpers
 
 	app_name: ()->
 		app = Creator.getApp()
-		return if app then t(app.name) else ""
+		unless app
+			return ""
+		return if app.label then t(app.label) else t(app.name)
 
 	app_objects: ()->
 		return Creator.getAppObjectNames()
@@ -70,3 +72,7 @@ Template.creatorNavigation.events
 	
 	'click .header-refresh': (event)->
 		window.location.reload(true)
+
+	'click .slds-context-bar__item>a': (event, template)->
+		if this.name != Session.get("list_view_id")
+			Session.set("grid_paging", null)

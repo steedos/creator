@@ -16,3 +16,5 @@ start.bat
 .vscode/*
 .dist/*
 .steedos/*
+.steedos
+my_start.bat

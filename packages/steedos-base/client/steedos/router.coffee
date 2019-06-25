@@ -30,6 +30,10 @@ FlowRouter.triggers.enter [
 					localStorage.setItem('Steedos.lastURL:' + Meteor.userId(), lastUrl)
 ]
 
+FlowRouter.triggers.exit [
+	()-> 
+]
+
 
 # FlowRouter.route '/steedos', 
 #   action: (params, queryParams)->
