@@ -49,13 +49,13 @@ Creator.getObjectSchema = (obj) ->
 					fs.autoform.type = 'date'
 				else
 					fs.autoform.outFormat = 'yyyy-MM-dd';
-					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dateTimePickerOptions参数会报错
+					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dxDateBoxOptions参数会报错
 					fs.autoform.afFieldInput =
-						type: "bootstrap-datetimepicker"
+						type: "dx-date-box"
 						timezoneId: "utc"
-						dateTimePickerOptions:
-							format: "YYYY-MM-DD"
-							locale: Session.get("TAPi18n::loaded_lang")
+						dxDateBoxOptions:
+							type: "date"
+							displayFormat: "yyyy-MM-dd"
 
 		else if field.type == "datetime"
 			fs.type = Date
@@ -63,12 +63,12 @@ Creator.getObjectSchema = (obj) ->
 				if Steedos.isMobile() || Steedos.isPad()
 					fs.autoform.type = 'datetime-local'
 				else
-					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dateTimePickerOptions参数会报错
+					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dxDateBoxOptions参数会报错
 					fs.autoform.afFieldInput =
-						type: "bootstrap-datetimepicker"
-						dateTimePickerOptions:
-							format: "YYYY-MM-DD HH:mm"
-							locale: Session.get("TAPi18n::loaded_lang")
+						type: "dx-date-box"
+						dxDateBoxOptions:
+							type: "datetime"
+							displayFormat: "yyyy-MM-dd HH:mm"
 		else if field.type == "[Object]"
 			fs.type = [Object]
 		else if field.type == "html"
@@ -512,6 +512,9 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only, field_type)->
 		"between_time_last_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_year"),
 		"between_time_this_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "this_year"),
 		"between_time_next_year": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_year"),
+		"between_time_last_quarter": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_quarter"),
+		"between_time_this_quarter": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "this_quarter"),
+		"between_time_next_quarter": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_quarter"),
 		"between_time_last_month": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_month"),
 		"between_time_this_month": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "this_month"),
 		"between_time_next_month": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_month"),
@@ -520,8 +523,69 @@ Creator.getBetweenTimeBuiltinValues = (is_check_only, field_type)->
 		"between_time_next_week": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_week"),
 		"between_time_yestday": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "yestday"),
 		"between_time_today": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "today"),
-		"between_time_tomorrow": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "tomorrow")
+		"between_time_tomorrow": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "tomorrow"),
+		"between_time_last_7_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_7_days"),
+		"between_time_last_30_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_30_days"),
+		"between_time_last_60_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_60_days"),
+		"between_time_last_90_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_90_days"),
+		"between_time_last_120_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "last_120_days"),
+		"between_time_next_7_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_7_days"),
+		"between_time_next_30_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_30_days"),
+		"between_time_next_60_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_60_days"),
+		"between_time_next_90_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_90_days"),
+		"between_time_next_120_days": if is_check_only then true else Creator.getBetweenTimeBuiltinValueItem(field_type, "next_120_days")
 	}
+
+Creator.getQuarterStartMonth = (month)->
+	if !month
+		month = new Date().getMonth()
+	
+	if month < 3
+		return 0
+	else if month < 6
+		return 3
+	else if month < 9
+		return 6
+	
+	return 9
+
+
+Creator.getLastQuarterFirstDay = (year,month)->
+	if !year
+		year = new Date().getFullYear()
+	if !month
+		month = new Date().getMonth()
+	
+	if month < 3
+		year--
+		month = 9
+	else if month < 6
+		month = 0
+	else if month < 9
+		month = 3
+	else 
+		month = 6
+	
+	return new Date(year, month, 1)
+	
+
+Creator.getNextQuarterFirstDay = (year,month)->
+	if !year
+		year = new Date().getFullYear()
+	if !month
+		month = new Date().getMonth()
+	
+	if month < 3
+		month = 3
+	else if month < 6
+		month = 6
+	else if month < 9
+		month = 9
+	else
+		year++
+		month = 0
+	
+	return new Date(year, month, 1)
 
 Creator.getMonthDays = (year,month)->
 	if month == 11
@@ -539,7 +603,7 @@ Creator.getLastMonthFirstDay = (year, month)->
 	if !month
 		month = new Date().getMonth()
 	
-	# 年份为0代表,是本年的第一月,所以不能减
+	# 月份为0代表本年的第一月
 	if month == 0
 		month = 11
 		year--
@@ -548,7 +612,7 @@ Creator.getLastMonthFirstDay = (year, month)->
 	# 否则,只减去月份
 	month--;
 	return new Date(year, month, 1)
-
+	
 Creator.getBetweenTimeBuiltinValueItem = (field_type, key)->
 	# 过滤器between运算符，现算日期/日期时间类型字段的values值
 	now = new Date()
@@ -599,6 +663,38 @@ Creator.getBetweenTimeBuiltinValueItem = (field_type, key)->
 	lastMonthFirstDay = Creator.getLastMonthFirstDay(currentYear,currentMonth)
 	# 上月最后一天
 	lastMonthFinalDay = new Date(firstDay.getTime() - millisecond)
+	# 本季度开始日
+	thisQuarterStartDay = new Date(currentYear,Creator.getQuarterStartMonth(currentMonth),1)
+	# 本季度结束日
+	thisQuarterEndDay = new Date(currentYear,Creator.getQuarterStartMonth(currentMonth)+2,Creator.getMonthDays(currentYear,Creator.getQuarterStartMonth(currentMonth)+2))
+	# 上季度开始日
+	lastQuarterStartDay = Creator.getLastQuarterFirstDay(currentYear,currentMonth)
+	# 上季度结束日
+	lastQuarterEndDay = new Date(lastQuarterStartDay.getFullYear(),lastQuarterStartDay.getMonth()+2,Creator.getMonthDays(lastQuarterStartDay.getFullYear(),lastQuarterStartDay.getMonth()+2))
+	# 下季度开始日
+	nextQuarterStartDay = Creator.getNextQuarterFirstDay(currentYear,currentMonth)
+	# 下季度结束日
+	nextQuarterEndDay = new Date(nextQuarterStartDay.getFullYear(),nextQuarterStartDay.getMonth()+2,Creator.getMonthDays(nextQuarterStartDay.getFullYear(),nextQuarterStartDay.getMonth()+2))
+	# 过去7天 
+	last_7_days = new Date(now.getTime() - (6 * millisecond))
+	# 过去30天
+	last_30_days = new Date(now.getTime() - (29 * millisecond))
+	# 过去60天
+	last_60_days = new Date(now.getTime() - (59 * millisecond))
+	# 过去90天
+	last_90_days = new Date(now.getTime() - (89 * millisecond))
+	# 过去120天
+	last_120_days = new Date(now.getTime() - (119 * millisecond))
+	# 未来7天 
+	next_7_days = new Date(now.getTime() + (6 * millisecond))
+	# 未来30天
+	next_30_days = new Date(now.getTime() + (29 * millisecond))
+	# 未来60天
+	next_60_days = new Date(now.getTime() + (59 * millisecond))
+	# 未来90天
+	next_90_days = new Date(now.getTime() + (89 * millisecond))
+	# 未来120天
+	next_120_days = new Date(now.getTime() + (119 * millisecond))
 
 	switch key
 		when "last_year"
@@ -616,6 +712,27 @@ Creator.getBetweenTimeBuiltinValueItem = (field_type, key)->
 			label = t("creator_filter_operation_between_next_year")
 			startValue = new Date("#{nextYear}-01-01T00:00:00Z")
 			endValue = new Date("#{nextYear}-12-31T23:59:59Z")
+		when "last_quarter"
+			#上季度
+			strFirstDay = moment(lastQuarterStartDay).format("YYYY-MM-DD")
+			strLastDay = moment(lastQuarterEndDay).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_last_quarter")
+			startValue = new Date("#{strFirstDay}T00:00:00Z")
+			endValue = new Date("#{strLastDay}T23:59:59Z")
+		when "this_quarter"
+			#本季度
+			strFirstDay = moment(thisQuarterStartDay).format("YYYY-MM-DD")
+			strLastDay = moment(thisQuarterEndDay).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_this_quarter")
+			startValue = new Date("#{strFirstDay}T00:00:00Z")
+			endValue = new Date("#{strLastDay}T23:59:59Z")
+		when "next_quarter"
+			#下季度
+			strFirstDay = moment(nextQuarterStartDay).format("YYYY-MM-DD")
+			strLastDay = moment(nextQuarterEndDay).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_next_quarter")
+			startValue = new Date("#{strFirstDay}T00:00:00Z")
+			endValue = new Date("#{strLastDay}T23:59:59Z")
 		when "last_month"
 			#上月
 			strFirstDay = moment(lastMonthFirstDay).format("YYYY-MM-DD")
@@ -676,6 +793,76 @@ Creator.getBetweenTimeBuiltinValueItem = (field_type, key)->
 			label = t("creator_filter_operation_between_tomorrow")
 			startValue = new Date("#{strTomorrow}T00:00:00Z")
 			endValue = new Date("#{strTomorrow}T23:59:59Z")
+		when "last_7_days"
+			#过去7天
+			strStartDay = moment(last_7_days).format("YYYY-MM-DD") 
+			strEndDay = moment(now).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_last_7_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "last_30_days"
+			#过去30天
+			strStartDay = moment(last_30_days).format("YYYY-MM-DD")
+			strEndDay = moment(now).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_last_30_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "last_60_days"
+			#过去60天
+			strStartDay = moment(last_60_days).format("YYYY-MM-DD")
+			strEndDay = moment(now).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_last_60_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "last_90_days"
+			#过去90天
+			strStartDay = moment(last_90_days).format("YYYY-MM-DD")
+			strEndDay = moment(now).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_last_90_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "last_120_days"
+			#过去120天
+			strStartDay = moment(last_120_days).format("YYYY-MM-DD")
+			strEndDay = moment(now).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_last_120_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "next_7_days"
+			#未来7天
+			strStartDay = moment(now).format("YYYY-MM-DD")
+			strEndDay = moment(next_7_days).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_next_7_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "next_30_days"
+			#未来30天
+			strStartDay = moment(now).format("YYYY-MM-DD")
+			strEndDay = moment(next_30_days).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_next_30_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "next_60_days"
+			#未来60天
+			strStartDay = moment(now).format("YYYY-MM-DD")
+			strEndDay = moment(next_60_days).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_next_60_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "next_90_days"
+			#未来90天
+			strStartDay = moment(now).format("YYYY-MM-DD")
+			strEndDay = moment(next_90_days).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_next_90_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
+		when "next_120_days"
+			#未来120天
+			strStartDay = moment(now).format("YYYY-MM-DD")
+			strEndDay = moment(next_120_days).format("YYYY-MM-DD")
+			label = t("creator_filter_operation_between_next_120_days")
+			startValue = new Date("#{strStartDay}T00:00:00Z")
+			endValue = new Date("#{strEndDay}T23:59:59Z")
 	
 	values = [startValue, endValue]
 	if field_type == "datetime"

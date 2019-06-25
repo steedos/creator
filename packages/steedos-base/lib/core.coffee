@@ -205,7 +205,7 @@ if Meteor.isClient
 		if !app
 			FlowRouter.go("/")
 			return
-
+		
 		# creatorSettings = Meteor.settings.public?.webservices?.creator
 		# if app._id == "admin" and creatorSettings?.status == "active"
 		# 	url = creatorSettings.url
@@ -256,6 +256,12 @@ if Meteor.isClient
 				console.error "#{e.message}\r\n#{e.stack}"
 		else
 			Steedos.openAppWithToken(app_id)
+		
+		
+		if !app.is_new_window && !Steedos.isMobile() && !Steedos.isCordova() && !app.is_use_ie && !on_click
+			# 需要选中当前app时，on_click函数里要单独加上Session.set("current_app_id", app_id)
+			Session.set("current_app_id", app_id)
+		
 
 	Steedos.checkSpaceBalance = (spaceId)->
 		unless spaceId
@@ -840,3 +846,30 @@ Steedos.convertSpecialCharacter = (str)->
 
 Steedos.removeSpecialCharacter = (str)->
 	return str.replace(/([\^\$\(\)\*\+\?\.\\\|\[\]\{\}\~\`\@\#\%\&\=\'\"\:\;\<\>\,\/])/g, "")
+
+Creator.getDBApps = (space_id)->
+	dbApps = {}
+	Creator.Collections["apps"].find({space: space_id,is_creator:true,visible:true}, {
+		fields: {
+			created: 0,
+			created_by: 0,
+			modified: 0,
+			modified_by: 0
+		}
+	}).forEach (app)->
+		dbApps[app._id] = app
+
+	return dbApps
+
+if Meteor.isClient
+	Meteor.autorun ()->
+		if Session.get('current_app_id')
+			sessionStorage.setItem('current_app_id', Session.get('current_app_id'))
+#		else
+#			console.log('remove current_app_id...');
+#			sessionStorage.removeItem('current_app_id')
+	Steedos.getCurrentAppId = ()->
+		if Session.get('current_app_id')
+			return Session.get('current_app_id')
+		else
+			return sessionStorage.getItem('current_app_id');
