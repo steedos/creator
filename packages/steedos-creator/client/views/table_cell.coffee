@@ -97,7 +97,16 @@ Template.creator_table_cell.helpers
 			return true
 		else
 			return false
-
+	
+	itemActionName: ()->
+		data = Template.instance().data
+		unless data
+			return null
+		object_name = data.object_name
+		if object_name == "cms_files"
+			return "download"
+		else
+			return null
 
 	cellData: ()->
 		data = []
@@ -343,3 +352,19 @@ Template.creator_table_cell.helpers
 	isExtraField: () ->
 		fieldName = this.field?.name
 		return fieldName == "created_by" or fieldName == "modified_by"
+
+
+Template.creator_table_cell.events
+
+	'click .list-item-link-action': (event, template) ->
+		data = template.data
+		unless data
+			return false
+		objectName = data.object_name
+		recordId = data._id
+		actionName = event.currentTarget.dataset.actionName
+		action = Creator.getActions("cms_files").find (n)->
+			return n.name == actionName
+		unless action
+			return false
+		Creator.executeAction(objectName, action, recordId)
