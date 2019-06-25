@@ -15,6 +15,15 @@
 		}
 	}
 
+	[type="odata"]{
+		.code-wrap, .url-wrap, .search_field-wrap, .formula-wrap{
+			label:after{
+				content: " *";
+				color: red;
+			}
+		}
+	}
+
 	.form-wrap.form-builder .frmb .prev-holder input[type=number]{
 		width: 100%;
 	}
@@ -44,5 +53,11 @@
 	.form-group {
 		margin-left: 0 !important;
 		margin-bottom: 15px !important;
+	}
+}
+
+.flow-modal{
+	.modal-lg{
+		width: 992px;
 	}
 }

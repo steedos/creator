@@ -4,7 +4,7 @@ FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 	"date", "number", "textarea",
 	"dateTime", "dateNew", "checkboxBoolean", "email", "url", "password", "user", "group",
 	"table", "section",
-	"lookup"]
+	"odata"]
 
 # 定义 禁用 的字段类型
 DISABLEFIELDS = ['button', 'file', 'paragraph', 'autocomplete', 'hidden', 'date', 'header']
@@ -18,7 +18,7 @@ DISABLEDATTRS = ['description', 'maxlength', 'placeholder', "access", "value", '
 
 # 定义字段类型排序
 CONTROLORDER = ['table', 'section', 'text', 'textarea', 'number', 'dateNew', 'dateTime', 'date', 'checkboxBoolean',
-	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group", "lookup"]
+	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group", "odata"]
 
 # 获取各字段类型禁用的字段属性
 #TYPEUSERDISABLEDATTRS = (()->
@@ -72,6 +72,14 @@ FORMULAUSERATTRS = {
 	formula: {
 		label: '公式',
 		type: 'textarea'
+	}
+}
+
+FORMULAUSERATTRS_REQUIRED = {
+	formula: {
+		label: '公式',
+		type: 'textarea',
+		required: 'true'
 	}
 }
 
@@ -160,26 +168,28 @@ getTypeUserAttrs = ()->
 						label: '字段'
 					}
 				}
-			when 'lookup'
+			when 'odata'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
-					related_object: {
-						label: '相关对象'
-						type: 'lookup'
-					},
+#					related_object: {
+#						label: '相关对象'
+#						type: 'lookup'
+#					},
+					url: {
+						label: 'Odata API',
+						type: 'textarea',
+						required: 'true'
+					}
 					filters: {
 						label: '过滤条件',
 						type: 'textarea'
 					},
-					showField: {
-						label: '显示的字段'
+					search_field: {
+						label: '可搜索字段'
 						type: 'input'
-					},
-					docField: {
-						label: '存储的字段',
-						type: 'input'
+						placeholder: '多个请用英文逗号(,)分隔',
+						required: 'true'
 					}
-
-				}
+				}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display'), FORMULAUSERATTRS_REQUIRED
 			else
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs
@@ -317,11 +327,11 @@ getFields = ()->
 			icon: "S"
 		},
 		{
-			label: "Steedos Data"
+			label: "Odata"
 			attrs: {
-				type: "lookup"
+				type: "odata"
 			}
-			icon: "SD"
+			icon: "OD"
 		}
 	]
 
@@ -432,14 +442,14 @@ getFieldTemplates = ()->
 								, 100
 					, 100
 			};
-		lookup: (fieldData)->
+		odata: (fieldData)->
 			if !fieldData.className
 				fieldData.className = 'form-control'
 			return {
 				field: "<div id='#{fieldData.name}' type='text' readonly #{Creator.formBuilder.utils.attrString(fieldData)}>",
-				onRender: (a, b, c)->
-					console.log(a, b, c);
-					console.log('this', this);
+#				onRender: (a, b, c)->
+#					console.log(a, b, c);
+#					console.log('this', this);
 			};
 	}
 
@@ -477,7 +487,6 @@ Creator.formBuilder.optionsForFormFields = (is_sub)->
 			lookups.each (lookup)->
 				parent = this.parentNode
 				className = this.className
-				console.log('lookup', this.parentNode)
 				this.remove()
 				schema = {}
 				schema['related_object'] = {
