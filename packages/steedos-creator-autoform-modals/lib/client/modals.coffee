@@ -123,6 +123,8 @@ Template.CreatorAutoformModals.rendered = ->
 		$(window).unbind 'keyup', onEscKey
 
 		doc = Session.get 'cmDoc'
+		# “保存并新建”操作中自动打开的新窗口中需要用到的doc
+		cmShowAgainDoc = Session.get 'cmShowAgainDoc'
 
 		sessionKeys = [
 			'cmCollection',
@@ -148,7 +150,8 @@ Template.CreatorAutoformModals.rendered = ->
 			'cmIsMultipleUpdate',
 			'cmTargetIds',
 			'cmEditSingleField',
-			'cmFullScreen'
+			'cmFullScreen',
+			'cmShowAgainDoc'
 		]
 		delete Session.keys[key] for key in sessionKeys
 
@@ -226,6 +229,12 @@ Template.CreatorAutoformModals.events
 		formId = Session.get('cmFormId') or defaultFormId
 		$("#"+formId, "#afModal").submit()
 		Session.set 'cmShowAgain', true
+		# 是否需要在打开新窗口时复制当前窗口doc内容到下次自动打开的窗口中
+		showAgainDuplicated = Session.get "cmShowAgainDuplicated"
+		if showAgainDuplicated
+			insertDoc = AutoForm.getFormValues(formId).insertDoc
+			# 把当前doc内容设置到自动打开的新窗口中需要用到的doc
+			Session.set("cmShowAgainDoc", insertDoc)
 	
 	'click .group-section-control': (event, template) ->
 		event.preventDefault()
