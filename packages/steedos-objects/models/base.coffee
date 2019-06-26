@@ -282,7 +282,7 @@ Creator.baseObject =
 		# 弹出新窗口查看详细
 		standard_open_view:
 			label: "查看"
-			visible: true
+			visible: false
 			on: "record"
 			only_list_item: true
 			todo: "standard_open_view"
