@@ -217,8 +217,6 @@ if Meteor.isServer
 		modifier.$set = modifier.$set || {};
 		if doc.owner != userId
 			throw new Meteor.Error(400, "spaces_error_space_owner_only");
-		if (!Steedos.isLegalVersion(doc._id,"workflow.professional")) and modifier.$set.avatar
-			throw new Meteor.Error(400, "space_paid_info_title");
 		modifier.$set.modified_by = userId;
 		modifier.$set.modified = new Date();
 
