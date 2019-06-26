@@ -56,4 +56,5 @@ Template.creatorSidebar.onRendered ->
 			else if template_name
 				menuUrl = "/app/admin/page/#{template_name}"
 			
-			FlowRouter.go(menuUrl);
+			if menuUrl
+				FlowRouter.go(menuUrl);
