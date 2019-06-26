@@ -35,11 +35,29 @@ if Meteor.isClient
 		# 在此定义全局 actions
 		"standard_query": ()->
 			Modal.show("standard_query_modal")
-			
+
 		"standard_new": (object_name, record_id, fields)->
+			ids = Creator.TabularSelectedIds[object_name]
+			if ids?.length
+				# 列表有选中项时，取第一个选中项，复制其内容到新建窗口中
+				# 这的第一个指的是第一次勾选的选中项，而不是列表中已勾选的第一项
+				record_id = ids[0]
+				doc = Creator.odata.get(object_name, record_id)
+				Session.set 'cmDoc', doc
+				# “保存并新建”操作中自动打开的新窗口中需要再次复制最新的doc内容到新窗口中
+				Session.set 'cmShowAgainDuplicated', true
 			Meteor.defer ()->
 				$(".creator-add").click()
 			return 
+
+		"standard_open_view": (object_name, record_id, fields)->
+			href = Creator.getObjectUrl(object_name, record_id)
+			window.open(
+				href,
+				'_blank',
+				'width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes'
+			)
+			return false
 
 		"standard_edit": (object_name, record_id, fields)->
 			if record_id
@@ -101,7 +119,9 @@ if Meteor.isClient
 								else
 									Template.creator_grid.refresh(dxDataGridInstance)
 							if isOpenerRemove or !dxDataGridInstance
-								if record_id == Session.get("record_id") and !Steedos.isMobile() and list_view_id != 'calendar'
+								if isOpenerRemove
+									window.close()
+								else if record_id == Session.get("record_id") and !Steedos.isMobile() and list_view_id != 'calendar'
 									appid = Session.get("app_id")
 									unless list_view_id
 										list_view_id = Session.get("list_view_id")
