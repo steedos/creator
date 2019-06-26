@@ -32,9 +32,6 @@ Creator.Objects.spaces =
   #               {label:'宠物',value:'pets'},
   #               {label:'汽车服务',value:'car'}
   #           ]
-		phone:
-			label:'联系电话'
-			type:'text'
 		admins:
 			label: "管理员"
 			type: "lookup"
@@ -43,10 +40,10 @@ Creator.Objects.spaces =
 			multiple: true
 			is_wide: true
 		avatar:
-			label:'公司Logo'
+			label:'浅色公司Logo'
 			type:'avatar'
-		cover:
-			label:'封面照片'
+		avatar_dark:
+			label:'深色公司Logo'
 			type:'avatar'
 		location:
 			label:'地址'
@@ -59,6 +56,7 @@ Creator.Objects.spaces =
 			type: "lookup"
 			reference_to: "apps"
 			multiple: true
+			hidden: true
 		apps_paid:
 			label:'已付费应用'
 			type: "[text]"
@@ -66,6 +64,7 @@ Creator.Objects.spaces =
 		hostname:
 			label:'绑定域名'
 			type: "[text]"
+			hidden: true
 		is_paid:
 			label: t("Spaces_isPaid")
 			type: "boolean"
@@ -115,6 +114,7 @@ Creator.Objects.spaces =
 			label:'允许新用户注册'
 			type: "boolean"
 			defaultValue:false
+			hidden: true
 		owner:
 			label: "所有者"
 			type: "lookup"
