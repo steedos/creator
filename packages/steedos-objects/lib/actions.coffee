@@ -35,8 +35,17 @@ if Meteor.isClient
 		# 在此定义全局 actions
 		"standard_query": ()->
 			Modal.show("standard_query_modal")
-			
+
 		"standard_new": (object_name, record_id, fields)->
+			ids = Creator.TabularSelectedIds[object_name]
+			if ids?.length
+				# 列表有选中项时，取第一个选中项，复制其内容到新建窗口中
+				# 这的第一个指的是第一次勾选的选中项，而不是列表中已勾选的第一项
+				record_id = ids[0]
+				doc = Creator.odata.get(object_name, record_id)
+				Session.set 'cmDoc', doc
+				# “保存并新建”操作中自动打开的新窗口中需要再次复制最新的doc内容到新窗口中
+				Session.set 'cmShowAgainDuplicated', true
 			Meteor.defer ()->
 				$(".creator-add").click()
 			return 
