@@ -980,23 +980,24 @@ Template.creator_report_content.onRendered ->
 			filter_items = reportObject.filters || []
 			filter_scope = reportObject.filter_scope
 			filter_logic = reportObject.filter_logic
-			object_fields = Creator.getObject(reportObject.object_name).fields
-			filter_items.forEach (item)->
-				filter_field_type = object_fields[item.field]?.type
-				# 数据库中的报表过滤条件中，时间类型字段会被保存为像`2019-07-02T06:25:14.898Z`这样的字符串格式
-				# 保存到Session的filter_items对象中之前，需要转换为时间类型的对象
-				if ["date", "datetime"].includes(filter_field_type)
-					if typeof item.start_value == "string"
-						item.start_value = new Date(item.start_value)
-					if typeof item.end_value == "string"
-						item.end_value = new Date(item.end_value)
-					if typeof item.value == "string"
-						item.value = new Date(item.value)
-					else if _.isArray(item.value)
-						if typeof item.value[0] == "string"
-							item.value[0] = new Date(item.value[0])
-						if typeof item.value[1] == "string"
-							item.value[1] = new Date(item.value[1])
+			object_fields = Creator.getObject(reportObject.object_name)?.fields
+			if object_fields
+				filter_items.forEach (item)->
+					filter_field_type = object_fields[item.field]?.type
+					# 数据库中的报表过滤条件中，时间类型字段会被保存为像`2019-07-02T06:25:14.898Z`这样的字符串格式
+					# 保存到Session的filter_items对象中之前，需要转换为时间类型的对象
+					if ["date", "datetime"].includes(filter_field_type)
+						if typeof item.start_value == "string"
+							item.start_value = new Date(item.start_value)
+						if typeof item.end_value == "string"
+							item.end_value = new Date(item.end_value)
+						if typeof item.value == "string"
+							item.value = new Date(item.value)
+						else if _.isArray(item.value)
+							if typeof item.value[0] == "string"
+								item.value[0] = new Date(item.value[0])
+							if typeof item.value[1] == "string"
+								item.value[1] = new Date(item.value[1])
 
 			Session.set("filter_items", filter_items)
 			Session.set("filter_scope", filter_scope)
