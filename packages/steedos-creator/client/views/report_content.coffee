@@ -339,6 +339,14 @@ renderTabularReport = (reportObject)->
 		else if itemField.type == "datetime"
 			# 如果不加这个转换语句，则datetime会显示为2019年 2月 28日这种格式，未显示时间值
 			field.dataType = "datetime"
+		
+		if ["date", "datetime"].includes(field.dataType)
+			field.format = {
+				formatter: (date)->
+					formattedDate = new Date(date.getTime())
+					formattedDate.setHours(formattedDate.getHours() - formattedDate.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+					return DevExpress.localization.formatDate(formattedDate, 'yyyy-MM-dd HH:mm')
+			}
 
 		if sorts[item]
 			field.sortOrder = sorts[item]
@@ -460,6 +468,14 @@ renderSummaryReport = (reportObject)->
 		else if itemField.type == "datetime"
 			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
 			field.dataType = "datetime"
+		
+		if ["date", "datetime"].includes(field.dataType)
+			field.format = {
+				formatter: (date)->
+					formattedDate = new Date(date.getTime())
+					formattedDate.setHours(formattedDate.getHours() - formattedDate.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+					return DevExpress.localization.formatDate(formattedDate, 'yyyy-MM-dd HH:mm')
+			}
 
 		if sorts[item]
 			field.sortOrder = sorts[item]
@@ -492,6 +508,14 @@ renderSummaryReport = (reportObject)->
 		else if groupField.type == "datetime"
 			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
 			field.dataType = "datetime"
+		
+		if ["date", "datetime"].includes(field.dataType)
+			field.format = {
+				formatter: (date)->
+					formattedDate = new Date(date.getTime())
+					formattedDate.setHours(formattedDate.getHours() - formattedDate.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+					return DevExpress.localization.formatDate(formattedDate, 'yyyy-MM-dd HH:mm')
+			}
 	
 		if sorts[group]
 			field.sortOrder = sorts[group]
