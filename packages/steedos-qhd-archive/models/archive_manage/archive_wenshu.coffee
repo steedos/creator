@@ -211,6 +211,7 @@ Creator.Objects.archive_wenshu =
 			type:"master_detail"
 			label:"全宗名称"
 			reference_to:"archive_fonds"
+			required:true
 			searchable:false
 			filterable:false
 			group:"档号"
