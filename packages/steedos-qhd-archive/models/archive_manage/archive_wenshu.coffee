@@ -24,8 +24,10 @@ set_retention = (doc)->
 	# 保管期限表
 	if retention_id
 		retention = Creator.Collections["archive_retention"].findOne({_id:retention_id})
+	else if !doc.retention_peroid
+		retention = Creator.Collections["archive_retention"].findOne({is_default:true})
 	else
-		retention = Creator.Collections["archive_retention"].findOne({is_default:true})		
+		retention = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})		
 	# 设置保管期限和销毁日期
 	if retention?.years
 		# 没有文件日期默认为当前日期
