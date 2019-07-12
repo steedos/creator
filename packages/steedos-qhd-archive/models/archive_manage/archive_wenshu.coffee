@@ -68,11 +68,18 @@ set_init = (record_id)->
 	Creator.Collections["archive_wenshu"].direct.update(record_id,
 	{
 		$set:{
-			is_received: false
 			is_destroyed: false
 			is_borrowed: false
 		}
 	})
+	ThisDoc = Creator.Collections["archive_wenshu"].findOne({_id:record_id})
+	if !ThisDoc.is_received
+		Creator.Collections["archive_wenshu"].direct.update(record_id,
+		{
+			$set:{
+				is_received: false
+			}
+		})	
 
 # 设置电子文件号
 set_electronic_record_code = (record_id)->
@@ -721,7 +728,7 @@ Creator.Objects.archive_wenshu =
 			defaultValue:false
 			# hidden: true
 			readonly:true
-			omit:true
+			# omit:true
 		received:
 			type:"datetime"
 			label:"接收时间"
