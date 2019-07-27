@@ -340,6 +340,14 @@ renderTabularReport = (reportObject)->
 		else if itemField.type == "datetime"
 			# 如果不加这个转换语句，则datetime会显示为2019年 2月 28日这种格式，未显示时间值
 			field.dataType = "datetime"
+		
+		if ["date", "datetime"].includes(field.dataType)
+			field.format = {
+				formatter: (date)->
+					formattedDate = new Date(date.getTime())
+					formattedDate.setHours(formattedDate.getHours() - formattedDate.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+					return DevExpress.localization.formatDate(formattedDate, 'yyyy-MM-dd HH:mm')
+			}
 
 		if sorts[item]
 			field.sortOrder = sorts[item]
@@ -462,6 +470,14 @@ renderSummaryReport = (reportObject)->
 		else if itemField.type == "datetime"
 			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
 			field.dataType = "datetime"
+		
+		if ["date", "datetime"].includes(field.dataType)
+			field.format = {
+				formatter: (date)->
+					formattedDate = new Date(date.getTime())
+					formattedDate.setHours(formattedDate.getHours() - formattedDate.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+					return DevExpress.localization.formatDate(formattedDate, 'yyyy-MM-dd HH:mm')
+			}
 
 		if sorts[item]
 			field.sortOrder = sorts[item]
@@ -494,6 +510,14 @@ renderSummaryReport = (reportObject)->
 		else if groupField.type == "datetime"
 			# 不加dataType，则显示出的格式就不对，会显示成：Fri Feb 08 2019 10:05:00 GMT+0800 (中国标准时间)
 			field.dataType = "datetime"
+		
+		if ["date", "datetime"].includes(field.dataType)
+			field.format = {
+				formatter: (date)->
+					formattedDate = new Date(date.getTime())
+					formattedDate.setHours(formattedDate.getHours() - formattedDate.getTimezoneOffset() / 60 )  # 处理grid中的datetime 偏移
+					return DevExpress.localization.formatDate(formattedDate, 'yyyy-MM-dd HH:mm')
+			}
 	
 		if sorts[group]
 			field.sortOrder = sorts[group]
@@ -921,6 +945,15 @@ renderMatrixReport = (reportObject)->
 			pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
 			self.pivotGridInstance?.set pivotGrid
 
+renderJsReport = (reportObject)->
+	url = Creator.getRelativeUrl("/plugins/jsreport/web/viewer_db/#{reportObject._id}");
+	filter_items = Tracker.nonreactive ()->
+		return Session.get("filter_items")
+	if filter_items
+		query = encodeURI JSON.stringify(filter_items)
+		url += "?user_filters=#{query}"
+	$('#jsreport').html("<iframe src=\"#{url}\"></iframe>");
+
 renderReport = (reportObject)->
 	unless reportObject
 		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
@@ -948,21 +981,33 @@ renderReport = (reportObject)->
 		return
 	if pivotGridChart
 		pivotGridChart.dispose()
+
+	innerStacking = $(".filter-list-wraper .innerStacking") #tabular/summary/matrix三种dx控件报表容器
 	switch reportObject.report_type
 		when 'tabular'
 			# 报表类型从matrix转变成tabular时，需要把原来matrix报表清除
 			gridLoadedArray = null
 			self.pivotGridInstance?.get()?.dispose()
+			innerStacking.show();
 			renderTabularReport.bind(self)(reportObject)
 		when 'summary'
 			# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
 			self.pivotGridInstance?.get()?.dispose()
+			innerStacking.show();
 			renderSummaryReport.bind(self)(reportObject)
 		when 'matrix'
 			# 报表类型从summary转变成matrix时，需要把原来summary报表清除
 			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
+			innerStacking.show();
 			renderMatrixReport.bind(self)(reportObject)
+		when 'jsreport'
+			# 报表类型从dx控件报表转变成jsreport时，需要把原来报表相关内容清除
+			gridLoadedArray = null
+			self.dataGridInstance?.get()?.dispose()
+			self.pivotGridInstance?.get()?.dispose()
+			innerStacking.hide();
+			renderJsReport.bind(self)(reportObject)
 
 
 Template.creator_report_content.onRendered ->
@@ -983,6 +1028,25 @@ Template.creator_report_content.onRendered ->
 			filter_items = reportObject.filters || []
 			filter_scope = reportObject.filter_scope
 			filter_logic = reportObject.filter_logic
+			object_fields = Creator.getObject(reportObject.object_name)?.fields
+			if object_fields
+				filter_items.forEach (item)->
+					filter_field_type = object_fields[item.field]?.type
+					# 数据库中的报表过滤条件中，时间类型字段会被保存为像`2019-07-02T06:25:14.898Z`这样的字符串格式
+					# 保存到Session的filter_items对象中之前，需要转换为时间类型的对象
+					if ["date", "datetime"].includes(filter_field_type)
+						if typeof item.start_value == "string"
+							item.start_value = new Date(item.start_value)
+						if typeof item.end_value == "string"
+							item.end_value = new Date(item.end_value)
+						if typeof item.value == "string"
+							item.value = new Date(item.value)
+						else if _.isArray(item.value)
+							if typeof item.value[0] == "string"
+								item.value[0] = new Date(item.value[0])
+							if typeof item.value[1] == "string"
+								item.value[1] = new Date(item.value[1])
+
 			Session.set("filter_items", filter_items)
 			Session.set("filter_scope", filter_scope)
 			Session.set("filter_logic", filter_logic)

@@ -80,7 +80,6 @@ Package.onUse(function (api) {
 
 	api.use('steedos:logger@0.0.2');
 
-	api.use('steedos:app-admin@0.0.1');
 	api.use('steedos:devexpress@18.1.4');
 	api.use('steedos:odata@0.0.3');
 	api.use('blaze-html-templates@1.1.2');
@@ -100,6 +99,7 @@ Package.onUse(function (api) {
 	// api.addFiles('lib/eval.js');
 	// api.addFiles('lib/formula_engine.coffee');
 	api.addFiles('lib/object_recent.coffee', 'client');
+	api.addFiles('lib/filters_transform.coffee', 'client');
 
 
 	api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
@@ -233,6 +233,7 @@ Package.onUse(function (api) {
 
 	api.addFiles('client/views/report_content.html', 'client');
 	api.addFiles('client/views/report_content.coffee', 'client');
+	api.addFiles('client/views/report_content.less', 'client');
 
 	api.addFiles('client/views/report.html', 'client');
 	api.addFiles('client/views/report.coffee', 'client');
