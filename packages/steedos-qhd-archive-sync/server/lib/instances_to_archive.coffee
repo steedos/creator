@@ -429,7 +429,7 @@ InstancesToArchive = (spaces, contract_flows, ins_ids) ->
 	return
 
 InstancesToArchive.success = (instance)->
-	Creator.Collections["instances"].update({_id: instance._id}, {$set: {is_recorded: true}})
+	Creator.Collections["instances"].direct.update({_id: instance._id}, {$set: {is_recorded: true}})
 
 InstancesToArchive.failed = (instance, error)->
 	logger.error "failed, name is #{instance.name}, id is #{instance._id}. error: ", error

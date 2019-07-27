@@ -44,6 +44,7 @@ Creator.Objects.archive_wenshu =
 			type:"master_detail"
 			label:"全宗名称"
 			reference_to:"archive_fonds"
+			required:true
 			searchable:false
 			filterable:false
 			group:"档号"
@@ -551,7 +552,7 @@ Creator.Objects.archive_wenshu =
 			defaultValue:false
 			# hidden: true
 			readonly:true
-			omit:true
+			# omit:true
 		received:
 			type:"datetime"
 			label:"接收时间"

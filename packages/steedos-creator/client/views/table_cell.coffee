@@ -351,7 +351,7 @@ Template.creator_table_cell.helpers
 		return this.type is type
 
 	isExtraField: () ->
-		fieldName = this.field?.name
+		fieldName = this.field.name
 		return fieldName == "created_by" or fieldName == "modified_by"
 
 

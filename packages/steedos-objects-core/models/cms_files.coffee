@@ -142,7 +142,6 @@ Creator.Objects.cms_files =
 				return perms["allowEdit"]
 			on: "record_more"
 			todo: "standard_delete"
-		
 		download:
 			label: "下载"
 			visible: (object_name, record_id, record_permissions)->
