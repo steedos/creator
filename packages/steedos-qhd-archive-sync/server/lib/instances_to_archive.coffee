@@ -508,6 +508,180 @@ InstancesToArchive.syncNonContractInstance = (instance, callback) ->
 	else
 		InstancesToArchive.failed instance, "立档单位未找到"
 
+# 设置保管期限
+InstancesToArchive.set_retention = (doc)->
+	rules = Creator.Collections["archive_rules"].find({ fieldname: 'title'},{ fields:{ keywords: 1,retention:1 },sort:{sort_no:-1} } ).fetch(retention:1)
+	if rules
+		rules_keywords = _.pluck rules, "keywords"
+	else
+		rules_keywords = []
+	# 所有规则关键词
+	i = 0
+	while i < rules_keywords.length
+		is_matched = true
+		j = 0
+		arrs = rules_keywords[i]
+		while j < arrs.length
+			if doc.title.indexOf(arrs[j])<0
+				is_matched = false
+				break;
+			j++
+		if is_matched
+			retention_id = rules[i].retention
+			break;
+		i++
+
+	# 保管期限表
+	if retention_id
+		retention = Creator.Collections["archive_retention"].findOne({_id:retention_id})
+	else if !doc.retention_peroid
+		retention = Creator.Collections["archive_retention"].findOne({is_default:true})
+	else
+		retention = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})		
+	# 设置保管期限和销毁日期
+	if retention?.years
+		# 没有文件日期默认为当前日期
+		if !doc.document_date
+			doc.document_date = new Date()
+		
+		duration = retention?.years
+		year = doc.document_date?.getFullYear() + duration
+		month = doc.document_date?.getMonth()
+		day = doc.document_date?.getDate()
+		destroy_date = new Date(year,month,day)
+		destroy_date_timestamp = parseInt(destroy_date?.getTime())
+		Creator.Collections["archive_wenshu"].direct.update(doc._id,
+		{
+			$set:{
+				retention_peroid: retention._id,
+				destroy_date: destroy_date,
+				destroy_date_timestamp: destroy_date_timestamp
+			}
+		})
+
+InstancesToArchive.set_category_code = (doc)->
+	# 根据归档部门确定类别号
+	if doc?.archive_dept
+		keyword = doc?.archive_dept
+		classification = Creator.Collections["archive_classification"].findOne({keywords: keyword})
+	if classification?._id
+		Creator.Collections["archive_wenshu"].direct.update(doc._id,
+		{
+			$set:{
+				category_code:classification?._id
+			}
+		})
+
+# 设置初始条件
+InstancesToArchive.set_init = (record_id)->
+	Creator.Collections["archive_wenshu"].direct.update(record_id,
+	{
+		$set:{
+			is_destroyed: false
+			is_borrowed: false
+		}
+	})
+	ThisDoc = Creator.Collections["archive_wenshu"].findOne({_id:record_id})
+	if !ThisDoc.is_received
+		Creator.Collections["archive_wenshu"].direct.update(record_id,
+		{
+			$set:{
+				is_received: false
+			}
+		})	
+
+# 设置电子文件号
+InstancesToArchive.set_electronic_record_code = (record_id)->
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,year:1}})
+	if record?.fonds_name and record?.year
+		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
+		count = Creator.Collections["archive_wenshu"].find({year:record?.year}).count()
+		strcount = "0000000" + count
+		count_code = strcount.substr(strcount.length-6)
+		electronic_record_code = fonds_code + "WS" + record?.year + count_code
+		Creator.Collections["archive_wenshu"].direct.update(record_id,
+		{
+			$set:{
+				electronic_record_code: electronic_record_code
+			}
+		})
+
+InstancesToArchive.set_company = (record_id)->
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
+	if record?.fonds_name
+		fonds_company = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{company:1}})?.company
+		if fonds_company
+			Creator.Collections["archive_wenshu"].direct.update(record_id,
+			{
+				$set:{
+					company: fonds_company
+				}
+			})
+		
+# 设置档号
+InstancesToArchive.set_archivecode = (record_id)->
+	console.log "修改档号"
+	record = Creator.Collections["archive_wenshu"].findOne(record_id,{fields:{fonds_name:1,retention_peroid:1,organizational_structure:1,year:1,item_number:1}})
+	if record?.item_number and record?.fonds_name and record?.retention_peroid and record?.year and record?.organizational_structure
+		fonds_code = Creator.Collections["archive_fonds"].findOne(record.fonds_name,{fields:{code:1}})?.code
+		retention_peroid_code = Creator.Collections["archive_retention"].findOne(record.retention_peroid,{fields:{code:1}})?.code
+		organizational_structure_code = Creator.Collections["archive_organization"].findOne(record.organizational_structure,{fields:{code:1}})?.code
+		year = record.year
+		item_number = (Array(6).join('0') + record.item_number).slice(-4)
+		if fonds_code and year and retention_peroid_code and item_number
+			if organizational_structure_code
+				archive_code = fonds_code + "-WS" + "-" + year + "-"+ retention_peroid_code + "-" + organizational_structure_code + "-"+item_number
+			else
+				archive_code = fonds_code + "-WS" + "-" + year + "-"+ retention_peroid_code + "-" + item_number
+			Creator.Collections["archive_wenshu"].direct.update(record_id,
+			{
+				$set:{
+					archival_code:archive_code
+				}
+			})
+
+InstancesToArchive.set_destory = (doc)->
+	if doc?.retention_peroid and doc?.document_date
+		duration = Creator.Collections["archive_retention"].findOne({_id:doc.retention_peroid})?.years
+		if duration
+			year = doc.document_date.getFullYear()+duration
+			month = doc.document_date.getMonth()
+			day = doc.document_date.getDate()
+			destroy_date = new Date(year,month,day)
+			destroy_date_timestamp = parseInt(destroy_date?.getTime())
+			Creator.Collections["archive_wenshu"].direct.update({_id:doc._id},
+				{
+					$set:{
+						destroy_date:destroy_date,
+						destroy_date_timestamp:destroy_date_timestamp
+						}
+				})
+
+# 日志记录
+InstancesToArchive.set_audit = (record_id, space, userId)->
+	doc = {
+		business_status: "历史行为",
+		business_activity: "修改文书档案",
+		action_time: new Date(),
+		action_user: userId,
+		action_mandate: "",
+		action_description: "",
+		action_administrative_records_id: record_id,
+		created_by: userId,
+		created: new Date(),
+		owner: userId,
+		space: space
+	}
+	Creator.Collections["archive_audit"].insert(doc)
+
+# 设置重新封装
+InstancesToArchive.set_hasXml = (record_id)->
+	Creator.Collections["archive_wenshu"].direct.update({_id:record_id},
+		{
+			$set:{
+				has_xml:false
+				}
+		})
 
 @Test = {}
 # Test.run('iTRRqEfHYGhDeWwaC')
