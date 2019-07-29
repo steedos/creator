@@ -398,11 +398,6 @@ Template.creator_calendarNew.onRendered ->
 				endDateExpr: view.options.endDateExpr
 				startDateExpr: view.options.startDateExpr
 				timeZone: "Asia/Shanghai"
-				# height: ()->
-				# 	console.log("window.innerHeight: ",window.innerHeight)
-				# 	height = window.innerHeight - 330
-				# 	console.log("height: ",height)
-				# 	return height
 				height: "100%"
 				crossScrollingEnabled: true
 				cellDuration: 30
