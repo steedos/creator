@@ -583,6 +583,7 @@ Template.creator_grid.onRendered ->
 			dxOptions =
 				scrolling: 
 					showScrollbar: "always"
+					mode: "virtual"
 				paging:
 					pageSize: pageSize
 				pager:
@@ -652,7 +653,7 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
-				columnAutoWidth: true
+				columnAutoWidth: false
 				sorting:
 					mode: "multiple"
 				customizeExportData: (col, row)->
@@ -760,6 +761,7 @@ Template.creator_grid.onRendered ->
 				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
 					DevExpress.ui.dxDataGrid = dxDataGrid;
 					# console.log("dxOptions.dataSource.filter=======", dxOptions.dataSource.filter);
+					console.log(dxOptions)
 					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
 					if !is_related && self.$(".gridContainer").length > 0
 						Session.set("grid_paging", null)
