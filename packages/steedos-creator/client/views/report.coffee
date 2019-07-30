@@ -71,6 +71,11 @@ Template.creator_report.helpers
 	isChartDisabled: ()->
 		return Template.instance().is_chart_disabled?.get()
 	
+	isChartNeedToShow: ()->
+		record_id = Session.get "record_id"
+		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+		return reportObject.report_type != "jsreport"
+	
 	isSavable: ->
 		obj = Creator.getObject()
 		object_name = obj.name
@@ -101,6 +106,12 @@ Template.creator_report.helpers
 				isFiltering = true;
 			return !isFiltering;
 		return isFiltering
+
+	isBtnSettingsNeedToShow: ->
+		record_id = Session.get "record_id"
+		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+		return reportObject.report_type != "jsreport"
+
 Template.creator_report.events
 
 	'click .record-action-custom': (event, template) ->

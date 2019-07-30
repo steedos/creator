@@ -34,10 +34,11 @@
 							</div>
 						</div>
 						<div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom_xx-small">
-							
-							<button disabled={{isChartDisabled}} class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-chart {{#if isChartOpen}}slds-is-selected{{else}}slds-not-selected{{/if}}" title="切换图表">
-								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="chart"}}
-							</button>
+							{{#if isChartNeedToShow}}
+								<button disabled={{isChartDisabled}} class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-chart {{#if isChartOpen}}slds-is-selected{{else}}slds-not-selected{{/if}}" title="切换图表">
+									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="chart"}}
+								</button>
+							{{/if}}
 
 							<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-filter {{#if isFiltering}}filtering{{/if}} {{#if isFilterOpen}}slds-is-selected{{else}}slds-not-selected{{/if}}" title="筛选器">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
@@ -58,11 +59,13 @@
 										<li class="slds-dropdown__header" role="separator">
 											<span class="slds-text-title--caps">{{_ "设置"}}</span>
 										</li>
-										<li class="slds-dropdown__item btn-settings" role="presentation">
-											<a href="javascript:void(0);" class="" role="option" tabindex="-1">
-												<span>{{_ "选项"}}</span>
-											</a>
-										</li>
+										{{#if isBtnSettingsNeedToShow}}
+											<li class="slds-dropdown__item btn-settings" role="presentation">
+												<a href="javascript:void(0);" class="" role="option" tabindex="-1">
+													<span>{{_ "选项"}}</span>
+												</a>
+											</li>
+										{{/if}}
 										<li class="slds-dropdown__item btn-export-excel" role="presentation">
 											<a href="javascript:void(0);" class="" role="option" tabindex="-1">
 												<span>{{_ "导出为EXCEL"}}</span>
