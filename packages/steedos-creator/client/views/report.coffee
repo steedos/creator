@@ -148,6 +148,20 @@ Template.creator_report.events
 			# 表格模式时只显示总计选项
 			data.options = ["totaling"]
 		Modal.show("report_settings", data)
+	
+	'click .btn-export-excel': (event, template)->
+		record_id = Session.get "record_id"
+		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+		if reportObject.report_type == "jsreport"
+			url = Creator.getJsReportExcelUrl(reportObject._id)
+			window.open(url)
+	
+	'click .btn-export-pdf': (event, template)->
+		record_id = Session.get "record_id"
+		reportObject = Creator.Reports[record_id] or Creator.getObjectRecord()
+		if reportObject.report_type == "jsreport"
+			url = Creator.getJsReportPdfUrl(reportObject._id)
+			window.open(url)
 
 	'click .btn-refresh': (event, template)->
 		Template.creator_report_content.renderReport()
