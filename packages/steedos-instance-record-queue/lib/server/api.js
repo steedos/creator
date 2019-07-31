@@ -177,7 +177,7 @@ InstanceRecordQueue.Configure = function (options) {
 		if (form.current._id === ins.form_version) {
 			formFields = form.current.fields || [];
 		} else {
-			var formVersion = _.find(ins.historys, function (h) {
+			var formVersion = _.find(form.historys, function (h) {
 				return h._id === ins.form_version;
 			})
 			formFields = formVersion ? formVersion.fields : [];
@@ -221,6 +221,9 @@ InstanceRecordQueue.Configure = function (options) {
 				var oField = objectFields[fm.object_field];
 
 				if (oField) {
+					if (!wField) {
+						console.log('fm.workflow_field: ', fm.workflow_field)
+					}
 					// 表单选人选组字段 至 对象 lookup master_detail类型字段同步
 					if (!wField.is_multiselect && ['user', 'group'].includes(wField.type) && !oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && ['users', 'organizations'].includes(oField.reference_to)) {
 						obj[fm.object_field] = values[fm.workflow_field]['id'];
@@ -263,7 +266,7 @@ InstanceRecordQueue.Configure = function (options) {
 							var oField = objectFields[objField];
 							if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to)) {
 								var oCollection = Creator.getCollection(oField.reference_to, spaceId)
-								if (oCollection && record[objField]) {
+								if (oCollection && record && record[objField]) {
 									var referSetObj = {};
 									referSetObj[referObjField] = values[fm.workflow_field];
 									oCollection.update(record[objField], {
@@ -289,7 +292,7 @@ InstanceRecordQueue.Configure = function (options) {
 								var oField = objectFields[objField];
 								if (!oField.multiple && ['lookup', 'master_detail'].includes(oField.type) && _.isString(oField.reference_to)) {
 									var oCollection = Creator.getCollection(oField.reference_to, spaceId)
-									if (oCollection && record[objField]) {
+									if (oCollection && record && record[objField]) {
 										var referSetObj = {};
 										referSetObj[referObjField] = ins[insField];
 										oCollection.update(record[objField], {
@@ -382,7 +385,7 @@ InstanceRecordQueue.Configure = function (options) {
 		var values = ins.values,
 			spaceId = ins.space;
 
-		if (records) {
+		if (records && !_.isEmpty(records)) {
 			// 此情况属于从creator中发起审批
 			var objectName = records[0].o;
 			var ow = Creator.getCollection('object_workflows').findOne({
@@ -497,6 +500,9 @@ InstanceRecordQueue.Configure = function (options) {
 								}
 							}
 						})
+						// workflow里发起审批后，同步时也可以修改相关表的字段值 #1183
+						var record = objectCollection.findOne(newRecordId);
+						self.syncValues(ow.field_map_back, values, ins, objectInfo, ow.field_map_back_script, record);
 					}
 
 					// 附件同步

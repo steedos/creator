@@ -100,10 +100,10 @@ _itemClick = (e, curObjectName, list_view_id)->
 		showTitle: false
 		usePopover: true
 		onItemClick: (value)->
+			object = Creator.getObject(objectName)
 			action = value.itemData.action
 			recordId = value.itemData.record._id
 			objectName = value.itemData.object_name
-			object = Creator.getObject(objectName)
 			collectionName = object.label
 			name_field_key = object.NAME_FIELD_KEY
 			if objectName == "organizations"
@@ -231,7 +231,8 @@ _expandFields = (object_name, columns)->
 			ref = ref.join(",")
 
 			if ref
-				expand_fields.push(n + "($select=" + ref + ")")
+#				expand_fields.push(n + "($select=" + ref + ")")
+				expand_fields.push(n)
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
 
@@ -252,7 +253,6 @@ _columns = (object_name, columns, list_view_id, is_related)->
 	else
 		#默认读取default view的sort配置
 		list_view_sort = column_default_sort
-
 	result = columns.map (n,i)->
 		field = object.fields[n]
 		columnItem =
@@ -272,16 +272,30 @@ _columns = (object_name, columns, list_view_id, is_related)->
 					cellOption["full_screen"] = true
 				Blaze.renderWithData Template.creator_table_cell, cellOption, container[0]
 
-		# if !is_related
-		# 	if column_width_settings
-		# 		width = column_width_settings[n]
-		# 		if width
-		# 			columnItem.width = width
-		# 		else
-		# 			columnItem.width = defaultWidth
-		# 	else
-		# 		columnItem.width = defaultWidth
+		if field?.default_width
+			columnItem.width = field?.default_width
 
+		list_view = Creator.getListView(object_name, list_view_id)
+
+		list_view_sort = Creator.transformSortToDX(list_view?.sort)
+
+		if column_sort_settings and column_sort_settings.length > 0
+			console.log("settings sort...")
+			_.each column_sort_settings, (sort)->
+				if sort[0] == n
+					columnItem.sortOrder = sort[1]
+		else if !_.isEmpty(list_view_sort)
+			console.log("view sort...")
+			_.each list_view_sort, (sort)->
+				if sort[0] == n
+					columnItem.sortOrder = sort[1]
+		else
+			console.log("default sort...")
+			#默认读取default view的sort配置
+			_.each column_default_sort, (sort)->
+				if sort[0] == n
+					columnItem.sortOrder = sort[1]
+		
 		unless field.sortable
 			columnItem.allowSorting = false
 		return columnItem
@@ -326,7 +340,11 @@ Template.creator_grid.onRendered ->
 
 		if !creator_obj
 			return
-
+		if !is_related
+			grid_paging = Tracker.nonreactive ()->
+							_grid_paging = Session.get('grid_paging')
+							if _grid_paging?.object_name == object_name && _grid_paging.list_view_id == list_view_id
+								return _grid_paging
 		related_object_name = self.data.related_object_name
 		curObjectName = if is_related then related_object_name else object_name
 		curObject = Creator.getObject(curObjectName)
@@ -339,15 +357,15 @@ Template.creator_grid.onRendered ->
 		record_id = Session.get("record_id")
 
 		listTreeCompany = Session.get('listTreeCompany')
-
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
+				_obj_name = Creator.formatObjectName(related_object_name)
 				if Creator.getListViewIsRecent(object_name, list_view_id)
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}/recent"
+					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 				else
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{related_object_name}"
+					url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}"
 					filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
 			else
 				filter_logic = Session.get("filter_logic")
@@ -400,15 +418,14 @@ Template.creator_grid.onRendered ->
 						filter_logic: filter_logic
 						filter_scope: filter_scope
 						filters: _filters
-
+				_obj_name = Creator.formatObjectName(object_name)
 				if Creator.getListViewIsRecent(object_name, list_view_id)
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/recent"
+					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}/recent"
 					# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
 				else
-					url = "/api/odata/v4/#{Steedos.spaceId()}/#{object_name}"
+					url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
 					filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
-
 				standardQuery = _standardQuery(object_name, Session.get("standard_query"))
 				if standardQuery and standardQuery.length
 					if filter
@@ -416,29 +433,37 @@ Template.creator_grid.onRendered ->
 					else
 						filter = standardQuery
 
-				if !filter
-					filter = ["_id", "<>", -1]
+#				if !filter
+#					filter = [creator_obj.idFieldName, "<>", "-1"]
 				if listTreeCompany and  listTreeCompany!='undefined' and curObject?.filter_company==true
 					listTreeFilter = [ "company", "=" , listTreeCompany ]
-					filter = [ filter, "and", listTreeFilter ]
+					if filter
+						filter = [ filter, "and", listTreeFilter ]
+					else
+						filter = listTreeFilter
 
 				unless is_related
 					# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
 					sidebarFilter = Session.get("grid_sidebar_filters")
 					if sidebarFilter and sidebarFilter.length
-						filter = [ filter, "and", sidebarFilter ]
-
-			selectColumns = Tracker.nonreactive ()->
-				grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
-				if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
-					settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-				if settingColumns
-					defaultColumns = _fields(curObjectName, list_view_id)
-					selectColumns = _.intersection(settingColumns, defaultColumns)
-					selectColumns = _.union(selectColumns, defaultColumns)
-				else
-					selectColumns = _fields(curObjectName, list_view_id)
-				return selectColumns
+						if filter
+							filter = [ filter, "and", sidebarFilter ]
+						else
+							filter = sidebarFilter
+			if Steedos.isMobile() && curObject.NAME_FIELD_KEY
+				selectColumns = [curObject.NAME_FIELD_KEY]
+			else
+				selectColumns = Tracker.nonreactive ()->
+					grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
+					if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
+						settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
+					if settingColumns
+						defaultColumns = _fields(curObjectName, list_view_id)
+						selectColumns = _.intersection(settingColumns, defaultColumns)
+						selectColumns = _.union(selectColumns, defaultColumns)
+					else
+						selectColumns = _fields(curObjectName, list_view_id)
+					return selectColumns
 
 			pageIndex = Tracker.nonreactive ()->
 				if Session.get("page_index")
@@ -450,7 +475,10 @@ Template.creator_grid.onRendered ->
 				else
 					return 0
 
-			extra_columns = ["owner", "company_id", "locked"]
+			if grid_paging
+				pageIndex = grid_paging.pageIndex
+
+			extra_columns = _.intersection(["owner", "company_id", "locked"], _.keys(curObject.fields));
 			if !is_related and curObject.enable_tree
 				extra_columns.push("parent")
 				extra_columns.push("children")
@@ -469,7 +497,7 @@ Template.creator_grid.onRendered ->
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
 			actions = Creator.getActions(curObjectName)
-			if actions.length
+			if !Steedos.isMobile() && actions.length
 				showColumns.push
 					dataField: "_id_actions"
 					width: 46
@@ -500,37 +528,38 @@ Template.creator_grid.onRendered ->
 				needToShowLinkForIndexColumn = false
 				if selectColumns.indexOf(nameFieldKey) < 0
 					needToShowLinkForIndexColumn = true
-				showColumns.splice 0, 0,
-					dataField: "_id_checkbox"
-					width: 30
-					allowResizing: false
-					allowExporting: false
-					allowSorting: false
-					allowReordering: false
-					headerCellTemplate: (container) ->
-						Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
-					cellTemplate: (container, options) ->
-						Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
+				if !Steedos.isMobile()
+					showColumns.splice 0, 0,
+						dataField: "_id_checkbox"
+						width: 30
+						allowResizing: false
+						allowExporting: false
+						allowSorting: false
+						allowReordering: false
+						headerCellTemplate: (container) ->
+							Blaze.renderWithData Template.creator_table_checkbox, {_id: "#", object_name: curObjectName}, container[0]
+						cellTemplate: (container, options) ->
+							Blaze.renderWithData Template.creator_table_checkbox, {_id: options.data._id, object_name: curObjectName}, container[0]
 
-				showColumns.splice 0, 0,
-					dataField: "_index"
-					width: 50
-					allowResizing: false
-					alignment: "right"
-					allowExporting: true
-					allowSorting: false
-					allowReordering: false
-					caption: ""
-					cellTemplate: (container, options) ->
-						pageSize = self.dxDataGridInstance.pageSize()
-						pageIndex = self.dxDataGridInstance.pageIndex()
-						htmlText = options.rowIndex + 1 + pageSize * pageIndex
-						if needToShowLinkForIndexColumn
-							href = Creator.getObjectUrl(curObjectName, options.data._id)
-							htmlText = "<a href=\"#{href}\" class=\"grid-index-link\">#{htmlText}</a>"
-							$("<div>").append(htmlText).appendTo(container)
-						else
-							$("<div>").append(htmlText).appendTo(container)
+					showColumns.splice 0, 0,
+						dataField: "_index"
+						width: 50
+						allowResizing: false
+						alignment: "right"
+						allowExporting: true
+						allowSorting: false
+						allowReordering: false
+						caption: ""
+						cellTemplate: (container, options) ->
+							pageSize = self.dxDataGridInstance.pageSize()
+							pageIndex = self.dxDataGridInstance.pageIndex()
+							htmlText = options.rowIndex + 1 + pageSize * pageIndex
+							if needToShowLinkForIndexColumn
+								href = Creator.getObjectUrl(curObjectName, options.data._id)
+								htmlText = "<a href=\"#{href}\" class=\"grid-index-link\">#{htmlText}</a>"
+								$("<div>").append(htmlText).appendTo(container)
+							else
+								$("<div>").append(htmlText).appendTo(container)
 			_.every showColumns, (n)->
 				n.sortingMethod = Creator.sortingMethod
 			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
@@ -539,13 +568,21 @@ Template.creator_grid.onRendered ->
 			if is_related
 				pageSize = 5
 			else
-				pageSize = 50
+				if grid_paging
+					pageSize = grid_paging.pageSize
+				else
+					pageSize = 50
 				# localStorage.setItem("creator_pageSize:"+Meteor.userId(),10)
 
 			# 对于a.b的字段，发送odata请求时需要转换为a/b
 			selectColumns = selectColumns.map (n)->
 				return n.replace(".", "/");
+			if !filter
+				# filter 为undefined时要设置为空，否则dxDataGrid控件会使用上次使用过的filter
+				filter = null
 			dxOptions =
+				scrolling: 
+					showScrollbar: "always"
 				paging:
 					pageSize: pageSize
 				pager:
@@ -607,6 +644,7 @@ Template.creator_grid.onRendered ->
 								if error.message == "Unexpected character at 106" or error.message == 'Unexpected character at 374'
 									error.message = t "creator_odata_unexpected_character"
 							toastr.error(error.message)
+							console.error('errorHandler', error)
 						fieldTypes: {
 							'_id': 'String'
 						}
@@ -614,7 +652,7 @@ Template.creator_grid.onRendered ->
 					filter: filter
 					expand: expand_fields
 				columns: showColumns
-				columnAutoWidth: true
+				columnAutoWidth: false
 				sorting:
 					mode: "multiple"
 				customizeExportData: (col, row)->
@@ -643,7 +681,7 @@ Template.creator_grid.onRendered ->
 										r.values[index] = val
 				onCellClick: (e)->
 					if e.column?.dataField ==  "_id_actions"
-						_itemClick.call(self, e, curObjectName)
+						_itemClick.call(self, e, curObjectName, list_view_id)
 
 				onContentReady: (e)->
 					if self.data.total
@@ -716,13 +754,16 @@ Template.creator_grid.onRendered ->
 				module.dynamicImport('devextreme/ui/tree_list').then (dxTreeList)->
 					DevExpress.ui.dxTreeList = dxTreeList;
 					self.dxDataGridInstance = self.$(".gridContainer").dxTreeList(dxOptions).dxTreeList('instance')
+					if !is_related && self.$(".gridContainer").length > 0
+						Session.set("grid_paging", null)
 			else
 				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
 					DevExpress.ui.dxDataGrid = dxDataGrid;
 					# console.log("dxOptions.dataSource.filter=======", dxOptions.dataSource.filter);
 					self.dxDataGridInstance = self.$(".gridContainer").dxDataGrid(dxOptions).dxDataGrid('instance')
+					if !is_related && self.$(".gridContainer").length > 0
+						Session.set("grid_paging", null)
 					# self.dxDataGridInstance.pageSize(pageSize)
-
 Template.creator_grid.helpers Creator.helpers
 
 Template.creator_grid.helpers
@@ -757,7 +798,8 @@ Template.creator_grid.events
 			field = field.join(",")
 
 		objectName = if is_related then (template.data?.related_object_name || Session.get("related_object_name")) else (template.data?.object_name || Session.get("object_name"))
-		collection_name = Creator.getObject(objectName).label
+		object = Creator.getObject(objectName)
+		collection_name = object.label
 		record = Creator.odata.get(objectName, this._id)
 		if record
 			Session.set("cmFullScreen", full_screen)
@@ -791,8 +833,16 @@ Template.creator_grid.events
 		object_name = Session.get("object_name")
 		Session.set 'page_index', {object_name: object_name, page_index: page_index}
 
+	'click .dx-datagrid-table .dx-row-lines': (event, template)->
+		if Steedos.isMobile()
+			herf = $("a", event.currentTarget).attr('href')
+			if herf.startsWith(__meteor_runtime_config__.ROOT_URL_PATH_PREFIX)
+				herf = herf.replace(__meteor_runtime_config__.ROOT_URL_PATH_PREFIX,'')
+			FlowRouter.go(herf)
+
 Template.creator_grid.onCreated ->
 	self = this
+	self.list_view_id = Session.get("list_view_id")
 	AutoForm.hooks creatorAddForm:
 		onSuccess: (formType,result)->
 			self.dxDataGridInstance?.refresh().done (result)->
@@ -843,5 +893,16 @@ Template.creator_grid.onCreated ->
 
 
 Template.creator_grid.refresh = (dxDataGridInstance)->
+	is_related = this.data?.is_related || false
+	if !is_related
+		Session.set("grid_paging", null)
 	dxDataGridInstance.refresh().done (result)->
 		Creator.remainCheckboxState(dxDataGridInstance.$element())
+
+Template.creator_grid.onDestroyed ->
+	is_related = this.data.is_related
+	if !is_related && this.list_view_id == Session.get("list_view_id")
+		paging = this.dxDataGridInstance.option().paging
+		paging.object_name = this.data.object_name
+		paging.list_view_id = this.list_view_id
+		Session.set("grid_paging", paging)

@@ -60,6 +60,8 @@ q42:autoform-markdown
 steedos:markdown@0.0.1
 steedos:autoform-dx-date-box
 
+vazco:universe-autoform-select
+
 steedos:devexpress
 
 gwendall:simple-schema-i18n
@@ -108,7 +110,7 @@ steedos:cfs-ui
 steedos:e164-phones-countries
 steedos:i18n-iso-countries
 steedos:qcloud-smsqueue
-#steedos:oauth2-server
+steedos:oauth2-server
 
 smoral:sweetalert@1.1.1
 
@@ -147,9 +149,8 @@ steedos:object-database
 steedos:mailqueue
 
 # 档案系统相关
-# steedos:app-archive
-# steedos:qhd-archive-sync
-# steedos:qhd-archive-xml
+steedos:qhd-archive-sync
+steedos:qhd-archive-xml
 
 # steedos:vip-card
 # steedos:vip-post
@@ -185,7 +186,7 @@ steedos:formbuilder
 #steedos:app-workflow
 steedos:app-admin
 
-#steedos:objects-to-yaml
+# steedos:objects-to-yaml
 
 # 应用 apps
 steedos:app-informations
@@ -196,3 +197,8 @@ steedos:app-informations
 #steedos:app-crm
 #steedos:app-meeting
 steedos:app-projects
+# steedos:qhd-archive
+
+steedos:oauth2-messenger
+
+steedos:object-webhooks-queue

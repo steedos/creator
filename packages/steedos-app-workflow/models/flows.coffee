@@ -159,11 +159,13 @@ Creator.Objects.flows =
 			label: "允许修改附件"
 			type: "boolean"
 			readonly: true
-#		'current.steps.$.distribute_optional_flows':
-#			label: "此步骤分发时可选的流程范围"
-#			type: "lookup"
-#			reference_to: "flows"
-#			multiple: true
+		'current.steps.$.distribute_optional_flows':
+			label: "此步骤分发时可选的流程范围"
+			type: "lookup"
+			reference_to: "flows"
+			multiple: true
+			omit: true
+			hidden: true
 		'current.steps.$.cc_must_finished':
 			label: "必须等待传阅完成"
 			type: "boolean"
@@ -264,16 +266,20 @@ Creator.Objects.flows =
 			group: "脚本"
 		distribute_optional_users:
 			type: "lookup"
-			label: "分发者"
+			label: "流程被分发时分发对象选择范围"
 			reference_to: "users"
 			multiple: true
 			is_wide: true
 			group: "分发"
 			blackbox: true
+			omit: true
+			hidden: true
 		distribute_to_self:
 			label:"分发给自己"
 			type: "boolean"
 			group: "分发"
+			omit: true
+			hidden: true
 
 		name_formula:
 			label:"标题公式"
@@ -439,12 +445,16 @@ Creator.Objects.flows =
 			on: "record"
 			todo: (object_name, record_id, fields)->
 				console.log("exportFlow", object_name, record_id, fields);
-				if this.record?.form?._id
-					window.open("/api/workflow/export/form?form=#{this.record.form._id}", '_blank')
+				if _.isString(this.record?.form)
+					form_id = this.record.form
+				else if this.record?.form?._id
+					form_id = this.record.form._id
+				if form_id
+					window.open(Steedos.absoluteUrl("/api/workflow/export/form?form=#{form_id}"), '_blank')
 				else
 					flow = Creator.getCollection(object_name).findOne(record_id)
 					if flow
-						window.open("/api/workflow/export/form?form=#{flow.form}", '_blank')
+						window.open(Steedos.absoluteUrl("/api/workflow/export/form?form=#{form_id}"), '_blank')
 		importFlow:
 			label: "导入流程"
 			visible: true
@@ -466,6 +476,12 @@ Creator.Objects.flows =
 						if flows.length > 0
 							FlowRouter.go("/app/admin/flows/view/#{flows[0]}")
 				}
+		distributeAdmin:
+			label: "设置分发"
+			visible: true
+			on: "record"
+			todo: (object_name, record_id, fields)->
+				Modal.show("distribute_edit_flow_modal", { flow: this.record })
 
 	permission_set:
 		user:

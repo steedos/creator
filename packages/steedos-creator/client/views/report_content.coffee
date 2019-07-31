@@ -310,6 +310,7 @@ renderTabularReport = (reportObject)->
 	selectColumns = []
 	expandFields = {}
 	objectName = reportObject.object_name
+	object = Creator.getObject(objectName)
 	objectFields = Creator.getObject(objectName)?.fields
 	if _.isEmpty objectFields
 		toastr.error "未找到对象#{objectName}，请确认该报表指定的对象名是否正确"
@@ -377,7 +378,7 @@ renderTabularReport = (reportObject)->
 	_.every reportColumns, (n)->
 		n.sortingMethod = Creator.sortingMethod
 
-	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{maxLoadCount}&$count=true"
+	url = "#{Creator.getObjectODataRouterPrefix(object)}/#{spaceId}/#{objectName}?$top=#{maxLoadCount}&$count=true"
 	selectColumns = _.uniq selectColumns
 	expands = []
 	_.each expandFields, (v,k)->
@@ -439,7 +440,8 @@ renderSummaryReport = (reportObject)->
 	selectColumns = []
 	expandFields = {}
 	objectName = reportObject.object_name
-	objectFields = Creator.getObject(objectName)?.fields
+	object = Creator.getObject(objectName)
+	objectFields = object?.fields
 	if _.isEmpty objectFields
 		toastr.error "未找到对象#{objectName}，请确认该报表指定的对象名是否正确"
 		return
@@ -596,7 +598,7 @@ renderSummaryReport = (reportObject)->
 	_.every reportColumns, (n)->
 		n.sortingMethod = Creator.sortingMethod
 
-	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{maxLoadCount}&$count=true"
+	url = "#{Creator.getObjectODataRouterPrefix(object)}/#{spaceId}/#{objectName}?$top=#{maxLoadCount}&$count=true"
 	selectColumns = _.uniq selectColumns
 	expands = []
 	_.each expandFields, (v,k)->
@@ -687,7 +689,8 @@ renderMatrixReport = (reportObject)->
 	selectColumns = []
 	expandFields = {}
 	objectName = reportObject.object_name
-	objectFields = Creator.getObject(objectName)?.fields
+	object = Creator.getObject(objectName)
+	objectFields = object?.fields
 	if _.isEmpty objectFields
 		toastr.error "未找到对象#{objectName}，请确认该报表指定的对象名是否正确"
 		return
@@ -830,7 +833,7 @@ renderMatrixReport = (reportObject)->
 	_.every reportFields, (n)->
 		n.sortingMethod = Creator.sortingMethod.bind({key:"value"})
 	
-	url = "/api/odata/v4/#{spaceId}/#{objectName}?$top=#{maxLoadCount}&$count=true"
+	url = "#{Creator.getObjectODataRouterPrefix(object)}/#{spaceId}/#{objectName}?$top=#{maxLoadCount}&$count=true"
 	selectColumns = _.uniq selectColumns
 	expands = []
 	_.each expandFields, (v,k)->
@@ -942,6 +945,10 @@ renderMatrixReport = (reportObject)->
 			pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
 			self.pivotGridInstance?.set pivotGrid
 
+renderJsReport = (reportObject)->
+	url = Creator.getJsReportViewUrl(reportObject._id)
+	$('#jsreport').html("<iframe src=\"#{url}\"></iframe>");
+
 renderReport = (reportObject)->
 	unless reportObject
 		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
@@ -969,21 +976,33 @@ renderReport = (reportObject)->
 		return
 	if pivotGridChart
 		pivotGridChart.dispose()
+
+	innerStacking = $(".filter-list-wraper .innerStacking") #tabular/summary/matrix三种dx控件报表容器
 	switch reportObject.report_type
 		when 'tabular'
 			# 报表类型从matrix转变成tabular时，需要把原来matrix报表清除
 			gridLoadedArray = null
 			self.pivotGridInstance?.get()?.dispose()
+			innerStacking.show();
 			renderTabularReport.bind(self)(reportObject)
 		when 'summary'
 			# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
 			self.pivotGridInstance?.get()?.dispose()
+			innerStacking.show();
 			renderSummaryReport.bind(self)(reportObject)
 		when 'matrix'
 			# 报表类型从summary转变成matrix时，需要把原来summary报表清除
 			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
+			innerStacking.show();
 			renderMatrixReport.bind(self)(reportObject)
+		when 'jsreport'
+			# 报表类型从dx控件报表转变成jsreport时，需要把原来报表相关内容清除
+			gridLoadedArray = null
+			self.dataGridInstance?.get()?.dispose()
+			self.pivotGridInstance?.get()?.dispose()
+			innerStacking.hide();
+			renderJsReport.bind(self)(reportObject)
 
 
 Template.creator_report_content.onRendered ->

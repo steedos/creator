@@ -10,14 +10,14 @@
 
 				<div class="slds-modal__content slds-p-around_medium {{#if isContainerVis fields}}container-vis{{/if}}">
 
-					{{> quickForm id="standardQueryForm" schema=schema doc=value template="slds" object_name=object_name}}
+					{{> quickForm id="standardQueryForm" schema=schema doc=value template="slds" object_name=object_name horizontal=true}}
 
 				</div>
 
 				<footer class="slds-modal__footer">
 						<button type="submit" class="slds-button slds-button_brand btn-confirm">确定</button>
 
-						<button type="submit" class="slds-button slds-button_neutral btn-reset">重置</button>
+						<!--<button type="submit" class="slds-button slds-button_neutral btn-reset">重置</button>-->
 
 						<button class="slds-button slds-button_neutral btn-cancel" data-dismiss="modal">取消</button>
 

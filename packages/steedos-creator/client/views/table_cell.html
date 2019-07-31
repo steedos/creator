@@ -16,10 +16,14 @@
 					<a href="mailto:{{value}}">{{value}}</a>
 				{{else}}
 					{{#if href}}
-						{{#if openWindow}}
-							<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false" title="{{value}}" class="link-detail list-item-link-{{id}}">{{value}}</a>
+						{{#if itemActionName}}
+							<a href="#" title="{{value}}" class="link-detail list-item-link-{{id}} list-item-link-action" data-action-name={{itemActionName}}>{{value}}</a>
 						{{else}}
-							<a href="{{href}}" title="{{value}}" class="link-detail list-item-link-{{id}}">{{value}}</a>
+							{{#if openWindow}}
+								<a href="#" onclick="window.open('{{href}}','_blank','width=800, height=600, left=50, top= 50, toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false" title="{{value}}" class="link-detail list-item-link-{{id}}">{{value}}</a>
+							{{else}}
+								<a href="{{href}}" title="{{value}}" class="link-detail list-item-link-{{id}}">{{value}}</a>
+							{{/if}}
 						{{/if}}
 					{{else}}
 						<span class="">{{{value}}}&nbsp;</span>
@@ -33,7 +37,7 @@
 			{{/if}}
 		</div>
 		{{#if showEditIcon}}
-			<button class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small {{#if editable}}table-cell-edit{{/if}}" tabindex="-1" title="Edit">
+			<button type="button" class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small {{#if editable}}table-cell-edit{{/if}}" tabindex="-1" title="Edit">
 				{{#if editable}}
 					{{> steedos_button_icon class="slds-button__icon slds-button__icon_hint slds-button__icon_edit" source="utility-sprite" name="edit"}}
 				{{else}}

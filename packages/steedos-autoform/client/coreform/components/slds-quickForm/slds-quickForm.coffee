@@ -67,12 +67,58 @@ Template.quickForm_slds.helpers
 				groupFields: fieldGroups
 				hiddenFields: hiddenFields
 				disabledFields: disabledFields
-
 			return finalFields
 
+	horizontal: ()->
+		return Template.instance().data.atts.horizontal
+
+	is_range_fields: (fields)->
+		if fields?.length > 0 && fields[0]
+			return Template.instance()?.data?.qfAutoFormContext.schema._schema[fields[0]]?.autoform?.is_range
+
+	has_wide_field: (fields)->
+		if fields?.length > 0 && fields[0]
+			return Template.instance()?.data?.qfAutoFormContext.schema._schema[fields[0]]?.autoform?.is_wide
 
 Template.quickForm_slds.events
 	'click .group-section-control': (event, template) ->
 		event.preventDefault()
 		event.stopPropagation()
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
+
+Template.quickForm_slds.onRendered ->
+	self = this
+	self.$(".has-inline-text").each ->
+		id = "info_" + $(".control-label", $(this)).attr("for")
+		html = """
+				<span class="help-info" id="#{id}">
+					<i class="ion ion-information-circled"></i>
+				</span>
+			"""
+		$(".control-label", $(this)).append(html)
+
+
+	self.$(".info-popover").each ->
+		_id = $("~ .form-group .help-info", $(this)).attr("id");
+		$(this).dxPopover
+			target: "#" + _id,
+			showEvent: "mouseenter",
+			hideEvent: "mouseleave",
+			position: "top",
+			width: 300,
+			animation: {
+				show: {
+					type: "pop",
+					from: {
+						scale: 0
+					},
+					to: {
+						scale: 1
+					}
+				},
+				hide: {
+					type: "fade",
+					from: 1,
+					to: 0
+				}
+			}

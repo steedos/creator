@@ -1,17 +1,33 @@
 
 Template.creator_list_wrapper.onRendered ->
 	self = this
+	self.rendered = false
 	self.autorun ->
 		if Session.get("list_view_id")
 			self.$(".btn-filter-list").removeClass("slds-is-selected")
 			self.$(".filter-list-container").addClass("slds-hide")
-			self.$("#grid-search").val('')
+			if self.rendered
+				self.$("#grid-search").val('')
 
 	self.autorun ->
-		if Session.get("list_view_id")
+		if Session.get("list_view_id") && self.rendered
+			# 刷新浏览器或从详细界面返回到列表时，因self.rendered条件不会进入
+			# 切换视图时会进入，清除查找条件
 			Session.set("standard_query", null)
-			list_view_obj = Creator.Collections.object_listviews.findOne(Session.get("list_view_id"))
+	
+	self.autorun ->
+		list_view_id = Session.get("list_view_id")
+		object_name = Session.get("object_name")
+		if list_view_id
+			list_view_obj = Creator.Collections.object_listviews.findOne(list_view_id)
+			filter_target = Tracker.nonreactive ->
+				return Session.get("filter_target")
+			# 是否过滤条件关联的视图及对象未发生变化
+			isFilterTargetNotChanged = filter_target?.list_view_id == list_view_id and filter_target?.object_name == object_name
 			if list_view_obj
+				if isFilterTargetNotChanged
+					# 过滤条件关联的视图及对象未发生变化时，不从数据库中重载过滤条件到Session，以允许界面跳转时过滤条件保持不变
+					return
 				if list_view_obj.filter_scope
 					Session.set("filter_scope", list_view_obj.filter_scope)
 				else
@@ -21,8 +37,27 @@ Template.creator_list_wrapper.onRendered ->
 				else
 					Session.set("filter_items", null)
 			else
+				if isFilterTargetNotChanged
+					# 过滤条件关联的视图及对象未发生变化时，不清空Session中的过滤条件，以允许界面跳转时过滤条件保持不变
+					return
 				Session.set("filter_scope", null)
 				Session.set("filter_items", null)
+				
+	self.autorun ->
+		# 同步标记过滤条件关联的视图及对象
+		filter_items = Session.get("filter_items")
+		filter_scope = Session.get("filter_scope")
+		if filter_items or filter_scope
+			list_view_id = Tracker.nonreactive ->
+				return Session.get("list_view_id")
+			object_name = Tracker.nonreactive ->
+				return Session.get("object_name")
+			Session.set("filter_target", {
+				list_view_id: list_view_id,
+				object_name: object_name
+			});
+
+	self.rendered = true
 
 
 Template.creator_list_wrapper.helpers Creator.helpers
@@ -165,6 +200,25 @@ Template.creator_list_wrapper.helpers
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)
 		return object.enable_tree
+
+	search_text: ()->
+		search_text = Tracker.nonreactive ()->
+			standard_query = Session.get("standard_query")
+			if standard_query && standard_query.is_mini && standard_query.object_name == Session.get("object_name") && standard_query.search_text
+				return standard_query.search_text
+		if search_text
+			return search_text
+		else
+			return ''
+	isFiltering: ()->
+		filter_items = Session.get("filter_items")
+		isFiltering = false;
+		_.every filter_items, (filter_item)->
+			if filter_item.value
+				isFiltering = true;
+			return !isFiltering;
+		return isFiltering
+
 
 transformFilters = (filters)->
 	_filters = []
@@ -313,16 +367,15 @@ Template.creator_list_wrapper.events
 					obj_fields = obj.fields
 					query = {}
 					_.each obj_fields, (field,field_name)->
-						if field.searchable || field_name == obj.NAME_FIELD_KEY
+						if (field.searchable || field_name == obj.NAME_FIELD_KEY) && field.type != 'number'
 							query[field_name] = searchKey
-					standard_query = object_name: object_name, query: query, is_mini: true
+					standard_query = object_name: object_name, query: query, is_mini: true, search_text: searchKey
 					Session.set 'standard_query', standard_query
 			else
 				if obj.enable_tree
 					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText()
 				else
 					Session.set 'standard_query', null
-
 
 Template.creator_list_wrapper.onCreated ->
 	this.recordsTotal = new ReactiveVar(0)

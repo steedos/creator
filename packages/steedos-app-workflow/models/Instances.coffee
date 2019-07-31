@@ -87,13 +87,13 @@ Creator.Objects.instances =
 			reference_to: "users"
 			label:"已办处理人"
 		traces:
-			type: [Object]
+			type: "[Object]"
 			blackbox: true
 			omit: true
 			label:"步骤审批"
 			hidden: true
 		attachments:
-			type: [Object]
+			type: "[Object]"
 			blackbox: true
 			omit: true
 			label:"附件"
@@ -105,6 +105,11 @@ Creator.Objects.instances =
 		category_name:
 			type: "string"
 			label:"流程分类"
+			hidden: true
+		category:
+			label: '流程分类'
+			type: "lookup"
+			reference_to: "categories"
 			hidden: true
 		state:
 			label:"审批单状态"
@@ -123,7 +128,9 @@ Creator.Objects.instances =
 			type: "boolean"
 			label:"已删除"
 			hidden: true
-
+		is_recorded_creator:
+			type: "boolean"
+			label:"已归档"
 		related_instances:
 			type: "string"
 			type: "lookup"
@@ -483,4 +490,13 @@ if Meteor.isServer
 	# 全文检索同步字段
 	db.instances._ensureIndex({
 		"is_recorded": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"category": 1
+	},{background: true})
+
+	db.instances._ensureIndex({
+		"record_ids.o": 1,
+		"record_ids.ids": 1
 	},{background: true})

@@ -14,5 +14,10 @@
 .idea/**
 start.bat
 .vscode/*
-
+.dist/*
+.steedos/*
 .steedos
+package-lock.json
+my_start.bat
+yarn.lock
+yarn-error.log
