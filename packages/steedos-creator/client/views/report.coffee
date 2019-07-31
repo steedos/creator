@@ -182,7 +182,7 @@ Template.creator_report.events
 				$(".filter-list-wraper .dx-pivotgrid-export-button").trigger("click")
 			when 'jsreport'
 				url = Creator.getJsReportExcelUrl(reportObject._id)
-				window.open(url)
+				window.open(url, "_self")
 	
 	'click .btn-export-pdf': (event, template)->
 		record_id = Session.get "record_id"
