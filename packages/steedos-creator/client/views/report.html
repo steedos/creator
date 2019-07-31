@@ -70,18 +70,23 @@
 											<a href="javascript:void(0);" class="" role="option" tabindex="-1">
 												<span>{{_ "导出为EXCEL"}}</span>
 											</a>
-										</li><li class="slds-dropdown__item btn-export-pdf" role="presentation">
-											<a href="javascript:void(0);" class="" role="option" tabindex="-1">
-												<span>{{_ "导出为PDF"}}</span>
-											</a>
 										</li>
+										{{#if isBtnExportPdfNeedToShow}}
+											<li class="slds-dropdown__item btn-export-pdf" role="presentation">
+												<a href="javascript:void(0);" class="" role="option" tabindex="-1">
+													<span>{{_ "导出为PDF"}}</span>
+												</a>
+											</li>
+										{{/if}}
 									</ul>
 								</div>
 							</div>
-							{{#if isSavable}}
-								<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-designer {{#if isDesignerOpen}}slds-is-selected{{else}}slds-not-selected{{/if}}" title="设计模式">
-									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="puzzle"}}
-								</button>
+							{{#if isDesignerNeedToShow}}
+								{{#if isSavable}}
+									<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-designer {{#if isDesignerOpen}}slds-is-selected{{else}}slds-not-selected{{/if}}" title="设计模式">
+										{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="puzzle"}}
+									</button>
+								{{/if}}
 							{{/if}}
 							<div class="slds-button-group" role="group">
 								{{#each actions}}
