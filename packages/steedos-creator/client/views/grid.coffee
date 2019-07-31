@@ -570,6 +570,8 @@ Template.creator_grid.onRendered ->
 			selectColumns = selectColumns.map (n)->
 				return n.replace(".", "/");
 			dxOptions =
+				scrolling: 
+					showScrollbar: "always"
 				paging:
 					pageSize: pageSize
 				pager:
