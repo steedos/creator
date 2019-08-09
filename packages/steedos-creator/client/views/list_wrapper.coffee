@@ -1,4 +1,3 @@
-
 Template.creator_list_wrapper.onRendered ->
 	self = this
 	self.rendered = false
@@ -383,6 +382,10 @@ Template.creator_list_wrapper.events
 					$(".gridContainer").dxTreeList({}).dxTreeList('instance').searchByText()
 				else
 					Session.set 'standard_query', null
+
+	'click .export-to-yml': (e, t)->
+		ListView.exportToYml()
+
 
 Template.creator_list_wrapper.onCreated ->
 	this.recordsTotal = new ReactiveVar(0)

@@ -630,7 +630,10 @@ Template.creator_grid.onRendered ->
 				stateStoring:{
 		   			type: "custom"
 					enabled: true
+					savingTimeout: 300
 					customSave: (gridState)->
+						Session.set("gridState", gridState)
+						console.log("gridState", gridState)
 						if self.data.is_related
 							return
 						columns = gridState.columns
