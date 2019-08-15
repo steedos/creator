@@ -5,6 +5,11 @@ getDefaultFilters = (object_name, filter_fields, filters)->
 		list_view = Creator.getListView(object_name, list_view_id, true)
 		filter_fields = list_view?.filter_fields
 	fields = Creator.getObject(object_name)?.fields
+
+	if list_view
+		_filter_fields = ListView.getFilterFields(list_view)
+		if _filter_fields
+			return _filter_fields
 	return Creator.getFiltersWithFilterFields(filters, fields, filter_fields)
 
 Template.filter_option_list.helpers Creator.helpers
@@ -160,7 +165,9 @@ Template.filter_option_list.onCreated ->
 		if list_view_obj and list_view_obj.filter_logic
 			Session.set("filter_logic", list_view_obj.filter_logic)
 		
-		filters = Session.get("filter_items")
+		filters = Tracker.nonreactive ()->
+			return Session.get("filter_items")
+
 		object_name = Template.instance().data?.object_name
 		fields = Creator.getObject(object_name)?.fields
 		# 报表过虑器会传入报表的filter_fields属性，否则默认取当前视图的filter_fields属性
@@ -174,6 +181,7 @@ Template.filter_option_list.onCreated ->
 			unless filter_fields
 				filter_fields = []
 		filters = getDefaultFilters(object_name, filter_fields, filters)
+		console.log('filters', filters);
 		if filters.length
 			Session.set("filter_items", filters)
 		if filters?.length

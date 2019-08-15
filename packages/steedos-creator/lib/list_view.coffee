@@ -86,3 +86,12 @@ createDownloadLink = (opt)->
 	setFilename(filename);
 	setTitle(title);
 	return anchor;
+
+ListView.getFilterFields = (listView)->
+	filterFields = []
+	if listView?.filter_conditions
+		_.each listView.filter_conditions, (filter)->
+			filterFields.push(filter)
+	if filterFields.length < 1
+		return null
+	return filterFields

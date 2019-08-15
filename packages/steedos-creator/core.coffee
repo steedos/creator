@@ -112,6 +112,7 @@ filter_fields: 默认过滤字段，支持字符串数组和对象数组两种�
 返回结果: 处理后的filters
 ###
 Creator.getFiltersWithFilterFields = (filters, fields, filter_fields)->
+	console.log('filter_fields', filter_fields);
 	unless filters
 		filters = []
 	unless filter_fields
@@ -126,7 +127,8 @@ Creator.getFiltersWithFilterFields = (filters, fields, filter_fields)->
 				filters.push
 					field: n.field,
 					is_default: true,
-					is_required: n.required
+					required: n.required
+					readonly: n.readonly
 	filters.forEach (filterItem)->
 		matchField = filter_fields.find (n)-> return n == filterItem.field or n.field == filterItem.field
 		if _.isString(matchField)
@@ -135,10 +137,10 @@ Creator.getFiltersWithFilterFields = (filters, fields, filter_fields)->
 				required: false
 		if matchField
 			filterItem.is_default = true
-			filterItem.is_required = matchField.required
+			filterItem.required = matchField.required
 		else
 			delete filterItem.is_default
-			delete filterItem.is_required
+			delete filterItem.required
 	return filters
 
 Creator.getObjectRecord = (object_name, record_id, select_fields, expand)->
