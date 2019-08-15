@@ -5,23 +5,7 @@ getDefaultFilters = (object_name, filter_fields, filters)->
 		list_view = Creator.getListView(object_name, list_view_id, true)
 		filter_fields = list_view?.filter_fields
 	fields = Creator.getObject(object_name)?.fields
-	unless filters
-		filters = []
-	unless filter_fields
-		filter_fields = []
-	if filter_fields?.length
-		filter_fields.forEach (n)->
-			if fields[n] and !_.findWhere(filters,{field:n})
-				filters.push {
-					field: n
-					is_default: true
-				}
-	filters.forEach (filterItem)->
-		if _.include(filter_fields, filterItem.field)
-			filterItem.is_default = true
-		else
-			delete filterItem.is_default
-	return filters
+	return Creator.getFiltersWithFilterFields(filters, fields, filter_fields)
 
 Template.filter_option_list.helpers Creator.helpers
 
@@ -167,7 +151,7 @@ Template.filter_option_list.onCreated ->
 			Blaze.remove self.optionbox
 	
 	#绑定事件从document委托到.wrapper中是为了避免过虑器中选人控件会解决该事件
-	$(document).on "click",".creator-content-wrapper, .oneHeader", self.destroyOptionbox
+	$(document).on "click",".steedos>header.creatorHeader, .steedos>.creator-sidebar-left, .steedos>.creator-content-wrapper", self.destroyOptionbox
 
 	self.filterItems = new ReactiveVar()
 
@@ -213,13 +197,21 @@ Template.filter_option_list.onCreated ->
 								filter.valuelabel = Creator.getObject(reference_to_object)?.label || ''
 
 						if reference_to_object && reference_to_value
-							name_field = Creator.getObject(reference_to_object).NAME_FIELD_KEY
+							referenceToObject = Creator.getObject(reference_to_object)
+							idFieldName = referenceToObject.idFieldName
+							nameField = referenceToObject.NAME_FIELD_KEY
 							if filter.value
-								Meteor.call 'getValueLable',reference_to_object,name_field,reference_to_value, Session.get("spaceId"),
-									(error,result)->
-										if result
-											filter.valuelabel = result
-											self.filterItems.set(filters)
+								if !_.isArray(reference_to_value)
+									reference_to_value = [reference_to_value];
+								odataFilter = Creator.formatFiltersToDev([idFieldName, "=", reference_to_value], reference_to_object)
+								queryOptions = 
+									filter: odataFilter,
+									select: nameField
+								Creator.odata.query reference_to_object, queryOptions, false, (result, args)->
+									if result
+										filter.valuelabel = (result.map (item)->
+											return item[nameField]).join(",")
+										self.filterItems.set(filters)
 					if field?.optionsFunction or field?.options
 						if field.optionsFunction
 							options = field?.optionsFunction()

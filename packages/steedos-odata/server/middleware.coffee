@@ -2,6 +2,8 @@ Fiber = require('fibers')
 
 basicAuth = require('basic-auth')
 
+authorizationCache = {}
+
 JsonRoutes.Middleware.use '/api/odata/v4/', (req, res, next)->
 
 	Fiber(()->
@@ -10,22 +12,27 @@ JsonRoutes.Middleware.use '/api/odata/v4/', (req, res, next)->
 			# oauth2验证
 			if req?.query?.access_token
 				console.log 'OAuth2: ', req.query.access_token
-				access_token = db.OAuth2AccessTokens.findOne({'accessToken':req.query.access_token})
-				# 有效期内使用token
-				if access_token?.expires > new Date()
-					user = Meteor.users.findOne({_id: access_token?.userId})
+				userId = Steedos.getUserIdFromAccessToken(req.query.access_token)
+				if userId
+					user = Meteor.users.findOne({_id: userId})
 					if user
 						isAuthed = true
 			# basic验证
 			if req.headers['authorization']
-				console.log 'basicAuth: ', basicAuth.parse(req.headers['authorization'])
 				auth = basicAuth.parse(req.headers['authorization'])
 				if auth
-					user = Meteor.users.findOne({username: auth.name})
+					user = Meteor.users.findOne({username: auth.name}, { fields: { 'services': 1 } })
 					if user
-						result = Accounts._checkPassword user, auth.pass
-						if !result.error
+						if authorizationCache[auth.name] == auth.pass
 							isAuthed = true
+						else
+							result = Accounts._checkPassword user, auth.pass
+							
+							if !result.error
+								isAuthed = true
+								if _.keys(authorizationCache).length > 100
+									authorizationCache = {}
+								authorizationCache[auth.name] = auth.pass
 			if isAuthed
 				req.headers['x-user-id'] = user._id
 				token = null

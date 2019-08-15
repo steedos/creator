@@ -1,9 +1,9 @@
 <template name="creator_list_wrapper">
-	<div class="steedos-brand-band slds-brand-band_medium slds-template_bottom-magnet">
+	<div class="steedos-brand-band slds-brand-band_medium slds-template_bottom-magnet creator-list-wrapper">
 		<div class="slds-template__container">
-			<div class="listViewManager slds-grid slds-grid--vertical filter-list-wraper">
+			<div class="listViewManager slds-grid slds-grid--vertical filter-list-wraper {{#if isCalendarView}}creator-calendar-wrap {{else}} creator-grid-wrap {{/if}}">
 				<div class="slds-page-header--object-home slds-page-header_joined slds-page-header_bleed slds-page-header slds-shrink-none test-headerRegion forceListViewManagerHeader">
-					<div class="slds-grid">
+					<div class="slds-grid grid-info-actions">
 						<div class="slds-col slds-has-flexi-truncate">
 							<div class="slds-media slds-no-space slds-grow">
 								<div class="slds-media__figure">
@@ -52,7 +52,7 @@
 						<div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom_xx-small">
 							<ul class="slds-button-group slds-m-left--xx-small oneActionsRibbon forceActionsContainer">
 								{{#each actions}}
-									<li class="slds-button slds-button--neutral slds-truncate list-action-custom">
+									<li class="slds-button slds-button--neutral slds-truncate list-action-custom list-action-custom-{{this.name}}">
 										<a href="javascript:void(0);" title="{{this.label}}" class="">
 											<div class="slds-truncate" title="{{this.label}}">{{this.label}}</div>
 										</a>
@@ -67,7 +67,7 @@
 						<div class="slds-col slds-align-middle">
 							<p class="slds-text-body_small tabular_info">{{#if recordsTotalCount}}{{_ "creator_list_item_counts" recordsTotalCount}}{{else}}{{_ "creator_list_item_counts" 0}}{{/if}}</p>
 						</div>
-						<div class="slds-col slds-no-flex slds-grid slds-align-bottom slds-shrink">
+						<div class="slds-col slds-no-flex slds-grid slds-align-bottom slds-shrink grid-search-div">
 							<div>
 								<div class="search-in-list slds-m-left_large slds-is-relative">
 									<div force-list-view-manager-search-bar_list-view-manager-search-bar="" class="slds-form-element">
@@ -83,7 +83,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="slds-col slds-no-flex slds-grid slds-align-bottom">
+						<div class="slds-col slds-no-flex slds-grid slds-align-bottom grid-actions">
 							<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-m-left_x-small" aria-expanded="false">
 								<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true" title="{{_ "creator_list_view_controls"}}" data-toggle="dropdown">
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="settings"}}
@@ -137,12 +137,12 @@
 								</div>
 							</div>
 							<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-m-left_xx-small">
-								<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true" title="{{_ "creator_change_view"}}" disabled>
+								<button class="slds-button slds-button_icon slds-button_icon-more hide" aria-haspopup="true" title="{{_ "creator_change_view"}}" disabled>
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="table"}}
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="down"}}
 								</button>
 							</div>
-							<button class="slds-button slds-button_icon slds-m-left_xx-small slds-button_icon-border-filled" title="{{_ "creator_edit_list"}}" disabled>
+							<button class="slds-button slds-button_icon slds-m-left_xx-small slds-button_icon-border-filled hide" title="{{_ "creator_edit_list"}}" disabled>
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="edit"}}
 							</button>
 							{{#if isRefreshable}}
@@ -150,20 +150,25 @@
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="refresh"}}
 								</button>
 							{{/if}}
+							{{!--
 							<div class="slds-button-group" role="group">
-								<button class="slds-button slds-button_icon slds-button_icon-border-filled" title="{{_ "creator_charts"}}" disabled>
+								<button class="slds-button slds-button_icon slds-button_icon-border-filled hide" title="{{_ "creator_charts"}}" disabled>
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="chart"}}
 								</button>
-								<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list" title="{{_ "creator_filters"}}">
+								<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list {{#if isFiltering}}filtering{{/if}}" title="{{_ "creator_filters"}}">
 									{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
 								</button>
 							</div>
+							--}}
+							<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list {{#if isFiltering}}filtering{{/if}}" title="{{_ "creator_filters"}}">
+								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
+							</button>
 						</div>
 					</div>
 					{{/unless}}
 				</div>
 				<div class="weui-flex" style="height: 100%;">
-					<div style="width: calc(100% - 30px);" class="slds-grid table-grid-content weui-flex__item">
+					<div style="overflow: hidden;" class="slds-grid table-grid-content weui-flex__item">
 						<div class="slds-col slds-no-space {{#if sidebar_data}}sidebar-open{{/if}}">
 						{{#if list_view_visible}}
 							{{#if isCalendarView}}
@@ -213,6 +218,6 @@
 		</div>
 	</div>
 	{{#CreatorAfModal formId="addListView" class="btn btn-primary btn-add-list-view hidden" collection="Creator.Collections.object_listviews" meteormethod="af_insert" fields=object_listviews_fields operation="insert" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="列表视图" useOdataApi=true}} {{_ "Create"}} {{/CreatorAfModal}}
-	{{#CreatorAfModal formId="editListView" class="btn btn-primary btn-edit-list-view hidden" collection="Creator.Collections.object_listviews" doc=current_list_view operation="update" meteormethod="af_update" fields="name,label,filter_scope,columns,filter_fields,sort,shared" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=updateButtonContent collectionName="列表视图" useOdataApi=true}} {{_ "Create"}} {{/CreatorAfModal}}
+	{{#CreatorAfModal formId="editListView" class="btn btn-primary btn-edit-list-view hidden" collection="Creator.Collections.object_listviews" doc=current_list_view operation="update" meteormethod="af_update" fields="name,label,filter_scope,columns,filter_fields,sort,shared,type,scrolling_mode" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=updateButtonContent collectionName="列表视图" useOdataApi=true}} {{_ "Create"}} {{/CreatorAfModal}}
 	{{#CreatorAfModal class="btn btn-primary btn-delete-list-view hidden" collection="Creator.Collections.object_listviews" operation="remove" dialogClass="modal-lg modal-body-zoom.includes" buttonContent=insertButtonContent collectionName="列表视图" onSuccess=delete_on_success useOdataApi=true}} {{_ "Delete"}} {{/CreatorAfModal}}
 </template>

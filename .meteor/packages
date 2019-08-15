@@ -111,7 +111,7 @@ steedos:cfs-ui
 steedos:e164-phones-countries
 steedos:i18n-iso-countries
 steedos:qcloud-smsqueue
-#steedos:oauth2-server
+steedos:oauth2-server
 
 smoral:sweetalert@1.1.1
 
@@ -145,9 +145,8 @@ steedos:mailqueue
 
 
 # 档案系统相关
-# steedos:app-archive
-# steedos:qhd-archive-sync
-# steedos:qhd-archive-xml
+steedos:qhd-archive-sync
+steedos:qhd-archive-xml
 
 # steedos:vip-card
 # steedos:vip-post
@@ -176,9 +175,8 @@ steedos:version
 steedos:audit
 steedos:formbuilder
 steedos:app-workflow
-steedos:app-admin
 
-#steedos:objects-to-yaml
+# steedos:objects-to-yaml
 
 ## 应用 apps
 # steedos:app-informations
