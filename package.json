@@ -7,14 +7,17 @@
     "login": "npm login --registry https://registry.npmjs.org",
     "pub": "cd .dist && npm publish --registry https://registry.npmjs.org",
     "postinstall": "node .scripts/npm-postinstall.js",
-    "clear": "rd /s /q node_modules\\@steedos\\auth\\node_modules\\@steedos node_modules\\@steedos\\core\\node_modules\\@steedos node_modules\\@steedos\\objectql\\node_modules\\@steedos node_modules\\@steedos\\plugin-jsreport\\node_modules\\@steedos"
+    "clear": "rd /s /q node_modules\\@steedos\\auth\\node_modules\\@steedos node_modules\\@steedos\\core\\node_modules\\@steedos node_modules\\@steedos\\objectql\\node_modules\\@steedos node_modules\\@steedos\\plugin-jsreport\\node_modules\\@steedos",
+    "tos": "cd ../object-server/ && yarn tsc",
+    "os": "npm run tos && cp -r ../object-server/packages/* node_modules/@steedos/"
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
     "@steedos/auth": "^1.1.5",
-    "@steedos/core": "^1.3.11",
+    "@steedos/core": "^1.3.16",
     "@steedos/filters": "^1.0.0",
-    "@steedos/objectql": "^1.0.3",
+    "@steedos/objectql": "^1.0.6",
+    "@steedos/standard-objects": "^1.0.4",
     "aliyun-sdk": "^1.11.12",
     "basic-auth": "^2.0.1",
     "bcrypt": "^3.0.6",
