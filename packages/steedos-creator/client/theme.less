@@ -217,15 +217,25 @@ body {
 			background: transparent;
 			box-shadow: none;
 
-			.slds-global-header__logo {
-				width: 12.5rem;
-				height: 2.5rem;
-				background-size: contain;
-				background-repeat: no-repeat;
-				background-position: left center;
-				img{
-					height: 100%;
-					width: auto;
+			.slds-global-header__item--logo {
+				display: flex;
+
+				.slds-global-header__logo {
+					width: 2.5rem;
+					height: 2.5rem;
+					background-size: contain;
+					background-repeat: no-repeat;
+					background-position: left center;
+					img{
+						height: 100%;
+						width: auto;
+					}
+				}
+				.slds-global-header__text {
+					font-size: 18px;
+					line-height: 2.5rem;
+					padding-left: 10px;
+					font-weight: 400;
 				}
 			}
 
