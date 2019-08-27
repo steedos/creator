@@ -8,6 +8,13 @@ body {
 	}
 
 	zoom: 1 !important;
+
+	// 防止 ios 上页面弹动
+	position: fixed;
+	overflow: hidden;
+
+	// iOS 上平滑滚动
+	-webkit-overflow-scrolling: touch;
 }
 
 .steedos {
