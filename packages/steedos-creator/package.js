@@ -343,6 +343,7 @@ Package.onUse(function (api) {
 	api.addFiles('client/i18n.coffee', 'client');
 
 	api.addAssets('assets/logo.png', 'client');
+	api.addAssets('assets/logo-square.png', 'client');
 
 	api.export(['uuflowManager', 'permissionManager'], ['server']);
 
