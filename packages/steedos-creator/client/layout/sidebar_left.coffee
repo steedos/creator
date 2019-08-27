@@ -62,3 +62,10 @@ Template.creatorSidebarLeft.events
 		Modal.show("mobile_apps_modal")
 	"click .settings-btn": (e, t)->
 		FlowRouter.go '/user_settings'
+	'click .sidebar-backdrop': (e, t)->
+		$("#sidebar-left").removeClass('move--right')
+		$(".steedos").removeClass('move--right')
+	'click .sidebar--left': (e, t)->
+		$("#sidebar-left").removeClass('move--right')
+		$(".steedos").removeClass('move--right')
+		
