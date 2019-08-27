@@ -1,3 +1,9 @@
+// 防止 ios 上手指滑动时，触发页面弹动
+html, body {
+	position: fixed;
+	overflow: hidden;
+}
+
 body {
 
 	background-size: cover;
@@ -8,10 +14,6 @@ body {
 	}
 
 	zoom: 1 !important;
-
-	// 防止 ios 上页面弹动
-	position: fixed;
-	overflow: hidden;
 
 	// iOS 上平滑滚动
 	-webkit-overflow-scrolling: touch;
