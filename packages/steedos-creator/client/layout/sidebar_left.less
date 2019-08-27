@@ -1,3 +1,15 @@
+.steedos.move--right {
+	.sidebar-backdrop {
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		background: #00000099;
+		z-index: 9998;
+	}
+}
+
 .creator-sidebar-left {
 
 	.sidebar--left .search__clear {
@@ -18,10 +30,12 @@
 		width: 220px;
 		z-index: 9999;
 		background: #3F0E40;
-		color: rgba(255, 255, 255, 0.7);
+		color: rgba(255, 255, 255, 0.8);
 
 		.slds-global-header {
-			margin-top: 10px;
+			padding: 0.6rem 0;
+			height: auto;
+			background: rgba(0, 0, 0, 0.2);
 		}
 	}
 
@@ -100,11 +114,12 @@
 	.sidebar--left .nav li > h4 {
 		align-items: end;
 		display: flex;
-		font-size: 1em;
-		font-weight: 600;
-		margin: 1.5em 0 .7em;
+		font-size: 14px;
+		font-weight: 400;
+		margin: 1em 0 0.7em;
 		padding: 0 12px 0 15px;
 		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.4);
 	}
 
 	.sidebar--left .nav li > h4 span {
@@ -211,10 +226,6 @@
 		width: 30px;
 		height: 30px;
 		line-height: 30px;
-	}
-
-	.sidebar--left .nav li h4 {
-		margin: 1.5 0 1em;
 	}
 
 	.sidebar--left .nav li > a {
