@@ -6,10 +6,10 @@
 					<div class="SidebarHeaderDropdownButton" id="sidebarHeaderDropdownButton">
 						<div id="headerInfo" class="header__info">
 							<h1 id="headerTeamName" class="team__name">{{spaceName}}</h1>
-							<!--<div id="headerUsername" class="user__name"></div>-->
-							<span class="sidebar-header-dropdown__icon settings-btn">
+							<!-- <div id="headerUsername" class="user__name"></div> -->
+							<!-- <span class="sidebar-header-dropdown__icon settings-btn">
 								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="setup"}}
-							</span>
+							</span> -->
 						</div>
 					</div>
 				</div>
@@ -19,14 +19,14 @@
 				<div style="position: absolute; overflow: hidden; width: 100%; height: 100%;">
 					<div class="scrollbar--view">
 						<div id="sidebarChannelContainer" class="nav-sidebar__container">
-						{{#each getApps}}
-							<ul class="nav nav-sidebar">
+						<ul class="nav nav-sidebar">
+							{{#each getApps}}
 								<li><h4 id="favoriteChannel"><span>{{app_name _id}}</span></h4></li>
 								{{#unless hideObjects _id}}
 									{{#each app_objects _id}}
 										<li class="{{#if isActive this}}active{{/if}}">
 											<a id="sidebarItem_town-square" class="sidebar-item"
-											   href="{{object_url}}">
+											href="{{object_url}}">
 												<span class="icon icon__globe">
 													{{> steedos_icon class="extraSmall slds-icon" source="standard-sprite" name=object_i.icon}}
 													<span>{{_ object_i.label}}</span>
@@ -35,8 +35,19 @@
 										</li>
 									{{/each}}
 								{{/unless}}
-							</ul>
-						{{/each}}
+							{{/each}}
+							<li><h4 id="favoriteChannel"><span>&nbsp;</span></h4></li>
+							<li>
+								<a id="sidebarItem_town-square" class="sidebar-item"
+								href="{{settings_url}}">
+									<span class="icon icon__globe">
+										{{> steedos_icon class="extraSmall slds-icon" source="utility-sprite" name="setup"}}
+										<span>设置</span>
+									</span>
+								</a>
+							</li>
+							<li><h4 id="favoriteChannel"><span>&nbsp;</span></h4></li>
+						</ul>
 						</div>
 					</div>
 				</div>

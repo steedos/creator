@@ -35,6 +35,9 @@ Template.creatorSidebarLeft.helpers
 	object_url: ()->
 		return Creator.getObjectFirstListViewUrl(String(this), null)
 
+	settings_url: ()->
+		return Steedos.absoluteUrl('/user_settings')
+
 	spaceName: ->
 		if Session.get("spaceId")
 			space = db.spaces.findOne(Session.get("spaceId"))
