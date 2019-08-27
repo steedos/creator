@@ -127,10 +127,9 @@ Creator.baseObject =
 		company_id:
 			label: "所属单位"
 			type: "lookup"
-			reference_to: "organizations"
+			reference_to: "company"
 			sortable: true
 			index: true
-			is_company_only: true
 			defaultValue: ()->
 				if Meteor.isClient
 					return Session.get("user_company_id")
