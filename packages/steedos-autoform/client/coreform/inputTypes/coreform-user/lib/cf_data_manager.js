@@ -26,14 +26,14 @@ CFDataManager.getNode = function (spaceId, node, options) {
 	}
 	if (node.id == '#') {
 		// 限制显示本单位数据时，第一棵树不显示
-		var selfCompanys = (showLimitedCompanyOnly) ? null : Steedos.selfCompanys();
+		var selfCompanyOrganizationIds = (showLimitedCompanyOnly) ? null : Steedos.selfCompanyOrganizationIds();
 		//第一棵树: 只显示顶部所属单位，可能是多个单位，之前是显示主部门
 		if(options.isSelf){
 			if (showLimitedCompanyOnly) {
 				console.error("限制显示本单位数据时，不应该加载顶部所属单位树")
 				return
 			}
-			if (selfCompanys) {
+			if (selfCompanyOrganizationIds) {
 				// 只显示顶部所属单位，强制showLimitedCompanyOnly为true调用getRoot，即可得到本单位组织
 				orgs = CFDataManager.getRoot(spaceId, { showLimitedCompanyOnly: true });
 				if (orgs.length) {
@@ -44,8 +44,8 @@ CFDataManager.getNode = function (spaceId, node, options) {
 		}else{  //第二棵树: 组织机构
 
 			if(options.rootOrg){
-				// selfCompanys中已经显示了rootOrg时，不再显示第二次
-				if (selfCompanys && selfCompanys.indexOf(options.rootOrg) > -1) {
+				// selfCompanyOrganizationIds中已经显示了rootOrg时，不再显示第二次
+				if (selfCompanyOrganizationIds && selfCompanyOrganizationIds.indexOf(options.rootOrg) > -1) {
 					orgs = []
 				}else{
 					orgs = CFDataManager.getOrganizationsByIds([options.rootOrg])
@@ -53,7 +53,7 @@ CFDataManager.getNode = function (spaceId, node, options) {
 					if(orgs.length > 0 ){
 						orgs[0].open = true;
 						orgs[0].select = true;
-						if (selfCompanys) {
+						if (selfCompanyOrganizationIds) {
 							orgs[0].open = false;
 							orgs[0].select = false;
 						}
@@ -79,15 +79,15 @@ CFDataManager.getNode = function (spaceId, node, options) {
 				if(outsideOrganizations.length){
 					_ids = _.union(outsideOrganizations, _ids);
 				}
-				//主部门在第一个jstree(即selfCompanys)中已有显示，第二个jstree就应该过滤掉不显示
-				_ids = _.difference(_ids, selfCompanys);
+				//主部门在第一个jstree(即selfCompanyOrganizationIds)中已有显示，第二个jstree就应该过滤掉不显示
+				_ids = _.difference(_ids, selfCompanyOrganizationIds);
 				// 这里故意重新抓取后台数据，因为前台无法正确排序
 				orgs = CFDataManager.getOrganizationsByIds(_ids);
 				if (orgs.length > 0) {
 					orgs[0].open = true;
 					orgs[0].select = true;
 					// 有所属单位的时候不应该再选中根节点
-					if (selfCompanys) {
+					if (selfCompanyOrganizationIds) {
 						orgs[0].select = false;
 					}
 				}
@@ -95,17 +95,17 @@ CFDataManager.getNode = function (spaceId, node, options) {
 				orgs = CFDataManager.getRoot(spaceId, options);
 				if(orgs.length){
 					// 当没有限制查看本部门的时候，顶部有所属单位树时，根节点中应该排除掉所属单位树中已存在的组织Id
-					// 限制显示本单位数据时，不加载selfCompanys
-					if (!showLimitedCompanyOnly && selfCompanys){
+					// 限制显示本单位数据时，不加载selfCompanyOrganizationIds
+					if (!showLimitedCompanyOnly && selfCompanyOrganizationIds){
 						orgs = _.filter(orgs, function(n){
-							return selfCompanys.indexOf(n._id) < 0;
+							return selfCompanyOrganizationIds.indexOf(n._id) < 0;
 						});
 					}
 					if(orgs.length){
 						orgs[0].open = true;
 						orgs[0].select = true;
 						// 顶部有所属单位树时不应该再选中根节点，且所属单位可能自动展开，所以根节点也不应该再自动展开
-						if (selfCompanys) {
+						if (selfCompanyOrganizationIds) {
 							orgs[0].open = false;
 							orgs[0].select = false;
 						}
@@ -427,7 +427,7 @@ CFDataManager.getRoot = function (spaceId, options) {
 
 	var showLimitedCompanyOnly = options && options.showLimitedCompanyOnly;
 	if(showLimitedCompanyOnly){
-		user_company_ids = Steedos.getCompanyOrganizationIds();
+		user_company_ids = Steedos.getUserCompanyOrganizationIds();
 		if (user_company_ids && user_company_ids.length) {
 			query._id = {
 				$in: user_company_ids

@@ -132,7 +132,7 @@ Creator.baseObject =
 			index: true
 			defaultValue: ()->
 				if Meteor.isClient
-					return Session.get("user_company_id")
+					return Steedos.getUserCompanyId()
 			omit: true
 			hidden: true
 
