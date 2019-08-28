@@ -1,17 +1,13 @@
 <template name="creatorSidebarLeft">
 	<div class="creator-sidebar-left">
-		<div class="sidebar--left" id="sidebar-left"><span><span></span></span>
-			<div id="teamHeader" class="SidebarHeader team__header theme">
-				<div class="MenuWrapper ">
-					<div class="SidebarHeaderDropdownButton" id="sidebarHeaderDropdownButton">
-						<div id="headerInfo" class="header__info">
-							<h1 id="headerTeamName" class="team__name">{{spaceName}}</h1>
-							<!-- <div id="headerUsername" class="user__name"></div> -->
-							<!-- <span class="sidebar-header-dropdown__icon settings-btn">
-								{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="setup"}}
-							</span> -->
-						</div>
+		<div class="sidebar-backdrop"></div>
+		<div class="sidebar--left" id="sidebar-left">
+			<div id="headerInfo" class="slds-global-header">
+				<div class="slds-global-header__item slds-global-header__item--logo">
+					<div class="slds-global-header__logo">
+						<img src="{{logoUrl}}" alt=""/>
 					</div>
+					<div class="slds-global-header__text">{{spaceName}}</div>
 				</div>
 			</div>
 			<div class="sidebar--left__icons"></div>
@@ -36,7 +32,7 @@
 									{{/each}}
 								{{/unless}}
 							{{/each}}
-							<li><h4 id="favoriteChannel"><span>&nbsp;</span></h4></li>
+							<li><br></li>
 							<li>
 								<a id="sidebarItem_town-square" class="sidebar-item"
 								href="{{settings_url}}">
@@ -46,7 +42,7 @@
 									</span>
 								</a>
 							</li>
-							<li><h4 id="favoriteChannel"><span>&nbsp;</span></h4></li>
+							<li><br></li>
 						</ul>
 						</div>
 					</div>
