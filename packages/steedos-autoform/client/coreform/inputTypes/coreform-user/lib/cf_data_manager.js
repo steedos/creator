@@ -8,7 +8,6 @@ CFDataManager = {};
 * isSelf: 用于生成另外一个树, 用户所属单位
 * isNeedtoSelDefault: 是否默认选中展开的节点， 因为有两棵树， 用户所属单位那棵树不应该默认选中
 * rootOrg: 允许支持组织树上的根节点, 值为organization _id
-* showCompanyOnly: 是否只显示公司级别的部门
 * showLimitedCompanyOnly: 是否只显示本单位公司级别的部门
 * }
 * */
@@ -16,20 +15,22 @@ CFDataManager = {};
 CFDataManager.getNode = function (spaceId, node, options) {
 	var orgs,
 		myContactsLimit = Steedos.my_contacts_limit,
-		showCompanyOnly = options && options.showCompanyOnly;
 		showLimitedCompanyOnly = options && options.showLimitedCompanyOnly;
 	
-	if (showCompanyOnly || showLimitedCompanyOnly) {
-		// 只显示单位或限制显示本单位数据时，不考虑通讯录的权限限制功能逻辑
+	console.log("===CFDataManager.getNode====myContactsLimit=======", myContactsLimit);
+	console.log("===CFDataManager.getNode====options=======", options);
+	
+	if (showLimitedCompanyOnly) {
+		// 限制显示本单位数据时，不考虑通讯录的权限限制功能逻辑
 		myContactsLimit = null;
 	}
 	if (node.id == '#') {
-		// 只显示单位或限制显示本单位数据时，第一棵树不显示
-		var selfCompanys = (showCompanyOnly || showLimitedCompanyOnly) ? null : Steedos.selfCompanys();
+		// 限制显示本单位数据时，第一棵树不显示
+		var selfCompanys = (showLimitedCompanyOnly) ? null : Steedos.selfCompanys();
 		//第一棵树: 只显示顶部所属单位，可能是多个单位，之前是显示主部门
 		if(options.isSelf){
-			if (showCompanyOnly || showLimitedCompanyOnly) {
-				console.error("只显示单位或限制显示本单位数据时，不应该加载顶部所属单位树")
+			if (showLimitedCompanyOnly) {
+				console.error("限制显示本单位数据时，不应该加载顶部所属单位树")
 				return
 			}
 			if (selfCompanys) {
@@ -94,8 +95,8 @@ CFDataManager.getNode = function (spaceId, node, options) {
 				orgs = CFDataManager.getRoot(spaceId, options);
 				if(orgs.length){
 					// 当没有限制查看本部门的时候，顶部有所属单位树时，根节点中应该排除掉所属单位树中已存在的组织Id
-					// 只显示单位或限制显示本单位数据时，不加载selfCompanys
-					if ((!showCompanyOnly && !showLimitedCompanyOnly) && selfCompanys){
+					// 限制显示本单位数据时，不加载selfCompanys
+					if (!showLimitedCompanyOnly && selfCompanys){
 						orgs = _.filter(orgs, function(n){
 							return selfCompanys.indexOf(n._id) < 0;
 						});
@@ -414,7 +415,7 @@ CFDataManager.handerOrganizationModalValueLabel = function () {
 
 CFDataManager.getRoot = function (spaceId, options) {
 
-	var query = {is_company: true, parent: null}
+	var query = {parent: null}
 
 	if(spaceId){
 		query.space = spaceId
@@ -426,7 +427,7 @@ CFDataManager.getRoot = function (spaceId, options) {
 
 	var showLimitedCompanyOnly = options && options.showLimitedCompanyOnly;
 	if(showLimitedCompanyOnly){
-		user_company_ids = Session.get("user_company_ids");
+		user_company_ids = Steedos.getCompanyOrganizationIds();
 		if (user_company_ids && user_company_ids.length) {
 			query._id = {
 				$in: user_company_ids
@@ -448,8 +449,7 @@ CFDataManager.getRoot = function (spaceId, options) {
 			fullname: 1,
 			parent: 1,
 			children: 1,
-			childrens: 1,
-			is_company: 1,
+			childrens: 1
 		}
 	});
 };
@@ -487,27 +487,6 @@ CFDataManager.getChild = function (spaceId, parentId, options) {
 		parent: parentId,
 		space: spaceId
 	};
-	var showCompanyOnly = options && options.showCompanyOnly
-	if (showCompanyOnly) {
-		query.is_company = true;
-	}
-	var showLimitedCompanyOnly = options && options.showLimitedCompanyOnly
-	if (showLimitedCompanyOnly) {
-		user_company_ids = Session.get("user_company_ids");
-		if (user_company_ids && user_company_ids.length) {
-			// 限制本单位范围时，如果要显示普通组织，而不是只显示公司级，则不能加query._id = user_company_ids过滤
-			// 因为query._id = user_company_ids条件只需要在根组织过滤一次就行了，这里显示根组织下的子组织只需要默认的parent过滤条件
-			if (showCompanyOnly) {
-				query._id = {
-					$in: user_company_ids
-				};
-			}
-		} else {
-			query._id = "-1";
-			toastr.error("您的单位信息未设置，请联系系统管理员。");
-			console.error("只显示本单位的部门时要求当前用户的company_ids不为空，请联系管理员修正相关数据");
-		}
-	}
 
 	if (!Steedos.isSpaceAdmin()) {
 		query.hidden = {
