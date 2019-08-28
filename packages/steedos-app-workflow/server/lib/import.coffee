@@ -144,7 +144,6 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 				else
 					orgs_can_add = db.organizations.find({
 						space: spaceId,
-						is_company: true,
 						parent: null
 					}, {fields: {_id: 1}}).fetch().getProperty("_id")
 				#设置提交部门为：全公司
