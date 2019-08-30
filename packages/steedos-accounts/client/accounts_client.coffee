@@ -34,7 +34,7 @@ Setup.clearAuthLocalStorage = ()->
 	i = 0
 	while i < localStorage.length
 		key = localStorage.key(i)
-		if key?.startsWith("Meteor.loginToken") || key?.startsWith("Meteor.userId")  || key?.startsWith("Meteor.loginTokenExpires")
+		if key?.startsWith("Meteor.loginToken") || key?.startsWith("Meteor.userId")  || key?.startsWith("Meteor.loginTokenExpires") || key?.startsWith('accounts:')
 			localStorage.removeItem(key)
 		i++
 
@@ -65,4 +65,12 @@ Meteor.startup ->
 				c.stop()
 				Steedos.subs["SpaceAvatar"]?.clear()
 
-		Setup.validate()
+		Setup.validate ()->
+			if FlowRouter.current()?.context?.pathname ==  Steedos.urlPrefix() + "/steedos/sign-in"
+				if FlowRouter.current()?.queryParams?.redirect
+					FlowRouter.go FlowRouter.current().queryParams.redirect
+				else
+					FlowRouter.go "/"
+
+	Accounts.onLogout ()->
+		Steedos.redirectToSignIn()
