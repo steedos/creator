@@ -34,7 +34,7 @@ if Meteor.isServer
 #				return false
 
 		if company_id
-			if db.organizations.find({ _id: company_id, space: spaceId }).count() == 0
+			if Creator.getCollection("company").find({ _id: company_id, space: spaceId }).count() == 0
 				return false
 
 		return true

@@ -6,7 +6,7 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id)->
 		throw new Meteor.Error('error', "无效的json data")
 
 	if company_id
-		if db.organizations.find({ _id: company_id, space: spaceId }).count() == 0
+		if Creator.getCollection("company").find({ _id: company_id, space: spaceId }).count() == 0
 			throw new Meteor.Error('error', "无效的字段: company_id")
 
 	new_form_ids = new Array()
