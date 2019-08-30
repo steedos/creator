@@ -190,7 +190,7 @@ if Meteor.isClient
 	Steedos.redirectToSignIn = (redirect)->
 
 		if Meteor.settings.public?.webservices?.accounts
-			window.location.href = Meteor.settings.public.webservices.accounts
+			window.location.href = Meteor.settings.public.webservices.accounts.url
 		else
 			signInUrl = AccountsTemplates.getRoutePath("signIn")
 			if redirect
