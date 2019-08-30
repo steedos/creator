@@ -20,7 +20,7 @@ checkUserSigned = (context, redirect) ->
 	Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
 	
 	if !Meteor.userId()
-		FlowRouter.go '/steedos/sign-in?redirect=' + context.path;
+		Steedos.redirectToSignIn(context.path)
 	else
 		currentPath = FlowRouter.current().path
 		if currentPath != urlQuery[urlQuery.length - 1]
