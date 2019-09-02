@@ -193,7 +193,7 @@ objectRoutes.route '/view/:record_id',
 		object_name = FlowRouter.getParam("object_name")
 		record_id = FlowRouter.getParam("record_id")
 		data = {app_id: app_id, object_name: object_name, record_id: record_id}
-		ObjectRecent.insert(object_name, record_id, Session.get("spaceId"))
+		ObjectRecent.insert(object_name, record_id)
 		Session.set("detail_info_visible", true)
 		if object_name == "users"
 			main = "user"
