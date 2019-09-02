@@ -303,7 +303,6 @@
 #			label: "查看"
 #			visible: false
 #			on: "record"
-#			only_list_item: true
 #			todo: "standard_open_view"
 #
 #		standard_edit:
