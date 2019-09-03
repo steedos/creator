@@ -1,11 +1,30 @@
+getCookie = (name)->
+	pattern = RegExp(name + "=.[^;]*")
+	matched = document.cookie.match(pattern)
+	if(matched)
+		cookie = matched[0].split('=')
+		return cookie[1]
+	return false
+
 Setup.validate = (cb)->
-	loginToken = Accounts._storedLoginToken()
+
+	searchParams = new URLSearchParams(window.location.search);
+	loginToken = searchParams.get("X-Auth-Token");
+	if (!loginToken)
+		loginToken = getCookie("X-Auth-Token");
+	userId = searchParams.get("X-User-Id");
+	if (!userId)
+		userId = getCookie("X-User-Id");
 	spaceId = window.localStorage.getItem("spaceId")
+	if (!spaceId)
+		spaceId = getCookie("X-Space-Id");
 	headers = {}
 	requestData = { 'utcOffset': moment().utcOffset() / 60 }
 	if loginToken && spaceId
 		headers['Authorization'] = 'Bearer ' + spaceId + ',' + loginToken
 	else if loginToken
+		# headers['Authorization'] = 'Bearer ' + loginToken
+		headers['X-User-Id'] = userId
 		headers['X-Auth-Token'] = loginToken
 	
 	$.ajax
@@ -21,6 +40,14 @@ Setup.validate = (cb)->
 	.done ( data ) ->
 		if !data
 			Steedos.redirectToSignIn()
+
+		if Meteor.userId() != data.userId
+			Accounts.connection.setUserId(data.userId);
+			Accounts.loginWithToken data.authToken, (err) ->
+				if (err)
+					Meteor._debug("Error logging in with token: " + err);
+					FlowRouter.go("/steedos/logout");
+
 		if data.webservices
 			Steedos.settings.webservices = data.webservices
 		if data.spaceId
@@ -30,6 +57,8 @@ Setup.validate = (cb)->
 		Creator.USER_CONTEXT = data
 		if cb
 			cb();
+	.fail ( e ) ->
+		FlowRouter.go("/steedos/logout");
 
 Setup.clearAuthLocalStorage = ()->
 	localStorage = window.localStorage;
@@ -52,12 +81,6 @@ Setup.logout = () ->
 		Setup.clearAuthLocalStorage()
 
 Meteor.startup ->
-	Setup.validate ()->
-		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
-			if FlowRouter.current()?.queryParams?.redirect
-				FlowRouter.go FlowRouter.current().queryParams.redirect
-			else
-				FlowRouter.go "/"
 
 	Accounts.onLogin ()->
 		Tracker.autorun (c)->
@@ -69,3 +92,23 @@ Meteor.startup ->
 
 	Accounts.onLogout ()->
 		Steedos.redirectToSignIn()
+
+
+FlowRouter.route '/steedos/validate',
+	Setup.validate ()->
+		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
+			if FlowRouter.current()?.queryParams?.redirect
+				FlowRouter.go FlowRouter.current().queryParams.redirect
+			else
+				FlowRouter.go "/"
+	
+
+FlowRouter.route '/steedos/logout',
+	action: (params, queryParams)->
+		#AccountsTemplates.logout();
+		$("body").addClass('loading')
+		Meteor.logout ()->
+			Setup.logout();
+			#Session.set("spaceId", null);
+			$("body").removeClass('loading')
+			Steedos.redirectToSignIn()
