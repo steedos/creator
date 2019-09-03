@@ -19,6 +19,8 @@ Setup.validate = (cb)->
 		crossDomain: true
 		headers: headers
 	.done ( data ) ->
+		if !data
+			Steedos.redirectToSignIn()
 		if data.webservices
 			Steedos.settings.webservices = data.webservices
 		if data.spaceId
@@ -64,13 +66,6 @@ Meteor.startup ->
 			if Steedos.subsSpaceBase.ready()
 				c.stop()
 				Steedos.subs["SpaceAvatar"]?.clear()
-
-		Setup.validate ()->
-			if FlowRouter.current()?.context?.pathname ==  Steedos.urlPrefix() + "/steedos/sign-in"
-				if FlowRouter.current()?.queryParams?.redirect
-					FlowRouter.go FlowRouter.current().queryParams.redirect
-				else
-					FlowRouter.go "/"
 
 	Accounts.onLogout ()->
 		Steedos.redirectToSignIn()
