@@ -57,7 +57,7 @@ workbenchRoutes = FlowRouter.group
 workbenchRoutes.route '/', 
 	action: (params, queryParams)->
 		if !Meteor.userId()
-			FlowRouter.go "/steedos/sign-in";
+			Steedos.redirectToSignIn()
 			return true
 
 		NavigationController.reset();
