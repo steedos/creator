@@ -15,15 +15,7 @@ Steedos.subs["distributed_instances"] = new SubsManager
 
 Steedos.subs["flow_main_attach_template"] = new SubsManager
 
-db.form_versions = new Mongo.Collection("form_versions");
-db.flow_versions = new Mongo.Collection("flow_versions");
-
-db.instance_traces = new Mongo.Collection("instance_traces");
-db.flow_instances = new Mongo.Collection("flow_instances");
-
 Steedos.subs["instance_traces"] = new SubsManager
-
-db.my_approves = new Mongo.Collection("my_approves");
 
 Steedos.subscribeFlowVersion = (space, flowId, flow_version)->
 	Steedos.subs["Instance"].subscribe("flow_version", space, flowId , flow_version)
