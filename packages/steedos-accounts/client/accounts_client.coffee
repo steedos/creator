@@ -72,7 +72,7 @@ Setup.clearAuthLocalStorage = ()->
 Setup.logout = () ->
 	$.ajax
 		type: "POST",
-		url: Steedos.absoluteUrl("api/setup/logout"),
+		url: Steedos.absoluteUrl("api/v4/users/logout"),
 		dataType: 'json',
 		xhrFields: 
 		   withCredentials: true
