@@ -352,7 +352,8 @@ instancesListTableTabular = (flowId, fields)->
 
 	return options;
 
-TabularTables.instances = new Tabular.Table instancesListTableTabular()
+Meteor.startup ()->
+	TabularTables.instances = new Tabular.Table instancesListTableTabular()
 
 
 GetBoxInstancesTabularOptions = (box, flowId, fields)->
@@ -441,7 +442,8 @@ _get_inbox_instances_tabular_options = (flowId, fields)->
 
 	return options
 
-TabularTables.inbox_instances = new Tabular.Table GetBoxInstancesTabularOptions("inbox")
+Meteor.startup ()->
+	TabularTables.inbox_instances = new Tabular.Table GetBoxInstancesTabularOptions("inbox")
 
 
 _get_outbox_instances_tabular_options = (flowId, fields)->
@@ -514,17 +516,19 @@ _get_outbox_instances_tabular_options = (flowId, fields)->
 
 	return options
 
-TabularTables.outbox_instances = new Tabular.Table GetBoxInstancesTabularOptions("outbox")
+Meteor.startup ()->
+	TabularTables.outbox_instances = new Tabular.Table GetBoxInstancesTabularOptions("outbox")
 
 if Meteor.isClient
 	TabularTables.flowInstances = new ReactiveVar()
 
-Tracker.autorun (c) ->
-	if Meteor.isClient && !Steedos.isMobile()
-		if Session.get("flowId") && Session.get("box") != 'draft'
-			Meteor.call "newInstancesListTabular", Session.get("box"), Session.get("flowId"), (error, result) ->
-				newInstancesListTabular Session.get("box"), Session.get("flowId"), result
-				Template.instance_list._changeOrder()
+Meteor.startup ()->
+	Tracker.autorun (c) ->
+		if Meteor.isClient && !Steedos.isMobile()
+			if Session.get("flowId") && Session.get("box") != 'draft'
+				Meteor.call "newInstancesListTabular", Session.get("box"), Session.get("flowId"), (error, result) ->
+					newInstancesListTabular Session.get("box"), Session.get("flowId"), result
+					Template.instance_list._changeOrder()
 
 
 newInstancesListTabular = (box, flowId, fields)->

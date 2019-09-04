@@ -1,4 +1,4 @@
-# db.instances = new Meteor.Collection('instances')
+db.instances = new Meteor.Collection('instances')
 
 # db.instances._simpleSchema = new SimpleSchema({
 # 	related_instances: {

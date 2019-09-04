@@ -21,7 +21,7 @@ Package.onUse(function(api) {
 	api.use('session');
 	api.use('blaze');
 	api.use('templating');
-	api.use('steedos:api');
+	// api.use('steedos:api');
 	api.use('flemay:less-autoprefixer@1.2.0');
 	api.use('simple:json-routes@2.1.0');
 	api.use('nimble:restivus@0.8.7');
@@ -50,7 +50,7 @@ Package.onUse(function(api) {
 
 	api.use('steedos:autoform')
 	api.use('steedos:base');
-	api.use('steedos:admin');
+	// api.use('steedos:admin');
 
 	api.use('steedos:mailqueue');
 	api.use('steedos:webhookqueue');
@@ -82,7 +82,7 @@ Package.onUse(function(api) {
 	api.addFiles('lib/models/auth_tokens.coffee');
 	api.addFiles('lib/models/webhooks.coffee');
 	api.addFiles('lib/models/space_user_signs.coffee');
-	api.addFiles('lib/models/instance_record_queue.coffee');
+	// api.addFiles('lib/models/instance_record_queue.coffee');
 	api.addFiles('lib/models/space_users.coffee');
 
 	api.addFiles('lib/cfs/instances.coffee');
@@ -272,9 +272,9 @@ Package.onUse(function(api) {
 	api.addFiles('client/router.coffee', 'client');
 	api.addFiles('client/subscribe.coffee', 'client');
 
-	api.addFiles('client/views/flow/distribute_edit_flow_modal.html', 'client');
-	api.addFiles('client/views/flow/distribute_edit_flow_modal.coffee', 'client');
-	api.addFiles('client/views/flow/distribute_edit_flow_modal.less', 'client');
+	// api.addFiles('client/views/flow/distribute_edit_flow_modal.html', 'client');
+	// api.addFiles('client/views/flow/distribute_edit_flow_modal.coffee', 'client');
+	// api.addFiles('client/views/flow/distribute_edit_flow_modal.less', 'client');
 
 	api.addFiles('client/views/flow/admin_flows.less', 'client');
 	api.addFiles('client/views/flow/admin_flows.html', 'client');
