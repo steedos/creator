@@ -197,3 +197,5 @@ steedos:object-webhooks-queue
 
 steedos:workflow
 keepnox:perfect-scrollbar
+jeremy:selectize
+comerc:autoform-selectize
