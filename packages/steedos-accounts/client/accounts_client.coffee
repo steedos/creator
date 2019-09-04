@@ -69,7 +69,7 @@ Setup.clearAuthLocalStorage = ()->
 			localStorage.removeItem(key)
 		i++
 
-Setup.logout = () ->
+Setup.logout = (callback) ->
 	$.ajax
 		type: "POST",
 		url: Steedos.absoluteUrl("api/v4/users/logout"),
@@ -79,6 +79,8 @@ Setup.logout = () ->
 		crossDomain: true,
 	.always ( data ) ->
 		Setup.clearAuthLocalStorage()
+		if callback
+			callback()
 
 Meteor.startup ->
 
@@ -108,7 +110,6 @@ FlowRouter.route '/steedos/logout',
 		#AccountsTemplates.logout();
 		$("body").addClass('loading')
 		Meteor.logout ()->
-			Setup.logout();
-			#Session.set("spaceId", null);
-			$("body").removeClass('loading')
-			Steedos.redirectToSignIn()
+			Setup.logout ()-> 
+				$("body").removeClass('loading')
+				Steedos.redirectToSignIn()
