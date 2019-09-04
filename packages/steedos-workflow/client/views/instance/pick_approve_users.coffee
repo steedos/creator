@@ -27,7 +27,9 @@ Template.instance_pick_approve_users.helpers
 			fs.beforeOpenFunction = (event, template)->
 				company_id = WorkflowManager.getInstance()?.company_id
 				if company_id
-					event.currentTarget.dataset.rootOrg = company_id
+					company = Creator.odata.get("company", company_id, "organization")
+					if company.organization
+						event.currentTarget.dataset.rootOrg = company.organization
 
 			schema[s._id] = fs;
 
@@ -41,6 +43,7 @@ Template.instance_pick_approve_users.events
 
 		Meteor.call 'set_instance_step_approve', Session.get("instanceId"), formValue, ()->
 			Meteor.setTimeout ()->
-				Session.set("instance_next_user_recalculate", Meteor.uuid())
+				uuidv1 = require('uuid/v1');
+				Session.set("instance_next_user_recalculate", uuidv1())
 			, 100
 
