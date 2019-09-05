@@ -15,7 +15,7 @@ if Meteor.isServer
 			if !user
 				reurn false
 
-			root_org = db.organizations.findOne({ space: space_id, is_company: true, parent: null })
+			root_org = db.organizations.findOne({ space: space_id, parent: null })
 			if !root_org
 				return false
 
