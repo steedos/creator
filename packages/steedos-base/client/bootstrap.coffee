@@ -1,11 +1,134 @@
+getCookie = (name)->
+	pattern = RegExp(name + "=.[^;]*")
+	matched = document.cookie.match(pattern)
+	if(matched)
+		cookie = matched[0].split('=')
+		return cookie[1]
+	return false
+
+@Setup = {}
+
+Setup.lastSpaceId = null;
+
+Setup.validate = (onSuccess)->
+	console.log("Validating user...")
+	searchParams = new URLSearchParams(window.location.search);
+	loginToken = searchParams.get("X-Auth-Token");
+	userId = searchParams.get("X-User-Id");
+	if (!userId or !loginToken)
+		loginToken = getCookie("X-Auth-Token");
+		userId = getCookie("X-User-Id");
+	if (!userId or !loginToken)
+		loginToken = Accounts._storedLoginToken()
+		userId = Accounts._storedUserId();
+	spaceId = localStorage.getItem("spaceId")
+	if (!spaceId)
+		spaceId = getCookie("X-Space-Id");
+	headers = {}
+	requestData = { 'utcOffset': moment().utcOffset() / 60 }
+	if loginToken && spaceId
+		headers['Authorization'] = 'Bearer ' + spaceId + ',' + loginToken
+	else if loginToken
+		# headers['Authorization'] = 'Bearer ' + loginToken
+		headers['X-User-Id'] = userId
+		headers['X-Auth-Token'] = loginToken
+	
+	$.ajax
+		type: "POST",
+		url: Steedos.absoluteUrl("api/v4/users/validate"),
+		contentType: "application/json",
+		dataType: 'json',
+		data: JSON.stringify(requestData),
+		xhrFields: 
+			withCredentials: true
+		crossDomain: true
+		headers: headers
+	.done ( data ) ->
+		if !data
+			Steedos.redirectToSignIn()
+
+		if Meteor.userId() != data.userId
+			Accounts.connection.setUserId(data.userId);
+			Accounts.loginWithToken data.authToken, (err) ->
+				if (err)
+					Meteor._debug("Error logging in with token: " + err);
+					FlowRouter.go("/steedos/logout");
+
+		if data.webservices
+			Steedos.settings.webservices = data.webservices
+		if data.spaceId 
+			Setup.lastSpaceId = data.spaceId
+			if (data.spaceId != Session.get("spaceId"))
+				Steedos.setSpaceId(data.spaceId)
+
+		Creator.USER_CONTEXT = data
+
+		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
+			if FlowRouter.current()?.queryParams?.redirect
+				FlowRouter.go FlowRouter.current().queryParams.redirect
+			else
+				FlowRouter.go "/"
+
+		if onSuccess
+			onSuccess()
+	.fail ( e ) ->
+		FlowRouter.go("/steedos/logout");
+
+Setup.clearAuthLocalStorage = ()->
+	localStorage = window.localStorage;
+	i = 0
+	while i < localStorage.length
+		key = localStorage.key(i)
+		if key?.startsWith("Meteor.loginToken") || key?.startsWith("Meteor.userId")  || key?.startsWith("Meteor.loginTokenExpires") || key?.startsWith('accounts:')
+			localStorage.removeItem(key)
+		i++
+
+Setup.logout = (callback) ->
+	$.ajax
+		type: "POST",
+		url: Steedos.absoluteUrl("api/v4/users/logout"),
+		dataType: 'json',
+		xhrFields: 
+		   withCredentials: true
+		crossDomain: true,
+	.always ( data ) ->
+		Setup.clearAuthLocalStorage()
+		if callback
+			callback()
+
+Meteor.startup ->
+
+	Accounts.onLogin ()->
+		Tracker.autorun (c)->
+			# 登录后需要清除登录前订阅的space数据，以防止默认选中登录前浏览器url参数中的的工作区ID所指向的工作区
+			# 而且可能登录后的用户不属性该SpaceAvatar中订阅的工作区，所以需要清除订阅，由之前的订阅来决定当前用户可以选择哪些工作区
+			if Steedos.subsSpaceBase.ready()
+				c.stop()
+				Steedos.subs["SpaceAvatar"]?.clear()
+			return
+		return
+
+	Accounts.onLogout ()->
+		Steedos.redirectToSignIn()
+		return
+
+	Tracker.autorun (c)->
+		console.log("Session spaceId change: " + Session.get("spaceId"))
+
+		if !Setup.lastSpaceId or (Setup.lastSpaceId != Session.get("spaceId"))
+			Setup.validate ()->
+				Setup.bootstrap Session.get("spaceId"), ()->
+					return
+	return
+
+
 Creator.bootstrapLoaded = new ReactiveVar(false)
 
-Creator.bootstrap = (spaceId, callback)->
+Setup.bootstrap = (spaceId, callback)->
 	if Meteor.loggingIn() || Meteor.loggingOut()
 		return
 	unless spaceId and Meteor.userId()
 		return
-	Creator.bootstrapLoaded.set(false)
 	url = Steedos.absoluteUrl "/api/bootstrap/#{spaceId}"
 	$.ajax
 		type: "get"
@@ -90,12 +213,11 @@ Creator.bootstrap = (spaceId, callback)->
 
 			Creator.bootstrapLoaded.set(true)
 
-
-Meteor.startup ->
-	Tracker.autorun ->
-		spaceId = Session.get("spaceId")
-		if (spaceId)
-			Creator.bootstrap spaceId, ()->
-				return
-
-		
+FlowRouter.route '/steedos/logout',
+	action: (params, queryParams)->
+		#AccountsTemplates.logout();
+		$("body").addClass('loading')
+		Meteor.logout ()->
+			Setup.logout ()-> 
+				$("body").removeClass('loading')
+				Steedos.redirectToSignIn()

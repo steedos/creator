@@ -1,8 +1,4 @@
 @urlQuery = new Array()
-
-Accounts.onLogout ()->
-	Creator.bootstrapLoaded.set(false)
-
 checkUserSigned = (context, redirect) ->
 	# listTreeCompany = localStorage.getItem("listTreeCompany")
 	# if listTreeCompany
