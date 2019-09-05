@@ -21,10 +21,6 @@ checkUserSigned = (context, redirect) ->
 	
 	if !Meteor.userId()
 		FlowRouter.go("/steedos/validate");
-	else
-		currentPath = FlowRouter.current().path
-		if currentPath != urlQuery[urlQuery.length - 1]
-			urlQuery.push currentPath
 
 subscribe_object_listviews = (context, redirect)->
 	Tracker.autorun ()->
@@ -61,17 +57,8 @@ checkObjectPermission = (context, redirect)->
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned],
 	action: (params, queryParams)->
-		$("body").addClass("loading")
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_app_home"
-		Tracker.autorun (c)->
-			if Creator.bootstrapLoaded.get()
-				c.stop()
-				$("body").removeClass("loading")
-				apps = Creator.getVisibleApps(true)
-				firstAppId = apps[0]?._id
-				if firstAppId
-					FlowRouter.go '/app/' + firstAppId
 
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned ],

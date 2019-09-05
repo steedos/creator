@@ -81,13 +81,21 @@ Creator.bootstrap = (spaceId, callback)->
 			
 			Creator.Menus = result.assigned_menus
 
+			if (!Session.get("app_id"))
+				apps = Creator.getVisibleApps(true)
+				Session.set("app_id", apps[0]?._id)
+				
 			if _.isFunction(callback)
 				callback()
 
 			Creator.bootstrapLoaded.set(true)
 
+
 Meteor.startup ->
 	Tracker.autorun ->
 		spaceId = Session.get("spaceId")
-		Creator.bootstrap spaceId, ()->
-			return
+		if (spaceId)
+			Creator.bootstrap spaceId, ()->
+				return
+
+		
