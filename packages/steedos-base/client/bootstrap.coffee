@@ -69,6 +69,8 @@ Setup.validate = (onSuccess)->
 			else
 				FlowRouter.go "/"
 
+		Setup.bootstrap(Session.get("spaceId"))
+
 		if onSuccess
 			onSuccess()
 	.fail ( e ) ->
@@ -99,6 +101,7 @@ Setup.logout = (callback) ->
 Meteor.startup ->
 
 	Accounts.onLogin ()->
+		Setup.validate();
 		Tracker.autorun (c)->
 			# 登录后需要清除登录前订阅的space数据，以防止默认选中登录前浏览器url参数中的的工作区ID所指向的工作区
 			# 而且可能登录后的用户不属性该SpaceAvatar中订阅的工作区，所以需要清除订阅，由之前的订阅来决定当前用户可以选择哪些工作区
@@ -109,6 +112,7 @@ Meteor.startup ->
 		return
 
 	Accounts.onLogout ()->
+		Creator.bootstrapLoaded.set(false)
 		Steedos.redirectToSignIn()
 		return
 
@@ -116,9 +120,7 @@ Meteor.startup ->
 		console.log("Session spaceId change: " + Session.get("spaceId"))
 
 		if !Setup.lastSpaceId or (Setup.lastSpaceId != Session.get("spaceId"))
-			Setup.validate ()->
-				Setup.bootstrap Session.get("spaceId"), ()->
-					return
+			Setup.validate()
 	return
 
 
