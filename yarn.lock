@@ -688,6 +688,11 @@ adal-node@^0.1.22:
     xmldom ">= 0.1.x"
     xpath.js "~1.1.0"
 
+addressparser@~0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/addressparser/-/addressparser-0.3.2.tgz#59873f35e8fcf6c7361c10239261d76e15348bb2"
+  integrity sha1-WYc/Nej89sc2HBAjkmHXbhU0i7I=
+
 adler-32@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/adler-32/-/adler-32-1.0.0.tgz#28728a71756f629666dd1653cd80793a9df18651"
@@ -2438,6 +2443,13 @@ encodeurl@~1.0.2:
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=
 
+encoding@~0.1.7:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/encoding/-/encoding-0.1.12.tgz#538b66f3ee62cd1ab51ec323829d1f9480c74beb"
+  integrity sha1-U4tm8+5izRq1HsMjgp0flIDHS+s=
+  dependencies:
+    iconv-lite "~0.4.13"
+
 engine.io-client@1.6.11:
   version "1.6.11"
   resolved "https://registry.yarnpkg.com/engine.io-client/-/engine.io-client-1.6.11.tgz#7d250d8fa1c218119ecde51390458a57d5171376"
@@ -3469,7 +3481,7 @@ iconv-lite@0.4.23:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-iconv-lite@0.4.24, iconv-lite@^0.4.23, iconv-lite@^0.4.4:
+iconv-lite@0.4.24, iconv-lite@^0.4.23, iconv-lite@^0.4.4, iconv-lite@~0.4.13:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
   integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
@@ -4483,6 +4495,14 @@ mime@~1.2.11, mime@~1.2.9:
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.2.11.tgz#58203eed86e3a5ef17aed2b7d9ebd47f0a60dd10"
   integrity sha1-WCA+7Ybjpe8XrtK32evUfwpg3RA=
 
+mimelib@^0.2.19:
+  version "0.2.19"
+  resolved "https://registry.yarnpkg.com/mimelib/-/mimelib-0.2.19.tgz#37ec90a6ac7d00954851d0b2c31618f0a49da0ee"
+  integrity sha1-N+yQpqx9AJVIUdCywxYY8KSdoO4=
+  dependencies:
+    addressparser "~0.3.2"
+    encoding "~0.1.7"
+
 mimic-fn@^1.0.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-1.2.0.tgz#820c86a39334640e99516928bd03fca88057d022"
@@ -4993,6 +5013,17 @@ object.pick@^1.3.0:
   integrity sha1-h6EKxMFpS9Lhy/U1kaZhQftd10c=
   dependencies:
     isobject "^3.0.1"
+
+odata-client@^0.6.12:
+  version "0.6.13"
+  resolved "https://registry.yarnpkg.com/odata-client/-/odata-client-0.6.13.tgz#bdcaf61ad0fb15724e5cb4d7a61ece13493de91f"
+  integrity sha512-sgIMudUsA4nK3LgxCEtbalBwLvb4pPuGtEi3tzoGL6lEqQI/FRSOYlf7TmvXFeFlbokOLEAFnUtK+oxBH2Uu6A==
+  dependencies:
+    bluebird "^3.4.1"
+    lodash "^4.17.14"
+    mimelib "^0.2.19"
+    request "^2.88.0"
+    uuid "^2.0.2"
 
 odata-v4-literal@^0.1.0:
   version "0.1.1"
@@ -5884,7 +5915,7 @@ request@2.81.0:
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
 
-"request@>= 2.52.0", request@^2.87.0:
+"request@>= 2.52.0", request@^2.87.0, request@^2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==
@@ -7193,7 +7224,12 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-uuid@^3.0.0, uuid@^3.1.0, uuid@^3.3.2:
+uuid@^2.0.2:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
+  integrity sha1-Z+LoY3lyFVMN/zGOW/nc6/1Hsho=
+
+uuid@^3.0.0, uuid@^3.1.0, uuid@^3.3.2, uuid@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
