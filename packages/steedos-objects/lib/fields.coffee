@@ -326,7 +326,7 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "grid"
 			fs.type = Array
 			fs.autoform.editable = true
-			fs.autoform.type = "table"
+			fs.autoform.type = "steedosGrid"
 
 			schema[field_name + ".$"] =
 				type: Object
