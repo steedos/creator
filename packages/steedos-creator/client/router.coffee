@@ -1,8 +1,4 @@
 @urlQuery = new Array()
-
-Accounts.onLogout ()->
-	Creator.bootstrapLoaded.set(false)
-
 checkUserSigned = (context, redirect) ->
 	# listTreeCompany = localStorage.getItem("listTreeCompany")
 	# if listTreeCompany
@@ -20,11 +16,7 @@ checkUserSigned = (context, redirect) ->
 	Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
 	
 	if !Meteor.userId()
-		Steedos.redirectToSignIn(context.path)
-	else
-		currentPath = FlowRouter.current().path
-		if currentPath != urlQuery[urlQuery.length - 1]
-			urlQuery.push currentPath
+		Setup.validate();
 
 subscribe_object_listviews = (context, redirect)->
 	Tracker.autorun ()->
@@ -61,17 +53,8 @@ checkObjectPermission = (context, redirect)->
 FlowRouter.route '/app',
 	triggersEnter: [ checkUserSigned],
 	action: (params, queryParams)->
-		$("body").addClass("loading")
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_app_home"
-		Tracker.autorun (c)->
-			if Creator.bootstrapLoaded.get()
-				c.stop()
-				$("body").removeClass("loading")
-				apps = Creator.getVisibleApps(true)
-				firstAppId = apps[0]?._id
-				if firstAppId
-					FlowRouter.go '/app/' + firstAppId
 
 FlowRouter.route '/app/menu',
 	triggersEnter: [ checkUserSigned ],
