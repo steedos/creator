@@ -2,17 +2,15 @@
   "name": "steedos",
   "private": true,
   "scripts": {
-    "start": "meteor run",
+    "start": "meteor run --settings settings.json",
     "build": "meteor build --directory .dist --server-only && node .scripts/build-after.js",
     "testbuild": "cp -rf .dist/* ../steedos-contracts-app/node_modules/steedos-server/",
     "login": "npm login --registry https://registry.npmjs.org",
     "pub": "cd .dist && npm publish --registry https://registry.npmjs.org",
     "postinstall": "node .scripts/npm-postinstall.js",
     "clear": "rd /s /q node_modules\\@steedos\\auth\\node_modules\\@steedos node_modules\\@steedos\\core\\node_modules\\@steedos node_modules\\@steedos\\objectql\\node_modules\\@steedos node_modules\\@steedos\\plugin-jsreport\\node_modules\\@steedos",
-    "tos": "cd ../object-server/ && yarn tsc",
-    "os": "npm run tos && cp -r ../object-server/packages/* node_modules/@steedos/",
-    "os2": "cp -r ../object-server/packages/standard-objects/* node_modules/@steedos/standard-objects/",
-    "oss": "npm run os2 && npm run start"
+    "os": "cp -r ../object-server/packages/* node_modules/@steedos/ && yarn start",
+    "oss": "cp -r ../object-server/packages/standard-objects/* node_modules/@steedos/standard-objects/ && yarn start"
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
