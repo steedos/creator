@@ -1,6 +1,6 @@
 checkUserSigned = (context, redirect) ->
 	if !Meteor.userId()
-		FlowRouter.go("/steedos/validate");
+		Setup.validate();
 
 FlowRouter.triggers.enter (context, redirect, stop)->
 	if context?.queryParams?.app_id

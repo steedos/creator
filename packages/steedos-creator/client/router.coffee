@@ -20,7 +20,7 @@ checkUserSigned = (context, redirect) ->
 	Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
 	
 	if !Meteor.userId()
-		FlowRouter.go("/steedos/validate");
+		Setup.validate();
 
 subscribe_object_listviews = (context, redirect)->
 	Tracker.autorun ()->

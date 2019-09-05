@@ -55,6 +55,13 @@ Setup.validate = (cb)->
 				window.localStorage.setItem("spaceId", data.spaceId)
 				Session.set('spaceId', data.spaceId)
 		Creator.USER_CONTEXT = data
+
+		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
+			if FlowRouter.current()?.queryParams?.redirect
+				FlowRouter.go FlowRouter.current().queryParams.redirect
+			else
+				FlowRouter.go "/"
+
 		if cb
 			cb();
 	.fail ( e ) ->
@@ -96,13 +103,9 @@ Meteor.startup ->
 		Steedos.redirectToSignIn()
 
 
-FlowRouter.route '/steedos/validate',
-	Setup.validate ()->
-		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
-			if FlowRouter.current()?.queryParams?.redirect
-				FlowRouter.go FlowRouter.current().queryParams.redirect
-			else
-				FlowRouter.go "/"
+# FlowRouter.route '/steedos/validate',
+# 	Setup.validate ()->
+# 		return 
 	
 
 FlowRouter.route '/steedos/logout',
