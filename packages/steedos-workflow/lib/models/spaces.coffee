@@ -1,37 +1,37 @@
-if Meteor.isServer
-	Meteor.startup ()->
+# if Meteor.isServer
+# 	Meteor.startup ()->
 
-		db.spaces.createTemplateFormAndFlow = (space_id) ->
+# 		db.spaces.createTemplateFormAndFlow = (space_id) ->
 
-			if db.forms.find({ space: space_id }).count() > 0
-				return false
+# 			if db.forms.find({ space: space_id }).count() > 0
+# 				return false
 
-			space = db.spaces.findOne(space_id, { fields: { owner: 1 } })
-			if !space
-				return false
-			owner_id = space.owner
+# 			space = db.spaces.findOne(space_id, { fields: { owner: 1 } })
+# 			if !space
+# 				return false
+# 			owner_id = space.owner
 
-			user = db.users.findOne(space.owner, { fields: { locale: 1 } })
-			if !user
-				reurn false
+# 			user = db.users.findOne(space.owner, { fields: { locale: 1 } })
+# 			if !user
+# 				reurn false
 
-			root_org = db.organizations.findOne({ space: space_id, parent: null })
-			if !root_org
-				return false
+# 			root_org = db.organizations.findOne({ space: space_id, parent: null })
+# 			if !root_org
+# 				return false
 
-			if db.forms.find({ space: space_id }).count() > 0
-				return
+# 			if db.forms.find({ space: space_id }).count() > 0
+# 				return
 
-			template_forms = []
+# 			template_forms = []
 
-			if user.locale == "zh-cn"
-				template_forms = EJSON.clone(workflowTemplate["zh-CN"])
-			else
-				template_forms = EJSON.clone(workflowTemplate["en"])
+# 			if user.locale == "zh-cn"
+# 				template_forms = EJSON.clone(workflowTemplate["zh-CN"])
+# 			else
+# 				template_forms = EJSON.clone(workflowTemplate["en"])
 
-			if template_forms && template_forms instanceof Array
-				template_forms.forEach (form) ->
-					steedosImport.workflow(owner_id, space_id, form, true)
+# 			if template_forms && template_forms instanceof Array
+# 				template_forms.forEach (form) ->
+# 					steedosImport.workflow(owner_id, space_id, form, true)
 
 		# 根据locale和模板创建表单流程
 #		template_space_id = null
