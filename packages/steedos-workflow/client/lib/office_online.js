@@ -124,7 +124,7 @@ OfficeOnline.http.uploadFile = function(fileDataInfo, files) {
 		host: window.location.hostname,
 		port: window.location.port,
 		method: "POST",
-		path: "/s3/"
+		path: "/api/v4/instances/s3/"
 	}
 	var req = http.request(options, function(res) {
 		res.on('data', function(chunk) {
@@ -259,7 +259,7 @@ OfficeOnline.https.uploadFile = function(fileDataInfo, files) {
 		host: window.location.hostname,
 		port: window.location.port,
 		method: "POST",
-		path: "/s3/"
+		path: "/api/v4/instances/s3/"
 	}
 	var req = https.request(options, function(res) {
 		res.on('data', function(chunk) {

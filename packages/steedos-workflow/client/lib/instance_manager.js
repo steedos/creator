@@ -1225,7 +1225,7 @@ InstanceManager.uploadAttach = function(files, isAddVersion, isMainAttach) {
 		}
 
 		$.ajax({
-			url: Steedos.absoluteUrl('s3/'),
+			url: Steedos.absoluteUrl('api/v4/instances/s3/'),
 			type: 'POST',
 			async: true,
 			data: fd,

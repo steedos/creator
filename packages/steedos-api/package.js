@@ -45,14 +45,14 @@ Package.onUse(function(api) {
 
 	api.addFiles('core.coffee');
 
-	api.addFiles('steedos/space_users.coffee', 'server');
-	api.addFiles('steedos/organizations.coffee', 'server');
+	// api.addFiles('steedos/space_users.coffee', 'server');
+	// api.addFiles('steedos/organizations.coffee', 'server');
 
 	api.addFiles('routes/s3.coffee', 'server');
 	api.addFiles('routes/push.coffee', 'server');
-	api.addFiles('routes/aliyun_push.coffee', 'server');
-	api.addFiles('routes/import.coffee', 'server');
-	api.addFiles('routes/proxy.coffee', 'server');
+	// api.addFiles('routes/aliyun_push.coffee', 'server');
+	// api.addFiles('routes/import.coffee', 'server');
+	// api.addFiles('routes/proxy.coffee', 'server');
 
 });
 

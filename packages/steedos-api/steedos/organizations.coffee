@@ -1,5 +1,5 @@
-API.addCollection db.organizations, 
-	excludedEndpoints: []
-	routeOptions:
-		authRequired: true
-		spaceRequired: true
+# API.addCollection db.organizations, 
+# 	excludedEndpoints: []
+# 	routeOptions:
+# 		authRequired: true
+# 		spaceRequired: true

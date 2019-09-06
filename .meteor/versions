@@ -136,6 +136,7 @@ steedos:accounts@0.0.40
 steedos:accounts-phone@0.0.7
 steedos:accounts-t9n@1.14.2_8
 steedos:adminlte@2.3.12_3
+steedos:api@0.0.1
 steedos:api-authenticate-user@1.0.0
 steedos:app-base@0.0.1
 steedos:app-chat@0.0.1

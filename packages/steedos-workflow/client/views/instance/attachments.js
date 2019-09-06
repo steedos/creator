@@ -923,9 +923,9 @@ Template.ins_attach_edit_modal.events({
 		}
 
 		if (Steedos.isNode())
-			url = window.location.orgin + "/s3/";
+			url = window.location.orgin + "/api/v4/instances/s3/";
 		else
-			url = Meteor.absoluteUrl('s3/');
+			url = Meteor.absoluteUrl('api/v4/instances/s3/');
 
 		var params_str = $.param(params);
 

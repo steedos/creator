@@ -45,7 +45,7 @@ JsonRoutes.parseFiles = (req, res, next) ->
 
 #JsonRoutes.Middleware.use(JsonRoutes.parseFiles);
 
-JsonRoutes.add "post", "/s3/",  (req, res, next) ->
+JsonRoutes.add "post", "/api/v4/instances/s3/",  (req, res, next) ->
 
   JsonRoutes.parseFiles req, res, ()->
     collection = cfs.instances
@@ -129,7 +129,7 @@ JsonRoutes.add "post", "/s3/",  (req, res, next) ->
       res.end();
 
 
-JsonRoutes.add "delete", "/s3/",  (req, res, next) ->
+JsonRoutes.add "delete", "/api/v4/instances/s3/",  (req, res, next) ->
 
   collection = cfs.instances
 
@@ -148,7 +148,7 @@ JsonRoutes.add "delete", "/s3/",  (req, res, next) ->
   res.end();
 
 
-JsonRoutes.add "get", "/s3/",  (req, res, next) ->
+JsonRoutes.add "get", "/api/v4/instances/s3/",  (req, res, next) ->
 
   id = req.query.version_id;
 
