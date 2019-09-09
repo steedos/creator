@@ -286,6 +286,15 @@
     moment "^2.24.0"
     underscore "^1.9.1"
 
+"@steedos/filters@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@steedos/filters/-/filters-1.5.4.tgz#3fcad8d769913ecbf392630a4f572dcb0ff74c2b"
+  integrity sha512-ePWbue//4DBmLYH1hqZQclsbpGwd+3/v97LsfocQxy/cJ8KuKbERct17c0Atp4qM3D1BY2fjeld+FqzuZlNlSg==
+  dependencies:
+    devextreme "^18.2.6"
+    moment "^2.24.0"
+    underscore "^1.9.1"
+
 "@steedos/objectql@^1.0.5", "@steedos/objectql@^1.0.7", "@steedos/objectql@^1.5.1", "@steedos/objectql@^1.5.5":
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/@steedos/objectql/-/objectql-1.5.5.tgz#56a98121ccfdad9de44e789892a507c7a153f851"
@@ -6000,7 +6009,7 @@ saml-idp@^1.1.0:
     xmldom "=0.1.27"
     xpath "0.0.27"
 
-"samlp@github:mcguinness/node-samlp":
+samlp@mcguinness/node-samlp:
   version "3.4.1"
   resolved "https://codeload.github.com/mcguinness/node-samlp/tar.gz/7bfb7c29be520f249beff6a9e933b63a628e31a1"
   dependencies:
