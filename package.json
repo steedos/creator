@@ -18,7 +18,7 @@
     "@steedos/app-contracts": "^0.1.1",
     "@steedos/auth": "^1.5.2",
     "@steedos/core": "^1.5.1",
-    "@steedos/filters": "^1.5.1",
+    "@steedos/filters": "^1.5.4",
     "@steedos/objectql": "^1.5.1",
     "@steedos/odata-v4-typeorm": "^0.0.24",
     "@steedos/standard-objects": "^1.5.1",
