@@ -31,7 +31,7 @@ yarn run build
 
 ### 测试
 
-执行以下命令，会把编译好的 steedos-server，复制到 ../object-server/server 中
+执行以下命令，会把编译好的 steedos-server，复制到 [../object-server/server](https://github.com/steedos/object-server/tree/develop/server) 中
 
 ```shell
 cd ../object-server/app/contracts
