@@ -6,3 +6,4 @@ console.log("Running npm-postinstall.js");
 
 // fix DevExtreme的 formatISO8601函数没用使用utc时间
 execSync('cp -r .scripts/devextreme/* node_modules/devextreme/');
+execSync('rm -rf ./node_modules/crypto');
