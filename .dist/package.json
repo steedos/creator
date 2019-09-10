@@ -1,6 +1,6 @@
 {
   "name": "steedos-server",
-  "version": "1.5.2-patch.2",
+  "version": "1.5.3",
   "main": "index.js",
   "files": [
     "/bundle/programs/server/app",
@@ -21,7 +21,7 @@
     "@babel/runtime": "^7.2.0",
     "@steedos/auth": "^1.5.2",
     "@steedos/core": "^1.5.1",
-    "@steedos/filters": "^1.5.1",
+    "@steedos/filters": "^1.5.4",
     "@steedos/objectql": "^1.5.1",
     "@steedos/standard-objects": "^1.5.1",
     "@steedos/meteor-bundle-dependencies": "1.5.1",
