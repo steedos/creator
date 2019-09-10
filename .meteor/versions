@@ -202,6 +202,7 @@ steedos:odata@0.0.7
 steedos:qcloud-smsqueue@0.0.5
 steedos:qhd-archive-sync@0.0.1
 steedos:qhd-archive-xml@0.0.1
+steedos:slipjs@2.1.0
 steedos:smsqueue@0.0.4
 steedos:sso@0.0.4
 steedos:theme@0.0.30
