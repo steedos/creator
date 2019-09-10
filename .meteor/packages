@@ -196,6 +196,7 @@ steedos:app-workflow
 steedos:object-webhooks-queue
 
 steedos:workflow
+steedos:workflow-chart
 steedos:api
 keepnox:perfect-scrollbar
 jeremy:selectize
