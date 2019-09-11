@@ -1,1 +1,1 @@
-require("./theme.css");
+require("./theme.less");

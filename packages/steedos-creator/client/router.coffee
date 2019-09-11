@@ -133,7 +133,6 @@ FlowRouter.route '/app/:app_id/instances/grid/all',
 		app_id = FlowRouter.getParam("app_id")
 		Session.set("app_id", app_id)
 		Session.set("object_name", "instances")
-		console.log("instances action")
 		FlowRouter.go '/workflow'
 		return
 
