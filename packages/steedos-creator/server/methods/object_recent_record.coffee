@@ -14,6 +14,8 @@ recent_aggregate = (created_by, spaceId, _records, callback)->
 		if callback && _.isFunction(callback)
 			callback()
 
+		return
+
 async_recent_aggregate = Meteor.wrapAsync(recent_aggregate)
 
 search_object = (space, object_name,userId, searchText)->
