@@ -1,5 +1,8 @@
 <template name="workflow_main">
-	<div class="workflow-main">
+
+	{{> workflowSidebar}}
+	<div class="content-wrapper">
+		<div class="workflow-main">
 			<div class="instance-list-wrapper">
 				{{> instance_list}}
 			</div>
@@ -10,6 +13,6 @@
 				{{/if}}
 			</div>
 			{{/if}}
-				
+		</div>
 	</div>
 </template>

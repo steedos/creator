@@ -41,7 +41,7 @@ workflowSpaceRoutes = FlowRouter.group
 workflowSpaceRoutes.route '/',
 	action: (params, queryParams)->
 		Steedos.setSpaceId(params.spaceId)
-		BlazeLayout.render 'workflowLayout',
+		BlazeLayout.render Creator.getLayout(),
 			main: "workflow_home"
 
 workflowSpaceRoutes.route '/print/:instanceId',
@@ -78,7 +78,7 @@ workflowSpaceRoutes.route '/:box/',
 		if params.box != 'inbox'
 			Session.set("workflowCategory", undefined);
 
-		BlazeLayout.render 'workflowLayout',
+		BlazeLayout.render Creator.getLayout(),
 			main: "workflow_main"
 
 		$(".workflow-main").removeClass("instance-show")
@@ -89,7 +89,7 @@ workflowSpaceRoutes.route '/:box/f/:flow',
 		Session.set("box", params.box);
 		Session.set("flowId", params.flow)
 
-		BlazeLayout.render 'workflowLayout',
+		BlazeLayout.render Creator.getLayout(),
 			main: "workflow_main"
 
 workflowSpaceRoutes.route '/:box/:instanceId',
@@ -104,7 +104,7 @@ workflowSpaceRoutes.route '/:box/:instanceId',
 		Session.set("next_user_multiple", null);
 		Session.set("box", params.box);
 
-		BlazeLayout.render 'workflowLayout',
+		BlazeLayout.render Creator.getLayout(),
 			main: "workflow_main"
 
 	triggersExit: [(context, redirect) ->
