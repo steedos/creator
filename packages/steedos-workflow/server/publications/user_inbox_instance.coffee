@@ -84,7 +84,7 @@ Meteor.publish 'my_inbox_instances', (spaceId)->
 ###
 
 _get_flow_instances_aggregate = (spaceId, userId, _items, callback)->
-	db.instances.rawCollection().aggregate [
+	db.instances.rawCollection().aggregate([
 		{
 			$match: {
 				space: spaceId,
@@ -96,7 +96,7 @@ _get_flow_instances_aggregate = (spaceId, userId, _items, callback)->
 				_id: {flow: "$flow", category: "$category"}, count: {$sum: 1}
 			}
 		}
-	], (err, data)->
+	]).toArray (err, data)->
 		if err
 			throw new Error(err)
 
