@@ -165,46 +165,19 @@ Meteor.methods
 				multiOrgs.forEach (orgFullname) ->
 					organization_depts = orgFullname.trim().split("/")
 					fullname = ""
-					parent_org_id = root_org._id
 					organization_depts.forEach (dept_name, j) ->
 						if j > 0
 							if j == 1
 								fullname = dept_name
 							else
 								fullname = fullname + "/" + dept_name
+						else
+							fullname = dept_name
 
-							org = db.organizations.findOne({space: space_id, fullname: fullname})
+					org = db.organizations.findOne({space: space_id, fullname: fullname})
 
-							if org
-								parent_org_id = org._id
-								belongOrgids.push org._id
-							# else
-							# 	org_doc = {}
-							# 	org_doc._id = db.organizations._makeNewID()
-							# 	org_doc.space = space_id
-							# 	org_doc.name = dept_name
-							# 	org_doc.parent = parent_org_id
-							# 	org_doc.created = now
-							# 	org_doc.created_by = owner_id
-							# 	org_doc.modified = now
-							# 	org_doc.modified_by = owner_id
-							# 	org_id = db.organizations.direct.insert(org_doc)
-
-							# 	if org_id
-							# 		org = db.organizations.findOne(org_id)
-							# 		updateFields = {}
-							# 		updateFields.parents = org.calculateParents()
-							# 		updateFields.fullname = org.calculateFullname()
-
-							# 		if !_.isEmpty(updateFields)
-							# 			db.organizations.direct.update(org._id, {$set: updateFields})
-
-							# 		if org.parent
-							# 			parent = db.organizations.findOne(org.parent)
-							# 			db.organizations.direct.update(parent._id, {$set: {children: parent.calculateChildren()}})
-
-							# 		parent_org_id = org_id
-							# 		belongOrgids.push org._id
+					if org
+						belongOrgids.push org._id
 
 
 				user_id = null
