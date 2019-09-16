@@ -35,7 +35,7 @@
     "connect-route": "^0.1.5",
     "cookies": "^0.7.3",
     "core-js": "^3.2.1",
-    "devextreme": "^19.1.6",
+    "devextreme": "18.2.6",
     "ejs": "^2.5.5",
     "ejs-lint": "^0.3.0",
     "eval": "0.1.4",

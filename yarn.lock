@@ -1779,10 +1779,15 @@ detect-libc@^1.0.2, detect-libc@^1.0.3:
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
   integrity sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=
 
-devexpress-diagram@0.0.30:
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/devexpress-diagram/-/devexpress-diagram-0.0.30.tgz#7d595627f9fcaf72942525550e23863835dd9e6d"
-  integrity sha512-CqyhA5V5ef7kSddvSeG94kEDVKFoJOFNzSn5m23fvmL3AbKLbeEgRPRdO4KsAdsLm8TIRGpapL0rQQgAw8p6lg==
+devextreme@18.2.6:
+  version "18.2.6"
+  resolved "https://registry.yarnpkg.com/devextreme/-/devextreme-18.2.6.tgz#2134bf01b3900af1642c5f9e5c4f13a7c77446a2"
+  integrity sha512-vPOKj/2Ex3qA1uDVCipVk5Z15kxE2g5o8h/98kzy0AI9XEbuXXQrTrZZyZFF+grJeMokHi92ODTWxegKM4zFIQ==
+  dependencies:
+    jszip "^2.0.0 || ^3.0.0"
+    quill "^1.3.6"
+    showdown "^1.8.6"
+    turndown "^5.0.1"
 
 devextreme@^18.2.6:
   version "18.2.10"
@@ -1791,17 +1796,6 @@ devextreme@^18.2.6:
   dependencies:
     jszip "^2.0.0 || ^3.0.0"
     quill "^1.3.6"
-    showdown "^1.8.6"
-    turndown "^5.0.1"
-
-devextreme@^19.1.6:
-  version "19.1.6"
-  resolved "https://registry.yarnpkg.com/devextreme/-/devextreme-19.1.6.tgz#db3054197efd3e97eafedddc78d05f11a9cd0cb2"
-  integrity sha512-u/fgCDlFJdGKDRfQ1KX7SgPfvAZsi3SCe78VR30lF5W65JAXKKzPCPM0eGT8Kzu4p50wQbGjK/c9c7EP5qSieA==
-  dependencies:
-    devexpress-diagram "0.0.30"
-    jszip "^2.0.0 || ^3.0.0"
-    quill "^1.3.7"
     showdown "^1.8.6"
     turndown "^5.0.1"
 
@@ -4805,7 +4799,7 @@ quill-delta@^3.6.2:
     extend "^3.0.2"
     fast-diff "1.1.2"
 
-quill@^1.3.6, quill@^1.3.7:
+quill@^1.3.6:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/quill/-/quill-1.3.7.tgz#da5b2f3a2c470e932340cdbf3668c9f21f9286e8"
   integrity sha512-hG/DVzh/TiknWtE6QmWAF/pxoZKYxfe3J/d/+ShUWkDvvkZQVTPeVmUJVu1uE6DDooC4fWTiCLh84ul89oNz5g==
