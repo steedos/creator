@@ -2,7 +2,7 @@
 
 if Meteor.isClient
 	WorkflowCore.openFlowDesign = (locale, space, flow, companyId)->
-		url = "/applications/designer/current/?locale=#{locale}&space=#{space}"
+		url = "/applications/designer/current/#{locale}/?space=#{space}"
 		if flow
 			url = url + "&flow=#{flow}"
 		if companyId && !Creator.isSpaceAdmin(space, Meteor.userId())
