@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
-    "@steedos/accounts": "^1.6.4",
+    "@steedos/accounts": "^1.6.5",
     "@steedos/app-contracts": "^1.6.4",
     "@steedos/auth": "^1.6.4",
     "@steedos/core": "^1.6.4",
