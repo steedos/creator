@@ -136,7 +136,7 @@ Template.instance_list.helpers
 		# 		return true
 
 		# return false;
-		return true
+		return Steedos.isMobile()
 
 	hasApproves: ->
 		if InstanceManager.getUserInboxInstances().length > 0
