@@ -187,6 +187,15 @@ Template.instance_list.helpers
 	showBatchBtn: ()->
 		return Session.get("workflow_batch_instances_count") > 0
 
+	objectIcon: ->
+		return "account"
+
+	objectLabel: ->
+		return "Workflow"
+
+	objectSearchLabel: ->
+		return "申请单"
+
 Template.instance_list._changeOrder = ()->
 
 	table = $(".datatable-instances")?.DataTable();
