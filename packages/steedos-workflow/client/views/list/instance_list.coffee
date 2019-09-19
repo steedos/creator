@@ -403,7 +403,7 @@ Template.instance_list.events
 	'click [name="show_all_ins"]': (event) ->
 		Session.set("flowId", undefined);
 
-	'click [name="create_ins_btn"]': (event) ->
+	'click .list-action-custom-standard_new': (event) ->
 		#判断是否为欠费工作区
 		if WorkflowManager.isArrearageSpace()
 			toastr.error(t("spaces_isarrearageSpace"));
@@ -433,7 +433,7 @@ Template.instance_list.events
 				else
 					Session.set("categorie_id", undefined)
 
-	'click #instance_more_search': (event, template) ->
+	'click .list-action-custom-standard_query': (event, template) ->
 		Modal.show("instance_more_search_modal")
 
 	'click #instance_search_tip_close_btn': (event, template) ->
