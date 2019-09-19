@@ -88,8 +88,44 @@
 					</div>
 				</div>
 			</div>
-			<div class="slds-col slds-no-flex slds-grid slds-align-bottom grid-actions slds-m-left_x-small">
-				<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list tabular-filter-by-flow" title="{{_ "creator_filters"}}">
+			<div class="slds-col slds-no-flex slds-grid slds-align-bottom grid-actions">
+				{{#if hasFlowId}}
+					<div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-m-left_x-small" aria-expanded="false">
+						<button class="slds-button slds-button_icon slds-button_icon-more" aria-haspopup="true"
+							title="{{_ "workflow_export_data"}}" data-toggle="dropdown" style="{{enabled_export}}">
+							{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="settings"}}
+							{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="down"}}
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" role="menu">
+							<ul class="slds-dropdown__list list-view-controls">
+								<li class="slds-dropdown__header" role="separator">
+									<span class="slds-text-title--caps">{{_ "workflow_export_data"}}</span>
+								</li>
+								<li class="slds-dropdown__item" role="presentation">
+									<a href="javascript:void(0);" class="export-thismonth" type="0" role="option" tabindex="-1">
+										<span>{{_ "workflow_export_thismonth"}}</span>
+									</a>
+								</li>
+								<li class="slds-dropdown__item" role="presentation">
+									<a href="javascript:void(0);" class="export-pro" type="1" role="option" tabindex="-1">
+										<span>{{_ "workflow_export_lastmonth"}}</span>
+									</a>
+								</li>
+								<li class="slds-dropdown__item" role="presentation">
+									<a href="javascript:void(0);" class="export-pro" type="2" role="option" tabindex="-1">
+										<span>{{_ "workflow_export_thisyear"}}</span>
+									</a>
+								</li>
+								<li class="slds-dropdown__item" role="presentation">
+									<a href="javascript:void(0);" class="export-pro" type="3" role="option" tabindex="-1">
+										<span>{{_ "workflow_export_all"}}</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				{{/if}}
+				<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list tabular-filter-by-flow slds-m-left_x-small" title="{{_ "creator_filters"}}">
 					{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
 				</button>
 				<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toogle-columns">

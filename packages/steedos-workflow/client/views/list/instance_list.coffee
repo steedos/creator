@@ -372,14 +372,14 @@ Template.instance_list.events
 			FlowRouter.go("/workflow/space/" + spaceId + "/" + box + "/" + rowData._id);
 		, 1
 
-	'click .dropdown-menu li a.export-thismonth': () ->
-		InstanceManager.exportIns(event.target.type);
+	'click .dropdown-menu li a.export-thismonth': (event) ->
+		InstanceManager.exportIns(event.currentTarget.type);
 
-	'click .dropdown-menu li a.export-pro': () ->
+	'click .dropdown-menu li a.export-pro': (event) ->
 		if !Steedos.isLegalVersion('',"workflow.professional")
 			Steedos.spaceUpgradedModal()
 			return;
-		InstanceManager.exportIns(event.target.type);
+		InstanceManager.exportIns(event.currentTarget.type);
 
 	'click #instance_search_button': (event) ->
 		dataTable = $(".datatable-instances").DataTable();
