@@ -175,3 +175,8 @@ Template.workflowMenuByFlow.events
 		if Steedos.isMobile()
 			# 手机上可能菜单展开了，需要额外收起来
 			$("body").removeClass("sidebar-open")
+
+	'click .workflow-menu-by-flow a': (event, template)->
+		# 点击任意a标签，跳转路由，应该关闭菜单
+		$("body").removeClass("sidebar-open")
+		

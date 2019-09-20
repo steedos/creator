@@ -9,3 +9,47 @@
 		padding-left: 20px;
 	}
 }
+
+// creator中手机上切换审批箱时，左侧sidebar展开为待选项菜单
+@media (max-width: 767px) {
+	.creator-content-wrapper {
+		.main-sidebar {
+			display: none;
+			width: 100%;
+			margin-top: 72px !important;
+			background: #fff !important;
+
+			.top-sidebar {
+				display: none;
+			}
+
+			.workflow-menu-by-flow {
+				.header-app {
+					display: none;
+				}
+
+				.mybox.active {
+					&>a {
+						color: #000 !important;
+						border-left: none;
+					}
+				}
+			}
+		}
+
+		.content-wrapper {
+			transform: none;
+			&.content-wrapper-shadow {
+				display: none;
+			}
+		}
+	}
+
+	.sidebar-open {
+		.creator-content-wrapper {
+			.main-sidebar {
+				display: block;
+			}
+		}
+	}
+}

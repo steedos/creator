@@ -472,6 +472,9 @@ Template.instance_list.events
 			template.btnToggleColumnsIcon.set("contract_alt")
 			localStorage.setItem("workflow_three_columns", "off")
 
+	'click .btn-toggle-workflow-menu': (event, template)->
+		$("body").toggleClass("sidebar-open")
+
 	'click .tabular-introduction': ()->
 		Modal.show("tableau_introduction_modal")
 
