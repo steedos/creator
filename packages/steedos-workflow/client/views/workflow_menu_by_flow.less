@@ -13,11 +13,9 @@
 	.main-sidebar {
 		background: rgb(243, 242, 242) !important;
 		.workflow-menu-by-flow {
-			.mybox.active {
-				&>a {
-					color: #000 !important;
-					border-left: none;
-				}
+			li>.treeview-menu {
+				// 默认自动展开所有菜单内容
+				display: block !important;
 			}
 		}
 	}

@@ -23,20 +23,23 @@ Template.workflowMenuByFlow.helpers
 			return "active"
 
 	hasInbox: ()->
-		query = {}
-		query.$or = [{
-			inbox_users: Meteor.userId()
-		}, {
-			cc_users: Meteor.userId()
-		}, {
-			is_cc: true
-		}]
+		# query = {}
+		# query.$or = [{
+		# 	inbox_users: Meteor.userId()
+		# }, {
+		# 	cc_users: Meteor.userId()
+		# }, {
+		# 	is_cc: true
+		# }]
 
-		query.space = Session.get("spaceId")
+		# query.space = Session.get("spaceId")
 
-		inboxInstances = db.instances.find(query).fetch();
+		# inboxInstances = db.instances.find(query).fetch();
 
-		return inboxInstances.length > 0
+		# return inboxInstances.length > 0
+		
+		# 切换到已审核和监控箱应该是一样的效果，但是上面的代码会造成前者待审核菜单没有显示子菜单内容，后者待审核菜单自动展开显示出了子菜单内容
+		return true
 
 	inboxCategory: (category_id)->
 
