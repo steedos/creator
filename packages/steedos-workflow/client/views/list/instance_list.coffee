@@ -196,8 +196,8 @@ Template.instance_list.helpers
 	objectSearchLabel: ->
 		return "申请单"
 
-	btnToogleColumnsIcon: ->
-		return Template.instance()?.btnToogleColumnsIcon.get()
+	btnToggleColumnsIcon: ->
+		return Template.instance()?.btnToggleColumnsIcon.get()
 
 Template.instance_list._changeOrder = ()->
 
@@ -290,7 +290,7 @@ Template.instance_list._tableColumns = ()->
 
 Template.instance_list.onCreated ->
 	self = this;
-	self.btnToogleColumnsIcon = new ReactiveVar("expand_alt")
+	self.btnToggleColumnsIcon = new ReactiveVar("expand_alt")
 
 	self.maxHeight = new ReactiveVar(
 		$(window).height());
@@ -339,7 +339,7 @@ Template.instance_list.onRendered ->
 		# $(".instance-list .dataTables_container").perfectScrollbar();
 
 	unless $("body").hasClass("three-columns")
-		self.btnToogleColumnsIcon.set("contract_alt")
+		self.btnToggleColumnsIcon.set("contract_alt")
 
 #	Template.instance_list._changeOrder()
 
@@ -457,7 +457,7 @@ Template.instance_list.events
 			else
 				$('.treeview-menu').perfectScrollbar('destroy');
 
-	'click .btn-toogle-columns': (event, template)->
+	'click .btn-toggle-columns': (event, template)->
 		if Session.get("instanceId")
 			backURL = "/workflow/space/" + Session.get("spaceId") + "/" + Session.get("box")
 			FlowRouter.go(backURL)
@@ -466,10 +466,10 @@ Template.instance_list.events
 		$("body").toggleClass("three-columns")
 		$(window).trigger("resize")
 		if $("body").hasClass("three-columns")
-			template.btnToogleColumnsIcon.set("expand_alt")
+			template.btnToggleColumnsIcon.set("expand_alt")
 			localStorage.removeItem("workflow_three_columns")
 		else
-			template.btnToogleColumnsIcon.set("contract_alt")
+			template.btnToggleColumnsIcon.set("contract_alt")
 			localStorage.setItem("workflow_three_columns", "off")
 
 	'click .tabular-introduction': ()->

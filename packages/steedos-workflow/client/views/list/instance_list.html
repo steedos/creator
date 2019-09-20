@@ -22,8 +22,8 @@
 						</nav>
 						<h1 class="slds-page-header__title slds-text-color--default slds-p-right--x-small crm-header-title dropdown">
 							{{#if isShowMenu}}
-								<a class="triggerLink slds-button slds-button--reset slds-type-focus slds-truncate forceListViewPicker" role="button"
-									title="" href="javascript:void(0);" data-toggle="dropdown">
+								<a class="triggerLink slds-button slds-button--reset slds-type-focus slds-truncate forceListViewPicker btn-toggle-columns" role="button"
+									title="" href="javascript:void(0);">
 									<div class="triggerLinkTextAndIconWrapper">
 										<span class="triggerLinkText selectedListView uiOutputText">{{boxName}}</span>
 										<span class="slds-icon_container slds-icon-utility-down downIcon slds-button__icon forceIcon">
@@ -33,9 +33,6 @@
 										</span>
 									</div>
 								</a>
-								<div class="dropdown-menu dropdown-menu-left dropdown-workflow-menu-by-flow" role="menu" style="max-height: {{maxHeight}}">
-									{{> workflowMenuByFlow}}
-								</div>
 							{{else}}
 								<a class="triggerLink slds-button slds-button--reset slds-type-focus slds-truncate forceListViewPicker" role="button"
 									title="" href="javascript:void(0);">
@@ -127,8 +124,8 @@
 				<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-filter-list tabular-filter-by-flow slds-m-left_x-small" title="{{_ "workflow_export_filter"}}">
 					{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="filterList"}}
 				</button>
-				<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toogle-columns">
-					{{> steedos_icon class="slds-button__icon" source="utility-sprite" name=btnToogleColumnsIcon}}
+				<button class="slds-button slds-button_icon slds-button_icon-border-filled btn-toggle-columns">
+					{{> steedos_icon class="slds-button__icon" source="utility-sprite" name=btnToggleColumnsIcon}}
 				</button>
 			</div>
 		</div>
