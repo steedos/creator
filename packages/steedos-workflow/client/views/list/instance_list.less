@@ -306,12 +306,26 @@
 		border-right: 0px;
 		.dropdown-workflow-menu-by-flow {
 			width: 140%;
-			ul{
-				background: #fff!important;
-			}
 		}
 		.slds-button {
 			cursor: pointer;
+		}
+	}
+	.instance-list-container{
+		&.sidebar-open {
+			display: flex;
+			flex: 4;
+			height: 100%;
+			&>.instance-list-sidebar {
+				display: flex;
+				flex: 1;
+				border-right: 1px solid rgb(224, 229, 238);
+			}
+			&>.instance-list-content {
+				display: flex;
+				flex: 3;
+				position: relative;
+			}
 		}
 	}
 }
