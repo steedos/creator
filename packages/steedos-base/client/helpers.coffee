@@ -210,11 +210,7 @@ TemplateHelpers =
 		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
 
 	isMobile: ->
-
-		if window.DevExpress
-			return DevExpress.devices._currentDevice.phone
-		else
-			return $(window).width()<767
+		return $(window).width() < 767
 
 	isAndroidOrIOS: ->
 		return Steedos.isAndroidApp() || Steedos.isiOS()
