@@ -22,7 +22,7 @@ Template.workflowMenuByFlow.helpers
 		if box == Session.get("box")
 			return "active"
 		else if box == "mybox"
-			return ["draft", "pending", "completed"].indexOf(Session.get("box")) > -1
+			return if ["draft", "pending", "completed"].indexOf(Session.get("box")) > -1 then "active" else ""
 
 	hasInbox: ()->
 		# query = {}
