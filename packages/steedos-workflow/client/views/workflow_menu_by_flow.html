@@ -19,12 +19,8 @@
 				{{#with inboxCategory this._id}}
 				{{#if hasInstances this.inbox_count}}
 				<li class="workflow-category {{#if (equals Session_category _id)}}active{{/if}}">
-					<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/inbox/"><i class="ion ion-ios-folder-outline"></i>
+					<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/inbox/">
 						<span class="category-name text-overflow">{{name}}</span>
-						<span class="pull-right-container">
-							<span class="label pull-right bg-red">{{inbox_count}}</span>
-							<i class="fa fa-angle-left pull-right"></i>
-						</span>
 					</a>
 					<ul class="treeview-menu">
 						{{#each this.inboxInstancesFlow}}
@@ -48,12 +44,8 @@
 				{{#with inboxCategory}}
 				{{#if hasInstances this.inbox_count}}
 				<li class="workflow-category {{#if (equals Session_category '-1')}}active{{/if}}">
-					<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/inbox/"><i class="ion ion-ios-folder-outline"></i>
+					<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/inbox/">
 						<span class="category-name text-overflow">{{_ "workflow_no_category"}}</span>
-						<span class="pull-right-container">
-							<span class="label pull-right bg-red">{{inbox_count}}</span>
-							<i class="fa fa-angle-left pull-right"></i>
-						</span>
 					</a>
 					<ul class="treeview-menu">
 						{{#each this.inboxInstancesFlow}}
