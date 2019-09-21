@@ -37,6 +37,17 @@
 .record-edit-text{
     display: block;
 }
+.listViewManager {
+    .slds-page-header--object-home {
+        height: 100px;
+        @media (max-width: 767px) {
+            height: 65px;
+        }
+        .slds-media__figure {
+            margin-top: -2px;
+        }
+    }
+}
 
 @media (max-width: 767px) {
     .slds-modal__container {
@@ -126,10 +137,6 @@
             //border-bottom: 1px solid #dddbda !important;
             border-left: 0px;
             border-right: 0px;
-            height: 100px;
-            @media (max-width: 768px) {
-                height: 65px;
-            }
         }
 
         .list-table-container{
