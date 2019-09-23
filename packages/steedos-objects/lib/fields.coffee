@@ -398,6 +398,8 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = String
 			fs.regEx = SimpleSchema.RegEx.Email
 			fs.autoform.type = 'steedosEmail'
+		else if field.type == 'autonumber'
+			fs.type = String
 		else
 			fs.type = field.type
 
