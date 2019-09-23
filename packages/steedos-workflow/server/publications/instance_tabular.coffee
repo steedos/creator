@@ -8,7 +8,7 @@ lastFinishedApproveAggregate = (instanceid, userId, dataMap, callback)->
 		{"$group": {"_id": "$_id", "finish_date": {"$last": "$_approve.finish_date"}}}
 	]
 
-	db.instances.rawCollection().aggregate operation, (err, data)->
+	db.instances.rawCollection().aggregate(operation).toArray (err, data)->
 		if err
 			throw new Error(err)
 
