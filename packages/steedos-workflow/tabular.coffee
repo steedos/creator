@@ -421,7 +421,7 @@ _get_inbox_instances_tabular_options = (flowId, fields)->
 				filteredRecordIds = new Array()
 
 				aggregate = (table, aggregate_operation, filteredRecordIds, cb) ->
-					table.collection.rawCollection().aggregate aggregate_operation, (err, data) ->
+					table.collection.rawCollection().aggregate(aggregate_operation).toArray (err, data) ->
 						if err
 							throw new Error(err)
 						data.forEach (doc) ->
@@ -495,7 +495,7 @@ _get_outbox_instances_tabular_options = (flowId, fields)->
 				filteredRecordIds = new Array()
 
 				aggregate = (table, aggregate_operation, filteredRecordIds, cb) ->
-					table.collection.rawCollection().aggregate aggregate_operation, (err, data) ->
+					table.collection.rawCollection().aggregate(aggregate_operation).toArray (err, data) ->
 						if err
 							throw new Error(err)
 						data.forEach (doc) ->
