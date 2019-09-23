@@ -188,7 +188,7 @@ Template.instance_list.helpers
 		return Session.get("workflow_batch_instances_count") > 0
 
 	objectIcon: ->
-		return "account"
+		return "task"
 
 	objectLabel: ->
 		return "Workflow"
