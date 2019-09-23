@@ -222,15 +222,43 @@
     saml-idp "^1.1.0"
     tslib "1.10.0"
 
-"@steedos/app-contracts@^1.6.4":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@steedos/app-contracts/-/app-contracts-1.6.4.tgz#9821234b77b927718f129e19b7947e324a527ec4"
-  integrity sha512-YkPzO0TfPnDg3rfmGzb7dMV2+NeU92uo0kdDiomYg2w96zj1Dz6JsBnq0egZW9OojMkG/W0i/WDcslXIEcOtAA==
+"@steedos/accounts@^1.6.5-patch.5":
+  version "1.6.5-patch.5"
+  resolved "https://registry.yarnpkg.com/@steedos/accounts/-/accounts-1.6.5-patch.5.tgz#6634ad404d25cc53603324730435650778358151"
+  integrity sha512-vuhiIDOQQnNhr9q9s4oSoyEyrrm+F+0RbSPQVo5+imEB25yWJDSyry3KyhBxpryRL0dcXyVZj96G0vsE2RxiOA==
+  dependencies:
+    "@accounts/mongo" "^0.19.0"
+    "@accounts/password" "^0.19.0"
+    "@accounts/rest-express" "^0.19.0"
+    "@accounts/server" "^0.19.0"
+    "@babel/runtime" "^7.6.0"
+    "@steedos/objectql" "^1.6.4"
+    app-root-path "^2.2.1"
+    body-parser "1.19.0"
+    cookies "^0.7.3"
+    cors "2.8.5"
+    crypto "^1.0.1"
+    express "4.17.1"
+    js-yaml "^3.13.1"
+    mem "^5.1.1"
+    mongoose "5.6.6"
+    nodemailer "^6.3.0"
+    oauth2-server "^3.0.1"
+    redux-thunk "^2.3.0"
+    saml-idp "^1.1.0"
+    tslib "1.10.0"
 
-"@steedos/auth@^1.6.4":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@steedos/auth/-/auth-1.6.4.tgz#3cde7947fa261865a5f56c051790b51d0ca11cee"
-  integrity sha512-dSE3AseTb8nI3MMggpeEizjq5SFnQi1t89VEbqRB7yYv71lqO3UnDxCX3TGrKN4p/wvZfy04FHWXyKai9jaVpw==
+"@steedos/app-contracts@^1.6.5":
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/@steedos/app-contracts/-/app-contracts-1.6.5.tgz#feac4f24bf95d6875dab1d6202cbf393366e4e27"
+  integrity sha512-vUbT7FMXnU9XapcdRIBERu8vcVWPBW9OGblYryt0h1RkfQ61+rwuXBKyounjQNNtpamlMBN5K+IwesPvsjXWMw==
+  dependencies:
+    "@steedos/accounts" "^1.6.5-patch.5"
+
+"@steedos/auth@^1.6.5":
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/@steedos/auth/-/auth-1.6.5.tgz#7d28a665c1d21602e591e2946128942950908799"
+  integrity sha512-k3UF5DwSIY5BDtR/8eojs/+i2K0cpjcyTI9pD7a3I1bf40LU4kSDMn7+/0sNyGr1AkXlf0COxfKw/M94yQVTBA==
   dependencies:
     "@steedos/objectql" "^1.6.4"
     bcrypt "^3.0.6"
@@ -241,15 +269,15 @@
     sha256 "^0.2.0"
     underscore "^1.9.1"
 
-"@steedos/core@^1.6.4":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@steedos/core/-/core-1.6.4.tgz#f04149d7e199291b1cda8eadcb1351976b3bdeaf"
-  integrity sha512-PCdbaC9VLN1Oxpj/JAnIL6qcYeduqOLjSUvtdQZxq+WAQGo/ZVGApBTXT1mggr2BVgz3yHCCAiq6ht0bTkiMaw==
+"@steedos/core@^1.6.5":
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/@steedos/core/-/core-1.6.5.tgz#9756ff1c518b3b2e06f57ce4ad57b696cecfcf2b"
+  integrity sha512-uGcOxbEbEGfoX9RUMqA8jmNnTfcgpjPLXc3lY3vdVFQSkH4x0Lhp6NBRRlVpHKOxP7HpUOjzW+ZEM8KTRJk07A==
   dependencies:
     "@salesforce/dev-config" "^1.4.4"
     "@salesforce/kit" "^1.0.4"
     "@salesforce/ts-types" "^1.1.1"
-    "@steedos/auth" "^1.6.4"
+    "@steedos/auth" "^1.6.5"
     "@steedos/migrate" "^1.6.4"
     "@steedos/objectql" "^1.6.4"
     "@steedos/standard-objects" "^1.6.4"
@@ -279,15 +307,6 @@
     simpl-schema "^1.5.5"
     uglify-js "^3.6.0"
     underscore "1.5.2"
-
-"@steedos/filters@^1.6.4":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@steedos/filters/-/filters-1.6.4.tgz#be52a4072ed11b05d6910437f4de0a5923486cac"
-  integrity sha512-YjyeC0k0ldk0CF3bMxMKoL+h+p/ev8URvGezV0oq3VCWXLuju3lA3kDW3R6Ibw0bTJGCz+F8F7tPqJukksgzmQ==
-  dependencies:
-    devextreme "^18.2.6"
-    moment "^2.24.0"
-    underscore "^1.9.1"
 
 "@steedos/filters@^1.6.5":
   version "1.6.5"
