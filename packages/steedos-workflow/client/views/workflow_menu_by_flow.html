@@ -11,7 +11,7 @@
 					<span class="label pull-right bg-red">{{_getBadge "workflow" getSpaceId}}</span>
 				</span>
 			</a>
-			{{#if hasInbox}}
+			<!-- {{#if hasInbox}}
 			<ul class="treeview-menu menu-open" style="display: block;">
 	
 				{{#each categorys}}
@@ -27,7 +27,6 @@
 						<li class="{{#if (equals selected_flow _id)}}active{{/if}}">
 							<a class="inbox-flow text-overflow" href="{{urlPrefix}}/workflow/space/{{space}}/inbox"
 								undefined="">
-								<!--<i class="ion ion-clipboard"></i>-->
 								<span class="flow-name text-overflow">{{name}}</span>
 								<span class="pull-right-container">
 									<span class="label pull-right bg-red">{{inbox_count}}</span>
@@ -52,7 +51,6 @@
 						<li class="{{#if (equals selected_flow _id)}}active{{/if}}">
 							<a class="inbox-flow text-overflow" href="{{urlPrefix}}/workflow/space/{{space}}/inbox"
 								undefined="">
-								<!--<i class="ion ion-clipboard"></i>-->
 								<span class="flow-name text-overflow">{{name}}</span>
 								<span class="pull-right-container">
 									<span class="label pull-right bg-red">{{inbox_count}}</span>
@@ -65,7 +63,7 @@
 				{{/if}}
 				{{/with}}
 			</ul>
-			{{/if}}
+			{{/if}} -->
 		</li>
 	
 	
@@ -76,21 +74,7 @@
 			</a>
 		</li>
 	
-		{{#if isShowMonitorBox}}
-		<li class="monitor {{boxActive 'monitor'}}">
-			<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/monitor/">
-				<i class="ion ion-eye"></i>
-				<span>{{_ "monitor"}}</span>
-			</a>
-		</li>
-		{{/if}}
 	
-		<li class="mybox {{boxActive 'mybox'}}">
-			<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/draft/">
-				<i class="ion ion-android-person"></i>
-				<span>{{_ "my_instances"}}</span>
-			</a>
-			<ul class="treeview-menu menu-open">
 				<li class="draft {{boxActive 'draft'}}">
 					<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/draft/"> <i
 							class="ion ion-compose"></i><span>{{_ "draft"}}</span>
@@ -113,8 +97,16 @@
 						<span>{{_ "completed"}}</span>
 					</a>
 				</li>
-			</ul>
+
+		{{#if isShowMonitorBox}}
+		<li class="monitor {{boxActive 'monitor'}}">
+			<a href="{{urlPrefix}}/workflow/space/{{spaceId}}/monitor/">
+				<i class="ion ion-eye"></i>
+				<span>{{_ "monitor"}}</span>
+			</a>
 		</li>
+		{{/if}}
+		
 		{{#if showOthenInbox inboxSpaces}}
 		<li class="header">
 			{{_ "workflow_more_inbox"}}
