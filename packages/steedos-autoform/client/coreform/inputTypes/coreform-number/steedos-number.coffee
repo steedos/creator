@@ -63,21 +63,3 @@ _format = (val, key, precision, scale)->
 Template.afSteedosNumber.events
 	'blur input[type=number]': (e, t)->
 		e.currentTarget.value = _format(e.currentTarget.value, this.atts.name, this.atts.precision, this.atts.scale)
-	
-	'keydown input[type=number]': (e, t)->
-		scale = this.atts.scale || 0
-		currentValue = e.currentTarget.value
-		unless currentValue
-			return true
-		key = if e.key then e.key else String.fromCharCode(e.which || e.keyCode)
-		# if /\./.test(key) # 不可以只用key，因为xp系统电脑上fromCharCode解码后的key值是特殊符号，不是点号
-		if /\./.test(key) || (e.which || e.keyCode) == 190
-			# 不能输入.连接符号
-			if scale == 0
-				return false
-			# 不能输入两个.连接符号
-			if /\./.test(currentValue)
-				return false
-		else if !/\d/.test(key) and !_.include([8,46,37,38,39,40,27], e.which || e.keyCode)
-			# 只能输入数字或退格、删除、方向键、esc
-			return false
