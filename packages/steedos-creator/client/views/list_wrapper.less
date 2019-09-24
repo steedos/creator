@@ -122,12 +122,15 @@
 	flex: 4;
 	&>.list-table-container{
 		flex: 3;
-		border-radius: 0px !important;
 		&.list-table-sidebar{
 			flex: 1;
 			border-right: 1px solid rgb(224, 229, 238);
+			border-bottom-right-radius: 0px !important;
 			.dx-scrollable-content{
 				padding-bottom: 20px;
+			}
+			&~.list-table-container {
+				border-bottom-left-radius: 0px !important;
 			}
 		}
 	}
