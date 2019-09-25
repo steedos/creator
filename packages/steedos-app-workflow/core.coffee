@@ -2,9 +2,9 @@
 
 if Meteor.isClient
 	WorkflowCore.openFlowDesign = (locale, space, flow, companyId)->
-		url = "/applications/designer/current/#{locale}/?space=#{space}"
+		url = "/applications/designer/current/#{locale.toLocaleLowerCase()}/?space=#{space}"
 		if flow
-			url = url + "&flow=#{flow}"
+			url = url + "&flowId=#{flow}"
 		if companyId && !Creator.isSpaceAdmin(space, Meteor.userId())
 			url = url + "&companyId=#{companyId}"
 		Steedos.openWindow Steedos.absoluteUrl(url)
