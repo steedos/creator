@@ -1,6 +1,6 @@
 require("./theme.less");
 
-import("main.html");
+import("./main.html");
 
 Template.preloadAssets.helpers({
     absoluteUrl(url){
