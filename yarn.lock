@@ -222,45 +222,17 @@
     saml-idp "^1.1.0"
     tslib "1.10.0"
 
-"@steedos/accounts@^1.6.5-patch.5":
-  version "1.6.5-patch.5"
-  resolved "https://registry.yarnpkg.com/@steedos/accounts/-/accounts-1.6.5-patch.5.tgz#6634ad404d25cc53603324730435650778358151"
-  integrity sha512-vuhiIDOQQnNhr9q9s4oSoyEyrrm+F+0RbSPQVo5+imEB25yWJDSyry3KyhBxpryRL0dcXyVZj96G0vsE2RxiOA==
-  dependencies:
-    "@accounts/mongo" "^0.19.0"
-    "@accounts/password" "^0.19.0"
-    "@accounts/rest-express" "^0.19.0"
-    "@accounts/server" "^0.19.0"
-    "@babel/runtime" "^7.6.0"
-    "@steedos/objectql" "^1.6.4"
-    app-root-path "^2.2.1"
-    body-parser "1.19.0"
-    cookies "^0.7.3"
-    cors "2.8.5"
-    crypto "^1.0.1"
-    express "4.17.1"
-    js-yaml "^3.13.1"
-    mem "^5.1.1"
-    mongoose "5.6.6"
-    nodemailer "^6.3.0"
-    oauth2-server "^3.0.1"
-    redux-thunk "^2.3.0"
-    saml-idp "^1.1.0"
-    tslib "1.10.0"
+"@steedos/app-contracts@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/app-contracts/-/app-contracts-1.6.6.tgz#f05d2af8de1f415ce902662f52e95535cc4a19f0"
+  integrity sha512-hlSCcMbQsWCUxgdlxkDlQxOdcbnl8evuG6KyISzSVMKe0eCvtXxt9A3MFfff1TUGbZ5owOj5M+JLbcwi5wFMDA==
 
-"@steedos/app-contracts@^1.6.5":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@steedos/app-contracts/-/app-contracts-1.6.5.tgz#feac4f24bf95d6875dab1d6202cbf393366e4e27"
-  integrity sha512-vUbT7FMXnU9XapcdRIBERu8vcVWPBW9OGblYryt0h1RkfQ61+rwuXBKyounjQNNtpamlMBN5K+IwesPvsjXWMw==
+"@steedos/auth@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/auth/-/auth-1.6.6.tgz#e3750b35b68ac49f321146d609125d8258aa2ff1"
+  integrity sha512-ub4jJj2qPE7SC00jzkZLRNi9ABYGYZmA7XpivDyUuOJMbIbIFShoTfoVzb/cfGK6owkq/taCKGEc708vTg3Xjw==
   dependencies:
-    "@steedos/accounts" "^1.6.5-patch.5"
-
-"@steedos/auth@^1.6.5":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@steedos/auth/-/auth-1.6.5.tgz#7d28a665c1d21602e591e2946128942950908799"
-  integrity sha512-k3UF5DwSIY5BDtR/8eojs/+i2K0cpjcyTI9pD7a3I1bf40LU4kSDMn7+/0sNyGr1AkXlf0COxfKw/M94yQVTBA==
-  dependencies:
-    "@steedos/objectql" "^1.6.4"
+    "@steedos/objectql" "^1.6.6"
     bcrypt "^3.0.6"
     cookies "^0.7.3"
     express "^4.16.4"
@@ -269,18 +241,18 @@
     sha256 "^0.2.0"
     underscore "^1.9.1"
 
-"@steedos/core@^1.6.5":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@steedos/core/-/core-1.6.5.tgz#9756ff1c518b3b2e06f57ce4ad57b696cecfcf2b"
-  integrity sha512-uGcOxbEbEGfoX9RUMqA8jmNnTfcgpjPLXc3lY3vdVFQSkH4x0Lhp6NBRRlVpHKOxP7HpUOjzW+ZEM8KTRJk07A==
+"@steedos/core@^1.6.6-patch.1":
+  version "1.6.6-patch.1"
+  resolved "https://registry.yarnpkg.com/@steedos/core/-/core-1.6.6-patch.1.tgz#e6d0b6c5afff3487a13b9f83f7645cc97a54107c"
+  integrity sha512-LzBGMpnpoUx62kGw9veT4SbUJkCRto8thrDG3YbbVGzMQJtpUVflCxUbUQgZyOuFltpKMfwuY18N1dkRtzexPw==
   dependencies:
     "@salesforce/dev-config" "^1.4.4"
     "@salesforce/kit" "^1.0.4"
     "@salesforce/ts-types" "^1.1.1"
-    "@steedos/auth" "^1.6.5"
-    "@steedos/migrate" "^1.6.4"
-    "@steedos/objectql" "^1.6.4"
-    "@steedos/standard-objects" "^1.6.4"
+    "@steedos/auth" "^1.6.6"
+    "@steedos/migrate" "^1.6.6"
+    "@steedos/objectql" "^1.6.6"
+    "@steedos/standard-objects" "^1.6.6"
     "@types/express" "^4.16.1"
     "@types/mongodb" "^3.1.22"
     "@types/node" "^11.10.4"
@@ -317,10 +289,19 @@
     moment "^2.24.0"
     underscore "^1.9.1"
 
-"@steedos/migrate@^1.6.4":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@steedos/migrate/-/migrate-1.6.4.tgz#22e9f54af9995f5e59843e56ed3575390ef3c764"
-  integrity sha512-YbfhalyhzUXy97oyKflUXYWWcjz18G9klQX38ktEy5ezlmUq/1LaiKjOkMRJ4kEpPLHX2mGQgKHv7TBY3sPOUQ==
+"@steedos/filters@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/filters/-/filters-1.6.6.tgz#197662ad250811f01b70b76301d51b0d90f322c4"
+  integrity sha512-BO/rLpbDehNE7eN0JroeQSgZvU8Y/6CeCiJQkXWSflqwWON/ijpLUDyO/xUJGpA9cbQryMcPPdtpebfpZ+eJRQ==
+  dependencies:
+    devextreme "^18.2.6"
+    moment "^2.24.0"
+    underscore "^1.9.1"
+
+"@steedos/migrate@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/migrate/-/migrate-1.6.6.tgz#912bba739a4b934c428700f8f756e137b3977e90"
+  integrity sha512-oqfMktAJRvamvxiGJOREMuxWrepbGbiXG/uChNveQDdBbBlLlHZYXvGypftjvuaWoassoEvHguu00L5veynC6Q==
   dependencies:
     migrate "^1.6.2"
 
@@ -361,6 +342,43 @@
     typeorm "^0.2.16"
     underscore "1.5.2"
 
+"@steedos/objectql@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/objectql/-/objectql-1.6.6.tgz#318a59b4c1750b8f54830a66d651a71655ebe664"
+  integrity sha512-QHWgRuyl14GDzFG0YYKEqy2ohLi5epopN+mXW1xYnIi/yEafx+ePpQL/1lGK65tcqoqjh9NaAPbGTPIkkvmkqQ==
+  dependencies:
+    "@salesforce/dev-config" "^1.4.4"
+    "@salesforce/kit" "^1.0.4"
+    "@salesforce/ts-types" "^1.1.1"
+    "@steedos/filters" "^1.6.6"
+    "@steedos/odata-v4-typeorm" "^0.0.24"
+    "@steedos/schemas" "^1.6.6"
+    "@steedos/standard-objects" "^1.6.6"
+    "@types/express" "^4.16.1"
+    "@types/mongodb" "^3.1.22"
+    "@types/node" "^11.10.4"
+    "@types/underscore" "^1.8.13"
+    app-root-path "^2.2.1"
+    body-parser "^1.18.1"
+    bunyan-sfdx-no-dtrace "^1.8.2"
+    chai "^4.2.0"
+    clone "^2.1.2"
+    cookies "^0.6.1"
+    express "^4.15.4"
+    express-graphql "^0.7.1"
+    fibers "^3.1.1"
+    globby "^9.1.0"
+    graphql "^14.1.1"
+    graphql-type-json "^0.2.2"
+    jsen "^0.6.6"
+    mongodb "^3.0.8"
+    odata-v4-mongodb "^0.1.12"
+    odata-v4-sql "^0.1.2"
+    reflect-metadata "^0.1.10"
+    routing-controllers "^0.7.7"
+    typeorm "^0.2.16"
+    underscore "1.5.2"
+
 "@steedos/odata-v4-typeorm@^0.0.24":
   version "0.0.24"
   resolved "https://registry.yarnpkg.com/@steedos/odata-v4-typeorm/-/odata-v4-typeorm-0.0.24.tgz#da14a880e5ec2b52b91f2912939b812449988e8b"
@@ -374,15 +392,25 @@
   resolved "https://registry.yarnpkg.com/@steedos/schemas/-/schemas-1.6.5.tgz#cd457cab50622673cfb961d7b3edf7ca77ed8b20"
   integrity sha512-eLfcVNXNpw2u4qfdq+k4RT4yoICS1s4e2eePcjkoqV9LSvt5FRim+Q0KPC8zFqUlZy7KEv0BTWynshPAVOpi6w==
 
+"@steedos/schemas@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/schemas/-/schemas-1.6.6.tgz#08fd5aa62a7fd34613054c1f80e4ee235d36bffb"
+  integrity sha512-9TW6IgpAql9ugMEOJ5WMu5ftdi82wk12ptNizEY4S9aA8CmAaMacWqgUBmdWLk/qKN2H8BZDPJlwg+Kw//Orjg==
+
 "@steedos/standard-objects@^1.6.4":
   version "1.6.5"
   resolved "https://registry.yarnpkg.com/@steedos/standard-objects/-/standard-objects-1.6.5.tgz#cee43b02352fe27cad45c4dae78057badd5f0335"
   integrity sha512-yT4PDkOfOuH5mfgtSXKa4UMaAlW5MNVsLXIQZudxCvp+8a9m/M9LxgJNv2+t3lzEhoJPq/tNkqCzalUN2Rn2Rw==
 
-"@steedos/steedos-plugin-workflow@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@steedos/steedos-plugin-workflow/-/steedos-plugin-workflow-1.0.4.tgz#c58ea9fe6ef675ed382a03413002002a9fe32723"
-  integrity sha512-JhcSPEbZUORZkSYZQfxn88emVXahe34sqoxRjxSAwapOuwbGxUfvaCh4BhK6L0PRX7c2o7kseKeOqVdYsFw2fw==
+"@steedos/standard-objects@^1.6.6":
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/@steedos/standard-objects/-/standard-objects-1.6.6.tgz#d57477339aa062cebfdc923273c1fdf0f279c6db"
+  integrity sha512-PI/8vmNo49Z8Llk3or7HX9FMVpiiMnPlwBuTwc78bD27NAl9GAsj2zM72LfQfUYb+WNeZCRg8UzHnqObfjvvgA==
+
+"@steedos/steedos-plugin-workflow@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@steedos/steedos-plugin-workflow/-/steedos-plugin-workflow-1.0.6.tgz#f62bbb6e0f20c75d0e2df0bd15d036ba9ce534f9"
+  integrity sha512-hL1V33ziKZj+CwBKv8/hd9BIhsRzzrSAZjH3EVjmi/YGff4vAEytCOPeAEHqq2Sgtm3MgDf5aA+TaNh4nBQvWw==
   dependencies:
     body-parser "^1.19.0"
     express "^4.17.1"
@@ -469,17 +497,17 @@
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
 
 "@types/mongodb@^3.1.22":
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.3.1.tgz#9569ffcb356fbb5313ae2d3afa88c230bf8cf0d1"
-  integrity sha512-Va7o1fN3zeabmIJSQ6yuAWkqPvrT38HSTIi4YbVOb2UL7FJ4diXrWt+OUuuEFWAVPtF9VZV5h+7LDYdzgXWgQA==
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.3.3.tgz#749ce52f1d958601dcc4cea3e2839a734c2723e2"
+  integrity sha512-ymI6OZB4kqaSgLDFn7PYGNC+BmwbKPuw88F+gr9SGyAltcSKI6nYf+rj8hrHEsypnjtT5rA+dnmjXdPSgXgSgQ==
   dependencies:
     "@types/bson" "*"
     "@types/node" "*"
 
 "@types/node@*":
-  version "12.7.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.5.tgz#e19436e7f8e9b4601005d73673b6dc4784ffcc2f"
-  integrity sha512-9fq4jZVhPNW8r+UYKnxF1e2HkDWOWKM5bC2/7c9wPV835I0aOrVbS/Hw/pWPk2uKrNXQqg9Z959Kz+IYDd5p3w==
+  version "12.7.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.8.tgz#cb1bf6800238898bc2ff6ffa5702c3cadd350708"
+  integrity sha512-FMdVn84tJJdV+xe+53sYiZS4R5yn1mAIxfj+DVoNiQjTYz1+OYmjwEZr1ev9nU0axXwda0QDbYl06QHanRVH3A==
 
 "@types/node@^10.1.0":
   version "10.14.17"
@@ -487,9 +515,9 @@
   integrity sha512-p/sGgiPaathCfOtqu2fx5Mu1bcjuP8ALFg4xpGgNkcin7LwRyzUKniEHBKdcE1RPsenq5JVPIpMTJSygLboygQ==
 
 "@types/node@^11.10.4":
-  version "11.13.20"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.13.20.tgz#da42fe93d6599f80b35ffeb5006f4c31f40d89ea"
-  integrity sha512-JE0UpLWZTV1sGcaj0hN+Q0760OEjpgyFJ06DOMVW6qKBducKdJQaIw0TGL6ccj7VXRduIOHLWQi+tHwulZJHVQ==
+  version "11.13.21"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.13.21.tgz#afcf913437eeb1f9e1994a62a03b1762ee4600d3"
+  integrity sha512-fLwcSjMmDnjfk4FP7/QDiNzXSCEOGNvEe9eA6vaITmC784+Gm70wF7woaFQxUb2CpMjgLBhSPyhH0oIe1JS2uw==
 
 "@types/node@^8.0.7":
   version "8.10.54"
@@ -515,9 +543,9 @@
   integrity sha512-h8KW3wSd3/l4oKRGYPxExCaos5VmjcnwDG3RK25tfcoWQR9iLmM9UbwvF1Pd+UT5aY1Z3LdQGt4xU0u9Zk/C2Q==
 
 "@types/underscore@^1.8.13":
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.9.2.tgz#2c4f7743287218f5c2d9a83db3806672aa48530d"
-  integrity sha512-KgOKTAD+9X+qvZnB5S1+onqKc4E+PZ+T6CM/NA5ohRPLHJXb+yCJMVf8pWOnvuBuKFNUAJW8N97IA6lba6mZGg==
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.9.3.tgz#d7d9dc5a5ff76fa3d001b29bc7cc95ab0ccfe85e"
+  integrity sha512-SwbHKB2DPIDlvYqtK5O+0LFtZAyrUSw4c0q+HWwmH1Ve3KMQ0/5PlV3RX97+3dP7yMrnNQ8/bCWWvQpPl03Mug==
 
 abab@^2.0.0:
   version "2.0.1"
@@ -3263,9 +3291,9 @@ graphql-type-json@^0.2.2:
   integrity sha512-/tq02ayMQjrG4oDFDRLLrPk0KvJXue0nVXoItBe7uAdbNXjQUu+HYCBdAmPLQoseVzUKKMzrhq2P/sfI76ON6w==
 
 graphql@^14.1.1:
-  version "14.5.6"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.5.6.tgz#3fa12173b50e6ccdef953c31c82f37c50ef58bec"
-  integrity sha512-zJ6Oz8P1yptV4O4DYXdArSwvmirPetDOBnGFRBl0zQEC68vNW3Ny8qo8VzMgfr+iC8PKiRYJ+f2wub41oDCoQg==
+  version "14.5.8"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.5.8.tgz#504f3d3114cb9a0a3f359bbbcf38d9e5bf6a6b3c"
+  integrity sha512-MMwmi0zlVLQKLdGiMfWkgQD7dY/TUKt4L+zgJ/aR0Howebod3aNgP5JkgvAULiR2HPVZaP2VEElqtdidHweLkg==
   dependencies:
     iterall "^1.2.2"
 
