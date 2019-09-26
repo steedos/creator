@@ -10,6 +10,10 @@ Package.onUse(function(api) {
 	api.versionsFrom('METEOR@1.3');
 	api.use('templating@1.2.15');
 	api.use('coffeescript@1.11.1_4');
+	api.use('webapp');
+	api.use('modules');
+
+	api.addFiles('server.js', 'server');
 
 	api.addFiles('client/styles/salesforce-lightning-design-system.css', 'client');
 
