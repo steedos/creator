@@ -34,7 +34,6 @@
 	<meta name="msapplication-config" content="/favicons/browserconfig.xml">
 	<meta property="twitter:image" content="/favicons/twitter.png">
 	<meta property="og:image" content="/favicons/open-graph.png">
-	<link rel="stylesheet" type="text/css" href="/assets/styles/salesforce-lightning-design-system.min.css">
 
 	<script type="text/javascript">
 		window.SC = window.SC || {
@@ -260,7 +259,7 @@
 </head>
 
 <body class="skin-blue-light fixed steedos sidebar-mini three-columns loading">
-
+	{{> preloadAssets}}
 	<section class="loadingOverlay keyboard">
 		<div class="loading-box">
 			<div class="spinner">
@@ -277,3 +276,7 @@
 	</section>
 
 </body>
+
+<template name="preloadAssets">
+	<link rel="stylesheet" type="text/css" href="{{absoluteUrl '/assets/styles/salesforce-lightning-design-system.min.css'}}">
+</template>
