@@ -27,7 +27,7 @@ WebApp.rawConnectHandlers.use (req, res, next) ->
 		req._body = true
 		next()
 
-WebApp.rawConnectHandlers.use(cors({origin: true}));
+WebApp.rawConnectHandlers.use(cors({origin: true, credentials: true}));
 
 WebApp.rawConnectHandlers.use (req, res, next) ->
 	#if /^\/(api|_timesync|sockjs|tap-i18n)(\/|$)/.test req.url
