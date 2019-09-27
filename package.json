@@ -69,7 +69,6 @@
     "odata-v4-parser": "^0.1.29",
     "odata-v4-service-document": "0.0.3",
     "odata-v4-service-metadata": "^0.1.6",
-    "parsejson": "0.0.3",
     "phone": "^1.0.12",
     "qs": "^6.6.0",
     "querystring": "^0.2.0",
@@ -104,5 +103,12 @@
     "simplemde": "^1.11.2",
     "summernote": "^0.8.11",
     "xlsx": "0.10.6"
+  },
+  "resolutions": {
+    "**/lodash": "^4.17.15",
+    "**/handlebars": "^4.3.0",
+    "**/debug": "^3.1.0",
+    "**/hoek": "^5.0.3",
+    "**/cryptiles": "^4.1.2"
   }
 }
