@@ -12,7 +12,7 @@ Template.preloadAssets.helpers({
 });
 
 Meteor.startup(function(){
-    if (Steedos.isMobile() && Meteor.settings.public && Meteor.settings.public.mobile && Meteor.settings.public.mobile.enabled == false) {
+    if (Steedos.isMobile() && Meteor.settings.public && Meteor.settings.public.tenant && Meteor.settings.public.tenant.enable_mobile == false) {
         $('head meta[name=viewport]').remove();
         $('head').append('<meta name="viewport" content="">');
     }
