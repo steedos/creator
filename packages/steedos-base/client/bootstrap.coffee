@@ -66,7 +66,11 @@ Setup.validate = (onSuccess)->
 			if (data.spaceId != Session.get("spaceId"))
 				Steedos.setSpaceId(data.spaceId)
 
-		Creator.USER_CONTEXT = data
+		Creator.USER_CONTEXT = {
+			spaceId: data.spaceId,
+			userId: data.userId,
+			user: data
+		}
 
 		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
 			if FlowRouter.current()?.queryParams?.redirect
