@@ -21,10 +21,6 @@ Meteor.methods
 
 		Accounts.setPassword(user_id, password, {logout: true})
 
-		db.users.update {
-			_id: user_id
-		}, $set: "services.resume": {loginTokens:[]}
-
 		# 如果用户手机号通过验证，就发短信提醒
 		if userCP.mobile
 			lang = 'en'
