@@ -13,6 +13,14 @@ getElementData = ($element)->
 	if $element && $element.length > 0
 		return $element[0].odata
 
+valOutformat = (val)->
+	if val
+		_.each _.keys(val), (key)->
+			if key.indexOf('.') > -1 || key.startsWith('$')
+				delete val[key]
+	return val || {}
+
+
 @SelectizeManager =
 	formatLabel: (code, data, formula)->
 		formula = '{_formatLabel} = ' +  formula
@@ -22,11 +30,13 @@ getElementData = ($element)->
 			item['@label'] = label
 		return data;
 	valueOutformat: (val)->
-		if val
-			_.each _.keys(val), (key)->
-				if key.indexOf('.') > -1 || key.startsWith('$')
-					delete val[key]
-		return val || {}
+		vals = []
+		if _.isArray(val)
+			_.each val, (item)->
+				vals.push valOutformat(item)
+			return vals
+		else
+			return valOutformat(val)
 	getCreatorService: (data)->
 		return data.url || Meteor.settings.public?.webservices?.creator?.url
 	getService: (data)->
