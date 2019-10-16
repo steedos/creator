@@ -17,8 +17,6 @@ Meteor.startup ->
 
         handle = query.observeChanges(added: (id, notification) ->
             console.log(notification)
-            if !notification?.title && !notification?.text
-                return
 
             # 非主窗口不弹推送消息
             if (window.opener)
@@ -47,7 +45,8 @@ Meteor.startup ->
                 if notification.payload.instance
                     options.tag = "/workflow/space/" + notification.payload.space + "/inbox/" + notification.payload.instance
             
-            Steedos.Push.create(options.title, options);
+            if options.title
+                Steedos.Push.create(options.title, options);
 
             if Steedos.isNode()
                 # 新版客户端
