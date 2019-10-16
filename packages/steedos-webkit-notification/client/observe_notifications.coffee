@@ -16,110 +16,47 @@ Meteor.startup ->
         Steedos.Push.Permission.request();
 
         handle = query.observeChanges(added: (id, notification) ->
+            console.log(notification)
             if !notification?.title && !notification?.text
                 return
 
+            # 非主窗口不弹推送消息
+            if (window.opener)
+                return;
+            
             options = 
                 iconUrl: ''
                 title: notification.title
                 body: notification.text
                 timeout: 15 * 1000
+                onClick: (event) ->
+                    console.log(event)
+                    if (event.target.tag)
+                        FlowRouter.go(event.target.tag)
+                    window.focus();
+                    this.close();
+                    return;
 
             if notification.payload
 
-                options.payload = notification.payload
+                if notification.payload.requireInteraction
+                    options.requireInteraction = payload.requireInteraction
 
-                if options.payload.requireInteraction
-                    options.requireInteraction = options.payload.requireInteraction
-
-                options.onClick = (event) ->
-
-                    if event.target.payload.app == "calendar"
-                        event_url = "/calendar/inbox"
-                        if Steedos.isNode() 
-                            win = nw.Window.get();
-                            if win
-                                win.restore();
-                                win.focus();
-                            Steedos.openWindow(event_url,"_self");    
-                        else
-                            Steedos.openWindow(event_url,"_self"); 
-                    else if event.target.payload.app == "sogo"
-                        uid = event.target.payload["imap-uid"]
-                        sogo_url = "/sogo?uid="
-                        if uid
-                            sogo_url += uid
-                        if Steedos.isNode() 
-                            win = nw.Window.get();
-                            if win
-                                win.restore();
-                                win.focus();
-                            FlowRouter.go(sogo_url); 
-                        else
-                            FlowRouter.go(sogo_url); 
-                    else
-                        # box = event.target.payload.box || "inbox"
-                        # inbox、outbox、draft、pending、completed、monitor
-
-                        instanceId = event.target.payload.instance
-
-                        Meteor.call "calculateBox", instanceId , 
-                            (error, result) ->
-                                if error
-                                    console.log error
-                                else
-                                    box = result
-
-                                    instance_url = "/workflow/space/" + event.target.payload.space + "/" + box + "/" + event.target.payload.instance
-                                
-                                    if Steedos.isNode()
-                                        win = nw.Window.get();
-                                        if win
-                                            win.restore();
-                                            win.focus();
-                                        
-                                        # 正在编辑时点击推送提示
-                                        if InstanceManager.isAttachLocked Session.get("instanceId"), Meteor.userId()
-                                            swal({
-                                                title: t("steedos_desktop_edit_office_info"),
-                                                confirmButtonText: t("node_office_confirm")
-                                            })
-                                        else
-                                            FlowRouter.go(instance_url);  
-                                    else
-                                        FlowRouter.go(instance_url); 
-                                        # window.open(instance_url);
-
-                    # if window.cos && typeof(window.cos) == 'object'
-                    #     if window.cos.win_focus && typeof(window.cos.win_focus) == 'function'
-                    #         window.cos.win_focus();
-                    #     FlowRouter.go(instance_url);
-                    # else
-                    #     window.open(instance_url);
-
-           
-            if Push.debug
-                console.log(options)
-
-            # 客户端非主窗口不弹推送消息
-            if (Steedos.isNode() && window.opener)
-                return;
+                if notification.payload.app == "calendar"
+                    options.tag = "/calendar/inbox"
+                if notification.payload.instance
+                    options.tag = "/workflow/space/" + notification.payload.space + "/inbox/" + notification.payload.instance
             
-            # notification = $.notification(options)
+            Steedos.Push.create(options.title, options);
 
-            # # add sound
-            # msg = new Audio("/sound/notification.mp3")
-            # msg.play();
-            Steedos.Push.create(options.title, {
-                body: options.body,
-                icon: options.iconUrl,
-                timeout: options.timeout,
-                onClick: options.onClick
-            });
-
-            # 任务栏高亮显示
-            # if Steedos.isNode()
-            #     nw.Window.get().requestAttention(3);
+            if Steedos.isNode()
+                # 新版客户端
+                if (nw.ipcRenderer)
+                    if notification.badge != undefined
+                        nw.ipcRenderer.sendToHost('onBadgeChange', false, 0, notification.badge, false, false)
+                else
+                    # 任务栏高亮显示
+                    nw.Window.get().requestAttention(3);
 
             return;
         )
