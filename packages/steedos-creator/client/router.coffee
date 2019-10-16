@@ -23,23 +23,24 @@ subscribe_object_listviews = (context, redirect)->
 		Creator.subs["Creator"]?.subscribe "object_listviews", context.params.object_name
 
 set_sessions = (context, redirect)->
-	app_id = FlowRouter.getParam("app_id")
+	app_id = context.params.app_id
 	if (app_id != "-")
 		Session.set("app_id", app_id)
 	Session.set("object_name", context.params.object_name)
 	Session.set("record_id", context.params.record_id)
 
 checkAppPermission = (context, redirect)->
-	Tracker.autorun (c)->
-		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-			c.stop()
-			app_id = context.params.app_id
-			if app_id == "admin"
-				return
-			apps = _.pluck(Creator.getVisibleApps(true),"_id")
-			if apps.indexOf(app_id) < 0
-				Session.set("app_id", null)
-				FlowRouter.go "/app"
+	return
+	# Tracker.autorun (c)->
+	# 	if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+	# 		c.stop()
+	# 		app_id = context.params.app_id
+	# 		if app_id == "admin"
+	# 			return
+	# 		apps = _.pluck(Creator.getVisibleApps(true),"_id")
+	# 		if apps.indexOf(app_id) < 0
+	# 			Session.set("app_id", null)
+	# 			FlowRouter.go "/app"
 
 checkObjectPermission = (context, redirect)->
 	Tracker.autorun (c)->
@@ -126,9 +127,9 @@ FlowRouter.route '/app/:app_id/reports/view/:record_id',
 		app_id = FlowRouter.getParam("app_id")
 		record_id = FlowRouter.getParam("record_id")
 		object_name = FlowRouter.getParam("object_name")
-		data = {app_id: app_id, record_id: record_id, object_name: object_name}
 		if (app_id != "-")
 			Session.set("app_id", app_id)
+		data = {app_id: Session.get("app_id"), record_id: record_id, object_name: object_name}
 		Session.set("object_name", "reports")
 		Session.set("record_id", record_id)
 		BlazeLayout.render Creator.getLayout(),
@@ -176,7 +177,7 @@ objectRoutes = FlowRouter.group
 
 objectRoutes.route '/:record_id/:related_object_name/grid',
 	action: (params, queryParams)->
-		app_id = FlowRouter.getParam("app_id")
+		app_id = Session.get("app_id")
 		object_name = FlowRouter.getParam("object_name")
 		record_id = FlowRouter.getParam("record_id")
 		related_object_name = FlowRouter.getParam("related_object_name")
