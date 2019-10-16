@@ -352,7 +352,7 @@ Creator.formatFiltersToDev = (filters, object_name, options)->
 			logicTempFilters.push("or")
 		logicTempFilters.pop()
 		filters = logicTempFilters
-	selector = steedosFilters.formatFiltersToDev(filters, Creator.USER_CONTEXT?.user)
+	selector = steedosFilters.formatFiltersToDev(filters, Creator.USER_CONTEXT)
 	return selector
 
 ###
