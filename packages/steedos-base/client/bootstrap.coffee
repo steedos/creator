@@ -126,8 +126,17 @@ Meteor.startup ->
 
 		if !Setup.lastSpaceId or (Setup.lastSpaceId != Session.get("spaceId"))
 			Setup.validate()
-	return
+		return
 
+	if (localStorage.getItem("app_id") && !Session.get("app_id"))
+		Session.set("app_id", localStorage.getItem("app_id"));
+
+	Tracker.autorun (c)->
+		#console.log("app_id change: " + Session.get("app_id"))
+		localStorage.setItem("app_id", Session.get("app_id"))
+		return
+
+	return
 
 Creator.bootstrapLoaded = new ReactiveVar(false)
 
@@ -211,10 +220,12 @@ Setup.bootstrap = (spaceId, callback)->
 			
 			Creator.Menus = result.assigned_menus
 
-			if (!Session.get("app_id"))
-				apps = Creator.getVisibleApps(true)
-				Session.set("app_id", apps[0]?._id)
+			appIds = _.pluck(Creator.getVisibleApps(true), "_id")
+			if (appIds && appIds.length>0)
+				if (!Session.get("app_id") || appIds.indexOf(Session.get("app_id"))<0)
+					Session.set("app_id", appIds[0])
 				
+
 			if _.isFunction(callback)
 				callback()
 
