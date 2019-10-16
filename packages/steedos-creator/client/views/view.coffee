@@ -202,7 +202,10 @@ Template.creator_view.helpers
 			else
 				return false
 
-		fields = Creator.getFieldsForReorder(schema, schemaFieldKeys)
+		fields = Creator.getFieldsForReorder(schema._schema, schemaFieldKeys)
+		console.log(schema)
+		console.log(schemaFieldKeys)
+		console.log(fields)
 		return {
 			name: name
 			fields: fields
