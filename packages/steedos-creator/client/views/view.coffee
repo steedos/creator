@@ -450,7 +450,7 @@ Template.creator_view.helpers
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
 	show_chatter: ()->
-		return Template.instance().recordLoad.get() && Creator.getObjectRecord()
+		return Creator.getObjectRecord()
 
 	agreement: ()->
 		return Template.instance().agreement.get()
