@@ -102,6 +102,7 @@
     "dotenv-flow": "^3.1.0",
     "jquery": "^2.2.4",
     "jquery-ui-sortable": "^1.0.0",
+    "push.js": "^1.0.12",
     "simplemde": "1.11.2",
     "summernote": "^0.8.11",
     "xlsx": "0.10.6"

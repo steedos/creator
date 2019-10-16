@@ -6,13 +6,14 @@ Tracker.autorun (c)->
 
 Meteor.startup ->
     if !Steedos.isMobile()
+        Steedos.Push = require("push.js");
         
         if Push.debug
             console.log("init notification observeChanges")
 
         query = db.raix_push_notifications.find();
         #发起获取发送通知权限请求
-        $.notification.requestPermission ->
+        Steedos.Push.Permission.request();
 
         handle = query.observeChanges(added: (id, notification) ->
             if !notification?.title && !notification?.text
@@ -31,7 +32,7 @@ Meteor.startup ->
                 if options.payload.requireInteraction
                     options.requireInteraction = options.payload.requireInteraction
 
-                options.onclick = (event) ->
+                options.onClick = (event) ->
 
                     if event.target.payload.app == "calendar"
                         event_url = "/calendar/inbox"
@@ -96,31 +97,29 @@ Meteor.startup ->
                     # else
                     #     window.open(instance_url);
 
-            appName = "steedos"
-
-            if notification.from == 'workflow'
-                appName = notification.from
-            if notification?.payload?.app == 'calendar'
-                appName = 'calendar'
-
-            options.iconUrl = Meteor.absoluteUrl() + "images/apps/" + appName + "/AppIcon48x48.png"
-            
+           
             if Push.debug
                 console.log(options)
 
             # 客户端非主窗口不弹推送消息
-            if (Steedos.isNode() && window.opener.opener)
+            if (Steedos.isNode() && window.opener)
                 return;
             
-            notification = $.notification(options)
+            # notification = $.notification(options)
 
-            # add sound
-            msg = new Audio("/sound/notification.mp3")
-            msg.play();
+            # # add sound
+            # msg = new Audio("/sound/notification.mp3")
+            # msg.play();
+            Steedos.Push.create(options.title, {
+                body: options.body,
+                icon: options.iconUrl,
+                timeout: options.timeout,
+                onClick: options.onClick
+            });
 
             # 任务栏高亮显示
-            if Steedos.isNode()
-                nw.Window.get().requestAttention(3);
+            # if Steedos.isNode()
+            #     nw.Window.get().requestAttention(3);
 
             return;
         )
