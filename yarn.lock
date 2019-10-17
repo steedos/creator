@@ -280,6 +280,14 @@
     moment "^2.24.0"
     underscore "^1.9.1"
 
+"@steedos/filters@^1.7.4":
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/@steedos/filters/-/filters-1.7.5.tgz#5ba7d4226eecd3ea65122600d4194863695c5170"
+  integrity sha512-ButiSJK0CGqFnFCZXnzoIRTqF27bqLUgqSzoA6YapPSYcUf+C2OdJ7iyZ9n+1NCuX/NRmFitfVQYuLXaeuyeAQ==
+  dependencies:
+    moment "^2.24.0"
+    underscore "^1.9.1"
+
 "@steedos/migrate@^1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@steedos/migrate/-/migrate-1.7.0.tgz#312e138fb977ae66e435178494eae732f3fda0ed"
