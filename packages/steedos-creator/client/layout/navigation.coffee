@@ -22,8 +22,7 @@ Template.creatorNavigation.helpers
 			return "slds-is-active"
 
 	object_url: ()->
-		# return "/app/-/#{String(this)}"
-		return Creator.getObjectFirstListViewUrl(String(this), null)
+		return "/app/-/#{String(this)}"
 
 	spaces: ->
 		return db.spaces.find();
