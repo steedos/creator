@@ -77,6 +77,8 @@ Setup.validate = (onSuccess)->
 				document.location.href = FlowRouter.current().queryParams.redirect;
 				return
 
+		Setup.bootstrap(Session.get("spaceId"))
+
 		if onSuccess
 			onSuccess()
 	.fail ( e ) ->
@@ -114,8 +116,6 @@ Meteor.startup ->
 		console.log("onLogin")
 		if Meteor.userId() != Setup.lastUserId
 			Setup.validate();
-		else
-			Setup.bootstrap(Session.get("spaceId"))
 
 		Tracker.autorun (c)->
 			# 登录后需要清除登录前订阅的space数据，以防止默认选中登录前浏览器url参数中的的工作区ID所指向的工作区
@@ -125,6 +125,9 @@ Meteor.startup ->
 				Steedos.subs["SpaceAvatar"]?.clear()
 			return
 		return
+
+	Accounts.onLogout ()->
+		Setup.lastUserId = null;
 
 	Tracker.autorun (c)->
 		if Setup.lastSpaceId && (Setup.lastSpaceId != Session.get("spaceId"))
@@ -145,6 +148,7 @@ Meteor.startup ->
 Creator.bootstrapLoaded = new ReactiveVar(false)
 
 Setup.bootstrap = (spaceId, callback)->
+	console.log("bootstrap")
 
 	unless spaceId and Meteor.userId()
 		return
@@ -234,7 +238,8 @@ Setup.bootstrap = (spaceId, callback)->
 				callback()
 
 			Creator.bootstrapLoaded.set(true)
-			FlowRouter.initialize();
+			if (!FlowRouter._initialized)
+				FlowRouter.initialize();
 
 FlowRouter.route '/steedos/logout',
 	action: (params, queryParams)->
