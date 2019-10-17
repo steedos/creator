@@ -1,3 +1,5 @@
+require('url-search-params-polyfill');
+
 getCookie = (name)->
 	pattern = RegExp(name + "=.[^;]*")
 	matched = document.cookie.match(pattern)
@@ -8,9 +10,6 @@ getCookie = (name)->
 
 @Setup = {}
 
-Setup.lastSpaceId = null;
-
-require('url-search-params-polyfill');
 
 FlowRouter.wait();
 
@@ -51,10 +50,6 @@ Setup.validate = (onSuccess)->
 		crossDomain: true
 		headers: headers
 	.done ( data ) ->
-		if !data
-			FlowRouter.initialize();
-			Steedos.redirectToSignIn()
-			return
 
 		if Meteor.userId() != data.userId
 			Accounts.connection.setUserId(data.userId);
@@ -66,6 +61,7 @@ Setup.validate = (onSuccess)->
 
 		if data.webservices
 			Steedos.settings.webservices = data.webservices
+		Setup.lastUserId = data.userId
 		if data.spaceId 
 			Setup.lastSpaceId = data.spaceId
 			if (data.spaceId != Session.get("spaceId"))
@@ -88,6 +84,7 @@ Setup.validate = (onSuccess)->
 			onSuccess()
 	.fail ( e ) ->
 		if (e.status == 401)
+			FlowRouter.initialize();
 			Steedos.redirectToSignIn()
 		return
 
@@ -115,8 +112,11 @@ Setup.logout = (callback) ->
 
 Meteor.startup ->
 
+	Setup.validate();
 	Accounts.onLogin ()->
-		Setup.validate();
+		console.log("onLogin")
+		if Meteor.userId() != Setup.lastUserId
+			Setup.validate();
 		Tracker.autorun (c)->
 			# 登录后需要清除登录前订阅的space数据，以防止默认选中登录前浏览器url参数中的的工作区ID所指向的工作区
 			# 而且可能登录后的用户不属性该SpaceAvatar中订阅的工作区，所以需要清除订阅，由之前的订阅来决定当前用户可以选择哪些工作区
@@ -127,9 +127,8 @@ Meteor.startup ->
 		return
 
 	Tracker.autorun (c)->
-		console.log("spaceId change: " + Session.get("spaceId"))
-
-		if !Setup.lastSpaceId or (Setup.lastSpaceId != Session.get("spaceId"))
+		if Setup.lastSpaceId && (Setup.lastSpaceId != Session.get("spaceId"))
+			console.log("spaceId change from " + Setup.lastSpaceId + " to " + Session.get("spaceId"))
 			Setup.validate()
 		return
 
