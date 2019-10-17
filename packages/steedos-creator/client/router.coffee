@@ -1,5 +1,6 @@
 @urlQuery = new Array()
 checkUserSigned = (context, redirect) ->
+	return
 	# listTreeCompany = localStorage.getItem("listTreeCompany")
 	# if listTreeCompany
 	# 	Session.set('listTreeCompany', listTreeCompany);
@@ -18,10 +19,6 @@ checkUserSigned = (context, redirect) ->
 	# if !Meteor.userId()
 	# 	Setup.validate();
 
-subscribe_object_listviews = (context, redirect)->
-	Tracker.autorun ()->
-		Creator.subs["Creator"]?.subscribe "object_listviews", context.params.object_name
-
 set_sessions = (context, redirect)->
 	app_id = context.params.app_id
 	if (app_id != "-")
@@ -30,28 +27,27 @@ set_sessions = (context, redirect)->
 	Session.set("record_id", context.params.record_id)
 
 checkAppPermission = (context, redirect)->
-	return
-	# Tracker.autorun (c)->
-	# 	if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-	# 		c.stop()
-	# 		app_id = context.params.app_id
-	# 		if app_id == "admin"
-	# 			return
-	# 		apps = _.pluck(Creator.getVisibleApps(true),"_id")
-	# 		if apps.indexOf(app_id) < 0
-	# 			Session.set("app_id", null)
-	# 			FlowRouter.go "/app"
+	console.log("checkAppPermission")
+	app_id = context.params.app_id
+	if app_id == "admin" || app_id == "-"
+		return
+	apps = _.pluck(Creator.getVisibleApps(true),"_id")
+	if apps.indexOf(app_id) < 0
+		console.log(app_id + " app access denied")
+		Session.set("app_id", Creator.getVisibleApps(true)[0]._id)
+		redirect "/"
 
 checkObjectPermission = (context, redirect)->
 	object_name = context.params.object_name
 	allowRead = Creator.getObject(object_name)?.permissions?.get()?.allowRead
 	unless allowRead
+		console.log(object_name + " object access denied")
 		Session.set("object_name", null)
-		FlowRouter.go "/app"
+		redirect "/"
 
 
 FlowRouter.route '/app',
-	triggersEnter: [ checkUserSigned],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_app_home"
@@ -144,20 +140,24 @@ FlowRouter.route '/app/:app_id/instances/grid/all',
 objectRoutes = FlowRouter.group
 	prefix: '/app/:app_id/:object_name',
 	name: 'objectRoutes',
-	triggersEnter: [checkUserSigned, checkObjectPermission, set_sessions]
+	triggersEnter: [checkUserSigned, checkAppPermission, checkObjectPermission, set_sessions]
 
 objectRoutes.route '/',
+	triggersEnter: [ 
+		# 自动跳转到对象的第一个视图
+		(context, redirect) -> 
+			object_name = context.params.object_name
+			list_view = Creator.getObjectFirstListView(object_name)
+			list_view_id = list_view?._id
+			app_id = context.params.app_id
+			if object_name == "meeting"
+				url = "/app/" + app_id + "/" + object_name + "/calendar/"
+			else
+				url = "/app/" + app_id + "/" + object_name + "/grid/" + list_view_id
+			redirect(url)
+	 ],
 	action: (params, queryParams)->
-		object_name = FlowRouter.getParam("object_name")
-		# 加Meteor.defer是因为如果不加浏览器上的url会显示为"/app/-/#{object_name}"，而不是显示为最终的url
-		list_view = Creator.getObjectFirstListView(object_name)
-		list_view_id = list_view?._id
-		app_id = FlowRouter.getParam("app_id")
-		if object_name is "meeting"
-			url = Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
-		else
-			url = Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
-		FlowRouter.go url
+		return
 
 #objectRoutes.route '/list/switch',
 #	action: (params, queryParams)->
@@ -211,8 +211,7 @@ objectRoutes.route '/view/:record_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: main
 
-FlowRouter.route '/app/:app_id/:object_name/grid/:list_view_id',
-	triggersEnter: [ checkUserSigned, checkObjectPermission ],
+objectRoutes.route '/grid/:list_view_id',
 	action: (params, queryParams)->
 		Session.set("record_id", null)
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
@@ -234,8 +233,7 @@ FlowRouter.route '/app/:app_id/:object_name/grid/:list_view_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_list_wrapper"
 
-FlowRouter.route '/app/:app_id/:object_name/calendar/',
-	triggersEnter: [ checkUserSigned, checkObjectPermission ],
+objectRoutes.route '/calendar/',
 	action: (params, queryParams)->
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
