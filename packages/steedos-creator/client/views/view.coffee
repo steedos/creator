@@ -44,7 +44,6 @@ loadRecordFromOdata = (template, object_name, record_id)->
 			return false
 	expand = _expandFields(object_name, _.keys(_fields))
 	record = Creator.odata.get(object_name, record_id, _keys.join(","), expand.join(","))
-	console.log(record)
 	template.record.set(record)
 
 
