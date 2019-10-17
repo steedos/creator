@@ -1,22 +1,22 @@
 @urlQuery = new Array()
-# checkUserSigned = (context, redirect) ->
-# 	# listTreeCompany = localStorage.getItem("listTreeCompany")
-# 	# if listTreeCompany
-# 	# 	Session.set('listTreeCompany', listTreeCompany);
-# 	# else
-# 	# 	# 从当前用户的space_users表中获取
-# 	# 	s_user = db.space_users.findOne()
-# 	# 	if s_user?.company
-# 	# 		localStorage.setItem("listTreeCompany", s_user?.company)
-# 	# 		Session.set('listTreeCompany', s_user?.company);
-# 	# 	else
-# 	# 		# Session.set('listTreeCompany', "-1");
-# 	# 		Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf");
-# 	# 统一设置此参数，待以后拆分
-# 	Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
+checkUserSigned = (context, redirect) ->
+	# listTreeCompany = localStorage.getItem("listTreeCompany")
+	# if listTreeCompany
+	# 	Session.set('listTreeCompany', listTreeCompany);
+	# else
+	# 	# 从当前用户的space_users表中获取
+	# 	s_user = db.space_users.findOne()
+	# 	if s_user?.company
+	# 		localStorage.setItem("listTreeCompany", s_user?.company)
+	# 		Session.set('listTreeCompany', s_user?.company);
+	# 	else
+	# 		# Session.set('listTreeCompany', "-1");
+	# 		Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf");
+	# 统一设置此参数，待以后拆分
+	# Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
 	
-# 	if !Meteor.userId()
-# 		Setup.validate();
+	# if !Meteor.userId()
+	# 	Setup.validate();
 
 subscribe_object_listviews = (context, redirect)->
 	Tracker.autorun ()->
@@ -43,30 +43,26 @@ checkAppPermission = (context, redirect)->
 	# 			FlowRouter.go "/app"
 
 checkObjectPermission = (context, redirect)->
-	# Tracker.autorun (c)->
-	# 	if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-	# 		c.stop()
-	# 		object_name = context.params.object_name
-	# 		allowRead = Creator.getObject(object_name)?.permissions?.get()?.allowRead
-	# 		unless allowRead
-	# 			Session.set("object_name", null)
-	# 			FlowRouter.go "/app"
+	object_name = context.params.object_name
+	allowRead = Creator.getObject(object_name)?.permissions?.get()?.allowRead
+	unless allowRead
+		Session.set("object_name", null)
+		FlowRouter.go "/app"
 
 
 FlowRouter.route '/app',
-	# triggersEnter: [ checkUserSigned],
+	triggersEnter: [ checkUserSigned],
 	action: (params, queryParams)->
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_app_home"
 
 FlowRouter.route '/app/menu',
-	# triggersEnter: [ checkUserSigned ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		return
 
 FlowRouter.route '/app/:app_id',
-	# triggersEnter: [ checkUserSigned, checkAppPermission ],
-	triggersEnter: [ checkAppPermission ],
+	triggersEnter: [ checkUserSigned, checkAppPermission ],
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		if (app_id != "-")
@@ -87,7 +83,7 @@ FlowRouter.route '/app/:app_id',
 	]
 
 FlowRouter.route '/user_settings',
-	# triggersEnter: [ checkUserSigned ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 			Session.set('headerTitle', '设置' )
 			Session.set("showBackHeader", true)
@@ -100,7 +96,7 @@ FlowRouter.route '/user_settings',
 
 
 FlowRouter.route '/user_settings/switchspace',
-	# triggersEnter: [ checkUserSigned ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 			Session.set('headerTitle', '选择工作区')
 			Session.set("showBackHeader", true)
@@ -112,7 +108,7 @@ FlowRouter.route '/user_settings/switchspace',
 	]
 
 FlowRouter.route '/app/:app_id/search/:search_text',
-	# triggersEnter: [ checkUserSigned ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		if (app_id != "-")
@@ -123,7 +119,7 @@ FlowRouter.route '/app/:app_id/search/:search_text',
 			main: "record_search_list"
 
 FlowRouter.route '/app/:app_id/reports/view/:record_id',
-	# triggersEnter: [ checkUserSigned ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
 		record_id = FlowRouter.getParam("record_id")
@@ -148,8 +144,14 @@ FlowRouter.route '/app/:app_id/instances/grid/all',
 objectRoutes = FlowRouter.group
 	prefix: '/app/:app_id/:object_name',
 	name: 'objectRoutes',
-	triggersEnter: [checkObjectPermission, set_sessions]
-	#triggersEnter: [checkUserSigned, checkObjectPermission, set_sessions]
+	triggersEnter: [checkUserSigned, checkObjectPermission, set_sessions]
+
+objectRoutes.route '/',
+	action: (params, queryParams)->
+		object_name = FlowRouter.getParam("object_name")
+		url = Creator.getObjectFirstListViewUrl(object_name)
+		if url
+			FlowRouter.go url
 
 #objectRoutes.route '/list/switch',
 #	action: (params, queryParams)->
@@ -203,15 +205,8 @@ objectRoutes.route '/view/:record_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: main
 
-objectRoutes.route '/',
-	action: (params, queryParams)->
-		object_name = FlowRouter.getParam("object_name")
-		url = Creator.getObjectFirstListViewUrl(object_name)
-		if url
-			FlowRouter.go url
-
-objectRoutes.route '/:template/:list_view_id',
-	#triggersEnter: [ checkUserSigned, checkObjectPermission ],
+FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
+	triggersEnter: [ checkUserSigned, checkObjectPermission ],
 	action: (params, queryParams)->
 		Session.set("record_id", null)
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
@@ -234,8 +229,7 @@ objectRoutes.route '/:template/:list_view_id',
 			main: "creator_list_wrapper"
 
 FlowRouter.route '/app/:app_id/:object_name/calendar/',
-	# triggersEnter: [ checkUserSigned, checkObjectPermission ],
-	triggersEnter: [ checkObjectPermission ],
+	triggersEnter: [ checkUserSigned, checkObjectPermission ],
 	action: (params, queryParams)->
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
@@ -253,7 +247,7 @@ FlowRouter.route '/app/:app_id/:object_name/calendar/',
 			main: "creator_calendar"
 
 FlowRouter.route '/app/admin/page/:template_name', 
-	# triggersEnter: [ checkUserSigned ],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		template_name = params?.template_name
 		if Meteor.userId()
