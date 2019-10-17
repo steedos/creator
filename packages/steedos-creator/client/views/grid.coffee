@@ -945,7 +945,8 @@ Template.creator_grid.refresh = (dxDataGridInstance)->
 Template.creator_grid.onDestroyed ->
 	is_related = this.data.is_related
 	if !is_related && this.list_view_id == Session.get("list_view_id")
-		paging = this.dxDataGridInstance.option().paging
-		paging.object_name = this.data.object_name
-		paging.list_view_id = this.list_view_id
-		Session.set("grid_paging", paging)
+		paging = this.dxDataGridInstance?.option().paging
+		if paging
+			paging.object_name = this.data.object_name
+			paging.list_view_id = this.list_view_id
+			Session.set("grid_paging", paging)

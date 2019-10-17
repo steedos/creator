@@ -12,6 +12,8 @@ Setup.lastSpaceId = null;
 
 require('url-search-params-polyfill');
 
+FlowRouter.wait();
+
 Setup.validate = (onSuccess)->
 	console.log("Validating user...")
 	searchParams = new URLSearchParams(window.location.search);
@@ -50,14 +52,17 @@ Setup.validate = (onSuccess)->
 		headers: headers
 	.done ( data ) ->
 		if !data
+			FlowRouter.initialize();
 			Steedos.redirectToSignIn()
+			return
 
 		if Meteor.userId() != data.userId
 			Accounts.connection.setUserId(data.userId);
 			Accounts.loginWithToken data.authToken, (err) ->
 				if (err)
 					Meteor._debug("Error logging in with token: " + err);
-					FlowRouter.go("/steedos/logout");
+					document.location.href = Steedos.absoluteUrl("/steedos/logout");
+					return
 
 		if data.webservices
 			Steedos.settings.webservices = data.webservices
@@ -74,16 +79,16 @@ Setup.validate = (onSuccess)->
 
 		if FlowRouter.current()?.context?.pathname == "/steedos/sign-in"
 			if FlowRouter.current()?.queryParams?.redirect
-				FlowRouter.go FlowRouter.current().queryParams.redirect
-			else
-				FlowRouter.go "/"
+				document.location.href = FlowRouter.current().queryParams.redirect;
+				return
 
 		Setup.bootstrap(Session.get("spaceId"))
 
 		if onSuccess
 			onSuccess()
 	.fail ( e ) ->
-		FlowRouter.go("/steedos/logout");
+		#Steedos.redirectToSignIn()
+		return
 
 Setup.clearAuthLocalStorage = ()->
 	localStorage = window.localStorage;
@@ -120,11 +125,6 @@ Meteor.startup ->
 			return
 		return
 
-	Accounts.onLogout ()->
-		Creator.bootstrapLoaded.set(false)
-		Steedos.redirectToSignIn()
-		return
-
 	Tracker.autorun (c)->
 		console.log("spaceId change: " + Session.get("spaceId"))
 
@@ -159,6 +159,7 @@ Setup.bootstrap = (spaceId, callback)->
 			request.setRequestHeader('X-User-Id', Meteor.userId())
 			request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
 		error: (jqXHR, textStatus, errorThrown) ->
+				FlowRouter.initialize();
 				error = jqXHR.responseJSON
 				console.error error
 				if error?.reason
@@ -234,6 +235,7 @@ Setup.bootstrap = (spaceId, callback)->
 				callback()
 
 			Creator.bootstrapLoaded.set(true)
+			FlowRouter.initialize();
 
 FlowRouter.route '/steedos/logout',
 	action: (params, queryParams)->
@@ -241,5 +243,6 @@ FlowRouter.route '/steedos/logout',
 		$("body").addClass('loading')
 		Meteor.logout ()->
 			Setup.logout ()-> 
+				Creator.bootstrapLoaded.set(false)
 				$("body").removeClass('loading')
 				Steedos.redirectToSignIn()
