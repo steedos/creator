@@ -184,7 +184,6 @@ valOutformat = (val)->
 				request.setRequestHeader('X-Auth-Token', Accounts._storedLoginToken())
 				request.setRequestHeader('X-Space-Id', Steedos.spaceId())
 			success: (data) ->
-				console.log('data', data);
 				result = SelectizeManager.formatLabel(options.code, data.value, options.formula);
 				if _.isEmpty($element[0].selectize.getValue())
 					$element[0].selectize.clearOptions()

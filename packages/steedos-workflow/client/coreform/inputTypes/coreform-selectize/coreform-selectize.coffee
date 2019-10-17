@@ -1,4 +1,6 @@
 getSelected = (tag)->
+	if !tag[0].selectize
+		return ;
 	if tag[0].selectize.settings.maxItems == 1
 		return tag[0].selectize?.options[tag.val()]
 	else
