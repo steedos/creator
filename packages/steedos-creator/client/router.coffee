@@ -201,6 +201,15 @@ objectRoutes.route '/view/:record_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: main
 
+objectRoutes.route '/',
+	action: (params, queryParams)->
+		object_name = FlowRouter.getParam("object_name")
+		Tracker.autorun (c)->
+			if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+				url = Creator.getObjectFirstListViewUrl(object_name)
+				if url
+					FlowRouter.go url
+
 FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 	triggersEnter: [ checkUserSigned, checkObjectPermission ],
 	action: (params, queryParams)->
