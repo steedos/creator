@@ -10,7 +10,7 @@ getCookie = (name)->
 
 @Setup = {}
 
-
+Blaze._allowJavascriptUrls() 
 FlowRouter.wait();
 
 Setup.validate = (onSuccess)->

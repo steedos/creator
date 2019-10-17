@@ -44,12 +44,13 @@ loadRecordFromOdata = (template, object_name, record_id)->
 			return false
 	expand = _expandFields(object_name, _.keys(_fields))
 	record = Creator.odata.get(object_name, record_id, _keys.join(","), expand.join(","))
+	console.log(record)
 	template.record.set(record)
 
 
 Template.creator_view.onCreated ->
 	this.recordsTotal = new ReactiveVar({})
-	this.recordLoad = new ReactiveVar(false)
+	# this.recordLoad = new ReactiveVar(false)
 	this.record = new ReactiveVar()
 	this.agreement = new ReactiveVar()
 	object_name = Session.get "object_name"
@@ -137,17 +138,18 @@ Template.creator_view.onRendered ->
 			$(".creator-view-tabs-content").removeClass("slds-show").addClass("slds-hide")
 			$("#creator-quick-form").addClass("slds-show")
 
-	if Steedos.isMobile()
-		this.autorun ->
-			loadRecord()
-	else
-		this.autorun ->
-			if Session.get("record_id")
-				Tracker.nonreactive(loadRecord)
+	loadRecord()
+	# if Steedos.isMobile()
+	# 	this.autorun ->
+	# 		loadRecord()
+	# else
+	# 	this.autorun ->
+	# 		if Session.get("record_id")
+	# 			Tracker.nonreactive(loadRecord)
 
-	this.autorun ->
-		if Creator.subs["Creator"].ready()
-			Template.instance().recordLoad.set(true)
+	# this.autorun ->
+	# 	if Creator.subs["Creator"].ready()
+	# 		Template.instance().recordLoad.set(true)
 
 	Meteor.defer ()->
 		addFieldInfo(self)

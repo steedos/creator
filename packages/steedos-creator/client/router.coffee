@@ -149,16 +149,16 @@ objectRoutes = FlowRouter.group
 objectRoutes.route '/',
 	action: (params, queryParams)->
 		object_name = FlowRouter.getParam("object_name")
-		# 加Meteor.defer是因为如果不加浏览器上的url会显示为"/app/-/#{object_name}"，而不是显示为最终的url
-		Meteor.defer ->
-			list_view = Creator.getObjectFirstListView(object_name)
-			list_view_id = list_view?._id
-			app_id = Session.get("app_id")
-			if object_name is "meeting"
-				url = Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
-			else
-				url = Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
-			FlowRouter.go url
+		# # 加Meteor.defer是因为如果不加浏览器上的url会显示为"/app/-/#{object_name}"，而不是显示为最终的url
+		# Meteor.defer ->
+		# 	list_view = Creator.getObjectFirstListView(object_name)
+		# 	list_view_id = list_view?._id
+		# 	app_id = Session.get("app_id")
+		# 	if object_name is "meeting"
+		# 		url = Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
+		# 	else
+		# 		url = Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
+		# 	FlowRouter.go url
 
 #objectRoutes.route '/list/switch',
 #	action: (params, queryParams)->
