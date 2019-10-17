@@ -50,7 +50,6 @@ Setup.validate = (onSuccess)->
 		crossDomain: true
 		headers: headers
 	.done ( data ) ->
-
 		if Meteor.userId() != data.userId
 			Accounts.connection.setUserId(data.userId);
 			Accounts.loginWithToken data.authToken, (err) ->
@@ -77,8 +76,6 @@ Setup.validate = (onSuccess)->
 			if FlowRouter.current()?.queryParams?.redirect
 				document.location.href = FlowRouter.current().queryParams.redirect;
 				return
-
-		Setup.bootstrap(Session.get("spaceId"))
 
 		if onSuccess
 			onSuccess()
@@ -117,6 +114,9 @@ Meteor.startup ->
 		console.log("onLogin")
 		if Meteor.userId() != Setup.lastUserId
 			Setup.validate();
+		else
+			Setup.bootstrap(Session.get("spaceId"))
+
 		Tracker.autorun (c)->
 			# 登录后需要清除登录前订阅的space数据，以防止默认选中登录前浏览器url参数中的的工作区ID所指向的工作区
 			# 而且可能登录后的用户不属性该SpaceAvatar中订阅的工作区，所以需要清除订阅，由之前的订阅来决定当前用户可以选择哪些工作区
@@ -145,8 +145,7 @@ Meteor.startup ->
 Creator.bootstrapLoaded = new ReactiveVar(false)
 
 Setup.bootstrap = (spaceId, callback)->
-	if Meteor.loggingIn() || Meteor.loggingOut()
-		return
+
 	unless spaceId and Meteor.userId()
 		return
 	url = Steedos.absoluteUrl "/api/bootstrap/#{spaceId}"
