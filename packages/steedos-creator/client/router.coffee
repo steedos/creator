@@ -27,7 +27,6 @@ set_sessions = (context, redirect)->
 	Session.set("record_id", context.params.record_id)
 
 checkAppPermission = (context, redirect)->
-	console.log("checkAppPermission")
 	app_id = context.params.app_id
 	if app_id == "admin" || app_id == "-"
 		return
