@@ -202,7 +202,10 @@ Template.creator_view.helpers
 			else
 				return false
 
-		fields = Creator.getFieldsForReorder(schema, schemaFieldKeys)
+		fields = Creator.getFieldsForReorder(schema._schema, schemaFieldKeys)
+		console.log(schema)
+		console.log(schemaFieldKeys)
+		console.log(fields)
 		return {
 			name: name
 			fields: fields
@@ -450,7 +453,7 @@ Template.creator_view.helpers
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
 
 	show_chatter: ()->
-		return Template.instance().recordLoad.get() && Creator.getObjectRecord()
+		return Creator.getObjectRecord()
 
 	agreement: ()->
 		return Template.instance().agreement.get()

@@ -23,21 +23,24 @@ subscribe_object_listviews = (context, redirect)->
 		Creator.subs["Creator"]?.subscribe "object_listviews", context.params.object_name
 
 set_sessions = (context, redirect)->
-	Session.set("app_id", context.params.app_id)
+	app_id = context.params.app_id
+	if (app_id != "-")
+		Session.set("app_id", app_id)
 	Session.set("object_name", context.params.object_name)
 	Session.set("record_id", context.params.record_id)
 
 checkAppPermission = (context, redirect)->
-	Tracker.autorun (c)->
-		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-			c.stop()
-			app_id = context.params.app_id
-			if app_id == "admin"
-				return
-			apps = _.pluck(Creator.getVisibleApps(true),"_id")
-			if apps.indexOf(app_id) < 0
-				Session.set("app_id", null)
-				FlowRouter.go "/app"
+	return
+	# Tracker.autorun (c)->
+	# 	if Creator.bootstrapLoaded.get() and Session.get("spaceId")
+	# 		c.stop()
+	# 		app_id = context.params.app_id
+	# 		if app_id == "admin"
+	# 			return
+	# 		apps = _.pluck(Creator.getVisibleApps(true),"_id")
+	# 		if apps.indexOf(app_id) < 0
+	# 			Session.set("app_id", null)
+	# 			FlowRouter.go "/app"
 
 checkObjectPermission = (context, redirect)->
 	Tracker.autorun (c)->
@@ -65,7 +68,8 @@ FlowRouter.route '/app/:app_id',
 	triggersEnter: [ checkUserSigned, checkAppPermission ],
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
-		Session.set("app_id", app_id)
+		if (app_id != "-")
+			Session.set("app_id", app_id)
 		Session.set("admin_template_name", null)
 		if FlowRouter.getParam("app_id") is "meeting"
 			FlowRouter.go('/app/' + app_id + '/meeting/calendar')
@@ -109,7 +113,9 @@ FlowRouter.route '/user_settings/switchspace',
 FlowRouter.route '/app/:app_id/search/:search_text',
 	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
-		Session.set("app_id", FlowRouter.getParam("app_id"))
+		app_id = FlowRouter.getParam("app_id")
+		if (app_id != "-")
+			Session.set("app_id", app_id)
 		Session.set("search_text", FlowRouter.getParam("search_text"))
 		Session.set("record_id", null) #有的地方会响应Session中record_id值，如果不清空可能会有异常现象，比如删除搜索结果中的记录后会跳转到记录对应的object的列表
 		BlazeLayout.render Creator.getLayout(),
@@ -121,8 +127,9 @@ FlowRouter.route '/app/:app_id/reports/view/:record_id',
 		app_id = FlowRouter.getParam("app_id")
 		record_id = FlowRouter.getParam("record_id")
 		object_name = FlowRouter.getParam("object_name")
-		data = {app_id: app_id, record_id: record_id, object_name: object_name}
-		Session.set("app_id", app_id)
+		if (app_id != "-")
+			Session.set("app_id", app_id)
+		data = {app_id: Session.get("app_id"), record_id: record_id, object_name: object_name}
 		Session.set("object_name", "reports")
 		Session.set("record_id", record_id)
 		BlazeLayout.render Creator.getLayout(),
@@ -131,7 +138,8 @@ FlowRouter.route '/app/:app_id/reports/view/:record_id',
 FlowRouter.route '/app/:app_id/instances/grid/all',
 	action: (params, queryParams)->
 		app_id = FlowRouter.getParam("app_id")
-		Session.set("app_id", app_id)
+		if (app_id != "-")
+			Session.set("app_id", app_id)
 		Session.set("object_name", "instances")
 		FlowRouter.go '/workflow'
 		return
@@ -169,7 +177,7 @@ objectRoutes = FlowRouter.group
 
 objectRoutes.route '/:record_id/:related_object_name/grid',
 	action: (params, queryParams)->
-		app_id = FlowRouter.getParam("app_id")
+		app_id = Session.get("app_id")
 		object_name = FlowRouter.getParam("object_name")
 		record_id = FlowRouter.getParam("record_id")
 		related_object_name = FlowRouter.getParam("related_object_name")
@@ -203,7 +211,9 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 		if queryParams?.hidden_header=="true"
 			Session.set("hidden_header", true)
 
-		Session.set("app_id", FlowRouter.getParam("app_id"))
+		app_id = FlowRouter.getParam("app_id")
+		if (app_id != "-")
+			Session.set("app_id", app_id)
 		Session.set("object_name", FlowRouter.getParam("object_name"))
 		Session.set("list_view_id", FlowRouter.getParam("list_view_id"))
 		Session.set("list_view_visible", false)
@@ -220,7 +230,9 @@ FlowRouter.route '/app/:app_id/:object_name/calendar/',
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
 
-		Session.set("app_id", FlowRouter.getParam("app_id"))
+		app_id = FlowRouter.getParam("app_id")
+		if (app_id != "-")
+			Session.set("app_id", app_id)
 		Session.set("object_name", FlowRouter.getParam("object_name"))
 		Session.set("list_view_visible", false)
 
