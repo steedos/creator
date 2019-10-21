@@ -22,7 +22,7 @@ Template.creatorNavigation.helpers
 			return "slds-is-active"
 
 	object_url: ()->
-		return "/app/-/#{String(this)}"
+		return Steedos.absoluteUrl("/app/-/#{String(this)}")
 
 	spaces: ->
 		return db.spaces.find();

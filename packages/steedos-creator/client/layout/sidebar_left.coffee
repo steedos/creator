@@ -33,7 +33,7 @@ Template.creatorSidebarLeft.helpers
 			return false
 
 	object_url: ()->
-		return "/app/-/#{String(this)}"
+		return Steedos.absoluteUrl("/app/-/#{String(this)}")
 
 	settings_url: ()->
 		return Steedos.absoluteUrl('/user_settings')
