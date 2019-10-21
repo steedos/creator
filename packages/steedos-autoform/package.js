@@ -18,6 +18,7 @@ Package.onUse(function(api) {
 	api.use('underscore');
 	api.use('reactive-var');
 	api.use('tracker');
+	api.use('ecmascript');
 
 	api.use('random');
 	api.use('ddp');
