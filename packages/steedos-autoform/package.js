@@ -92,8 +92,6 @@ Package.onUse(function(api) {
 	api.addFiles('client/coreform/inputTypes/coreform-url/url.html', 'client');
 	api.addFiles('client/coreform/inputTypes/coreform-url/url.js', 'client');
 
-	api.addFiles('client/coreform/inputTypes/coreform-widearea/lib/widearea.css', 'client');
-	api.addFiles('client/coreform/inputTypes/coreform-widearea/lib/widearea.js', 'client');
 	api.addFiles('client/coreform/inputTypes/coreform-widearea/widearea.html', 'client');
 	api.addFiles('client/coreform/inputTypes/coreform-widearea/widearea.coffee', 'client');
 
