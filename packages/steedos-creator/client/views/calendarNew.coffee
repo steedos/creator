@@ -55,8 +55,11 @@ _dataSource = (options) ->
 					loadOptions.filter = _f
 			beforeSend: (request, b, c) ->
 				filters = Creator.getODataFilter(Session.get("list_view_id"), Session.get('object_name'))
-				odataFilters = Filters.formatFiltersToODataQuery(filters)
-				request.params.$filter = "(#{odataFilters}) and (#{request.params.$filter})"
+				if filters
+					odataFilters = Filters.formatFiltersToODataQuery(filters)
+					request.params.$filter = "(#{odataFilters}) and (#{request.params.$filter})"
+				else
+					request.params.$filter = "#{request.params.$filter}"
 				request.headers['X-User-Id'] = Meteor.userId()
 				request.headers['X-Space-Id'] = Steedos.spaceId()
 				request.headers['X-Auth-Token'] = Accounts._storedLoginToken()
