@@ -148,7 +148,7 @@ Creator.odata.queryCount = (object_name, options, callback)->
 		store = new DevExpress.data.ODataStore({
 			type: "odata"
 			version: 4
-			url: Steedos.absoluteUrl(url)
+			url: url
 			withCredentials: false
 			beforeSend: (request) ->
 				request.headers['X-User-Id'] = Meteor.userId()
