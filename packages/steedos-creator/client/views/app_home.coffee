@@ -8,7 +8,7 @@ Template.creator_app_home.onRendered ()->
 			else
 				first_app_obj = _.first(Creator.getAppObjectNames(appId))
 				if first_app_obj
-					objectHomeComponent = ReactSteedos.pluginComponentSelector(ReactSteedos.store.getState(), "ObjectHome", first_app_obj)
+					objectHomeComponent = Session.get("object_home_component")
 					if objectHomeComponent
 						FlowRouter.go "/app/" + appId + "/" + first_app_obj
 					else
