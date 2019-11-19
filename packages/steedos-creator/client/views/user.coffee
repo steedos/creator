@@ -1,9 +1,14 @@
 loadRecordFromOdata = (template, object_name, record_id)->
+	if template.record.get()?._id == record_id
+		return
 	object = Creator.getObject(object_name)
 	selectFields = Creator.objectOdataSelectFields(object)
 	expand = Creator.objectOdataExpandFields(object)
 	record = Creator.odata.get(object_name, record_id, selectFields, expand)
 	template.record.set(record)
+
+getObjectRecord = ()->
+	return Template.instance().record.get()
 
 Template.user.onCreated ->
 	this.record = new ReactiveVar()
@@ -28,18 +33,12 @@ Template.user.onRendered ->
 		spaceId = Session.get "spaceId"
 		userId = Session.get "record_id"
 		space_record = Creator.getCollection("space_users").findOne({space: spaceId, user: userId})
-		loadRecordFromOdata(Template.instance(), "space_users", space_record._id)
-		fields = Creator.getFields("space_users")
-		ref_fields = {}
-		_.each fields, (f)->
-			ref_fields[f] = 1
-
-		if space_record
-			Creator.subs["Creator"].subscribe "steedos_object_tabular", "creator_space_users", [space_record._id], ref_fields
+		if space_record?._id
+			loadRecordFromOdata(Template.instance(), "space_users", space_record._id)
 
 Template.user.helpers 
 	doc: ()->
-		return Template.instance()?.record?.get()
+		return getObjectRecord()
 
 	fields: ()->
 		schema = Creator.getSchema("space_users")._schema
