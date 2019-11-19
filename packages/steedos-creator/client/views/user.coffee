@@ -1,3 +1,22 @@
+loadRecordFromOdata = (template, object_name, record_id)->
+	object = Creator.getObject(object_name)
+	selectFields = Creator.objectOdataSelectFields(object)
+	expand = Creator.objectOdataExpandFields(object)
+	record = Creator.odata.get(object_name, record_id, selectFields, expand)
+	template.record.set(record)
+
+Template.user.onCreated ->
+	this.record = new ReactiveVar()
+	template = Template.instance()
+	this.onEditSuccess = onEditSuccess = (formType,result)->
+		spaceId = Session.get "spaceId"
+		userId = Session.get "record_id"
+		space_record = Creator.getCollection("space_users").findOne({space: spaceId, user: userId})
+		loadRecordFromOdata(template, "space_users", space_record._id)
+		$('#afModal').modal('hide')
+	AutoForm.hooks creatorEditForm:
+		onSuccess: onEditSuccess
+	,false
 
 Template.user.onRendered ->
 	this.autorun ->
@@ -9,6 +28,7 @@ Template.user.onRendered ->
 		spaceId = Session.get "spaceId"
 		userId = Session.get "record_id"
 		space_record = Creator.getCollection("space_users").findOne({space: spaceId, user: userId})
+		loadRecordFromOdata(Template.instance(), "space_users", space_record._id)
 		fields = Creator.getFields("space_users")
 		ref_fields = {}
 		_.each fields, (f)->
@@ -19,9 +39,7 @@ Template.user.onRendered ->
 
 Template.user.helpers 
 	doc: ()->
-		spaceId = Session.get "spaceId"
-		userId = Session.get "record_id"
-		return Creator.getCollection("space_users").findOne({space: spaceId, user: userId})
+		return Template.instance()?.record?.get()
 
 	fields: ()->
 		schema = Creator.getSchema("space_users")._schema
@@ -35,11 +53,11 @@ Template.user.helpers
 		return fields
 
 	keyValue: (key)->
-		spaceId = Session.get "spaceId"
-		userId = Session.get "record_id"
-		doc = Creator.getCollection("space_users").findOne({space: spaceId, user: userId})
-		if doc
-			return doc[key]
+		record = Template.instance()?.record?.get()
+#		return record[key]
+		key.split('.').reduce (o, x) ->
+				o?[x]
+		, record
 	
 	showEditBtn: ()->
 		return Session.get("record_id") == Meteor.userId()
