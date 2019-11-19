@@ -73,6 +73,8 @@ Template.creator_table_cell.onRendered ->
 			extraContainer = self.$(".cell-extra-field-container")
 			unless extraContainer.find(".creator_table_cell").length
 				currentDoc = self.data.doc
+				unless currentDoc
+					return
 				if extra_field.indexOf(".") > 0
 					# 子表字段取值
 					extraKeys = extra_field.split(".")
