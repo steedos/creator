@@ -212,7 +212,7 @@ Template.filter_option_list.onCreated ->
 										filter.valuelabel = (result.map (item)->
 											return item[nameField]).join(",")
 										self.filterItems.set(filters)
-					if field?.optionsFunction or field?.options
+					if (fieldType == 'select') and (field?.optionsFunction or field?.options)
 						if field.optionsFunction
 							options = field?.optionsFunction()
 						else
