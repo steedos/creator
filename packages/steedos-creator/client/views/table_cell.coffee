@@ -171,7 +171,7 @@ Template.creator_table_cell.helpers
 		else if _field.type == "url"
 			href = val
 			if !href?.startsWith("http")
-				href = "http://" + encodeURI(href)
+				href = Steedos.absoluteUrl(encodeURI(href))
 			data.push({value: val, href: href, id: this._id, isUrl: true})
 		else if _field.type == "email"
 			data.push({value: val, href: href, id: this._id, isEmail: true})
