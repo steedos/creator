@@ -70,10 +70,6 @@ Template.creatorNavigation.helpers
 	dashboard_class_name: ()->
 		if Session.get("app_home_active")
 			return "slds-is-active"
-	getObjectBadge: (object)->
-		spaceId = Steedos.getSpaceId()
-		if object.name == "instances"
-			return Steedos.getBadge("workflow", spaceId)
 
 Template.creatorNavigation.events
 
