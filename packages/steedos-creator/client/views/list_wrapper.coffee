@@ -255,13 +255,7 @@ Template.creator_list_wrapper.helpers
 		else
 			return ''
 	isFiltering: ()->
-		filter_items = Session.get("filter_items")
-		isFiltering = false;
-		_.every filter_items, (filter_item)->
-			if filter_item.value
-				isFiltering = true;
-			return !isFiltering;
-		return isFiltering
+		return Creator.getIsFiltering()
 	canFollow: ()->
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)

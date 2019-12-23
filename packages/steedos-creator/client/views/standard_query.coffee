@@ -155,3 +155,7 @@ Template.standard_query_modal.events
 		$(".filter-list-wraper #grid-search").val("")
 		Modal.hide(template)
 
+		isFiltering = Creator.getIsFiltering()
+		if isFiltering
+			$(".filter-list-container").removeClass("slds-hide")
+
