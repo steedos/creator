@@ -152,7 +152,6 @@ Template.standard_query_modal.events
 #		$(".btn-filter-list").toggleClass("slds-is-selected", true)
 #		$(".filter-list-container").toggleClass("slds-hide", false)
 #		Session.set 'standard_query', {object_name: object_name, query: query, is_mini: false}
-		$(".filter-list-wraper #grid-search").val("")
 		Modal.hide(template)
 
 		isFiltering = Creator.getIsFiltering()
