@@ -412,10 +412,10 @@
   dependencies:
     tslib "^1.10.0"
 
-"@steedos/accounts@^1.10.2":
-  version "1.10.2"
-  resolved "https://registry.npm.taobao.org/@steedos/accounts/download/@steedos/accounts-1.10.2.tgz#0a06cc692587b28c27ffe62b107cbf138da50641"
-  integrity sha1-CgbMaSWHsown/+YrEHy/E42lBkE=
+"@steedos/accounts@^1.10.4":
+  version "1.10.4"
+  resolved "https://registry.npm.taobao.org/@steedos/accounts/download/@steedos/accounts-1.10.4.tgz#df3131de8761534fbfd033bc0f661459a11f9110"
+  integrity sha1-3zEx3odhU0+/0DO8D2YUWaEfkRA=
   dependencies:
     "@accounts/mongo" "^0.19.0"
     "@accounts/password" "^0.19.0"
@@ -437,10 +437,10 @@
     saml-idp "^1.1.0"
     tslib "1.10.0"
 
-"@steedos/app-contracts@^1.13.3":
-  version "1.13.3"
-  resolved "https://registry.yarnpkg.com/@steedos/app-contracts/-/app-contracts-1.13.3.tgz#d42daff34be68f2814d810a6d642c0196f8863b0"
-  integrity sha512-U2CzHVoyWD88cixNSRvKZjJ6O74+d/06EHvsLFcWYO9BciDcpqGlOC89Evr4YddqSlBuTYh2fN4N2UD91XYlNQ==
+"@steedos/app-contracts@^1.14.0":
+  version "1.14.0"
+  resolved "https://registry.npm.taobao.org/@steedos/app-contracts/download/@steedos/app-contracts-1.14.0.tgz#9b70ad886f04adbcc6a09adf71113b3360bcf39e"
+  integrity sha1-m3CtiG8ErbzGoJrfcRE7M2C8854=
   dependencies:
     dotenv "^8.2.0"
     dotenv-flow "^3.1.0"
@@ -587,15 +587,15 @@
   resolved "https://registry.yarnpkg.com/@steedos/schemas/-/schemas-1.14.0.tgz#d4b72c28fc3ce335c082e2910d8411670d98847a"
   integrity sha512-gHXYR3XrpEGTQAsSu3jjbH9/BRnruyTbFgoYHf48mcH1yvIATkhK7+mL5tIIWLNMysmVfJrcqj0w28/akqwUAQ==
 
-"@steedos/standard-objects@^1.14.0":
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/@steedos/standard-objects/-/standard-objects-1.14.0.tgz#a0da83a10864db9ec1375c6b61cb250d16fbb362"
-  integrity sha512-dvSY5Q4ak2ZoRQ3TrP3INVtrkaTXWxjP2qqTu9CexkJVQa6VwI1N+HSFuI4C2GsDSGIK2McsvjJyj7opAFE+OQ==
+"@steedos/standard-objects@^1.14.0", "@steedos/standard-objects@^1.14.1":
+  version "1.14.1"
+  resolved "https://registry.npm.taobao.org/@steedos/standard-objects/download/@steedos/standard-objects-1.14.1.tgz#4fc1b0d81a1abba3ef12b179addd5c21aedaa1d3"
+  integrity sha1-T8Gw2Boau6PvErF5rd1cIa7aodM=
 
-"@steedos/steedos-plugin-workflow@^1.10.1":
-  version "1.10.1"
-  resolved "https://registry.npm.taobao.org/@steedos/steedos-plugin-workflow/download/@steedos/steedos-plugin-workflow-1.10.1.tgz#900281967ddb39f1597965ddb0f001cdc2b7f324"
-  integrity sha1-kAKBln3bOfFZeWXdsPABzcK38yQ=
+"@steedos/steedos-plugin-workflow@^1.10.3":
+  version "1.10.3"
+  resolved "https://registry.npm.taobao.org/@steedos/steedos-plugin-workflow/download/@steedos/steedos-plugin-workflow-1.10.3.tgz#aabdadf14429c401b53288c760b7e01d65ff9b07"
+  integrity sha1-qr2t8UQpxAG1MojHYLfgHWX/mwc=
   dependencies:
     body-parser "^1.19.0"
     express "^4.17.1"
@@ -1175,6 +1175,14 @@ bcrypt-pbkdf@^1.0.0:
   integrity sha1-pDAdOJtqQ/m2f/PKEaP2Y342Dp4=
   dependencies:
     tweetnacl "^0.14.3"
+
+bcrypt@3.0.5:
+  version "3.0.5"
+  resolved "https://registry.npm.taobao.org/bcrypt/download/bcrypt-3.0.5.tgz#37a296c48ebf39fe6b28e4da3a221bf80da5aa26"
+  integrity sha1-N6KWxI6/Of5rKOTaOiIb+A2lqiY=
+  dependencies:
+    nan "2.13.1"
+    node-pre-gyp "0.12.0"
 
 bcrypt@^3.0.6:
   version "3.0.6"
@@ -5121,6 +5129,11 @@ mz@^2.4.0, mz@^2.7.0:
     any-promise "^1.0.0"
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
+
+nan@2.13.1:
+  version "2.13.1"
+  resolved "https://registry.npm.taobao.org/nan/download/nan-2.13.1.tgz#a15bee3790bde247e8f38f1d446edcdaeb05f2dd"
+  integrity sha1-oVvuN5C94kfo848dRG7c2usF8t0=
 
 nan@2.13.2:
   version "2.13.2"

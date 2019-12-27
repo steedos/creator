@@ -706,14 +706,14 @@ Template.creator_grid.onRendered ->
 						_.each r.values, (val, index)->
 							if val
 								if val.constructor == Object
-									r.values[index] = val.name
+									r.values[index] = val.name || val._NAME_FIELD_VALUE
 								else if val.constructor == Array
 									_val = [];
 									_.each val, (_v)->
 										if _.isString(_v)
 											_val.push _v
 										else if _.isObject(_v)
-											_val.push(_v.name)
+											_val.push(_v.name || _v._NAME_FIELD_VALUE)
 									r.values[index] = _val.join(",")
 								else if val.constructor == Date
 									dataField = col[index]?.dataField
