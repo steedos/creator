@@ -59,14 +59,10 @@ function sendTextMsg(sdkappid, appkey, phone, msg) {
 	};
 	url = url.replace('{sdkappid}', sdkappid)
 		.replace('{random}', rand);
-	console.log('qcloud msg', msg);
-	console.log('qcloud content', url);
-	console.log('qcloud content', content);
 	request
 		.post(url)
 		.send(content)
 		.end(function(err, res) {
-			console.log('qcloud end err', err);
 			if (err) {
 				return console.error(err);
 			}
