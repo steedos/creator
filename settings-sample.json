@@ -88,6 +88,12 @@
             "sdkappid": "xxx",
             "appkey": "xxx",
             "signname": "xxx" // 短信签名
+        },
+        "webservice": {
+            "url": "",  //短信平台接口地址
+            "smsqueue_interval": 1000, //发送间隔
+            "space_token": "",
+            "signname": "xxx" // 短信签名
         }
     },
     //同步OA表单
