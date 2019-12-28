@@ -266,7 +266,7 @@ getColumnItem = (object, list_view, column, list_view_sort, column_default_sort,
 		columnWidth = "160px"
 
 	columnItem =
-		cssClass: "slds-cell-edit cell-type-#{field.type} cell-type-#{field.name}"
+		cssClass: "slds-cell-edit cell-type-#{field.type} cell-name-#{field.name}"
 		caption: listViewColumn?.label || field.label || TAPi18n.__(object.schema.label(listViewColumn?.field))
 		dataField: listViewColumn?.field
 		alignment: "left"
