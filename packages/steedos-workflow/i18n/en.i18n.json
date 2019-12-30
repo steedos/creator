@@ -392,7 +392,7 @@
 			}
 		},
 		"sms": {
-		  "submit_pending_inbox": "Inbox: {$instance_name} ({$current_user_name})"
+		  "submit_pending_inbox": "您有新的待审核：{$instance_name}，提交人：{$applicant_name}"
 		},
 	  	"remindMessage": {
 			"update_failed": "Requested action not taken, because this request has been updated.",

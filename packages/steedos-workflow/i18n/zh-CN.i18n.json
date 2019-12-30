@@ -394,7 +394,7 @@
 			}
 		},
 	  	"sms": {
-		  "submit_pending_inbox": "待审核: {$instance_name} ({$current_user_name})"
+		  "submit_pending_inbox": "您有新的待审核：{$instance_name}，提交人：{$applicant_name}"
 		},
 		"remindMessage": {
 			"update_failed": "申请单状态已更新，您的操作未能执行。",
