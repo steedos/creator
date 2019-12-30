@@ -17,12 +17,21 @@ Template.creator_app_list_modal.helpers
 
 	app_url: ()->
 		if this?.url
-			return Creator.getRelativeUrl(this.url);
+			if /^http(s?):\/\//.test(this.url)
+				return this.url
+			else
+				return Creator.getRelativeUrl(this.url);
 		else if this._id
 			return Creator.getRelativeUrl("/app/#{this._id}/");
+	
+	app_target: ()->
+		if this?.is_new_window
+			return "_blank"
+		else
+			return ""
 
 	object_url: ()->
-		return Creator.getObjectFirstListViewUrl(this.name)
+		return Steedos.absoluteUrl("/app/-/#{this.name}")
 
 	spaceName: ->
 		if Session.get("spaceId")
@@ -54,3 +63,8 @@ Template.creator_app_list_modal.events
 		rootName = FlowRouter.current().path.split("/")[1]
 		FlowRouter.go("/#{rootName}")
 		Modal.hide(template)
+	
+	'click .app-sction-part-1 .slds-section__content .app-launcher-link': (event)->
+		appid = event.currentTarget.dataset.appid
+		if appid && Creator.openApp
+			Creator.openApp appid, event

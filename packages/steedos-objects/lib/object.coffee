@@ -1,4 +1,4 @@
-
+clone = require('clone');
 Creator.objectsByName = {}   # 此对象只能在确保所有Object初始化完成后调用， 否则获取到的object不全
 
 Creator.formatObjectName = (object_name)->
@@ -19,6 +19,7 @@ Creator.Object = (options)->
 	self.icon = options.icon
 	self.description = options.description
 	self.is_view = options.is_view
+	self.form = options.form
 	if !_.isBoolean(options.is_enable)  || options.is_enable == true
 		self.is_enable = true
 	else
@@ -42,6 +43,7 @@ Creator.Object = (options)->
 	self.enable_trash = options.enable_trash
 	self.enable_space_global = options.enable_space_global
 	self.enable_approvals = options.enable_approvals
+	self.enable_follow = options.enable_follow
 	self.idFieldName = '_id'
 	if options.database_name
 		self.database_name = options.database_name
@@ -49,7 +51,7 @@ Creator.Object = (options)->
 		console.error(options)
 		throw new Error('Creator.Object options must specify name');
 
-	self.fields = _.clone(options.fields)
+	self.fields = clone(options.fields)
 
 	_.each self.fields, (field, field_name)->
 		if field_name == 'name' || field.is_name

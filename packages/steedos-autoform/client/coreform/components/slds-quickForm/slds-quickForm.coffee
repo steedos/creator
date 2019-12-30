@@ -1,7 +1,8 @@
 Template.quickForm_slds.helpers
 	isDisabled: (key)->
 		object_name = Template.instance().data.atts.object_name
-		fields = Creator.getObject(object_name)?.fields
+		#处理不能使用Creator.getObject 获取对象， 因为在client端， Creator.getObject 中的对象已被user permission 改写
+		fields = Creator.Objects[object_name]?.fields
 		return fields[key]?.disabled
 	hasInlineHelpText: (key)->
 		object_name = Template.instance().data.atts.object_name
@@ -10,6 +11,8 @@ Template.quickForm_slds.helpers
 
 	is_range: (key)->
 		return Template.instance()?.data?.qfAutoFormContext.schema._schema[key]?.autoform?.is_range
+	is_renge_end: (key)->
+		return key?.endsWith("_endLine");
 
 	schemaFields: ()->
 		object_name = this.atts.object_name
@@ -122,3 +125,9 @@ Template.quickForm_slds.onRendered ->
 					to: 0
 				}
 			}
+
+Template.range_field.helpers
+	startName: ()->
+		return this.toString()
+	endName: ()->
+		return this.toString() + '_endLine'

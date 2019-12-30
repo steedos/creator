@@ -10,6 +10,49 @@ getSelected = (tag)->
 				return _.include(vals, item._id)
 			)
 
+getLinkText = (item, label, detail_url)->
+	if detail_url
+		detail_url = detail_url.replace("{_id}", item._id)
+		if !/^http(s?):\/\//.test(detail_url)
+			detail_url =  Steedos.absoluteUrl(detail_url)
+		return '<a href="'+detail_url+'" target="_blank">'+label+'</a>';
+	else
+		return label
+
+getItemContext = (item, label, detail_url)->
+	return '<div class="item" data-value="'+item._id+'">'+getLinkText(item, label, detail_url)+'</div>';
+
+getArgumentsList = (func) ->
+	if _.isFunction(func)
+		funcString = func.toString();
+	else
+		funcString = func
+	regExp =/function\s*\w*\(([\s\S]*?)\)/;
+	if regExp.test(funcString)
+		argList = RegExp.$1.split(',');
+		return argList.map((arg)->
+			return arg.replace(/\s/g,'');
+		);
+	else
+		return []
+
+isFunctionStr = (funStr)->
+	if !_.isString(funStr)
+		return false
+	if funStr.startsWith('function')
+		return true
+	else
+		return false
+
+getFilterStr = (filters, functionArgsName)->
+	instanceform = AutoForm.getFormValues("instanceform")
+	formValues = instanceform.insertDoc
+	functionArgs = _.map functionArgsName, (argName)->
+		return formValues[argName]
+	filterFun = null;
+	eval('filterFun=' + filters)
+	return filterFun.apply({}, functionArgs)
+
 AutoForm.addInputType "steedos-selectize", {
 	template: "afSteedosSelectize"
 	valueOut: ()->
@@ -30,13 +73,17 @@ Template.afSteedosSelectize.helpers
 	readonlyValue: ()->
 		value = this.value
 		is_multiselect = this.atts.multiple
+		detail_url = this.atts.detail_url
 		if value
 			if is_multiselect
-				value = _.pluck(value, '@label').toString()
+				value = _.map value, (item)->
+					return getLinkText(item, item['@label'], detail_url)
 			else
-				value = value['@label']
+				value = getLinkText(value, value['@label'], detail_url)
 			return value
 		return ''
+	description: ()->
+		return this.atts?.title || ""
 
 Template.afSteedosSelectize.events
 	'click .slds-pill__remove': (e, t)->
@@ -58,6 +105,7 @@ Template.afSteedosSelectize.onRendered ()->
 	search_field = this.data.atts.search_field
 	filters = this.data.atts.filters
 	multiple = this.data.atts.multiple
+	detail_url = this.data.atts.detail_url
 
 	maxItems = 1
 	if multiple
@@ -67,6 +115,24 @@ Template.afSteedosSelectize.onRendered ()->
 
 	self = this
 
+	filterStr = '';
+
+	if isFunctionStr(filters)
+		functionArgsName = getArgumentsList(filters);
+		filterStr = getFilterStr(filters, functionArgsName);
+		$("#instanceform").on 'change',(e, elementName)->
+			if e.target.nodeName == 'FORM'
+				changeFieldName = elementName
+			else
+				changeFieldName = e.target.name;
+			if changeFieldName && functionArgsName.includes(changeFieldName)
+				filterStr = getFilterStr(filters, functionArgsName)
+				if self.filterStr != filterStr
+					self.selectize[0].selectize.clearOptions();
+					self.selectize[0].selectize.load(selectizeLoad)
+					self.filterStr = filterStr
+	else
+		filterStr = filters
 
 	selectizeRender = {
 		option: (item, escape) ->
@@ -77,11 +143,15 @@ Template.afSteedosSelectize.onRendered ()->
 				'</div>';
 	}
 
+	if detail_url
+		selectizeRender.item = (item, escape)->
+			return getItemContext(item, escape(item[key]), detail_url)
+
 	if multiple
 		selectizeRender.item = (item, escape) ->
 			return '<span class="slds-pill slds-pill_link">
-							<a href="javascript:void(0);" class="slds-pill__action">
-							<span class="slds-pill__label">' + escape(item[key]) + '</span></a>
+							<div class="slds-pill__action">
+							<span class="slds-pill__label">' + getLinkText(item, escape(item[key]), detail_url) + '</span></div>
 							<button class="slds-button slds-button_icon slds-button_icon slds-pill__remove" type="button">
 								<svg class="slds-button__icon" aria-hidden="true">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="close">
@@ -89,6 +159,21 @@ Template.afSteedosSelectize.onRendered ()->
 								</svg>
 							</button>
 						</span>'
+	selectizeLoad = (query, callback) ->
+		if _.isFunction(query)
+			callback = query;
+			query = '';
+		if query.indexOf("'") > -1
+			console.debug('搜索已忽略：odata字段搜索字符串包含无效字符\'', query);
+			return
+		if this.lastQuery != query || this.lastFilters != filterStr || true
+			this.lastQuery = query;
+			this.lastFilters = filterStr
+			if self.st
+				clearTimeout(self.st)
+			self.st = setTimeout ()->
+				SelectizeManager.dataFunc(self.selectize, service, objectName, {code: code, formula: formula, query: query, search_field: search_field, filters: filterStr}, callback);
+			, 100
 
 	this.selectize = $("##{this.data.atts.id}").selectize {
 		valueField: '_id',
@@ -104,14 +189,7 @@ Template.afSteedosSelectize.onRendered ()->
 			return  (item) ->
 				return score(item);
 		,
-		load: (query, callback) ->
-			if this.lastquery != query
-				this.lastquery = query;
-				if self.st
-					clearTimeout(self.st)
-				self.st = setTimeout ()->
-					SelectizeManager.dataFunc(self.selectize, service, objectName, {code: code, formula: formula, query: query, search_field: search_field, filters: filters}, callback);
-				, 100
+		load: selectizeLoad
 		,
 		onFocus: SelectizeManager.onFocus,
 		onBlur: SelectizeManager.onBlur,
@@ -132,10 +210,10 @@ Template.afSteedosSelectize.onRendered ()->
 		if _.isArray(value)
 			_.each value, (_val)->
 				self.selectize[0].selectize.addOption(_val)
-			self.selectize[0].selectize.setValue(_.pluck(value, '_id'))
+			self.selectize[0].selectize.setValue(_.pluck(value, '_id'), true)
 		else
 			self.selectize[0].selectize.addOption(value)
-			self.selectize[0].selectize.setValue(value._id)
+			self.selectize[0].selectize.setValue(value._id, true)
 
 	firstNode = this.view.firstNode()
 

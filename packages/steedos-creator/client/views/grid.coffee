@@ -119,7 +119,9 @@ _itemClick = (e, curObjectName, list_view_id)->
 					self.dxDataGridInstance.refresh()
 			else
 				Creator.executeAction objectName, action, recordId, value.itemElement
-	unless actions.length
+	if actions.length
+		actionSheetOption.itemTemplate = "item"
+	else
 		actionSheetOption.itemTemplate = (itemData, itemIndex, itemElement)->
 			itemElement.html "<span class='text-muted'>#{itemData.text}</span>"
 
@@ -264,7 +266,7 @@ getColumnItem = (object, list_view, column, list_view_sort, column_default_sort,
 		columnWidth = "160px"
 
 	columnItem =
-		cssClass: "slds-cell-edit cell-type-#{field.type} cell-type-#{field.name}"
+		cssClass: "slds-cell-edit cell-type-#{field.type} cell-name-#{field.name}"
 		caption: listViewColumn?.label || field.label || TAPi18n.__(object.schema.label(listViewColumn?.field))
 		dataField: listViewColumn?.field
 		alignment: "left"
@@ -353,6 +355,9 @@ _depandOnFields = (object_name, columns)->
 Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
+		if Session.get("object_home_component")
+			# 如果从grid界面切换到plugin自定义的object component则不需要执行下面的代码
+			return
 		# Template.currentData() 这个代码不能删除，用于更新self.data中的数据
 		templateData = Template.currentData()
 		is_related = self.data.is_related
@@ -513,7 +518,7 @@ Template.creator_grid.onRendered ->
 			if grid_paging
 				pageIndex = grid_paging.pageIndex
 
-			extra_columns = _.intersection(["owner", "company_id", "locked"], _.keys(curObject.fields));
+			extra_columns = _.intersection(["owner", "company_id", "company_ids", "locked"], _.keys(curObject.fields));
 			if !is_related and curObject.enable_tree
 				extra_columns.push("parent")
 				extra_columns.push("children")
@@ -701,14 +706,14 @@ Template.creator_grid.onRendered ->
 						_.each r.values, (val, index)->
 							if val
 								if val.constructor == Object
-									r.values[index] = val.name
+									r.values[index] = val.name || val._NAME_FIELD_VALUE
 								else if val.constructor == Array
 									_val = [];
 									_.each val, (_v)->
 										if _.isString(_v)
 											_val.push _v
 										else if _.isObject(_v)
-											_val.push(_v.name)
+											_val.push(_v.name || _v._NAME_FIELD_VALUE)
 									r.values[index] = _val.join(",")
 								else if val.constructor == Date
 									dataField = col[index]?.dataField
@@ -945,7 +950,8 @@ Template.creator_grid.refresh = (dxDataGridInstance)->
 Template.creator_grid.onDestroyed ->
 	is_related = this.data.is_related
 	if !is_related && this.list_view_id == Session.get("list_view_id")
-		paging = this.dxDataGridInstance.option().paging
-		paging.object_name = this.data.object_name
-		paging.list_view_id = this.list_view_id
-		Session.set("grid_paging", paging)
+		paging = this.dxDataGridInstance?.option().paging
+		if paging
+			paging.object_name = this.data.object_name
+			paging.list_view_id = this.list_view_id
+			Session.set("grid_paging", paging)

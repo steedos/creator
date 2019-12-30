@@ -8,6 +8,7 @@ UniSelectize = function (options, template, filtersFunction, optionsFunction, cr
 	this.itemsUnselected = new ReactiveVar([]);
 
 	this.open = new ReactiveVar(false);
+	this.opened = new ReactiveVar(false);
 	this.loading = new ReactiveVar(false);
 	this.searchText = new ReactiveVar();
 	this.activeOption = new ReactiveVar(-1);
@@ -434,9 +435,25 @@ UniSelectize.prototype.createItem = function () {
 UniSelectize.prototype.getItemsUnselectedFiltered = function () {
 	var items = this.itemsUnselected.get();
 	var searchText = this.searchText.get();
+	var labelSearch = function(label, text){
+		if(!text){
+			return true;
+		}
+		var textArr = text.split(' ');
 
+		var searchedText = _.find(textArr, function(item){
+			if(label.search(new RegExp(item, 'i')) !== -1){
+				return true;
+			}
+		});
+		if(searchedText){
+			return true;
+		}else{
+			return false;
+		}
+	};
 	return _.filter(items, function (item) {
-		if (item.label && typeof(item.label) == 'string' && item.label.search(new RegExp(searchText, 'i')) !== -1) {
+		if (item.label && typeof(item.label) == 'string' && labelSearch(item.label, searchText)) {
 			return true;
 		}
 		return false;

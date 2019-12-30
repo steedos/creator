@@ -16,15 +16,6 @@
 Creator.getSchema = (object_name)->
 	return Creator.getObject(object_name)?.schema
 
-Creator.getObjectFirstListViewUrl = (object_name)->
-	list_view = Creator.getObjectFirstListView(object_name)
-	list_view_id = list_view?._id
-	app_id = Session.get("app_id")
-	if object_name is "meeting"
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/calendar/")
-	else
-		return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/grid/" + list_view_id)
-
 Creator.getObjectUrl = (object_name, record_id, app_id) ->
 	if !app_id
 		app_id = Session.get("app_id")
@@ -78,7 +69,7 @@ Creator.getSwitchListUrl = (object_name, app_id, list_view_id) ->
 Creator.getRelatedObjectUrl = (object_name, app_id, record_id, related_object_name) ->
 	return Creator.getRelativeUrl("/app/" + app_id + "/" + object_name + "/" + record_id + "/" + related_object_name + "/grid")
 
-Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide)->
+Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide, is_related)->
 	_options = []
 	unless object_name
 		return _options
@@ -101,6 +92,14 @@ Creator.getObjectLookupFieldOptions = (object_name, is_deep, is_skip_hide)->
 				if r_object
 					_.forEach r_object.fields, (f2, k2)->
 						_options.push {label: "#{f.label || k}=>#{f2.label || k2}", value: "#{k}.#{k2}", icon: r_object?.icon}
+	if is_related
+		relatedObjects = Creator.getRelatedObjects(object_name)
+		_.each relatedObjects, (_relatedObject)=>
+			relatedOptions = Creator.getObjectLookupFieldOptions(_relatedObject.object_name, false, false, false)
+			relatedObject = Creator.getObject(_relatedObject.object_name)
+			_.each relatedOptions, (relatedOption)->
+				if _relatedObject.foreign_key != relatedOption.value
+					_options.push {label: "#{relatedObject.label || relatedObject.name}=>#{relatedOption.label}", value: "#{relatedObject.name}.#{relatedOption.value}", icon: relatedObject?.icon}
 	return _options
 
 # 统一为对象object_name提供可用于过虑器过虑字段
@@ -573,57 +572,68 @@ Creator.getFieldsInFirstLevel = (firstLevelKeys, keys) ->
 Creator.getFieldsForReorder = (schema, keys, isSingle) ->
 	fields = []
 	i = 0
-	while i < keys.length
-		sc_1 = _.pick(schema, keys[i])
-		sc_2 = _.pick(schema, keys[i+1])
+	_keys = _.filter(keys, (key)->
+		return !key.endsWith('_endLine')
+	);
+	while i < _keys.length
+		sc_1 = _.pick(schema, _keys[i])
+		sc_2 = _.pick(schema, _keys[i+1])
 
 		is_wide_1 = false
 		is_wide_2 = false
 
-		is_range_1 = false
-		is_range_2 = false
+#		is_range_1 = false
+#		is_range_2 = false
 
 		_.each sc_1, (value) ->
 			if value.autoform?.is_wide || value.autoform?.type == "table"
 				is_wide_1 = true
 
-			if value.autoform?.is_range
-				is_range_1 = true
+#			if value.autoform?.is_range
+#				is_range_1 = true
 
 		_.each sc_2, (value) ->
 			if value.autoform?.is_wide || value.autoform?.type == "table"
 				is_wide_2 = true
 
-			if value.autoform?.is_range
-				is_range_2 = true
+#			if value.autoform?.is_range
+#				is_range_2 = true
+
+		if Steedos.isMobile()
+			is_wide_1 = true
+			is_wide_2 = true
 
 		if isSingle
-			fields.push keys.slice(i, i+1)
+			fields.push _keys.slice(i, i+1)
 			i += 1
 		else
-			if !is_range_1 && is_range_2
-				childKeys = keys.slice(i, i+1)
-				childKeys.push undefined
-				fields.push childKeys
-				i += 1
-			else if is_wide_1
-				fields.push keys.slice(i, i+1)
+#			if !is_range_1 && is_range_2
+#				childKeys = _keys.slice(i, i+1)
+#				childKeys.push undefined
+#				fields.push childKeys
+#				i += 1
+#			else
+			if is_wide_1
+				fields.push _keys.slice(i, i+1)
 				i += 1
 			else if !is_wide_1 and is_wide_2
-				childKeys = keys.slice(i, i+1)
+				childKeys = _keys.slice(i, i+1)
 				childKeys.push undefined
 				fields.push childKeys
 				i += 1
 			else if !is_wide_1 and !is_wide_2
-				childKeys = keys.slice(i, i+1)
-				if keys[i+1]
-					childKeys.push keys[i+1]
+				childKeys = _keys.slice(i, i+1)
+				if _keys[i+1]
+					childKeys.push _keys[i+1]
 				else
 					childKeys.push undefined
 				fields.push childKeys
 				i += 2
 
 	return fields
+
+Creator.isFilterValueEmpty = (v) ->
+	return typeof v == "undefined" || v == null || Number.isNaN(v) || v.length == 0
 
 # END
 

@@ -312,6 +312,125 @@ if Meteor.isClient
 		url += Creator.getJsReportUrlQuery()
 		return url;
 	
+	Creator.objectOdataSelectFields = (object)->
+		_fields = object.fields
+		_keys = _.keys(_fields)
+		_keys = _keys.filter (k)->
+			if k.indexOf(".") < 0
+				return true
+			else
+				return false
+		return _keys.join(",")
+
+	Creator.objectOdataExpandFields = (object, columns)->
+		expand_fields = []
+		fields = object.fields
+		unless columns
+			columns = _.keys(fields)
+		_.each columns, (n)->
+			if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+				if fields[n].reference_to
+					ref = fields[n].reference_to
+					if _.isFunction(ref)
+						ref = ref()
+				else
+					ref = fields[n].optionsFunction({}).getProperty("value")
+
+				if !_.isArray(ref)
+					ref = [ref]
+
+				ref = _.map ref, (o)->
+					key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
+					return key
+
+				ref = _.compact(ref)
+
+				ref = _.uniq(ref)
+
+				ref = ref.join(",")
+				if ref && n.indexOf("$") < 0
+					if n.indexOf(".") < 0
+						expand_fields.push(n)
+					else
+						expand_fields.push(n.replace('.', '/'))
+	#		else if fields[n].type == 'grid'
+	#			expand_fields.push(n)
+		return expand_fields.join(",")
+	
+	Creator.relatedObjectFileUploadHandler = (event, gridContainerWrap)->
+		dataset = event.currentTarget.dataset
+		parent = dataset?.parent
+		targetObjectName = dataset?.targetObjectName
+		files = event.currentTarget.files
+		i = 0
+		record_id = Session.get("record_id")
+		object_name = Session.get("object_name")
+		spaceId = Session.get("spaceId")
+		dxDataGridInstance = gridContainerWrap.find(".gridContainer.#{targetObjectName}").dxDataGrid().dxDataGrid('instance')
+		while i < files.length
+			file = files[i]
+			if !file.name
+				continue
+			fileName = file.name
+			if [
+					'image.jpg'
+					'image.gif'
+					'image.jpeg'
+					'image.png'
+				].includes(fileName.toLowerCase())
+				fileName = 'image-' + moment(new Date).format('YYYYMMDDHHmmss') + '.' + fileName.split('.').pop()
+			# Session.set 'filename', fileName
+			# $('.loading-text').text TAPi18n.__('workflow_attachment_uploading') + fileName + '...'
+			fd = new FormData
+			fd.append 'Content-Type', cfs.getContentType(fileName)
+			fd.append 'file', file
+			fd.append 'record_id', record_id
+			fd.append 'object_name', object_name
+			fd.append 'space', spaceId
+			fd.append 'owner', Meteor.userId()
+			fd.append 'owner_name', Meteor.user().name
+			if parent
+				fd.append 'parent', parent
+			$(document.body).addClass 'loading'
+			$.ajax
+				url: Steedos.absoluteUrl('s3/')
+				type: 'POST'
+				async: true
+				data: fd
+				dataType: 'json'
+				processData: false
+				contentType: false
+				success: (responseText, status) ->
+					fileObj = undefined
+					$(document.body).removeClass 'loading'
+					if responseText.errors
+						responseText.errors.forEach (e) ->
+							toastr.error e.errorMessage
+							return
+						return
+					toastr.success TAPi18n.__('Attachment was added successfully')
+					Template.creator_grid.refresh dxDataGridInstance
+					return
+				error: (xhr, msg, ex) ->
+					$(document.body).removeClass 'loading'
+					if ex
+						msg = ex
+					if msg == "Request Entity Too Large"
+						msg = "creator_request_oversized"
+					toastr.error t(msg)
+					return
+			i++
+		$(event.target).val("")
+
+	Creator.getIsFiltering = ()->
+		filter_items = Session.get("filter_items")
+		isFiltering = false;
+		_.every filter_items, (filter_item)->
+			if filter_item.value
+				isFiltering = true;
+			return !isFiltering;
+		return isFiltering
+	
 
 # 切换工作区时，重置下拉框的选项
 Meteor.startup ->

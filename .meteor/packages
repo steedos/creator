@@ -46,7 +46,6 @@ fourseven:scss
 tap:i18n
 
 raix:push
-steedos:cors
 aldeed:tabular
 aldeed:collection2
 aldeed:simple-schema
@@ -202,5 +201,6 @@ keepnox:perfect-scrollbar
 jeremy:selectize
 comerc:autoform-selectize
 steedos:slipjs
+react-template-helper
 
 steedos:webkit-notification

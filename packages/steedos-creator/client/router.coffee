@@ -1,5 +1,10 @@
 @urlQuery = new Array()
 checkUserSigned = (context, redirect) ->
+	if Meteor.userId()
+		currentPath = FlowRouter.current().path
+		if currentPath != urlQuery[urlQuery.length - 1]
+			urlQuery.push currentPath
+	return
 	# listTreeCompany = localStorage.getItem("listTreeCompany")
 	# if listTreeCompany
 	# 	Session.set('listTreeCompany', listTreeCompany);
@@ -13,14 +18,10 @@ checkUserSigned = (context, redirect) ->
 	# 		# Session.set('listTreeCompany', "-1");
 	# 		Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf");
 	# 统一设置此参数，待以后拆分
-	Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
+	# Session.set('listTreeCompany', "xZXy9x8o6qykf2ZAf")
 	
-	if !Meteor.userId()
-		Setup.validate();
-
-subscribe_object_listviews = (context, redirect)->
-	Tracker.autorun ()->
-		Creator.subs["Creator"]?.subscribe "object_listviews", context.params.object_name
+	# if !Meteor.userId()
+	# 	Setup.validate();
 
 set_sessions = (context, redirect)->
 	app_id = context.params.app_id
@@ -28,33 +29,34 @@ set_sessions = (context, redirect)->
 		Session.set("app_id", app_id)
 	Session.set("object_name", context.params.object_name)
 	Session.set("record_id", context.params.record_id)
+	object_name = context.params.object_name
+	objectHomeComponent = ReactSteedos.pluginComponentSelector(ReactSteedos.store.getState(), "ObjectHome", context.params.object_name)
+	if objectHomeComponent
+		Session.set("object_home_component", objectHomeComponent.toString());
+	else
+		Session.set("object_home_component", null)
 
 checkAppPermission = (context, redirect)->
-	return
-	# Tracker.autorun (c)->
-	# 	if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-	# 		c.stop()
-	# 		app_id = context.params.app_id
-	# 		if app_id == "admin"
-	# 			return
-	# 		apps = _.pluck(Creator.getVisibleApps(true),"_id")
-	# 		if apps.indexOf(app_id) < 0
-	# 			Session.set("app_id", null)
-	# 			FlowRouter.go "/app"
+	app_id = context.params.app_id
+	if app_id == "admin" || app_id == "-"
+		return
+	apps = _.pluck(Creator.getVisibleApps(true),"_id")
+	if apps.indexOf(app_id) < 0
+		console.log(app_id + " app access denied")
+		Session.set("app_id", Creator.getVisibleApps(true)[0]._id)
+		redirect "/"
 
 checkObjectPermission = (context, redirect)->
-	Tracker.autorun (c)->
-		if Creator.bootstrapLoaded.get() and Session.get("spaceId")
-			c.stop()
-			object_name = context.params.object_name
-			allowRead = Creator.getObject(object_name)?.permissions?.get()?.allowRead
-			unless allowRead
-				Session.set("object_name", null)
-				FlowRouter.go "/app"
+	object_name = context.params.object_name
+	allowRead = Creator.getObject(object_name)?.permissions?.get()?.allowRead
+	unless allowRead
+		console.log(object_name + " object access denied")
+		Session.set("object_name", null)
+		redirect "/"
 
 
 FlowRouter.route '/app',
-	triggersEnter: [ checkUserSigned],
+	triggersEnter: [ checkUserSigned ],
 	action: (params, queryParams)->
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_app_home"
@@ -81,6 +83,28 @@ FlowRouter.route '/app/:app_id',
 			BlazeLayout.render Creator.getLayout(),
 				main: main
 	triggersExit: [(context, redirect) ->
+		if Steedos.isMobile()
+			Session.set("hidden_header", undefined)
+	]
+
+FlowRouter.route '/app/:app_id/home',
+	triggersEnter: [ checkUserSigned, checkAppPermission ],
+	action: (params, queryParams)->
+		app_id = FlowRouter.getParam("app_id")
+		Session.set("app_id", app_id)
+		Session.set("admin_template_name", null)
+		Session.set("app_home_active", true)
+		if FlowRouter.getParam("app_id") is "meeting"
+			FlowRouter.go('/app/' + app_id + '/meeting/calendar')
+		else
+			main = 'dashboard'
+			if Steedos.isMobile()
+				Session.set('hidden_header', true)
+				main = 'dashboard'
+			BlazeLayout.render Creator.getLayout(),
+				main: main
+	triggersExit: [(context, redirect) ->
+		Session.set("app_home_active", false);
 		if Steedos.isMobile()
 			Session.set("hidden_header", undefined)
 	]
@@ -147,7 +171,26 @@ FlowRouter.route '/app/:app_id/instances/grid/all',
 objectRoutes = FlowRouter.group
 	prefix: '/app/:app_id/:object_name',
 	name: 'objectRoutes',
-	triggersEnter: [checkUserSigned, checkObjectPermission, set_sessions]
+	triggersEnter: [checkUserSigned, checkAppPermission, checkObjectPermission, set_sessions]
+
+objectRoutes.route '/',
+	triggersEnter: [ 
+		# 自动跳转到对象的第一个视图
+		(context, redirect) -> 
+			object_name = context.params.object_name
+			unless Session.get("object_home_component")
+				list_view = Creator.getObjectFirstListView(object_name)
+				list_view_id = list_view?._id
+				app_id = context.params.app_id
+				if object_name == "meeting"
+					url = "/app/" + app_id + "/" + object_name + "/calendar/"
+				else
+					url = "/app/" + app_id + "/" + object_name + "/grid/" + list_view_id
+				redirect(url)
+	 ],
+	action: (params, queryParams)->
+		BlazeLayout.render Creator.getLayout(),
+			main: "object_home"
 
 #objectRoutes.route '/list/switch',
 #	action: (params, queryParams)->
@@ -201,10 +244,13 @@ objectRoutes.route '/view/:record_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: main
 
-FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
-	triggersEnter: [ checkUserSigned, checkObjectPermission ],
+objectRoutes.route '/grid/:list_view_id',
 	action: (params, queryParams)->
 		Session.set("record_id", null)
+		# 每次进视图应该把过滤器关联的视图及对象清空，否则有bug：刷新浏览器时过滤器中已保存条件未能显示出来 #1167
+		if Session.get("object_name") != FlowRouter.getParam("object_name") or Session.get("list_view_id") != FlowRouter.getParam("list_view_id")
+			Session.set("filter_target", null)
+
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)
 
@@ -224,8 +270,7 @@ FlowRouter.route '/app/:app_id/:object_name/:template/:list_view_id',
 		BlazeLayout.render Creator.getLayout(),
 			main: "creator_list_wrapper"
 
-FlowRouter.route '/app/:app_id/:object_name/calendar/',
-	triggersEnter: [ checkUserSigned, checkObjectPermission ],
+objectRoutes.route '/calendar/',
 	action: (params, queryParams)->
 		if Session.get("object_name") != FlowRouter.getParam("object_name")
 			Session.set("list_view_id", null)

@@ -227,7 +227,14 @@ InstanceReadOnlyTemplate.init = (steedosData) ->
 		InstanceReadOnlyTemplate.createImageSign(steedosData)
 		InstanceReadOnlyTemplate.createInstanceSignText(steedosData)
 
-
+getLinkText = (item, label, detail_url)->
+	if detail_url
+		detail_url = detail_url.replace("{_id}", item._id)
+		if !/^http(s?):\/\//.test(detail_url)
+			detail_url = Steedos.absoluteUrl(detail_url)
+		return '<a href="'+detail_url+'" target="_blank">'+label+'</a>';
+	else
+		return label
 
 InstanceReadOnlyTemplate.getValue = (value, field, locale, utcOffset) ->
 	if !value && value != false
@@ -291,10 +298,12 @@ InstanceReadOnlyTemplate.getValue = (value, field, locale, utcOffset) ->
 				value = value.toFixed(field.digits)
 				value = Steedos.numberToString value, locale
 		when 'odata'
+			detail_url = field.detail_url
 			if field.is_multiselect
-				value = _.pluck(value, '@label').toString()
+				value = _.map value, (item)->
+					return getLinkText(item, item['@label'], detail_url)
 			else
-				value = value['@label']
+				value = getLinkText(value, value['@label'], detail_url)
 
 	return value;
 
@@ -550,6 +559,30 @@ InstanceReadOnlyTemplate.getRelatedInstancesView = (user, space, instance, optio
 
 	return body;
 
+InstanceReadOnlyTemplate.getRelatedRecordsView = (user, space, instance, options)->
+	steedosData = _getTemplateData(user, space, instance)
+
+	steedosData.absolute = false;
+
+	if options?.absolute
+		steedosData.absolute = true;
+
+	relatedRecordsHtml = _getViewHtml('client/views/instance/related_records.html')
+
+	relatedRecordsCompiled = SpacebarsCompiler.compile(relatedRecordsHtml, {isBody: true});
+
+	relatedRecordsRenderFunction = eval(relatedRecordsCompiled);
+
+	Template.related_records_view = new Blaze.Template("related_records_view", relatedRecordsRenderFunction);
+
+	Template.related_records_view.steedosData = steedosData
+
+	Template.related_records_view.helpers RelatedRecords.helpers
+
+	body = Blaze.toHTMLWithData(Template.related_records_view, steedosData)
+
+	return body;
+
 InstanceReadOnlyTemplate.getOnLoadScript = (instance)->
 	form_version = WorkflowManager.getFormVersion(instance.form, instance.form_version)
 
@@ -568,6 +601,9 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 	body = InstanceReadOnlyTemplate.getInstanceView(user, space, instance, options);
 
 	onLoadScript = InstanceReadOnlyTemplate.getOnLoadScript(instance);
+
+	creatorService = Meteor.settings.public.webservices?.creator?.url
+	ins_record_ids = instance.record_ids
 
 	openFileScript = """
 			if(window.isNode && isNode()){
@@ -588,6 +624,34 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 
 			var flow = "#{instance.flow}";
 			var space = "#{instance.space}";
+
+			function getCookie(name){
+				let pattern = RegExp(name + "=.[^;]*")
+				let matched = document.cookie.match(pattern)
+				if(matched){
+					let cookie = matched[0].split('=')
+					return cookie[1]
+				}
+				return ''
+			}
+
+			var records = document.getElementsByClassName("ins-related-records");
+			for(var i = 0; i < records.length; i++){
+					var record = records[i];
+					record.addEventListener("click", function(e){
+						var creatorService = "#{creatorService}"
+						var ins_record_ids = #{JSON.stringify(ins_record_ids)}
+						if(creatorService && ins_record_ids && ins_record_ids.length > 0){
+							var objcetName = ins_record_ids[0].o
+							var id = ins_record_ids[0].ids[0]
+							var uobj = {};
+							uobj["X-User-Id"] = getCookie("X-User-Id");
+							uobj["X-Auth-Token"] = getCookie("X-Auth-Token");
+							redirectUrl = creatorService + "app/-/" + objcetName + "/view/" + id + "?" + $.param(uobj);
+							openWindow(redirectUrl);
+						}
+					});
+				}
 
 	""";
 
@@ -617,15 +681,17 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 			instanceBoxStyle = "box-danger"
 	if !options || options.showAttachments == true
 		attachment = InstanceReadOnlyTemplate.getAttachmentView(user, space, instance)
+		related_instances = InstanceReadOnlyTemplate.getRelatedInstancesView(user, space, instance, options)
+		related_records = InstanceReadOnlyTemplate.getRelatedRecordsView(user, space, instance, options)
 	else
 		attachment = ""
-
-	related_instances = InstanceReadOnlyTemplate.getRelatedInstancesView(user, space, instance, options)
+		related_instances = ""
+		related_records = ""
 
 	absoluteUrl = Meteor.absoluteUrl()
 
 	width = "960px"
-#	如果给table的parent设置width，则会导致阿里云邮箱显示table 异常
+	#	如果给table的parent设置width，则会导致阿里云邮箱显示table 异常
 	if options?.width
 		width = ""
 
@@ -633,25 +699,20 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 
 	allCssLink = """<link rel="stylesheet" type="text/css" class="__meteor-css__" href="#{cssHref}">"""
 
-	submit_btn = ""
-	instanceTracesStyle = ""
-
-#	if options?.editable
-#		submit_btn = '<a class="btn btn-block btn-social btn-steedos-workflow" onclick="wc.submit()"><i class="fa fa-facebook"></i> 提交到审批王</a>'
+	traceCheck = ""
+	if !_.isEmpty(trace)
+		traceCheck = "checked"
 	if options?.tagger == 'email'
 		showTracesBtn = ""
 	else
 		showTracesBtn = """
-			<div class="print-tool">
-				<label class="cbx-label"><input type="checkbox" checked class="cbx-print cbx-print-traces" id="cbx-print-traces"/><span>#{t('instance_approval_history')}</span></label>
+			<div class="navigation-bar btn-group no-print" style="min-width: 600px; z-index: 999">
+				<div class="print-tool">
+					<label class="cbx-label"><input type="checkbox" class="cbx-print cbx-print-attachments" id="cbx-print-attachments" checked="checked"><span>附件</span></label>
+					<label class="cbx-label"><input type="checkbox" class="cbx-print cbx-print-traces" id="cbx-print-traces" checked="#{traceCheck}"><span>#{t('instance_approval_history')}</span></label>
+				</div>
 			</div>
 			"""
-		instanceTracesStyle = """
-			.instance-view .instance-traces{
-				padding-left: 15px;
-				padding-right: 15px;
-			}
-		"""
 
 	showTracesScript = """
 		$( document ).ready(function(){
@@ -667,6 +728,21 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 					t.style = 'display: block;'
 				} else {
 					t.style = 'display: none;'
+				}
+			});
+
+			var attachmentsCheckbox = document.getElementById('cbx-print-attachments');
+			var attachmentsView = document.getElementsByClassName('attachments-section')[0];
+			if (attachmentsCheckbox.checked){
+				attachmentsView.style = 'display: block;'
+			} else {
+				attachmentsView.style = 'display: none;'
+			}
+			attachmentsCheckbox.addEventListener('change', function(e){
+				if (e.target.checked){
+					attachmentsView.style = 'display: block;'
+				} else {
+					attachmentsView.style = 'display: none;'
 				}
 			});
 		});
@@ -721,30 +797,42 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 						background: azure !important;
 					}
 
-					#{instanceTracesStyle}
+					.instance-view .instance-traces{
+						padding-left: 15px;
+						padding-right: 15px;
+					}
 
 					#{options?.styles || ""}
 				</style>
 			</head>
 			<body>
-				<div class="steedos">
-					#{submit_btn}
-					#{showTracesBtn}
-					<div class="instance-view">
-						<div class="instance #{instance_style}">
-							<form name="instanceForm">
-								<div class="instance-form box #{instanceBoxStyle}">
-									#{formDescriptionHtml}
-									<div class="box-body">
-										<div class="col-md-12">
-											#{body}
-											#{attachment}
-											#{related_instances}
-										</div>
+				<div class="steedos workflow instance-print">
+					<div class="skin-green skin-admin-lte">
+						<div class="wrapper">
+							<div class="content-wrapper">
+								#{showTracesBtn}
+								<div class="instance-print">
+									<div class="instance #{instance_style}">
+										<form name="instanceForm">
+											<div class="instance-form box #{instanceBoxStyle}">
+												#{formDescriptionHtml}
+												<div class="box-body">
+													<div class="col-md-12">
+														<div class='attachments-section'>
+															#{attachment}
+															#{related_instances}
+															#{related_records}
+														</div>
+														#{body}
+													</div>
+												</div>
+											</div>
+										</form>
+										#{trace}
 									</div>
+
 								</div>
-							</form>
-							#{trace}
+							</div>
 						</div>
 					</div>
 				</div>

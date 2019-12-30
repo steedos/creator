@@ -103,7 +103,7 @@ Template.CreatorAutoformModals.rendered = ->
 	$('#afModal').modal(show: false)
 
 	onEscKey = (e) ->
-		if e.keyCode == 27
+		if e.keyCode == 27 && $('#creatorObjectModal').length < 1
 			$('#afModal').modal 'hide'
 
 	$('#afModal').on 'show.bs.modal', ->
@@ -245,6 +245,14 @@ Template.CreatorAutoformModals.events
 		event.preventDefault()
 		event.stopPropagation()
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
+
+	'change form': (event, template)->
+		collection = Session.get 'cmCollection'
+		object_name = getObjectName(collection)
+		validate = FormManager.validate(object_name, Session.get('cmFormId') or defaultFormId);
+		if(!validate)
+			event.preventDefault()
+			event.stopPropagation()
 
 
 helpers =
@@ -590,12 +598,20 @@ Template.CreatorAfModal.events
 					self = this
 					urls = []
 
+
+					validate = FormManager.validate(object_name, t.data.formId);
+					if !validate
+						return false;
+
+					onSubmit = FormManager.onSubmit(object_name, t.data.formId);
+					if !onSubmit
+						return false;
+
 					cmCollection = Session.get 'cmCollection'
 					if cmCollection
 						schemaInstance = getSimpleSchema(cmCollection)
 						schema = schemaInstance._schema
 						disabledFields = Creator.getDisabledFields(schema)
-						console.log('disabledFields', disabledFields);
 						_.each disabledFields, (disabledField)->
 							delete insertDoc[disabledField]
 

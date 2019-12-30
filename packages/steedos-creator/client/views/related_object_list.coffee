@@ -1,6 +1,12 @@
 Template.related_object_list.helpers
+	related_object_name: ()->
+		return Session.get("related_object_name")
+
 	related_object_label: ()->
 		return Creator.getObject(Session.get("related_object_name")).label
+
+	is_file: ()->
+		return Session.get("related_object_name") == "cms_files"
 
 	object_label: ()->
 		object_name = Session.get "object_name"
@@ -18,12 +24,29 @@ Template.related_object_list.helpers
 		record_id = Session.get "record_id"
 		return Creator.getObjectUrl(object_name, record_id)
 
-	allow_create: ()->
+	allowCreate: ()->
+		relatedList = Creator.getRelatedList(Session.get("object_name"), Session.get("record_id"))
 		related_object_name = Session.get "related_object_name"
-		if related_object_name == "cms_files"
-			# 附件列表及相关列表的新建按钮应该去掉 #940，先去掉，以后有需要可以再改为上传附件功能
-			return false
-		return Creator.getPermissions(related_object_name).allowCreate
+		related_object = relatedList.find((item)-> return item.object_name == related_object_name )
+		sharing = related_object?.sharing || 'masterWrite'
+		masterAllow = false
+		masterRecordPerm = Creator.getRecordPermissions(Session.get('object_name'), Creator.getObjectRecord(), Meteor.userId(), Session.get('spaceId'))
+		if sharing == 'masterRead'
+			masterAllow = masterRecordPerm.allowRead
+		else if sharing == 'masterWrite'
+			masterAllow = masterRecordPerm.allowEdit
+		return masterAllow && Creator.getPermissions(related_object_name).allowCreate
+
+	isUnlocked: ()->
+		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
+			return true
+		record = Creator.getObjectRecord()
+		return !record?.locked
+
+	hasPermission: (permissionName)->
+		permissions = Creator.getPermissions()
+		if permissions
+			return permissions[permissionName]
 
 	recordsTotalCount: ()->
 		return Template.instance().recordsTotal.get()
@@ -35,7 +58,7 @@ Template.related_object_list.helpers
 
 
 Template.related_object_list.events
-	"click .add-related-record": (event, template)->
+	"click .add-related-object-record": (event, template)->
 		related_object_name = Session.get "related_object_name"
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
@@ -64,6 +87,9 @@ Template.related_object_list.events
 	'click .btn-refresh': (event, template)->
 		dxDataGridInstance = $(event.currentTarget).closest(".related_object_list").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
 		Template.creator_grid.refresh(dxDataGridInstance)
+
+	'change .input-file-upload': (event, template)->
+		Creator.relatedObjectFileUploadHandler event, $(event.currentTarget).closest(".related_object_list")
 
 
 Template.related_object_list.onCreated ->

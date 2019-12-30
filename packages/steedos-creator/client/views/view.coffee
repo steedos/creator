@@ -1,55 +1,14 @@
-_expandFields = (object_name, columns)->
-	expand_fields = []
-	fields = Creator.getObject(object_name).fields
-	_.each columns, (n)->
-		if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
-			if fields[n].reference_to
-				ref = fields[n].reference_to
-				if _.isFunction(ref)
-					ref = ref()
-			else
-				ref = fields[n].optionsFunction({}).getProperty("value")
-
-			if !_.isArray(ref)
-				ref = [ref]
-
-			ref = _.map ref, (o)->
-				key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
-				return key
-
-			ref = _.compact(ref)
-
-			ref = _.uniq(ref)
-
-			ref = ref.join(",")
-			if ref && n.indexOf("$") < 0
-				if n.indexOf(".") < 0
-					expand_fields.push(n)
-				else
-					expand_fields.push(n.replace('.', '/'))
-#		else if fields[n].type == 'grid'
-#			expand_fields.push(n)
-	return expand_fields
-
 loadRecordFromOdata = (template, object_name, record_id)->
 	object = Creator.getObject(object_name)
-
-	_fields = object.fields
-
-	_keys = _.keys(_fields)
-	_keys = _keys.filter (k)->
-		if k.indexOf(".") < 0
-			return true
-		else
-			return false
-	expand = _expandFields(object_name, _.keys(_fields))
-	record = Creator.odata.get(object_name, record_id, _keys.join(","), expand.join(","))
+	selectFields = Creator.objectOdataSelectFields(object)
+	expand = Creator.objectOdataExpandFields(object)
+	record = Creator.odata.get(object_name, record_id, selectFields, expand)
 	template.record.set(record)
 
 
 Template.creator_view.onCreated ->
 	this.recordsTotal = new ReactiveVar({})
-	this.recordLoad = new ReactiveVar(false)
+	# this.recordLoad = new ReactiveVar(false)
 	this.record = new ReactiveVar()
 	this.agreement = new ReactiveVar()
 	object_name = Session.get "object_name"
@@ -137,17 +96,18 @@ Template.creator_view.onRendered ->
 			$(".creator-view-tabs-content").removeClass("slds-show").addClass("slds-hide")
 			$("#creator-quick-form").addClass("slds-show")
 
-	if Steedos.isMobile()
-		this.autorun ->
-			loadRecord()
-	else
-		this.autorun ->
-			if Session.get("record_id")
-				Tracker.nonreactive(loadRecord)
+	loadRecord()
+	# if Steedos.isMobile()
+	# 	this.autorun ->
+	# 		loadRecord()
+	# else
+	# 	this.autorun ->
+	# 		if Session.get("record_id")
+	# 			Tracker.nonreactive(loadRecord)
 
-	this.autorun ->
-		if Creator.subs["Creator"].ready()
-			Template.instance().recordLoad.set(true)
+	# this.autorun ->
+	# 	if Creator.subs["Creator"].ready()
+	# 		Template.instance().recordLoad.set(true)
 
 	Meteor.defer ()->
 		addFieldInfo(self)
@@ -288,10 +248,10 @@ Template.creator_view.helpers
 	label: (key) ->
 		return AutoForm.getLabelForField(key)
 
-	hasPermission: (permissionName)->
-		permissions = Creator.getObject()?.permissions?.default
-		if permissions
-			return permissions[permissionName]
+	# hasPermission: (permissionName)->
+	# 	permissions = Creator.getObject()?.permissions?.default
+	# 	if permissions
+	# 		return permissions[permissionName]
 
 	record: ()->
 		return Creator.getObjectRecord()
@@ -376,7 +336,14 @@ Template.creator_view.helpers
 		return Creator.getObject(this.object_name)
 
 	allowCreate: ()->
-		return Creator.getPermissions(this.object_name).allowCreate
+		sharing = this.sharing || 'masterWrite'
+		masterAllow = false
+		masterRecordPerm = Creator.getRecordPermissions(Session.get('object_name'), Creator.getObjectRecord(), Meteor.userId(), Session.get('spaceId'))
+		if sharing == 'masterRead'
+			masterAllow = masterRecordPerm.allowRead
+		else if sharing == 'masterWrite'
+			masterAllow = masterRecordPerm.allowEdit
+		return masterAllow && Creator.getPermissions(this.object_name).allowCreate
 
 	isUnlocked: ()->
 		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
@@ -457,6 +424,9 @@ Template.creator_view.helpers
 
 	agreement: ()->
 		return Template.instance().agreement.get()
+	
+	showRightSidebar: ()->
+		return false
 
 	showEditIcon: ()->
 		return Steedos.isMobile() && this.name == 'standard_edit'
@@ -465,6 +435,18 @@ Template.creator_view.helpers
 		object_name = Session.get "object_name"
 		fields = Creator.getObject(object_name).fields
 		return fields[key]?.inlineHelpText
+
+	illustration: ()->
+		return ReactDesignSystem.Illustration
+
+	notFoundPath: ()->
+		return Steedos.absoluteUrl("/assets/images/illustrations/empty-state-no-results.svg#no-results")
+
+	notFoundHeading: ()->
+		return "似乎出现了一个问题。"
+
+	notFoundMessageBody: ()->
+		return "我们无法找到您尝试访问的记录。此记录可能已被其他用户删除，或您没有此记录的访问权限，也可能发生了系统错误。请向您的管理员寻求帮助。"
 
 Template.creator_view.events
 
@@ -541,11 +523,11 @@ Template.creator_view.events
 		collection = "Creator.Collections.#{Creator.getObject(object_name)._collection_name}"
 		current_object_name = Session.get("object_name")
 
-		relatedKey = ""
-		relatedValue = Session.get("record_id")
-		Creator.getRelatedList(current_object_name, relatedValue).forEach (related_obj) ->
-			if object_name == related_obj.object_name
-				relatedKey = related_obj.related_field_name
+#		relatedKey = ""
+#		relatedValue = Session.get("record_id")
+#		Creator.getRelatedList(current_object_name, relatedValue).forEach (related_obj) ->
+#			if object_name == related_obj.object_name
+#				relatedKey = related_obj.related_field_name
 		
 		ids = Creator.TabularSelectedIds[object_name]
 		if ids?.length
@@ -556,11 +538,16 @@ Template.creator_view.events
 			Session.set 'cmDoc', doc
 			# “保存并新建”操作中自动打开的新窗口中需要再次复制最新的doc内容到新窗口中
 			Session.set 'cmShowAgainDuplicated', true
-		else if current_object_name == "objects"
-			recordObjectName = Creator.getObjectRecord().name
-			Session.set 'cmDoc', {"#{relatedKey}": recordObjectName}
-		else if relatedKey
-			Session.set 'cmDoc', {"#{relatedKey}": {o: current_object_name, ids: [relatedValue]}}
+		else
+			defaultDoc = FormManager.getRelatedInitialValues(current_object_name, Session.get("record_id"), object_name);
+			if !_.isEmpty(defaultDoc)
+				Session.set 'cmDoc', defaultDoc
+
+#		else if current_object_name == "objects"
+#			recordObjectName = Creator.getObjectRecord().name
+#			Session.set 'cmDoc', {"#{relatedKey}": recordObjectName}
+#		else if relatedKey
+#			Session.set 'cmDoc', {"#{relatedKey}": {o: current_object_name, ids: [relatedValue]}}
 
 		Session.set("action_fields", undefined)
 		Session.set("action_collection", collection)
@@ -635,69 +622,26 @@ Template.creator_view.events
 				$(".btn.creator-edit").click()
 
 	'change .input-file-upload': (event, template)->
-		dataset = event.currentTarget.dataset
-		parent = dataset?.parent
-		targetObjectName = dataset?.targetObjectName
-		files = event.currentTarget.files
-		i = 0
-		record_id = Session.get("record_id")
-		object_name = Session.get("object_name")
-		spaceId = Session.get("spaceId")
-		dxDataGridInstance = $(".related-object-tabular").find(".gridContainer.#{targetObjectName}").dxDataGrid().dxDataGrid('instance')
-		while i < files.length
-			file = files[i]
-			if !file.name
-				continue
-			fileName = file.name
-			if [
-					'image.jpg'
-					'image.gif'
-					'image.jpeg'
-					'image.png'
-				].includes(fileName.toLowerCase())
-				fileName = 'image-' + moment(new Date).format('YYYYMMDDHHmmss') + '.' + fileName.split('.').pop()
-			# Session.set 'filename', fileName
-			# $('.loading-text').text TAPi18n.__('workflow_attachment_uploading') + fileName + '...'
-			fd = new FormData
-			fd.append 'Content-Type', cfs.getContentType(fileName)
-			fd.append 'file', file
-			fd.append 'record_id', record_id
-			fd.append 'object_name', object_name
-			fd.append 'space', spaceId
-			fd.append 'owner', Meteor.userId()
-			fd.append 'owner_name', Meteor.user().name
-			if parent
-				fd.append 'parent', parent
-			$(document.body).addClass 'loading'
-			$.ajax
-				url: Steedos.absoluteUrl('s3/')
-				type: 'POST'
-				async: true
-				data: fd
-				dataType: 'json'
-				processData: false
-				contentType: false
-				success: (responseText, status) ->
-					fileObj = undefined
-					$(document.body).removeClass 'loading'
-					if responseText.errors
-						responseText.errors.forEach (e) ->
-							toastr.error e.errorMessage
-							return
-						return
-					toastr.success TAPi18n.__('Attachment was added successfully')
-					Template.creator_grid.refresh dxDataGridInstance
-					return
-				error: (xhr, msg, ex) ->
-					$(document.body).removeClass 'loading'
-					if ex
-						msg = ex
-					if msg == "Request Entity Too Large"
-						msg = "creator_request_oversized"
-					toastr.error t(msg)
-					return
-			i++
-		$(event.target).val("")
+		Creator.relatedObjectFileUploadHandler event, $(".related-object-tabular")
+	
+	'click .slds-tabs_card .slds-tabs_default__item': (event) ->
+		currentTarget = $(event.currentTarget)
+		if currentTarget.hasClass("slds-is-active")
+			return
+		currentIndex = currentTarget.index()
+		currentTabContainer = currentTarget.closest(".slds-tabs_card")
+		currentTarget.siblings(".slds-is-active").removeClass("slds-is-active").end().addClass("slds-is-active")
+		currentTabContainer.find(">.slds-tabs_default__content.slds-show").toggleClass("slds-show").toggleClass("slds-hide")
+		currentTabContainer.find(">.slds-tabs_default__content").eq(currentIndex).toggleClass("slds-show").toggleClass("slds-hide")
+	'click .back-icon': (event)->
+		app_id = Session.get("app_id")
+		object = Session.get("object_name")
+		if app_id && object
+			FlowRouter.go Creator.getObjectRouterUrl(object, undefined, app_id)
+		else if app_id
+			FlowRouter.go "/app/#{app_id}"
+		else
+			FlowRouter.go "/app"
 
 Template.creator_view.onDestroyed ()->
 	self = this

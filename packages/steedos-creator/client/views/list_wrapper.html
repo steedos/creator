@@ -51,6 +51,28 @@
 							</div>
 						</div>
 						<div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom_xx-small">
+							{{#if canFollow}}
+								{{#if isFollowing}}
+								<button class="slds-button slds-button_neutral slds-button_stateful slds-is-selected list-action-follow" aria-live="assertive">
+									<span class="slds-text-selected">
+									  {{> steedos_icon class="slds-button__icon slds-button__icon_small slds-button__icon_left" source="utility-sprite" name="check"}}
+									  {{_ "following"}}
+									</span>
+									<span class="slds-text-selected-focus">
+									  {{> steedos_icon class="slds-button__icon slds-button__icon_small slds-button__icon_left" source="utility-sprite" name="close"}}
+									  {{_ "unfollow"}}
+									</span>
+								  </button>
+								{{else}}
+								<button class="slds-button slds-button_neutral slds-button_stateful slds-not-selected list-action-follow" aria-live="assertive">
+									<span class="slds-text-not-selected">
+										{{> steedos_icon class="slds-button__icon slds-button__icon_small slds-button__icon_left" source="utility-sprite" name="add"}}
+										{{_ "follow"}}
+									</span>
+								</button>
+								{{/if}}
+							
+							{{/if}}
 							<ul class="slds-button-group slds-m-left--xx-small oneActionsRibbon forceActionsContainer">
 								{{#each actions}}
 									<li class="slds-button slds-button--neutral slds-truncate list-action-custom list-action-custom-{{this.name}}">
@@ -117,7 +139,7 @@
 														<span>{{_ "creator_list_edit"}}</span>
 													</a>
 												</li>
-												<li class="slds-dropdown__item select-fields-to-display" role="presentation">
+												<li class="slds-dropdown__item select-fields-to-display hidden" role="presentation">
 													<a href="javascript:void(0);" title="{{_ "creator_list_select_fields"}}" class="" role="option" tabindex="-1">
 														<span>{{_ "creator_list_select_fields"}}</span>
 													</a>
@@ -129,7 +151,7 @@
 												</li>
 											{{/if}}
 										{{/if}}
-										<li class="slds-dropdown__item reset-column-width" role="presentation">
+										<li class="slds-dropdown__item reset-column-width hidden" role="presentation">
 											<a href="javascript:void(0);" class="" role="option" tabindex="-1">
 												<span>{{_ "reset_column_width"}}</span>
 											</a>

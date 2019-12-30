@@ -91,7 +91,7 @@ Creator.odata.query = (object_name, options, is_ajax, callback)->
 		return result
 	else
 		if object_name
-			url = Steedos.absoluteUrl"/api/v4/#{_object_name}"
+			url = Steedos.absoluteUrl "/api/v4/#{_object_name}"
 			options.store = new DevExpress.data.ODataStore({
 				type: "odata"
 				version: 4
@@ -148,7 +148,7 @@ Creator.odata.queryCount = (object_name, options, callback)->
 		store = new DevExpress.data.ODataStore({
 			type: "odata"
 			version: 4
-			url: Steedos.absoluteUrl(url)
+			url: url
 			withCredentials: false
 			beforeSend: (request) ->
 				request.headers['X-User-Id'] = Meteor.userId()

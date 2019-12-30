@@ -42,7 +42,10 @@ valOutformat = (val)->
 	getService: (data)->
 		spaceId = Steedos.getSpaceId()
 		if data.url
-			return data.url
+			if /^http(s?):\/\//.test(data.url)
+				return data.url
+			else
+				return Steedos.absoluteUrl(data.url)
 		creatorService = SelectizeManager.getCreatorService(data)
 		return Meteor.absoluteUrl("api/odata/v4/#{spaceId}", {rootUrl :creatorService})
 	getHeaders: ($element)->
@@ -189,7 +192,7 @@ valOutformat = (val)->
 					$element[0].selectize.clearOptions()
 				cb(result)
 			error: (jqXHR, textStatus, errorThrown) ->
-				error = jqXHR.responseJSON.error
+				error = jqXHR.responseJSON?.error
 				if error?.reason
 					toastr?.error?(TAPi18n.__(error.reason))
 				else if error?.message

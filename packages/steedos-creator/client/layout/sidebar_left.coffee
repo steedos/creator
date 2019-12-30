@@ -22,7 +22,7 @@ Template.creatorSidebarLeft.helpers
 		return objects
 
 	isActive: (obj)->
-		if (obj == FlowRouter.getParam("object_name"))
+		if (obj == Session.get("object_name"))
 			return true
 
 	hideObjects: (_id)->
@@ -33,7 +33,7 @@ Template.creatorSidebarLeft.helpers
 			return false
 
 	object_url: ()->
-		return Creator.getObjectFirstListViewUrl(String(this), null)
+		return Steedos.absoluteUrl("/app/-/#{String(this)}")
 
 	settings_url: ()->
 		return Steedos.absoluteUrl('/user_settings')
