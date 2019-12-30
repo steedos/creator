@@ -500,7 +500,7 @@ pushManager.send_message = (steedos_ids, body, current_user_info)->
 
 
 pushManager.send_to_sms = (to_user, message, current_user_info, spaceId)->
-	if to_user?.mobile
+	if Meteor.settings?.workflow?.sms_notification && to_user?.mobile
 		spaceUser = db.space_users.findOne({user: to_user._id, space: spaceId}, {fields: {sms_notification: 1}})
 		if spaceUser?.sms_notification
 			SMSQueue.send({
