@@ -5,10 +5,11 @@
 		to Navigation</a><a href="javascript:void(0);" class="slds-assistive-text slds-assistive-text_focus">Skip to
 		Main Content</a>
 		<div class="slds-global-header slds-grid slds-grid_align-spread">
-			<div class="slds-global-header__item">
+			<div class="slds-global-header__item slds-global-header__item--logo">
 				<div class="slds-global-header__logo">
 					<img src="{{logoUrl}}" alt=""/>
 				</div>
+				<div class="slds-global-header__text" title={{spaceName}}>{{spaceName}}</div>
 			</div>
 			{{> headerSearch}}
 			<ul class="slds-global-header__item slds-grid slds-grid_vertical-align-center">
@@ -76,6 +77,11 @@
 						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="setup" title="Setup"}}
 					</button>
 				</li>
+				{{#unless isMobile}}
+					<li class="slds-dropdown-trigger slds-dropdown-trigger_click">
+						{{> notifications}}
+					</li>
+				{{/unless}}
 				<li class="slds-hide slds-dropdown-trigger slds-dropdown-trigger_click">
 					<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon slds-is-disabled"
 							title="Notifications">

@@ -9,8 +9,13 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 			data: null
 		return
 
-	USER_CONTEXT = Creator.getUserContext(userId, spaceId, true)
-	unless USER_CONTEXT
+	authToken = Steedos.getAuthToken(req, res)
+	userSession = Meteor.wrapAsync((authToken, spaceId, cb)->
+			steedosAuth.getSession(authToken, spaceId).then (resolve, reject)->
+				cb(reject, resolve)
+		)(authToken, spaceId)
+	
+	unless userSession
 		JsonRoutes.sendResult res,
 			code: 500,
 			data: null
@@ -19,18 +24,11 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 	space = Creator.Collections["spaces"].findOne({_id: spaceId}, {fields: {name: 1}})
 
 	result = Creator.getAllPermissions(spaceId, userId)
-	result.USER_CONTEXT = USER_CONTEXT
+	result.user = userSession
 	result.space = space
 	result.apps = _.extend Creator.getDBApps(spaceId), Creator.Apps
 	result.object_listviews = Creator.getUserObjectsListViews(userId, spaceId, result.objects)
 	result.object_workflows = Meteor.call 'object_workflows.get', spaceId, userId
-
-	authToken = Steedos.getAuthToken(req, res)
-
-	userSession = Meteor.wrapAsync((authToken, spaceId, cb)->
-			steedosAuth.getSession(authToken, spaceId).then (resolve, reject)->
-				cb(reject, resolve)
-		)(authToken, spaceId)
 
 	permissions = Meteor.wrapAsync (v, userSession, cb)->
 		v.getUserObjectPermission(userSession).then (resolve, reject)->
@@ -41,13 +39,33 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 			datasourceObjects = datasource.getObjects()
 			_.each(datasourceObjects, (v, k)->
 				_obj = Creator.convertObject(v.toConfig())
-				_obj.name = "#{name}.#{k}"
+#				_obj.name = "#{name}.#{k}"
+				_obj.name = k
 				_obj.database_name = name
 				_obj.permissions = permissions(v, userSession)
 				result.objects[_obj.name] = _obj
 			)
 	_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
 		result.apps = _.extend result.apps, datasource.getAppsConfig()
+
+	tryFetchPluginsInfo = (fun)->
+		try
+			# 因为require函数中参数用变量传入的话，可能会造成直接报错
+			# 具体`name = "@steedos/objectql/package.json",info = require(name)`会报错，只能用`info = require("@steedos/objectql/package.json")`
+			# 但是`name = "@steedos/core/package.json",info = require(name)`却不会报错
+			# 所以这里把整个fun传入执行
+			fun()
+		catch
+
+	result.plugins = {}
+	tryFetchPluginsInfo ->
+		result.plugins["@steedos/core"] = version: require("@steedos/core/package.json")?.version
+	tryFetchPluginsInfo ->
+		result.plugins["@steedos/objectql"] = version: require("@steedos/objectql/package.json")?.version
+	tryFetchPluginsInfo ->
+		result.plugins["@steedos/accounts"] = version: require("@steedos/accounts/package.json")?.version
+	tryFetchPluginsInfo ->
+		result.plugins["@steedos/steedos-plugin-workflow"] = version: require("@steedos/steedos-plugin-workflow/package.json")?.version
 
 	JsonRoutes.sendResult res,
 		code: 200,

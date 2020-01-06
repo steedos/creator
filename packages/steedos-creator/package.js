@@ -67,7 +67,7 @@ Package.onUse(function (api) {
 	api.use('steedos:sso@0.0.4');
 	api.use('steedos:adminlte@2.3.12_3');
 	api.use('steedos:base@0.0.79');
-	api.use('steedos:accounts@0.0.31');
+	api.use('steedos:accounts@0.0.40');
 	api.use('steedos:theme@0.0.29');
 	api.use('steedos:i18n@0.0.11');
 	api.use('steedos:autoform@0.0.13');
@@ -100,7 +100,7 @@ Package.onUse(function (api) {
 	// api.addFiles('lib/formula_engine.coffee');
 	api.addFiles('lib/object_recent.coffee', 'client');
 	api.addFiles('lib/filters_transform.coffee', 'client');
-
+	api.addFiles('lib/form_manager.coffee', 'client');
 
 	api.addFiles('server/methods/object_recent_viewed.coffee', 'server');
 	api.addFiles('server/methods/object_recent_record.coffee', 'server');
@@ -145,6 +145,7 @@ Package.onUse(function (api) {
 	api.addFiles('client/layout/header_search.coffee', 'client');
 	api.addFiles('client/layout/header.html', 'client');
 	api.addFiles('client/layout/header.coffee', 'client');
+	api.addFiles('client/layout/header.less', 'client');
 	api.addFiles('client/layout/navigation.html', 'client');
 	api.addFiles('client/layout/navigation.coffee', 'client');
 	api.addFiles('client/layout/sidebar.html', 'client');
@@ -333,10 +334,17 @@ Package.onUse(function (api) {
 	api.addFiles('client/views/about_content.coffee', 'client');
 	api.addFiles('client/views/about_content.less', 'client');
 
+	api.addFiles('client/views/slds_illustration_preview.html', 'client');
+	api.addFiles('client/views/slds_illustration_preview.coffee', 'client');
+	api.addFiles('client/views/slds_illustration_preview.less', 'client');
+
+	api.addFiles('client/title.coffee', 'client');
+
 	api.addFiles('client/theme.less', 'client');
 	api.addFiles('client/i18n.coffee', 'client');
 
 	api.addAssets('assets/logo.png', 'client');
+	api.addAssets('assets/logo-square.png', 'client');
 
 	api.export(['uuflowManager', 'permissionManager'], ['server']);
 

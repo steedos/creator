@@ -46,7 +46,11 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = Date
 			if Meteor.isClient
 				if Steedos.isMobile() || Steedos.isPad()
-					fs.autoform.type = 'date'
+					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dxDateBoxOptions参数会报错
+					fs.autoform.afFieldInput =
+						type: "steedos-date-mobile"
+						dateMobileOptions:
+							type: "date"
 				else
 					fs.autoform.outFormat = 'yyyy-MM-dd';
 					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dxDateBoxOptions参数会报错
@@ -61,7 +65,11 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = Date
 			if Meteor.isClient
 				if Steedos.isMobile() || Steedos.isPad()
-					fs.autoform.type = 'datetime-local'
+					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dxDateBoxOptions参数会报错
+					fs.autoform.afFieldInput =
+						type: "steedos-date-mobile"
+						dateMobileOptions:
+							type: "datetime"
 				else
 					# 这里用afFieldInput而不直接用autoform的原因是当字段被hidden的时候去执行dxDateBoxOptions参数会报错
 					fs.autoform.afFieldInput =
@@ -93,7 +101,7 @@ Creator.getObjectSchema = (obj) ->
 
 		else if (field.type == "lookup" or field.type == "master_detail")
 			fs.type = String
-
+			fs.autoform.showIcon = field.showIcon
 			if field.multiple
 				fs.type = [String]
 
@@ -148,10 +156,8 @@ Creator.getObjectSchema = (obj) ->
 
 					if field.reference_to == "users"
 						fs.autoform.type = "selectuser"
-						fs.autoform.is_company_only = field.is_company_only
 						if !field.hidden && !field.omit
 							# is_company_limited表示过滤数据时是否只显示本单位下的数据
-							# is_company_limited为true时，is_company_only不会被强制设置为true，它们是两个独立的功能属性
 							# is_company_limited可以被改写覆盖成true/false或其他function
 							if field.is_company_limited == undefined
 								# 未定义is_company_limited属性时默认处理逻辑：
@@ -180,10 +186,8 @@ Creator.getObjectSchema = (obj) ->
 							fs.autoform.is_company_limited = field.is_company_limited
 					else if field.reference_to == "organizations"
 						fs.autoform.type = "selectorg"
-						fs.autoform.is_company_only = field.is_company_only
 						if !field.hidden && !field.omit
 							# is_company_limited表示过滤数据时是否只显示本单位下的数据
-							# is_company_limited为true时，is_company_only不会被强制设置为true，它们是两个独立的功能属性
 							# is_company_limited可以被改写覆盖成true/false或其他function
 							if field.is_company_limited == undefined
 								# 未定义is_company_limited属性时默认处理逻辑：
@@ -322,7 +326,7 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "grid"
 			fs.type = Array
 			fs.autoform.editable = true
-			fs.autoform.type = "table"
+			fs.autoform.type = "steedosGrid"
 
 			schema[field_name + ".$"] =
 				type: Object
@@ -394,6 +398,8 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = String
 			fs.regEx = SimpleSchema.RegEx.Email
 			fs.autoform.type = 'steedosEmail'
+		else if field.type == 'autonumber'
+			fs.type = String
 		else
 			fs.type = field.type
 
@@ -404,6 +410,11 @@ Creator.getObjectSchema = (obj) ->
 			fs.allowedValues = field.allowedValues
 
 		if !field.required
+			fs.optional = true
+
+		# [签约对象同时配置了company_ids必填及uneditable_fields造成部分用户新建签约对象时报错 #192](https://github.com/steedos/steedos-project-dzug/issues/192)
+		# 后台始终设置required为false
+		if !Meteor.isClient
 			fs.optional = true
 
 		if field.unique

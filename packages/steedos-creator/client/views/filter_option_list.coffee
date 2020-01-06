@@ -5,23 +5,7 @@ getDefaultFilters = (object_name, filter_fields, filters)->
 		list_view = Creator.getListView(object_name, list_view_id, true)
 		filter_fields = list_view?.filter_fields
 	fields = Creator.getObject(object_name)?.fields
-	unless filters
-		filters = []
-	unless filter_fields
-		filter_fields = []
-	if filter_fields?.length
-		filter_fields.forEach (n)->
-			if fields[n] and !_.findWhere(filters,{field:n})
-				filters.push {
-					field: n
-					is_default: true
-				}
-	filters.forEach (filterItem)->
-		if _.include(filter_fields, filterItem.field)
-			filterItem.is_default = true
-		else
-			delete filterItem.is_default
-	return filters
+	return Creator.getFiltersWithFilterFields(filters, fields, filter_fields)
 
 Template.filter_option_list.helpers Creator.helpers
 
@@ -220,6 +204,9 @@ Template.filter_option_list.onCreated ->
 								if !_.isArray(reference_to_value)
 									reference_to_value = [reference_to_value];
 								odataFilter = Creator.formatFiltersToDev([idFieldName, "=", reference_to_value], reference_to_object)
+								if reference_to_object == "users"
+									reference_to_object = "space_users"
+									odataFilter = Creator.formatFiltersToDev([["user", "=", reference_to_value], ["space", "=", Steedos.spaceId()]], reference_to_object)
 								queryOptions = 
 									filter: odataFilter,
 									select: nameField
@@ -228,7 +215,7 @@ Template.filter_option_list.onCreated ->
 										filter.valuelabel = (result.map (item)->
 											return item[nameField]).join(",")
 										self.filterItems.set(filters)
-					if field?.optionsFunction or field?.options
+					if (fieldType == 'select') and (field?.optionsFunction or field?.options)
 						if field.optionsFunction
 							options = field?.optionsFunction()
 						else
@@ -277,7 +264,7 @@ Template.filter_option_list.onCreated ->
 					else
 						filter.valuelabel = ""
 				else if fieldType == 'boolean'
-					filter.valuelabel = if filterValue then "是" else "否"
+					filter.valuelabel = if filterValue == true then "是" else if filterValue == false then "否" else ""
 			self.filterItems.set(filters)
 		else
 			self.filterItems.set(null)

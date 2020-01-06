@@ -17,8 +17,8 @@ DISABLEDATTRS = ['description', 'maxlength', 'placeholder', "access", "value", '
 	'toggle', 'rows', 'subtype', 'multiple', 'name']
 
 # 定义字段类型排序
-CONTROLORDER = ['table', 'section', 'text', 'textarea', 'number', 'dateNew', 'dateTime', 'date', 'checkboxBoolean',
-	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group", "odata"]
+CONTROLORDER = ['text', 'textarea', 'number', 'dateNew', 'dateTime', 'date', 'checkboxBoolean',
+	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group", "odata", 'table', 'section']
 
 # 获取各字段类型禁用的字段属性
 #TYPEUSERDISABLEDATTRS = (()->
@@ -40,18 +40,22 @@ BASEUSERATTRS = {
 	default_value: {
 		label: '默认值'
 		type: 'text'
+		value: ''
 	},
 	is_wide: {
 		label: '宽字段',
 		type: 'checkbox'
+		value: false
 	},
 	is_list_display: {
 		label: '列表显示',
 		type: 'checkbox'
+		value: false
 	},
 	is_searchable: {
 		label: '内容可搜',
 		type: 'checkbox'
+		value: false
 	}
 }
 
@@ -61,9 +65,16 @@ CODEUSERATTRS = {
 		label: '字段名'
 		type: 'text'
 		required: 'true'
+		value: ''
 	},
 	label: {
 		type: 'text'
+		value: ''
+	},
+	description: {
+		label: '描述',
+		type: 'textarea'
+		value: ''
 	}
 }
 
@@ -72,6 +83,7 @@ FORMULAUSERATTRS = {
 	formula: {
 		label: '公式',
 		type: 'textarea'
+		value: ''
 	}
 }
 
@@ -79,7 +91,8 @@ FORMULAUSERATTRS_REQUIRED = {
 	formula: {
 		label: '公式',
 		type: 'textarea',
-		required: 'true'
+		required: 'true',
+		value: ''
 	}
 }
 
@@ -122,6 +135,7 @@ getTypeUserAttrs = ()->
 						label: "小数位数"
 						type: 'number'
 						min: '0'
+						value: 0
 					}
 				}, BASEUSERATTRS, FORMULAUSERATTRS
 			when 'password'
@@ -146,10 +160,6 @@ getTypeUserAttrs = ()->
 						label: '唯一键'
 						readonly: 'readonly'
 					},
-					description: {
-						label: '描述',
-						type: 'textarea'
-					},
 					fields: {
 						label: '字段'
 					}
@@ -159,10 +169,6 @@ getTypeUserAttrs = ()->
 					_id: {
 						label: '唯一键'
 						readonly: 'readonly'
-					},
-					description: {
-						label: '描述',
-						type: 'textarea'
 					},
 					fields: {
 						label: '字段'
@@ -177,19 +183,28 @@ getTypeUserAttrs = ()->
 					url: {
 						label: 'Odata API',
 						type: 'textarea',
-						required: 'true'
-					}
+						required: 'true',
+						value: ''
+					},
+					detail_url: {
+						label: '详细页面URL',
+						type: 'textarea',
+						placeholder: '必须包含{_id}标识，示例：http://127.0.0.1/app/-/contracts/view/{_id}',
+						value: ''
+					},
 					filters: {
 						label: '过滤条件',
-						type: 'textarea'
+						type: 'textarea',
+						value: ''
 					},
 					search_field: {
 						label: '可搜索字段'
 						type: 'input'
 						placeholder: '多个请用英文逗号(,)分隔',
-						required: 'true'
+						required: 'true',
+						value: ''
 					}
-				}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display'), FORMULAUSERATTRS_REQUIRED
+				}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display'), MULTISELECTUSERATTRS, FORMULAUSERATTRS_REQUIRED
 			else
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs

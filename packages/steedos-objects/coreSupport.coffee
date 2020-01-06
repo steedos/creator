@@ -30,6 +30,11 @@ Creator.loadObjects = (obj, object_name)->
 
 	if obj.space
 		object_name = 'c_' + obj.space + '_' + obj.name
+	if object_name == 'cfs_files_filerecord'
+		object_name = 'cfs.files.filerecord'
+		obj = _.clone(obj)
+		obj.name = object_name
+		Creator.Objects[object_name] = obj
 
 	Creator.convertObject(obj)
 	new Creator.Object(obj);
@@ -186,18 +191,43 @@ Creator.getObjectRelateds = (object_name)->
 	_object = Creator.Objects[object_name]
 	if !_object
 		return related_objects
+	
+	relatedList = _object.relatedList
+	if !_.isEmpty relatedList
+		relatedListMap = {}
+		_.each relatedList, (objName)->
+			relatedListMap[objName] = {}
+		_.each Creator.Objects, (related_object, related_object_name)->
+			_.each related_object.fields, (related_field, related_field_name)->
+				if (related_field.type == "master_detail" || related_field.type == "lookup") and related_field.reference_to and related_field.reference_to == object_name and relatedListMap[related_object_name]
+					relatedListMap[related_object_name] = { object_name: related_object_name, foreign_key: related_field_name, sharing: related_field.sharing }
+		if relatedListMap['cms_files']
+			relatedListMap['cms_files'] = { object_name: "cms_files", foreign_key: "parent" }
+		if relatedListMap['instances']
+			relatedListMap['instances'] = { object_name: "instances", foreign_key: "record_ids" }
+		_.each ['tasks', 'notes', 'events', 'approvals'], (enableObjName)->
+			if relatedListMap[enableObjName]
+				relatedListMap[enableObjName] = { object_name: enableObjName, foreign_key: "related_to" }
+		if relatedListMap['audit_records']
+			#record 详细下的audit_records仅modifyAllRecords权限可见
+			if Meteor.isClient
+				permissions = Creator.getPermissions(object_name)
+				if _object.enable_audit && permissions?.modifyAllRecords
+					relatedListMap['audit_records'] = { object_name:"audit_records", foreign_key: "related_to" }
+		related_objects = _.values relatedListMap
+		return related_objects
 
 	if _object.enable_files
 		related_objects.push {object_name:"cms_files", foreign_key: "parent"}
 
 	_.each Creator.Objects, (related_object, related_object_name)->
 		_.each related_object.fields, (related_field, related_field_name)->
-			if related_field.type == "master_detail" and related_field.reference_to and related_field.reference_to == object_name
+			if (related_field.type == "master_detail" || (related_field.type == "lookup" && related_field.relatedList)) and related_field.reference_to and related_field.reference_to == object_name
 				if related_object_name == "object_fields"
 					#TODO 待相关列表支持排序后，删除此判断
 					related_objects.splice(0, 0, {object_name:related_object_name, foreign_key: related_field_name})
 				else
-					related_objects.push {object_name:related_object_name, foreign_key: related_field_name}
+					related_objects.push {object_name:related_object_name, foreign_key: related_field_name, sharing: related_field.sharing}
 
 	if _object.enable_tasks
 		related_objects.push {object_name:"tasks", foreign_key: "related_to"}
@@ -207,6 +237,8 @@ Creator.getObjectRelateds = (object_name)->
 		related_objects.push {object_name:"events", foreign_key: "related_to"}
 	if _object.enable_instances
 		related_objects.push {object_name:"instances", foreign_key: "record_ids"}
+	if _object.enable_approvals
+		related_objects.push {object_name:"approvals", foreign_key: "related_to"}
 	#record 详细下的audit_records仅modifyAllRecords权限可见
 	if Meteor.isClient
 		permissions = Creator.getPermissions(object_name)
@@ -256,8 +288,7 @@ Creator.getUserContext = (userId, spaceId, isUnSafeMode)->
 			USER_CONTEXT.user.organization = {
 				_id: space_user_org._id,
 				name: space_user_org.name,
-				fullname: space_user_org.fullname,
-				is_company: space_user_org.is_company
+				fullname: space_user_org.fullname
 			}
 		return USER_CONTEXT
 

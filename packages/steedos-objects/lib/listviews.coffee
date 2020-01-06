@@ -63,15 +63,16 @@ Creator.convertListView = (default_columens, list_view, list_view_name)->
 	if !oitem.columns
 		oitem.columns = ["name"]
 	if !oitem.filter_scope
-		if Steedos.isSpaceAdmin()
-			oitem.filter_scope = "space"
-		else
-			oitem.filter_scope = "mine"
+		# listview视图的filter_scope默认值改为space #131
+		oitem.filter_scope = "space"
 
 	if !_.has(oitem, "_id")
 		oitem._id = list_view_name
 	else
 		oitem.label = oitem.label || list_view.name
+
+	if _.isString(oitem.options)
+		oitem.options = JSON.parse(oitem.options)
 
 	_.forEach oitem.filters, (filter, _index)->
 		if !_.isArray(filter) && _.isObject(filter)
@@ -92,6 +93,7 @@ if Meteor.isClient
 		_.each related_objects, (related_object_item) ->
 			related_object_name = related_object_item.object_name
 			related_field_name = related_object_item.foreign_key
+			sharing = related_object_item.sharing
 			related_object = Creator.getObject(related_object_name)
 			unless related_object
 				return
@@ -109,6 +111,7 @@ if Meteor.isClient
 				columns: columns
 				related_field_name: related_field_name
 				is_file: related_object_name == "cms_files"
+				sharing: sharing
 
 			list.push related
 

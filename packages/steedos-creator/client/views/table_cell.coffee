@@ -73,6 +73,8 @@ Template.creator_table_cell.onRendered ->
 			extraContainer = self.$(".cell-extra-field-container")
 			unless extraContainer.find(".creator_table_cell").length
 				currentDoc = self.data.doc
+				unless currentDoc
+					return
 				if extra_field.indexOf(".") > 0
 					# 子表字段取值
 					extraKeys = extra_field.split(".")
@@ -125,8 +127,6 @@ Template.creator_table_cell.helpers
 
 		_field = this.field
 
-		# debugger
-
 		if !_field
 			return
 
@@ -141,12 +141,15 @@ Template.creator_table_cell.helpers
 			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
 			# 有optionsFunction的情况下，reference_to不考虑数组
-			if _.isFunction(_field.optionsFunction)
+			if _.isFunction(_field.optionsFunction) && !_field.reference_to
 				_values = this.doc || {}
 				_record_val = this.record_val
 				_val = val
 				if _val
-					if !_.isArray(_val)
+					if _.isArray(_val)
+						_val = _val.map (_item)->
+							return if _.isObject(_item) then _item._id else _item
+					else
 						if _.isObject(_val)
 							_val = [_val._id]
 						else
@@ -164,59 +167,13 @@ Template.creator_table_cell.helpers
 				else
 					data.push {value: val, id: this._id}
 			else
-				if this.agreement == "odata"
-					if !_.isArray(val)
-						val = if val then [val] else []
-					_.each val, (v)->
-						reference_to = v["reference_to._o"] || reference_to
-						href = Creator.getObjectUrl(reference_to, v._id)
-						data.push {reference_to: reference_to, rid: v._id, value: v['_NAME_FIELD_VALUE'], href: href, id: this._id}
+				if !_.isArray(val)
+					val = if val then [val] else []
+				_.each val, (v)->
+					reference_to = v["reference_to._o"] || reference_to
+					href = Creator.getObjectUrl(reference_to, v._id)
+					data.push {reference_to: reference_to, rid: v._id, value: v['_NAME_FIELD_VALUE'], href: href, id: this._id}
 
-				else
-					if _.isArray(reference_to) && _.isObject(val)
-						reference_to = val.o
-						val = val.ids
-
-					if !_.isArray(val)
-						val = if val then [val] else []
-					try
-						# debugger;
-						reference_to_object = Creator.getObject(reference_to)
-
-						reference_to_object_name_field_key = reference_to_object.NAME_FIELD_KEY
-
-						reference_to_fields = {_id: 1}
-						reference_to_fields[reference_to_object_name_field_key] = 1
-
-						reference_to_sort = {}
-						reference_to_sort[reference_to_object_name_field_key] = -1
-
-						if _.isFunction(_field.optionsFunction)
-							_values = this.doc || {}
-							_record_val = this.record_val
-							_val = val
-							if _val
-								if !_.isArray(_val)
-									if _.isObject(_val)
-										_val = [_val._id]
-									else
-										_val = [_val]
-								selectedOptions = _.filter _field.optionsFunction(_record_val || _values), (_o)->
-									return _val.indexOf(_o?.value) > -1
-								if selectedOptions
-									if val && _.isArray(val) && _.isArray(selectedOptions)
-										selectedOptions = Creator.getOrderlySetByIds(selectedOptions, val, "value")
-									val = selectedOptions.getProperty("label").join(',')
-									data.push {value: val}
-						else
-							values = Creator.getCollection(reference_to).find({_id: {$in: val}}, {fields: reference_to_fields, sort: reference_to_sort}).fetch()
-							values = Creator.getOrderlySetByIds(values, val)
-							values.forEach (v)->
-								href = Creator.getObjectUrl(reference_to, v._id)
-								data.push {reference_to: reference_to, rid: v._id, value: v[reference_to_object_name_field_key], href: href, id: this._id}
-					catch e
-						console.error(reference_to, e)
-						return
 		else if _field.type == "image"
 			if typeof val is "string"
 				data.push {value: val, id: this._id, isImage: true, baseUrl: Creator.getRelativeUrl("/api/files/images")}
@@ -242,7 +199,7 @@ Template.creator_table_cell.helpers
 		else if _field.type == "url"
 			href = val
 			if !href?.startsWith("http")
-				href = "http://" + encodeURI(href)
+				href = Steedos.absoluteUrl(encodeURI(href))
 			data.push({value: val, href: href, id: this._id, isUrl: true})
 		else if _field.type == "email"
 			data.push({value: val, href: href, id: this._id, isEmail: true})
@@ -285,8 +242,12 @@ Template.creator_table_cell.helpers
 					val = "否"
 			else if _field.type == "select"
 				_options = _field.options
+				_values = this.doc || {}
+				_record_val = this.record_val
 				if _.isFunction(_field.options)
-					_options = _field.options()
+					_options = _field.options(_record_val || _values)
+				if _.isFunction(_field.optionsFunction)
+					_options = _field.optionsFunction(_record_val || _values)
 				if _.isArray(this.val)
 					self_val = this.val
 					_val = []
@@ -311,8 +272,17 @@ Template.creator_table_cell.helpers
 							val = selectedOptions.getProperty("label")
 			else if _field.type == "filesize"
 				val = formatFileSize(val)
-			else if _field.type == "number" && val
-				val = Number(val).toFixed(_field.scale)
+			else if ["number", "currency"].indexOf(_field.type) > -1 && _.isNumber(val)
+				fieldScale = 0
+				if _field.scale
+					fieldScale = _field.scale
+				else if _field.scale != 0
+					fieldScale = if _field.type == "currency" then 2 else 0
+				val = Number(val).toFixed(fieldScale)
+				reg = /(\d)(?=(\d{3})+\.)/g
+				if fieldScale == 0
+					reg = /(\d)(?=(\d{3})+\b)/g
+				val = val.replace(reg, '$1,')
 			else if _field.type == "markdown"
 				val = Spacebars.SafeString(marked(val))
 

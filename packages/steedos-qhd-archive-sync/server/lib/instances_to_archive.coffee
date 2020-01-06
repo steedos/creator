@@ -439,11 +439,11 @@ InstancesToArchive::getNonContractInstances = ()->
 	query = {
 		space: {$in: @spaces},
 		flow: {$nin: @contract_flows},
-		# is_archived 字段被老归档接口占用，所以使用 is_recorded 字段判断是否归档
-		# 正常情况下，未归档的表单无 is_recorded 字段
+		# is_archived 字段被老归档接口占用，所以使用 is_recorded_creator 字段判断是否归档
+		# 正常情况下，未归档的表单无 is_recorded_creator 字段
 		$or: [
-			{is_recorded: false},
-			{is_recorded: {$exists: false}}
+			{is_recorded_creator: false},
+			{is_recorded_creator: {$exists: false}}
 		],
 		is_deleted: false,
 		state: "completed",

@@ -113,6 +113,8 @@ Package.onUse(function(api) {
 	api.addFiles('server/methods/object_workflows.coffee', 'server');
 
 	api.addFiles('server/methods/update_server_session.coffee', 'server');
+	
+	api.addFiles('server/methods/set_space_user_password.coffee', 'server');
 
 	api.addFiles('server/lib/billing_manager.coffee', 'server');
 
@@ -161,8 +163,6 @@ Package.onUse(function(api) {
 		'client/helpers.coffee',
 		'client/tooltip.coffee',
 		'client/router.coffee',
-		'client/layout/main.html',
-		'client/layout/main.less',
 		'client/layout/main.coffee',
 		'client/layout/layout.html',
 		'client/layout/layout.less',
@@ -185,7 +185,8 @@ Package.onUse(function(api) {
 		'client/views/sidebar_user_panel.less',
 		'client/dataTables_bootstrap.less',
 		'client/my_contacts_limit.coffee',
-		'client/my_company_ids.coffee'
+		'client/my_company_ids.coffee',
+		'client/company.coffee'
 	], "client");
 
 	api.addFiles([
@@ -250,10 +251,6 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/steedos/views/space/space_select.html', 'client');
 	api.addFiles('client/steedos/views/space/space_select.coffee', 'client');
-
-	api.addFiles('client/steedos/views/about/steedos_about.html', 'client');
-	api.addFiles('client/steedos/views/about/steedos_about.coffee', 'client');
-	api.addFiles('client/steedos/views/about/steedos_about.css', 'client');
 
 	api.addFiles('client/steedos/views/billing/steedos_billing.html', 'client');
 	api.addFiles('client/steedos/views/billing/steedos_billing.coffee', 'client');

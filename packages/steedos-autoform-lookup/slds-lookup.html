@@ -62,16 +62,18 @@
 						<div class="slds-combobox__form-element slds-input-has-icon{{#if
 								isReadOnly}} slds-input-has-icon_left-right{{else}} slds-input-has-icon_right{{/if}} "
 							 role="none">
+							{{#if isShowIcon}}
 							{{#if isReadOnly}}
 								<span class="slds-icon_container slds-combobox__input-entity-icon slds-icon_object steedos-icon-{{selectedReferenceObject}}">
 									{{> steedos_icon class="slds-icon slds-icon_smal" source="standard-sprite" name=(getIcon selectedReferenceIcon)}}
 								</span>
 							{{/if}}
+							{{/if}}
 							{{#with _value}}
 								<input type="text"
 									   class="form-control slds-input slds-combobox__input steedos-lookups-input {{#if
-											   isReadOnly}}has-value{{/if}}"
-									   id="for-{{../id}}"
+											   isReadOnly}}{{#if isShowIcon}}has-value{{/if}}{{/if}}"
+									   id="for-{{id}}"
 									   aria-autocomplete="list"
 									   aria-controls="listbox-unique-id"
 									   autocomplete="off"
@@ -79,8 +81,7 @@
 									   placeholder="{{_ "Search"}} {{placeholder}}..."
 									   aria-activedescendant="{{value}}" readonly="{{isReadOnly}}" value="{{label}}">
 								{{#if isReadOnly}}
-									<a class="slds-button slds-button_icon slds-input__icon slds-input__icon_right slds-pill__remove"
-									   title="Remove selected option">
+									<a class="slds-button slds-button_icon slds-input__icon slds-input__icon_right slds-pill__remove">
 										{{> steedos_icon class="slds-button__icon" source="utility-sprite" name="close"}}
 									</a>
 								{{else}}
@@ -90,46 +91,49 @@
 								{{/if}}
 							{{/with}}
 						</div>
+
 						{{!--选择项--}}
 						<div id="listbox-unique-id" role="listbox">
 							<ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid"
 								role="presentation">
-								{{#each getItemsUnselected}}
-									<li role="presentation" data-value={{value}} data-index={{@index}} data-selectable
-										class="listbox__item {{isPlaceholder}}">
-										<span id="{{value}}"
-											  class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
-											  role="option">
-											{{!----}}
-											{{#if isShowIcon}}
-												<span class="slds-media__figure">
-												<span class="slds-icon_container slds-icon_object steedos-icon-{{selectedReferenceObject}}">
-													{{> steedos_icon class="slds-icon slds-icon_small" source="standard-sprite" name=(getIcon selectedReferenceIcon)}}
+								{{#if isOpened}}
+									{{#each getItemsUnselected}}
+										<li role="presentation" data-value={{value}} data-index={{@index}} data-selectable
+											class="listbox__item {{isPlaceholder}}">
+											<span id="{{value}}"
+												  class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta {{#if activeOption @index}}slds-has-focus{{/if}}"
+												  role="option">
+												{{!----}}
+												{{#if isShowIcon}}
+													<span class="slds-media__figure">
+													<span class="slds-icon_container slds-icon_object steedos-icon-{{selectedReferenceObject}}">
+														{{> steedos_icon class="slds-icon slds-icon_small" source="standard-sprite" name=(getIcon selectedReferenceIcon)}}
+													</span>
+												</span>
+												{{/if}}
+
+												<span class="slds-m-left--smalllabels slds-truncate slds-media__body media__body-center">
+													<span class="slds-listbox__option-text slds-listbox__option-text_entity">{{label}}</span>
 												</span>
 											</span>
-											{{/if}}
+										</li>
+									{{/each}}
+									{{#if canCreate}}
+									<li role="presentation">
+										<span class="createNew slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta {{#if activeOption 'create'}}slds-has-focus{{/if}}"
+											  role="option">
+											<span class="slds-media__figure">
+												<span class="slds-icon_container steedos-icon-add slds-button__icon">
+													{{> steedos_icon class="slds-icon slds-icon_small" source="utility-sprite" name="add"}}
+												</span>
+											</span>
 
 											<span class="slds-m-left--smalllabels slds-truncate slds-media__body media__body-center">
-												<span class="slds-listbox__option-text slds-listbox__option-text_entity">{{label}}</span>
+												<span class="slds-listbox__option-text slds-listbox__option-text_entity">新建{{createTitle}}</span>
 											</span>
 										</span>
 									</li>
-								{{/each}}
-								{{#if canCreate}}
-								<li role="presentation">
-									<span class="createNew slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
-										  role="option">
-										<span class="slds-media__figure">
-											<span class="slds-icon_container steedos-icon-add slds-button__icon">
-												{{> steedos_icon class="slds-icon slds-icon_small" source="utility-sprite" name="add"}}
-											</span>
-										</span>
-
-										<span class="slds-m-left--smalllabels slds-truncate slds-media__body media__body-center">
-											<span class="slds-listbox__option-text slds-listbox__option-text_entity">新建{{createTitle}}</span>
-										</span>
-									</span>
-								</li>
+									{{/if}}
 								{{/if}}
 							</ul>
 						</div>

@@ -17,6 +17,15 @@ start.bat
 .dist/*
 .steedos/*
 .steedos
-package-lock.json
 my_start.bat
-yarn.lock
+yarn-error.log
+.dist/yarn.lock
+.plugins
+package-lock.json
+
+.DS_Store
+.env.development.local
+.env.local
+.env.production.local
+.env.test.local
+.history/*

@@ -21,6 +21,10 @@ Creator.formBuilder.transformFormFieldsIn = (formFields)->
 			value: f.default_value,
 			required: f.is_required
 		}, f)
+		if !field.code
+			field.code = field.name
+		else
+			field.name = field.code
 		switch f.type
 			when 'input'
 				field.type = 'text'
@@ -106,6 +110,9 @@ Creator.formBuilder.transformFormFieldsOut = (fields)->
 		delete field.className
 		delete field.required
 		delete field.value
+
+		if _.isEmpty(field._id)
+			field._id = db.forms._makeNewID()
 
 		field.is_multiselect = field.is_multiselect || false
 		field.is_searchable = field.is_searchable || false

@@ -1,3 +1,12 @@
+@media (max-width: 767px) {
+	// 防止 ios 上手指滑动时，触发页面弹动
+	// 只应用在手机上，是因为PC上部分界面需要滚动条，比如审批王申请单打印界面
+	html, body {
+		position: fixed;
+		overflow: hidden;
+	}
+}
+
 body {
 
 	background-size: cover;
@@ -8,6 +17,9 @@ body {
 	}
 
 	zoom: 1 !important;
+
+	// iOS 上平滑滚动
+	-webkit-overflow-scrolling: touch;
 }
 
 .steedos {
@@ -206,61 +218,6 @@ body {
 		min-height: auto;
 		padding-bottom: 0.75rem;
 	}
-	.slds-global-header_container {
-		z-index: 1000;
-		background: rgba(255, 255, 255, 0.95);
-		border-bottom: 0;
-		transition: all 1s ease-in-out 0.5s;
-		x-box-shadow: rgba(0, 0, 0, 0.3) 0 1px 5px, rgba(255, 255, 255, 0.2) 0 -1px 0 inset;
-
-		.slds-global-header {
-			background: transparent;
-			box-shadow: none;
-
-			.slds-global-header__logo {
-				width: 12.5rem;
-				height: 2.5rem;
-				background-size: contain;
-				background-repeat: no-repeat;
-				background-position: left center;
-				img{
-					height: 100%;
-					width: auto;
-				}
-			}
-
-		}
-		.slds-context-bar {
-			background: transparent;
-			padding: 0px 0px 0px 1rem;
-			border-bottom: 2px solid rgba(0, 161, 223, 1.0);
-			color: rgb(8, 7, 7);
-			a {
-				text-decoration: none !important;
-			}
-			.slds-context-bar__app-name {
-				font-weight: inherit;
-			}
-			.slds-context-bar__primary, .slds-context-bar__secondary, .slds-context-bar__tertiary {
-				height: 2.5rem;
-			}
-			.slds-context-bar__item:not(.slds-no-hover):hover:after {
-				bottom: auto;
-				top: 0;
-			}
-			.slds-context-bar__item.slds-is-active:before {
-				background: rgba(0, 161, 223, 1.0);
-			}
-		}
-	}
-
-	.slds-page-header {
-		background: rgb(243, 242, 242);
-	}
-
-	.slds-button_neutral, .slds-button--neutral, .slds-button_icon-border-filled, .slds-button--icon-border-filled, .slds-button_icon-border, .slds-button--icon-border {
-		border-color: #e7e7eb;
-	}
 
 	.slds-form-element {
 		.control-label{
@@ -301,14 +258,10 @@ body {
 
 	.slds-tabs_default__nav, .slds-tabs--default__nav {
 		border-bottom: 1px solid #e7e7eb;
-		.slds-tabs_default__item:after, .slds-tabs--default__item:after {
-			height: 1px;
-		}
-	}
-
-	.objectViewManager {
-		.slds-tabs_default {
-			background: transparent;
+		.slds-tabs_default__item{
+			.slds-tabs_default__link{
+				margin-top: -0.75rem;
+			}
 		}
 	}
 
@@ -481,7 +434,7 @@ body {
 }
 
 .dx-treeview-search {
-	margin: 12px 6px;
+	margin: 8px 6px;
 }
 
 .dx-treeview-item.dx-state-hover {
@@ -572,3 +525,5 @@ margin-left: 216px; }
 		height: 14px;
 	}
 }
+
+

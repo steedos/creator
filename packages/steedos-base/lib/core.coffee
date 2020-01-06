@@ -59,18 +59,16 @@ if Meteor.isClient
 		if accountBgBodyValue.url
 			if url == avatar
 				avatarUrl = 'api/files/avatars/' + avatar
-				$("body").css "backgroundImage","url(#{if Meteor.isCordova then avatarUrl else Meteor.absoluteUrl(avatarUrl)})"
+				$("body").css "backgroundImage","url(#{Steedos.absoluteUrl(avatarUrl)})"
 			else
-				# 这里不可以用Steedos.absoluteUrl，因为app中要从本地抓取资源可以加快速度并节约流量
-				$("body").css "backgroundImage","url(#{if Meteor.isCordova then url else Meteor.absoluteUrl(url)})"
+				$("body").css "backgroundImage","url(#{Steedos.absoluteUrl(url)})"
 		else
-			# 这里不可以用Steedos.absoluteUrl，因为app中要从本地抓取资源可以加快速度并节约流量
 			background = Meteor.settings?.public?.admin?.background
 			if background
-				$("body").css "backgroundImage","url(#{if Meteor.isCordova then background else Meteor.absoluteUrl(background)})"
+				$("body").css "backgroundImage","url(#{Steedos.absoluteUrl(background)})"
 			else
 				background = "/packages/steedos_theme/client/background/sea.jpg"
-				$("body").css "backgroundImage","url(#{if Meteor.isCordova then background else Meteor.absoluteUrl(background)})"
+				$("body").css "backgroundImage","url(#{Steedos.absoluteUrl(background)})"
 
 		if isNeedToLocal
 			if Meteor.loggingIn()
@@ -187,14 +185,6 @@ if Meteor.isClient
 			else
 				Steedos.openWindow(url)
 
-	Steedos.redirectToSignIn = (redirect)->
-		signInUrl = AccountsTemplates.getRoutePath("signIn")
-		if redirect
-			if signInUrl.indexOf("?") > 0
-				signInUrl += "&redirect=#{redirect}"
-			else
-				signInUrl += "?redirect=#{redirect}"
-		FlowRouter.go signInUrl
 
 	Steedos.openApp = (app_id)->
 		if !Meteor.userId()
@@ -827,12 +817,22 @@ if Meteor.isServer
 			valid = true
 			unless pwd
 				valid = false
-			unless /\d+/.test(pwd)
-				valid = false
-			unless /[a-zA-Z]+/.test(pwd)
-				valid = false
-			if pwd.length < 8
-				valid = false
+
+			passworPolicy = Meteor.settings.public?.password?.policy
+			passworPolicyError = Meteor.settings.public?.password?.policyError
+			if passworPolicy
+				if !(new RegExp(passworPolicy)).test(pwd || '')
+					reason = passworPolicyError
+					valid = false
+				else
+					valid = true
+#			else
+#				unless /\d+/.test(pwd)
+#					valid = false
+#				unless /[a-zA-Z]+/.test(pwd)
+#					valid = false
+#				if pwd.length < 8
+#					valid = false
 			if valid
 				return true
 			else

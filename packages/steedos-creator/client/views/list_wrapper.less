@@ -125,17 +125,24 @@
 		&.list-table-sidebar{
 			flex: 1;
 			border-right: 1px solid rgb(224, 229, 238);
+			border-bottom-right-radius: 0px !important;
+			.dx-scrollable-content{
+				padding-bottom: 20px;
+			}
+			&~.list-table-container {
+				border-bottom-left-radius: 0px !important;
+			}
 		}
 	}
 }
 
-#addListView{
-	.view-page-section-row:nth-child(5){
-		display: none;
-	}
-}
+//#addListView{
+//	.view-page-section-row:nth-child(5){
+//		display: none;
+//	}
+//}
 
-/*start=====处理客户端高度问题，客户端高度计算有bug，会造成grid列表底部显示不全，进而造成看不到底部水平滚动条======*/
+/*start=====处理客户端grid列表高度问题，客户端高度计算有bug，会造成grid列表底部显示不全，进而造成看不到底部水平滚动条======*/
 @media (min-width: 767px) {
 	.filter-list-wraper.creator-grid-wrap>.weui-flex {
 		height: calc(~"100% - 100px") !important;
@@ -144,9 +151,34 @@
 			height: 100%;
 		}
 
-		.dx-scrollable-customizable-scrollbars {
-			height: calc(~"100% - 76px") !important;
+		.dx-datagrid {
+			.dx-scrollable-customizable-scrollbars {
+				height: calc(~"100% - 76px") !important;
+			}
 		}
 	}
 }
 /*end===========*/
+
+/*start=====处理客户端日历高度问题======*/
+@media (min-width: 767px) {
+	.filter-list-wraper.creator-calendar-wrap>.weui-flex {
+		height: calc(~"100% - 68px") !important;
+
+		&>.table-grid-content>.slds-col {
+			height: 100%;
+			&>.list-table-container>.creator-calendar>.slds-grid>.slds-col {
+				height: 100%;
+			}
+		}
+
+		.dx-scheduler-scrollable-fixed-content {
+			height: 100%;
+			min-height: 700px;
+			overflow: hidden !important;
+    		width: 100%;
+		}
+	}
+}
+/*end===========*/
+

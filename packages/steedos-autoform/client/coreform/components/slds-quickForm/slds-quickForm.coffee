@@ -1,7 +1,8 @@
 Template.quickForm_slds.helpers
 	isDisabled: (key)->
 		object_name = Template.instance().data.atts.object_name
-		fields = Creator.getObject(object_name)?.fields
+		#处理不能使用Creator.getObject 获取对象， 因为在client端， Creator.getObject 中的对象已被user permission 改写
+		fields = Creator.Objects[object_name]?.fields
 		return fields[key]?.disabled
 	hasInlineHelpText: (key)->
 		object_name = Template.instance().data.atts.object_name
@@ -10,6 +11,8 @@ Template.quickForm_slds.helpers
 
 	is_range: (key)->
 		return Template.instance()?.data?.qfAutoFormContext.schema._schema[key]?.autoform?.is_range
+	is_renge_end: (key)->
+		return key?.endsWith("_endLine");
 
 	schemaFields: ()->
 		object_name = this.atts.object_name
@@ -85,3 +88,46 @@ Template.quickForm_slds.events
 		event.preventDefault()
 		event.stopPropagation()
 		$(event.currentTarget).closest('.group-section').toggleClass('slds-is-open')
+
+Template.quickForm_slds.onRendered ->
+	self = this
+	self.$(".has-inline-text").each ->
+		id = "info_" + $(".control-label", $(this)).attr("for")
+		html = """
+				<span class="help-info" id="#{id}">
+					<i class="ion ion-information-circled"></i>
+				</span>
+			"""
+		$(".control-label", $(this)).append(html)
+
+
+	self.$(".info-popover").each ->
+		_id = $("~ .form-group .help-info", $(this)).attr("id");
+		$(this).dxPopover
+			target: "#" + _id,
+			showEvent: "mouseenter",
+			hideEvent: "mouseleave",
+			position: "top",
+			width: 300,
+			animation: {
+				show: {
+					type: "pop",
+					from: {
+						scale: 0
+					},
+					to: {
+						scale: 1
+					}
+				},
+				hide: {
+					type: "fade",
+					from: 1,
+					to: 0
+				}
+			}
+
+Template.range_field.helpers
+	startName: ()->
+		return this.toString()
+	endName: ()->
+		return this.toString() + '_endLine'

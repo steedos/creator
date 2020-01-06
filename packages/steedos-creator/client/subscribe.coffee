@@ -12,10 +12,6 @@ Meteor.startup ->
 	# 		Creator.subs["objectRecentViewed"].subscribe "object_recent_viewed", Session.get("object_name")
 
 	Tracker.autorun (c)->
-		if Session.get("spaceId")
-			Creator.subs["Creator"].subscribe 'subCompany', Session.get('spaceId')
-
-	Tracker.autorun (c)->
 		if Session.get("object_name") and Session.get("spaceId")
 			Creator.subs["CreatorListViews"].subscribe "object_listviews", Session.get("object_name"), Session.get("spaceId")
 
@@ -29,7 +25,10 @@ Meteor.startup ->
 			defaultColumns = Creator.getObjectDefaultColumns(Session.get("object_name"))
 			object_listViews.forEach (listview)->
 				_list_view = Creator.convertListView(defaultColumns, listview, listview.name)
-				_key = listview._id
+				if listview.api_name
+					_key = listview.api_name
+				else
+					_key = listview._id
 #				if listview.is_default
 #					_key = "all"
 				list_views[_key] = _list_view
@@ -43,7 +42,10 @@ Meteor.startup ->
 					# 	key = oldDocument.name
 					# else
 					# 	key = oldDocument._id
-					key = oldDocument._id
+					if oldDocument.api_name
+						key = oldDocument.api_name
+					else
+						key = oldDocument._id
 					delete Creator.Objects[Session.get("object_name")].list_views[key]
 					delete Creator.getObject(Session.get("object_name")).list_views[key]
 			}
@@ -67,4 +69,8 @@ Meteor.startup ->
 #		if Session.get("action_object_name") and Session.get("action_record_id")
 #			Creator.subs["CreatorActionRecord"].subscribe "creator_object_record", Session.get("action_object_name"), Session.get("action_record_id"), Session.get('spaceId')
 
+Meteor.startup ->
+	Tracker.autorun (c)->
+		if Session.get("spaceId")
+			Meteor.subscribe("myFollows", Session.get("spaceId"))
 

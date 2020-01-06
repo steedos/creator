@@ -2,8 +2,8 @@ Template.creatorSidebarLeft.helpers
 	app_id: ()->
 		return Session.get("app_id")
 
-	app_name: ()->
-		app = Creator.getApp()
+	app_name: (_id)->
+		app = Creator.getApp(_id)
 		unless app
 			return ""
 		return if app.label then t(app.label) else t(app.name)
@@ -11,22 +11,32 @@ Template.creatorSidebarLeft.helpers
 	object_i: ()->
 		return Creator.getObject(this)
 
-	app_objects: ()->
-		return Creator.getAppObjectNames()
+	app_objects: (_id)->
+		app = Creator.getApp(_id)
+		objects = []
+		if app
+			_.each app.mobile_objects, (v)->
+				obj = Creator.getObject(v)
+				if obj?.permissions.get().allowRead and !obj.hidden
+					objects.push v
+		return objects
 
 	isActive: (obj)->
-		if (obj == FlowRouter.getParam("object_name"))
+		if (obj == Session.get("object_name"))
 			return true
 
-	hideObjects: ()->
-		app = Creator.getApp()
+	hideObjects: (_id)->
+		app = Creator.getApp(_id)
 		if app and app._id == "admin"
 			return true
 		else
 			return false
 
 	object_url: ()->
-		return Creator.getObjectFirstListViewUrl(String(this), null)
+		return Steedos.absoluteUrl("/app/-/#{String(this)}")
+
+	settings_url: ()->
+		return Steedos.absoluteUrl('/user_settings')
 
 	spaceName: ->
 		if Session.get("spaceId")
@@ -35,9 +45,27 @@ Template.creatorSidebarLeft.helpers
 				return space.name
 		return t("none_space_selected_title")
 
+	getApps: ->
+		return _.filter Creator.getVisibleApps(true), (item)->
+			return item._id !='admin' && !_.isEmpty(item.mobile_objects)
+
+	logoUrl: ()->
+		avatar = db.spaces.findOne(Steedos.getSpaceId())?.avatar_square
+		if avatar
+			return Creator.getRelativeUrl("/api/files/avatars/#{avatar}")
+		else
+			logo_url = "/packages/steedos_creator/assets/logo-square.png"
+			return Creator.getRelativeUrl(logo_url)
+
 Template.creatorSidebarLeft.events
 	"click #sidebarSwitcherButton": (e, t)->
 		Modal.show("mobile_apps_modal")
 	"click .settings-btn": (e, t)->
-		console.log('click .settings-btn');
 		FlowRouter.go '/user_settings'
+	'click .sidebar-backdrop': (e, t)->
+		$("#sidebar-left").removeClass('move--right')
+		$(".steedos").removeClass('move--right')
+	'click .sidebar--left': (e, t)->
+		$("#sidebar-left").removeClass('move--right')
+		$(".steedos").removeClass('move--right')
+		

@@ -129,6 +129,9 @@ if Meteor.isClient
 						selector.push "and"
 
 					filters = Creator.formatFiltersToDev(filters, object_name)
+					if filters and filters.length > 0
+						#兼容[filter1,'or',filters]这种or链接条件，应该改为[[filter1,'or',filters]]，这样下面的selector.push就不会出问题
+						filters = [filters] 
 					_.each filters, (filter)->
 						selector.push filter
 		else
@@ -138,6 +141,8 @@ if Meteor.isClient
 				if filters
 					filters = Creator.formatFiltersToDev(filters, object_name)
 					if filters and filters.length > 0
+						#兼容[filter1,'or',filters]这种or链接条件，应该改为[[filter1,'or',filters]]，这样下面的selector.push就不会出问题
+						filters = [filters]
 						if selector.length > 0
 							selector.push "and"
 						_.each filters, (filter)->
@@ -149,29 +154,29 @@ if Meteor.isClient
 				selector.push "and"
 			selector.push ["owner", "=", userId]
 		
-		permissions = Creator.getPermissions(object_name)
-		if permissions.viewAllRecords
-			# 有所有权限则不另外加过虑条件
-		else if permissions.viewCompanyRecords
-			# 限制查看本单位时另外加过虑条件
-			if selector.length > 0
-				selector.push "and"
-			userCompanyIds = Creator.getUserCompanyIds()
-			if userCompanyIds && userCompanyIds.length
-				companyIdsFilters = Creator.formatFiltersToDev(["company_id", "=", userCompanyIds], object_name)
-				selector.push companyIdsFilters
-			else 
-				selector.push ["company_id", "=", -1]
-		else if permissions.allowRead
-			# 只是时allowRead另外加过虑条件，限制为只能看自己的记录
-			if selector.length > 0
-				selector.push "and"
-			selector.push ["owner", "=", userId]
-		else
-			# 没有权限时不应该显示任何记录
-			if selector.length > 0
-				selector.push "and"
-			selector.push ["id", "=", "-1"]
+		# permissions = Creator.getPermissions(object_name)
+		# if permissions.viewAllRecords
+		# 	# 有所有权限则不另外加过虑条件
+		# else if permissions.viewCompanyRecords
+		# 	# 限制查看本单位时另外加过虑条件
+		# 	if selector.length > 0
+		# 		selector.push "and"
+		# 	userCompanyIds = Creator.getUserCompanyIds()
+		# 	if userCompanyIds && userCompanyIds.length
+		# 		companyIdsFilters = Creator.formatFiltersToDev(["company_id", "=", userCompanyIds], object_name)
+		# 		selector.push companyIdsFilters
+		# 	else 
+		# 		selector.push ["company_id", "=", -1]
+		# else if permissions.allowRead
+		# 	# 只是时allowRead另外加过虑条件，限制为只能看自己的记录
+		# 	if selector.length > 0
+		# 		selector.push "and"
+		# 	selector.push ["owner", "=", userId]
+		# else
+		# 	# 没有权限时不应该显示任何记录
+		# 	if selector.length > 0
+		# 		selector.push "and"
+		# 	selector.push ["id", "=", "-1"]
 
 		if selector.length == 0
 			return undefined
@@ -216,6 +221,9 @@ if Meteor.isClient
 							else
 								return obj
 						filters = Creator.formatFiltersToDev(filters, related_object_name)
+						if filters and filters.length > 0
+							#兼容[filter1,'or',filters]这种or链接条件，应该改为[[filter1,'or',filters]]，这样下面的selector.push就不会出问题
+							filters = [filters] 
 						_.each filters, (filter)->
 							addSelector filter
 
@@ -256,29 +264,173 @@ if Meteor.isClient
 		if filter_scope == "mine"
 			addSelector ["owner", "=", userId]
 			
-		permissions = Creator.getPermissions(related_object_name, spaceId, userId)
-		if permissions.viewAllRecords
-			# 有所有权限则不另外加过虑条件
-		else if permissions.viewCompanyRecords
-			# 限制查看本单位时另外加过虑条件
-			if selector.length > 0
-				selector.push "and"
-			userCompanyIds = Creator.getUserCompanyIds()
-			if userCompanyIds && userCompanyIds.length
-				companyIdsFilters = Creator.formatFiltersToDev(["company_id", "=", userCompanyIds], related_object_name)
-				addSelector companyIdsFilters
-			else
-				addSelector ["company_id", "=",-1]
-		else if permissions.allowRead
-			# 只是时allowRead另外加过虑条件，限制为只能看自己的记录
-			addSelector ["owner", "=", userId]
-		else
-			# 没有权限时不应该显示任何记录
-			addSelector ["1", "=", "-1"]
+		# permissions = Creator.getPermissions(related_object_name, spaceId, userId)
+		# if permissions.viewAllRecords
+		# 	# 有所有权限则不另外加过虑条件
+		# else if permissions.viewCompanyRecords
+		# 	# 限制查看本单位时另外加过虑条件
+		# 	if selector.length > 0
+		# 		selector.push "and"
+		# 	userCompanyIds = Creator.getUserCompanyIds()
+		# 	if userCompanyIds && userCompanyIds.length
+		# 		companyIdsFilters = Creator.formatFiltersToDev(["company_id", "=", userCompanyIds], related_object_name)
+		# 		addSelector companyIdsFilters
+		# 	else
+		# 		addSelector ["company_id", "=",-1]
+		# else if permissions.allowRead
+		# 	# 只是时allowRead另外加过虑条件，限制为只能看自己的记录
+		# 	addSelector ["owner", "=", userId]
+		# else
+		# 	# 没有权限时不应该显示任何记录
+		# 	addSelector ["1", "=", "-1"]
 
 		if selector.length == 0
 			return undefined
 		return selector
+
+	Creator.getJsReportUrlQuery = ()->
+		urlQuery = "?space_id=#{Steedos.getSpaceId()}"
+		filter_items = Tracker.nonreactive ()->
+			return Session.get("filter_items")
+		if filter_items
+			filterQuery = encodeURI JSON.stringify(filter_items)
+			urlQuery += "&user_filters=#{filterQuery}"
+		return urlQuery;
+
+	Creator.getJsReportViewUrl = (report_id)->
+		url = Creator.getRelativeUrl("/plugins/jsreport/web/viewer_db/#{report_id}")
+		url += Creator.getJsReportUrlQuery()
+		return url;
+	
+	Creator.getJsReportExcelUrl = (report_id)->
+		url = Creator.getRelativeUrl("/plugins/jsreport/api/report_db/#{report_id}/excel")
+		url += Creator.getJsReportUrlQuery()
+		return url;
+	
+	Creator.getJsReportPdfUrl = (report_id)->
+		url = Creator.getRelativeUrl("/plugins/jsreport/api/report_db/#{report_id}/pdf")
+		url += Creator.getJsReportUrlQuery()
+		return url;
+	
+	Creator.objectOdataSelectFields = (object)->
+		_fields = object.fields
+		_keys = _.keys(_fields)
+		_keys = _keys.filter (k)->
+			if k.indexOf(".") < 0
+				return true
+			else
+				return false
+		return _keys.join(",")
+
+	Creator.objectOdataExpandFields = (object, columns)->
+		expand_fields = []
+		fields = object.fields
+		unless columns
+			columns = _.keys(fields)
+		_.each columns, (n)->
+			if fields[n]?.type == "master_detail" || fields[n]?.type == "lookup"
+				if fields[n].reference_to
+					ref = fields[n].reference_to
+					if _.isFunction(ref)
+						ref = ref()
+				else
+					ref = fields[n].optionsFunction({}).getProperty("value")
+
+				if !_.isArray(ref)
+					ref = [ref]
+
+				ref = _.map ref, (o)->
+					key = Creator.getObject(o)?.NAME_FIELD_KEY || "name"
+					return key
+
+				ref = _.compact(ref)
+
+				ref = _.uniq(ref)
+
+				ref = ref.join(",")
+				if ref && n.indexOf("$") < 0
+					if n.indexOf(".") < 0
+						expand_fields.push(n)
+					else
+						expand_fields.push(n.replace('.', '/'))
+	#		else if fields[n].type == 'grid'
+	#			expand_fields.push(n)
+		return expand_fields.join(",")
+	
+	Creator.relatedObjectFileUploadHandler = (event, gridContainerWrap)->
+		dataset = event.currentTarget.dataset
+		parent = dataset?.parent
+		targetObjectName = dataset?.targetObjectName
+		files = event.currentTarget.files
+		i = 0
+		record_id = Session.get("record_id")
+		object_name = Session.get("object_name")
+		spaceId = Session.get("spaceId")
+		dxDataGridInstance = gridContainerWrap.find(".gridContainer.#{targetObjectName}").dxDataGrid().dxDataGrid('instance')
+		while i < files.length
+			file = files[i]
+			if !file.name
+				continue
+			fileName = file.name
+			if [
+					'image.jpg'
+					'image.gif'
+					'image.jpeg'
+					'image.png'
+				].includes(fileName.toLowerCase())
+				fileName = 'image-' + moment(new Date).format('YYYYMMDDHHmmss') + '.' + fileName.split('.').pop()
+			# Session.set 'filename', fileName
+			# $('.loading-text').text TAPi18n.__('workflow_attachment_uploading') + fileName + '...'
+			fd = new FormData
+			fd.append 'Content-Type', cfs.getContentType(fileName)
+			fd.append 'file', file
+			fd.append 'record_id', record_id
+			fd.append 'object_name', object_name
+			fd.append 'space', spaceId
+			fd.append 'owner', Meteor.userId()
+			fd.append 'owner_name', Meteor.user().name
+			if parent
+				fd.append 'parent', parent
+			$(document.body).addClass 'loading'
+			$.ajax
+				url: Steedos.absoluteUrl('s3/')
+				type: 'POST'
+				async: true
+				data: fd
+				dataType: 'json'
+				processData: false
+				contentType: false
+				success: (responseText, status) ->
+					fileObj = undefined
+					$(document.body).removeClass 'loading'
+					if responseText.errors
+						responseText.errors.forEach (e) ->
+							toastr.error e.errorMessage
+							return
+						return
+					toastr.success TAPi18n.__('Attachment was added successfully')
+					Template.creator_grid.refresh dxDataGridInstance
+					return
+				error: (xhr, msg, ex) ->
+					$(document.body).removeClass 'loading'
+					if ex
+						msg = ex
+					if msg == "Request Entity Too Large"
+						msg = "creator_request_oversized"
+					toastr.error t(msg)
+					return
+			i++
+		$(event.target).val("")
+
+	Creator.getIsFiltering = ()->
+		filter_items = Session.get("filter_items")
+		isFiltering = false;
+		_.every filter_items, (filter_item)->
+			if filter_item.value
+				isFiltering = true;
+			return !isFiltering;
+		return isFiltering
+	
 
 # 切换工作区时，重置下拉框的选项
 Meteor.startup ->

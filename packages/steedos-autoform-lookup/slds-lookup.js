@@ -140,6 +140,12 @@ Template.steedosLookups.onRendered(function () {
 		}
 	});
 
+	template.autorun(function () {
+		if(template.uniSelectize.open.get()){
+			template.uniSelectize.opened.set(true)
+		}
+	});
+
 	if(template.uniSelectize.dependOn && _.isArray(template.uniSelectize.dependOn) && template.uniSelectize.dependOn.length > 0){
 		template.autorun(function () {
 
@@ -173,19 +179,20 @@ Template.steedosLookups.onRendered(function () {
     this.form.bind('reset', function () {
         template.uniSelectize.unselectItem(null, true);
     });
-
-	Sortable.create($(".slds-selected-items-" + this.data.id)[0], {
-		group: 'words',
-		animation: 150,
-		filter: '.js-remove',
-		onFilter: function (evt) {
-			var el = selectUsersList.closest(evt.item)
-			console.log("onFilter-->", el)
-		},
-		onEnd: function (event) {
-			console.log("onEnd-->", event)
-		}
-	})
+	if($(".slds-selected-items-" + this.data.id)[0]){
+		Sortable.create($(".slds-selected-items-" + this.data.id)[0], {
+			group: 'words',
+			animation: 150,
+			filter: '.js-remove',
+			onFilter: function (evt) {
+				var el = selectUsersList.closest(evt.item)
+				console.log("onFilter-->", el)
+			},
+			onEnd: function (event) {
+				console.log("onEnd-->", event)
+			}
+		})
+	}
 });
 
 Template.steedosLookups.onDestroyed(function () {
@@ -199,7 +206,9 @@ Template.steedosLookups.helpers({
 		var template = Template.instance();
 		return template.uniSelectize.initialized.get();
 	},
-
+	id: function () {
+		return Template.instance().data.atts.id
+	},
 	dataSchemaKeyFromAtts: function(){
 		return Template.instance().data.atts.dataSchemaKey
 	},
@@ -246,6 +255,10 @@ Template.steedosLookups.helpers({
 
         return template.uniSelectize.open.get();
     },
+	isOpened: function () {
+		var template = Template.instance();
+		return template.uniSelectize.opened.get();
+	},
     loading: function () {
         var template = Template.instance();
         return template.uniSelectize.loading.get();
@@ -378,7 +391,7 @@ Template.steedosLookups.helpers({
 
 	selectedReferenceObject: function () {
     	if(Template.instance().data.objectSwitche){
-			return Template.instance().uniSelectize.selectedReference.get().object
+			return Template.instance().uniSelectize.selectedReference.get() ? Template.instance().uniSelectize.selectedReference.get().object : ''
 		}
 	},
 
@@ -446,7 +459,7 @@ Template.steedosLookups.events({
 			template.uniSelectize.getOptionsFromMethod();
 		}
     },
-    'keydown input.js-universeSelectizeInput': function (e, template) {
+    'keydown input.steedos-lookups-input': function (e, template) {
         var uniSelectize = template.uniSelectize;
         var itemsSelected = uniSelectize.itemsSelected.get();
         var itemsUnselected = uniSelectize.getItemsUnselectedFiltered();
@@ -459,7 +472,6 @@ Template.steedosLookups.events({
         var width = template.uniSelectize.measureString($input.val(), $input) + 10;
 
         $input.width(width);
-
         switch (e.keyCode) {
             case 8: // backspace
                 if ($input.val() === '') {
@@ -486,6 +498,7 @@ Template.steedosLookups.events({
 
             case 13: // enter
                 e.preventDefault();
+                e.stopPropagation();
 
                 if (activeOption === -1 && $input.val() === '') {
                     break;
@@ -523,12 +536,23 @@ Template.steedosLookups.events({
             case 38:    // up
                 if (activeOption > -1) {
                     uniSelectize.activeOption.set(activeOption - 1);
+                    if(activeOption - 1 > -1){
+						Meteor.defer(function () {
+							var focusElement = $(template.find('.slds-has-focus'));
+							focusElement.offsetParent().scrollTop(focusElement.offsetParent().scrollTop() + (focusElement.offset().top-focusElement.offsetParent().offset().top))
+						})
+					}
                 }
                 break;
             case 40:    // down
                 if (activeOption < itemsUnselected.length - 1 ||
                     (activeOption < itemsUnselected.length && uniSelectize.create)) {
+                	// console.debug('activeOption.set', activeOption + 1);
                     uniSelectize.activeOption.set(activeOption + 1);
+					Meteor.defer(function () {
+						var focusElement = $(template.find('.slds-has-focus'));
+						focusElement.offsetParent().scrollTop(focusElement.offsetParent().scrollTop() + (focusElement.offset().top-focusElement.offsetParent().offset().top))
+					})
                 }
                 break;
         }
@@ -599,13 +623,13 @@ Template.steedosLookups.events({
             template.uniSelectize.open.set(false);
         }, 500);
     },
-    // 'scroll .selectize-dropdown-content':  function (e, template) {
+    // 'scroll .slds-listbox_vertical':  function (e, template) {
     //     Meteor.clearTimeout(template.uniSelectize.timeoutId);
     //     template.uniSelectize.timeoutId = Meteor.setTimeout(function () {
     //         template.uniSelectize.open.set(false);
     //     }, 5000);
     // },
-    // 'mouseenter .selectize-dropdown-content > div': function (e, template) {
+    // 'mouseenter .slds-listbox_vertical > li': function (e, template) {
     //     var $el = $(e.target);
     //     var elIndex = $el.attr('data-index');
     //     var itemsUnselected = template.uniSelectize.getItemsUnselectedFiltered();

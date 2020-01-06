@@ -97,12 +97,22 @@ Steedos.Helpers =
 		valid = true
 		unless pwd
 			valid = false
-		unless /\d+/.test(pwd)
-			valid = false
-		unless /[a-zA-Z]+/.test(pwd)
-			valid = false
-		if pwd.length < 8
-			valid = false
+
+		passworPolicy = Meteor.settings.public?.password?.policy
+		passworPolicyError = Meteor.settings.public?.password?.policyError
+		if passworPolicy
+			if !(new RegExp(passworPolicy)).test(pwd || '')
+				reason = passworPolicyError
+				valid = false
+			else
+				valid = true
+#		else
+#			unless /\d+/.test(pwd)
+#				valid = false
+#			unless /[a-zA-Z]+/.test(pwd)
+#				valid = false
+#			if pwd.length < 8
+#				valid = false
 		if valid
 			return true
 		else
@@ -166,10 +176,15 @@ Steedos.Helpers =
 	coreformNumberToString: (number, locale)->
 		return Steedos.numberToString number, locale
 
-	selfCompanys: ()->
-		# 返回当前用户所属公司Id集合
-		company_ids = Session.get("user_company_ids")
+	selfCompanyOrganizationIds: ()->
+		# 返回当前用户所属公司的关联组织Id集合
+		company_ids = Steedos.getUserCompanyOrganizationIds()
 		return if company_ids?.length then company_ids else null
+
+	getObjectBadge: (object)->
+		spaceId = Steedos.getSpaceId()
+		if object.name == "instances"
+			return Steedos.getBadge("workflow", spaceId)
 
 _.extend Steedos, Steedos.Helpers
 
@@ -187,7 +202,7 @@ TemplateHelpers =
 	session: (v)->
 		return Session.get(v)
 
-	absoluteUrl: (url)->
+	absoluteUrl: (url, realAbsolute)->
 		if url
 			# url以"/"开头的话，去掉开头的"/"
 			url = url.replace(/^\//,"")
@@ -196,11 +211,12 @@ TemplateHelpers =
 		else
 			if Meteor.isClient
 				try
-					root_url = new URI(Meteor.absoluteUrl());
+					root_url = new URL(Meteor.absoluteUrl())
+					origin = if realAbsolute then window.location.origin else ''
 					if url
-						return root_url._parts.path + url
+						return origin + root_url.pathname + url
 					else
-						return root_url._parts.path
+						return origin + root_url.pathname
 				catch e
 					return Meteor.absoluteUrl(url)
 			else
@@ -210,11 +226,7 @@ TemplateHelpers =
 		return __meteor_runtime_config__.ROOT_URL_PATH_PREFIX
 
 	isMobile: ->
-
-		if window.DevExpress
-			return DevExpress.devices._currentDevice.phone
-		else
-			return $(window).width()<767
+		return $(window).width() < 767
 
 	isAndroidOrIOS: ->
 		return Steedos.isAndroidApp() || Steedos.isiOS()
@@ -230,6 +242,7 @@ TemplateHelpers =
 		return Steedos.absoluteUrl("avatar/#{Meteor.userId()}?avatar=#{avatar}");
 
 	setSpaceId: (spaceId)->
+		console.log("set spaceId " + spaceId)
 		if !spaceId
 			Session.set("spaceId", null)
 			localStorage.removeItem("spaceId:" + Meteor.userId())
@@ -242,27 +255,8 @@ TemplateHelpers =
 
 	getSpaceId: ()->
 		# find space from session and local storage
-		spaceId = Session.get("spaceId")
-		if !spaceId
-			spaceId = localStorage.getItem("spaceId")
 
-		# check space exists
-		if spaceId
-			space = db.spaces.findOne(spaceId);
-			if space
-				return space._id
-
-		# find space by hostname, currently hostname must unique for each space
-		hostSpace = db.spaces.findOne({hostname: document.location.hostname});
-		if hostSpace
-			return hostSpace._id
-
-		# nothing found, select first space
-		space = db.spaces.findOne();
-		if space
-			return space._id
-
-		return undefined
+		return Session.get("spaceId")
 
 	isSpaceAdmin: (spaceId)->
 		if !spaceId
@@ -542,7 +536,7 @@ TemplateHelpers =
 				return true
 
 	isNode: ()->
-		return process?.__nwjs
+		return nw?.require?
 
 	detectIE: ()->
 		ua = window.navigator.userAgent

@@ -18,7 +18,8 @@ Template.creator_list_wrapper.onRendered ->
 	self.autorun ->
 		list_view_id = Session.get("list_view_id")
 		object_name = Session.get("object_name")
-		if list_view_id
+		isSubReady = Creator.subs["CreatorListViews"].ready()
+		if isSubReady and list_view_id
 			list_view_obj = Creator.Collections.object_listviews.findOne(list_view_id)
 			filter_target = Tracker.nonreactive ->
 				return Session.get("filter_target")
@@ -42,16 +43,8 @@ Template.creator_list_wrapper.onRendered ->
 					return
 				Session.set("filter_scope", null)
 				Session.set("filter_items", null)
-				
-	self.autorun ->
-		# 同步标记过滤条件关联的视图及对象
-		filter_items = Session.get("filter_items")
-		filter_scope = Session.get("filter_scope")
-		if filter_items or filter_scope
-			list_view_id = Tracker.nonreactive ->
-				return Session.get("list_view_id")
-			object_name = Tracker.nonreactive ->
-				return Session.get("object_name")
+			
+			# list_view_id、object_name变化时，标记过滤条件关联的视图及对象
 			Session.set("filter_target", {
 				list_view_id: list_view_id,
 				object_name: object_name
@@ -59,12 +52,37 @@ Template.creator_list_wrapper.onRendered ->
 
 	self.rendered = true
 
+	self.autorun ->
+		# object_name变化时自动请求odata获取每个视图的记录数
+		object_name = Session.get("object_name")
+		listViews = Creator.getListViews()
+		self.recordsListViewTotal.set {}
+		listViews?.forEach (view)->
+			unless view?.show_count
+				return
+			filters = Creator.getODataFilter(view._id, object_name)
+			options =
+				filter: filters
+			Creator.odata.queryCount object_name, options, (count, error)->
+				if !error and count != false
+					recordsListViewTotal = self.recordsListViewTotal.get()
+					recordsListViewTotal[view._id] = count
+					self.recordsListViewTotal.set recordsListViewTotal
+
 
 Template.creator_list_wrapper.helpers Creator.helpers
 
 isCalendarView = ()->
 	view = Creator.getListView(Session.get "object_name", Session.get("list_view_id"))
 	return view?.type == 'calendar'
+
+getFollowAction = ()->
+	actions = Creator.getActions()
+	return _.find actions, (action)->
+		return action.name == 'standard_follow'
+
+isFollowing = ()->
+	return Creator.getCollection("follows")?.findOne({object_name: Session.get("object_name"), owner: Meteor.userId()})
 
 Template.creator_list_wrapper.helpers
 
@@ -77,13 +95,20 @@ Template.creator_list_wrapper.helpers
 		field_keys.remove(field_keys.indexOf("object_name"))
 		if !Steedos.isSpaceAdmin()
 			field_keys.remove(field_keys.indexOf("shared"))
+
+		field_keys.remove(field_keys.indexOf("filters"))
+		field_keys.remove(field_keys.indexOf("filters.$"))
+		field_keys.remove(field_keys.indexOf("filters.$.field"))
+		field_keys.remove(field_keys.indexOf("filters.$.operation"))
+		field_keys.remove(field_keys.indexOf("filters.$.value"))
+
 		return field_keys.join(",")
 
 	isRefreshable: ()->
-		return Template["creator_#{FlowRouter.getParam('template')}"]?.refresh
+		return Template["creator_grid"]?.refresh
 
 	list_template: ()->
-		return "creator_#{FlowRouter.getParam('template')}"
+		return "creator_grid"
 
 	recordsTotalCount: ()->
 		return Template.instance().recordsTotal.get()
@@ -135,12 +160,24 @@ Template.creator_list_wrapper.helpers
 			return item.label || item.name 
 		else
 			return ""
+	
+	list_view_count: (item)->
+		unless item.show_count
+			return ""
+		recordsListViewTotal = Template.instance().recordsListViewTotal.get()
+		if(recordsListViewTotal[item._id] != undefined)
+			return "#{recordsListViewTotal[item._id]}"
+		else
+			# 显示为正在请求中效果
+			return "..."
 
 	actions: ()->
 		actions = Creator.getActions()
 		isCalendar = isCalendarView()
 		actions = _.filter actions, (action)->
 			if isCalendar && action.todo == "standard_query"
+				return false
+			if action.name == "standard_follow"
 				return false
 			if action.on == "list"
 				if typeof action.visible == "function"
@@ -199,7 +236,7 @@ Template.creator_list_wrapper.helpers
 	isTree: ()->
 		objectName = Session.get("object_name")
 		object = Creator.getObject(objectName)
-		return object.enable_tree
+		return object?.enable_tree
 
 	search_text: ()->
 		search_text = Tracker.nonreactive ()->
@@ -211,14 +248,17 @@ Template.creator_list_wrapper.helpers
 		else
 			return ''
 	isFiltering: ()->
-		filter_items = Session.get("filter_items")
-		isFiltering = false;
-		_.every filter_items, (filter_item)->
-			if filter_item.value
-				isFiltering = true;
-			return !isFiltering;
-		return isFiltering
-
+		return Creator.getIsFiltering()
+	canFollow: ()->
+		objectName = Session.get("object_name")
+		object = Creator.getObject(objectName)
+		followAction = getFollowAction();
+		followActionVisible = followAction?.visible
+		if _.isFunction(followActionVisible)
+			followActionVisible = followActionVisible()
+		return (object?.enable_follow && followActionVisible) || isFollowing()
+	isFollowing : ()->
+		return isFollowing();
 
 transformFilters = (filters)->
 	_filters = []
@@ -353,7 +393,7 @@ Template.creator_list_wrapper.events
 	'click .btn-refresh': (event, template)->
 		$(".slds-icon-standard-refresh", event.currentTarget).animateCss("rotate")
 		dxDataGridInstance = $(event.currentTarget).closest(".filter-list-wraper").find(".gridContainer").dxDataGrid().dxDataGrid('instance')
-		Template["creator_#{FlowRouter.getParam('template')}"]?.refresh(dxDataGridInstance)
+		Template["creator_grid"]?.refresh(dxDataGridInstance)
 
 	'keydown input#grid-search': (event, template)->
 		if event.keyCode == "13" or event.key == "Enter"
@@ -377,8 +417,12 @@ Template.creator_list_wrapper.events
 				else
 					Session.set 'standard_query', null
 
+	'click .list-action-follow': (event, template)->
+		followAction = getFollowAction()
+		Creator.executeAction(Session.get("object_name"), followAction)
 Template.creator_list_wrapper.onCreated ->
 	this.recordsTotal = new ReactiveVar(0)
+	this.recordsListViewTotal = new ReactiveVar({})
 
 Template.creator_list_wrapper.onDestroyed ->
 	object_name = Session.get("object_name")

@@ -77,6 +77,17 @@ Template.CreatorObjectModal.onRendered ()->
 	onError = @data.onError
 	#清理hooks，否则会多次执行
 	delete AutoForm._hooks[formId]
+
+	onEscKey = (e) ->
+		if e.keyCode == 27
+			$('#creatorObjectModal').modal 'hide'
+
+	$('#creatorObjectModal').on 'shown.bs.modal', ->
+		$(window).bind 'keyup', onEscKey
+
+	$('#creatorObjectModal').on 'hidden.bs.modal', ->
+		$(window).unbind 'keyup', onEscKey
+
 	#添加当前form的hooks
 	AutoForm.addHooks formId,
 		before:
@@ -117,7 +128,7 @@ Template.CreatorObjectModal.onRendered ()->
 			if operation == "insert"
 				data = insertDoc
 				type = "post"
-				urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}")
+				urls.push Steedos.absoluteUrl("/api/v4/#{object_name}")
 				delete data._object_name
 			if operation == "update"
 				if Session.get("cmMeteorMethod")
@@ -142,7 +153,7 @@ Template.CreatorObjectModal.onRendered ()->
 
 				_ids = _id.split(",")
 				_.each _ids, (id)->
-					urls.push Steedos.absoluteUrl("/api/odata/v4/#{Steedos.spaceId()}/#{object_name}/#{id}")
+					urls.push Steedos.absoluteUrl("/api/v4/#{object_name}/#{id}")
 				data = updateDoc
 				type = "put"
 

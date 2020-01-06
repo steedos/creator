@@ -946,12 +946,7 @@ renderMatrixReport = (reportObject)->
 			self.pivotGridInstance?.set pivotGrid
 
 renderJsReport = (reportObject)->
-	url = Creator.getRelativeUrl("/plugins/jsreport/web/viewer_db/#{reportObject._id}");
-	filter_items = Tracker.nonreactive ()->
-		return Session.get("filter_items")
-	if filter_items
-		query = encodeURI JSON.stringify(filter_items)
-		url += "?user_filters=#{query}"
+	url = Creator.getJsReportViewUrl(reportObject._id)
 	$('#jsreport').html("<iframe src=\"#{url}\"></iframe>");
 
 renderReport = (reportObject)->
@@ -981,32 +976,45 @@ renderReport = (reportObject)->
 		return
 	if pivotGridChart
 		pivotGridChart.dispose()
-
-	innerStacking = $(".filter-list-wraper .innerStacking") #tabular/summary/matrix三种dx控件报表容器
+	innerStackingBox = $(".filter-list-wraper .innerStacking") #tabular/summary/matrix三种dx控件报表容器
+	jsreportBox = $(".filter-list-wraper #jsreport") #jsreport报表容器
+	emptyBox = $(".filter-list-wraper .creator-report-empty")
+	if filter_items and filter_items.length and filter_items.find((n)-> return n.is_required && Creator.isFilterValueEmpty(n.value))
+		# 存在未填写的必要过滤条件则显示提示
+		innerStackingBox.hide();
+		jsreportBox.hide()
+		emptyBox.show()
+		Session.set("is_filter_open", true)
+		return;
+	emptyBox.hide()
 	switch reportObject.report_type
 		when 'tabular'
 			# 报表类型从matrix转变成tabular时，需要把原来matrix报表清除
 			gridLoadedArray = null
 			self.pivotGridInstance?.get()?.dispose()
-			innerStacking.show();
+			jsreportBox.hide()
+			innerStackingBox.show();
 			renderTabularReport.bind(self)(reportObject)
 		when 'summary'
 			# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
 			self.pivotGridInstance?.get()?.dispose()
-			innerStacking.show();
+			jsreportBox.hide()
+			innerStackingBox.show();
 			renderSummaryReport.bind(self)(reportObject)
 		when 'matrix'
 			# 报表类型从summary转变成matrix时，需要把原来summary报表清除
 			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
-			innerStacking.show();
+			jsreportBox.hide()
+			innerStackingBox.show();
 			renderMatrixReport.bind(self)(reportObject)
 		when 'jsreport'
 			# 报表类型从dx控件报表转变成jsreport时，需要把原来报表相关内容清除
 			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
 			self.pivotGridInstance?.get()?.dispose()
-			innerStacking.hide();
+			innerStackingBox.hide();
+			jsreportBox.show()
 			renderJsReport.bind(self)(reportObject)
 
 
@@ -1030,22 +1038,7 @@ Template.creator_report_content.onRendered ->
 			filter_logic = reportObject.filter_logic
 			object_fields = Creator.getObject(reportObject.object_name)?.fields
 			if object_fields
-				filter_items.forEach (item)->
-					filter_field_type = object_fields[item.field]?.type
-					# 数据库中的报表过滤条件中，时间类型字段会被保存为像`2019-07-02T06:25:14.898Z`这样的字符串格式
-					# 保存到Session的filter_items对象中之前，需要转换为时间类型的对象
-					if ["date", "datetime"].includes(filter_field_type)
-						if typeof item.start_value == "string"
-							item.start_value = new Date(item.start_value)
-						if typeof item.end_value == "string"
-							item.end_value = new Date(item.end_value)
-						if typeof item.value == "string"
-							item.value = new Date(item.value)
-						else if _.isArray(item.value)
-							if typeof item.value[0] == "string"
-								item.value[0] = new Date(item.value[0])
-							if typeof item.value[1] == "string"
-								item.value[1] = new Date(item.value[1])
+				filter_items = Creator.getFiltersWithFilterFields(filter_items, object_fields, reportObject.filter_fields)
 
 			Session.set("filter_items", filter_items)
 			Session.set("filter_scope", filter_scope)

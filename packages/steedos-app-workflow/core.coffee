@@ -2,14 +2,14 @@
 
 if Meteor.isClient
 	WorkflowCore.openFlowDesign = (locale, space, flow, companyId)->
-		url = "/packages/steedos_admin/assets/designer/index.html?locale=#{locale}&space=#{space}"
+		url = "/applications/designer/current/#{locale.toLocaleLowerCase()}/?spaceId=#{space}"
 		if flow
-			url = url + "&flow=#{flow}"
+			url = url + "&flowId=#{flow}"
 		if companyId && !Creator.isSpaceAdmin(space, Meteor.userId())
 			url = url + "&companyId=#{companyId}"
 		Steedos.openWindow Steedos.absoluteUrl(url)
 	WorkflowCore.openFormDesign = (locale, space, form, companyId)->
-		Modal.show('formDesign', {formId: form})
+		Modal.show('formDesign', {formId: form}, {keyboard:false, backdrop: "static"})
 
 	Meteor.startup ->
 		$(document).keydown (e) ->
@@ -34,7 +34,7 @@ if Meteor.isServer
 #				return false
 
 		if company_id
-			if db.organizations.find({ _id: company_id, space: spaceId }).count() == 0
+			if Creator.getCollection("company").find({ _id: company_id, space: spaceId }).count() == 0
 				return false
 
 		return true
