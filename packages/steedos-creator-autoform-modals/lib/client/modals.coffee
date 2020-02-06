@@ -59,7 +59,8 @@ getSimpleSchema = (collectionName)->
 		object_fields = Creator.getObject(object_name).fields
 		_fields = Creator.getFields(object_name)
 		#schema = collectionObj("Creator.Collections."+Creator.getObject(object_name)._collection_name).simpleSchema()._schema
-		schema = Creator.Collections[Creator.getObject(object_name)._collection_name].simpleSchema()._schema
+#		schema = Creator.Collections[Creator.getObject(object_name)._collection_name].simpleSchema()._schema
+		schema = Creator.getRecordSafeObjectSchema(Session.get('cmDoc'), object_name)
 		fields = Session.get("cmFields")
 
 		final_schema = {}
@@ -107,6 +108,10 @@ Template.CreatorAutoformModals.rendered = ->
 			$('#afModal').modal 'hide'
 
 	$('#afModal').on 'show.bs.modal', ->
+		# 设置dxOverlay的zIndex值，解决dxOverlay弹出窗口被creator-auotform-modals窗口覆盖的问题
+		# 比如弹出的时间、日期控件，popup控件等
+		# 因creator-auotform-modals的z-index值为2000，所以这里要比它大
+		DevExpress.ui.dxOverlay.baseZIndex(2100);
 		self.shouldUpdateQuickForm.set(true)
 
 		operation = Session.get 'cmOperation'
@@ -124,6 +129,9 @@ Template.CreatorAutoformModals.rendered = ->
 		, 100
 
 	$('#afModal').on 'hidden.bs.modal', ->
+		# 还原dxOverlay原来默认的zIndex值
+		DevExpress.ui.dxOverlay.baseZIndex(1500);
+		Session.set("cmSaving", false)
 		$(window).unbind 'keyup', onEscKey
 
 		doc = Session.get 'cmDoc'
@@ -328,6 +336,9 @@ helpers =
 		isMultiple = Session.get('cmIsMultipleUpdate') and Session.get('cmTargetIds')?.length > 1
 		return isMultiple
 
+	cmSaving: ()->
+		Session.get 'cmSaving'
+
 	isUseMethod: ()->
 		if Session.get 'cmMeteorMethod'
 			return true
@@ -422,7 +433,7 @@ helpers =
 		cmCollection = Session.get 'cmCollection'
 		if cmCollection
 			object_name = getObjectName(cmCollection)
-			fields = Creator.getObject(object_name).fields
+			fields = Creator.getRecordSafeFields(Session.get('cmDoc'), object_name)
 			return fields[key].disabled
 
 	disabledFieldsValue: (key)->
@@ -588,6 +599,10 @@ Template.CreatorAfModal.events
 										trigger.todo.apply({object_name: object_name},[userId, result])
 						return result
 				onSubmit: (insertDoc, updateDoc, currentDoc)->
+					if Session.get 'cmSaving'
+						return false
+
+					Session.set 'cmSaving', true
 
 					userId = Meteor.userId()
 					cmCollection = Session.get 'cmCollection'
@@ -674,6 +689,7 @@ Template.CreatorAfModal.events
 					return false
 
 				onSuccess: (operation,result)->
+					Session.set 'cmSaving', false
 					console.log('onSuccess hide......');
 					$('#afModal').modal 'hide'
 					# if result.type == "post"
@@ -684,6 +700,8 @@ Template.CreatorAfModal.events
 					# 	FlowRouter.go url
 
 				onError: (operation,error) ->
+					Session.set 'cmSaving', false
+					console.log('onError......');
 					console.error error
 					if error.reason
 						toastr?.error?(TAPi18n.__(error.reason))

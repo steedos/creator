@@ -214,6 +214,29 @@ WorkflowManager.getOrganizations = function (orgIds) {
 	}, {fields: {created: 0, created_by: 0, modified: 0, modified_by: 0}}).fetch();
 };
 
+WorkflowManager.getCompany = function (companyId) {
+	if (!companyId) {
+		return {};
+	}
+	return Creator.getCollection("company").findOne(companyId, {fields: {created: 0, created_by: 0, modified: 0, modified_by: 0}}) || {};
+}
+
+WorkflowManager.getCompanys = function (companyIds) {
+	if (!companyIds) {
+		return [];
+	}
+
+	if ("string" == typeof (companyIds)) {
+		return [WorkflowManager.getCompany(companyIds)]
+	}
+	return Creator.getCollection("company").find({
+		_id: {
+			$in: companyIds
+		}
+	}, {fields: {created: 0, created_by: 0, modified: 0, modified_by: 0}}).fetch();
+};
+
+
 WorkflowManager.getUser = function (spaceId, userId, notNeedDetails) {
 	if (!userId || !spaceId) {
 		return;
@@ -240,6 +263,10 @@ WorkflowManager.getUser = function (spaceId, userId, notNeedDetails) {
 		if (!spaceUser.organization) {
 			return;
 		}
+
+		spaceUser.company = WorkflowManager.getCompany(spaceUser.company_id);
+		spaceUser.companys = WorkflowManager.getCompanys(spaceUser.company_ids);
+
 		spaceUser.roles = WorkflowManager.getUserRoles(spaceId, spaceUser.organization.id, spaceUser.id);
 	}
 
@@ -274,6 +301,9 @@ WorkflowManager.getUsers = function (spaceId, userIds, notNeedDetails) {
 
 				spaceUser.organizations = WorkflowManager.getOrganizations(spaceUser.organizations);
 
+				spaceUser.company = WorkflowManager.getCompany(spaceUser.company_id);
+				spaceUser.companys = WorkflowManager.getCompanys(spaceUser.company_ids);
+
 				if (spaceUser.organization) {
 					spaceUser.roles = WorkflowManager.getUserRoles(spaceId, spaceUser.organization.id, spaceUser.id);
 					users.push(spaceUser);
@@ -285,6 +315,28 @@ WorkflowManager.getUsers = function (spaceId, userIds, notNeedDetails) {
 
 	return users;
 };
+
+WorkflowManager.getHrRolesUsers = function(spaceId, hrRoleIds){
+	var hrRolesUsers = [];
+
+	if(!_.isArray(hrRoleIds)){
+		return [];
+	}
+	var hrRoles = db.roles.find({space: spaceId, _id: {$in: hrRoleIds}}).fetch();
+	_.each(hrRoles, function(hrRole){
+		hrRolesUsers = hrRolesUsers.concat(hrRole.users || [])
+	});
+
+	var spaceUsers = db.space_users.find({
+		space: spaceId,
+		user: {$in: hrRolesUsers}
+	}, {fields: {created: 0, created_by: 0, modified: 0, modified_by: 0}}).fetch();
+
+	_.each(spaceUsers, function(spaceUser){
+		spaceUser.id = spaceUser.user
+	});
+	return spaceUsers
+}
 
 WorkflowManager.getFormulaUsers = function (spaceId, userIds) {
 	var spaceUsers = [];
@@ -303,6 +355,18 @@ WorkflowManager.getFormulaUsers = function (spaceId, userIds) {
 			'id': user.organizations.getProperty("_id"),
 			'name': user.organizations.getProperty("name"),
 			'fullname': user.organizations.getProperty("fullname")
+		}
+
+		userObject['company'] = {
+			'id': user.company._id,
+			'name': user.company.name,
+			'code': user.company.code,
+		}
+
+		userObject['companys'] = {
+			'id': user.companys.getProperty("_id"),
+			'name': user.companys.getProperty("name"),
+			'code': user.companys.getProperty("code"),
 		}
 
 		userObject.hr = {}

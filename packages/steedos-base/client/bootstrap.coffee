@@ -16,8 +16,15 @@ FlowRouter.wait();
 Steedos.redirectToSignIn = (redirect)->
 	accountsUrl = Meteor.settings.public?.webservices?.accounts?.url
 	if accountsUrl 
-		window.location.href = accountsUrl + "/authorize?redirect_uri=/";
+		if !redirect
+			redirect = location.href.replace("/steedos/sign-in", "")
+		if _.isFunction(Steedos.isCordova) && Steedos.isCordova()
+			rootUrl = new URL(__meteor_runtime_config__.ROOT_URL)
+			accountsUrl = rootUrl.origin + accountsUrl
+		window.location.href = accountsUrl + "/authorize?redirect_uri=" + redirect;
 	else
+		if (!FlowRouter._initialized)
+			FlowRouter.initialize();
 		if window.location.pathname.indexOf('/steedos/sign-in')>=0
 			return
 		signInUrl = AccountsTemplates.getRoutePath("signIn")
@@ -26,13 +33,14 @@ Steedos.redirectToSignIn = (redirect)->
 				signInUrl += "&redirect=#{redirect}"
 			else
 				signInUrl += "?redirect=#{redirect}"
-		window.location.href = Steedos.absoluteUrl signInUrl
+		FlowRouter.go signInUrl
 		
 Setup.validate = (onSuccess)->
 
-	if window.location.pathname.indexOf('/steedos/sign-in')>=0
-		FlowRouter.initialize();
-		return;
+	# if window.location.pathname.indexOf('/steedos/sign-in')>=0
+	# 	if (!FlowRouter._initialized)
+	# 		FlowRouter.initialize();
+	# 	return;
 
 	console.log("Validating user...")
 	searchParams = new URLSearchParams(window.location.search);
@@ -75,7 +83,7 @@ Setup.validate = (onSuccess)->
 			Accounts.loginWithToken data.authToken, (err) ->
 				if (err)
 					Meteor._debug("Error logging in with token: " + err);
-					document.location.href = Steedos.absoluteUrl("/steedos/logout");
+					FlowRouter.go "/steedos/logout"
 					return
 
 		if data.webservices
@@ -129,7 +137,7 @@ Meteor.startup ->
 	Setup.validate();
 	Accounts.onLogin ()->
 		console.log("onLogin")
-
+		
 		if Meteor.userId() != Setup.lastUserId
 			Setup.validate();
 		else 
@@ -176,6 +184,7 @@ Meteor.startup ->
 Creator.bootstrapLoaded = new ReactiveVar(false)
 
 handleBootstrapData = (result, callback)->
+	Creator._recordSafeObjectCache = []; # 切换工作区时，情况object缓存
 	Creator.Objects = result.objects
 	object_listviews = result.object_listviews
 	Creator.object_workflows = result.object_workflows
@@ -200,10 +209,10 @@ handleBootstrapData = (result, callback)->
 			app._id = key
 		if app.is_creator
 			if isSpaceAdmin
-# 如果是工作区管理员应该强制把is_creator的应该显示出来
+				# 如果是工作区管理员应该强制把is_creator的应用显示出来
 				app.visible = true
 		else
-# 非creator应该一律不显示
+			# 非creator应该一律不显示
 			app.visible = false
 
 	sortedApps = _.sortBy _.values(result.apps), 'sort'
@@ -278,13 +287,14 @@ requestBootstrapDataUseAjax = (spaceId, callback)->
 			handleBootstrapData(result, callback);
 
 
-requestBootstrapDataUseAction = ()->
+requestBootstrapDataUseAction = (spaceId)->
 	SteedosReact = require('@steedos/react');
-	store.dispatch(SteedosReact.loadBootstrapEntitiesData({}))
+	store.dispatch(SteedosReact.loadBootstrapEntitiesData({spaceId: spaceId}))
 
 requestBootstrapData = (spaceId, callback)->
-	if window.store
-		requestBootstrapDataUseAction();
+	SteedosReact = require('@steedos/react');
+	if SteedosReact.store
+		requestBootstrapDataUseAction(spaceId);
 	else
 		requestBootstrapDataUseAjax(spaceId, callback);
 
@@ -297,14 +307,15 @@ FlowRouter.route '/steedos/logout',
 		#AccountsTemplates.logout();
 		$("body").addClass('loading')
 		Meteor.logout ()->
+			FlowRouter.go("/steedos/sign-in")
 			return
 
 Meteor.startup ()->
 	SteedosReact = require('@steedos/react');
 	RequestStatusOption = SteedosReact.RequestStatusOption
 	lastBootStrapRequestStatus = '';
-	window.store?.subscribe ()->
-		state = store.getState();
+	SteedosReact.store?.subscribe ()->
+		state = SteedosReact.store.getState();
 		if lastBootStrapRequestStatus == RequestStatusOption.STARTED
 			lastBootStrapRequestStatus = SteedosReact.getRequestStatus(state); # 由于handleBootstrapData函数执行比较慢，因此在handleBootstrapData执行前，给lastBootStrapRequestStatus更新值
 			if SteedosReact.isRequestSuccess(state)

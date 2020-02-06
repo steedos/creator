@@ -37,6 +37,8 @@ Template.standard_query_modal.helpers
 		canSearchFields = _.intersection(first_level_keys, canSearchFields)
 		_.each canSearchFields, (field)->
 			schema[field] = obj_schema[field]
+			delete schema[field].min
+			delete schema[field].max
 			if !(object_fields[field].searchable || object_fields[field].filterable)
 				schema[field].autoform.group = '高级'
 			if object_fields[field].searchable || object_fields[field].filterable
@@ -83,15 +85,11 @@ Template.standard_query_modal.helpers
 							# 注意不可以用'yyyy-MM-ddT23:59:59Z'，因日期类型字段已经用timezoneId: "utc"处理了时区问题，后面带Z的话，会做时区转换
 							schema[field + "_endLine"].autoform.afFieldInput.dxDateBoxOptions.dateSerializationFormat = 'yyyy-MM-ddT23:59:59';
 			if ["boolean"].includes(object_fields[field].type)
-				schema[field].type = String
 				group = schema[field].autoform?.group
 				schema[field].autoform = {group: group}
-				schema[field].autoform.type = "select"
-				schema[field].autoform.firstOption = ""
-				schema[field].autoform.options = [
-					{label: "是", value: "true"}
-					{label: "否", value: "false"}
-				]
+				schema[field].autoform.type = "boolean-select"
+				schema[field].autoform.trueLabel = t("True")
+				schema[field].autoform.falseLabel = t("False")
 
 			if ["code", "textarea"].includes(object_fields[field].type)
 				group = schema[field].autoform?.group
@@ -157,7 +155,8 @@ Template.standard_query_modal.events
 #		Session.set 'standard_query', {object_name: object_name, query: query, is_mini: false}
 		Modal.hide(template)
 
-		isFiltering = Creator.getIsFiltering()
-		if isFiltering
-			$(".filter-list-container").removeClass("slds-hide")
+		unless Steedos.isMobile()
+			isFiltering = Creator.getIsFiltering()
+			if isFiltering
+				$(".filter-list-container").removeClass("slds-hide")
 

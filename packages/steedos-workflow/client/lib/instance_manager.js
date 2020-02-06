@@ -1687,15 +1687,64 @@ InstanceManager.getDistributeStep = function() {
 	}
 	return step;
 }
-InstanceManager.pickApproveSteps = function () {
-	var steps = WorkflowManager.getInstanceSteps()
 
-	var apporve_stesp = _.filter(steps, function(s){
-			return s.allow_pick_approve_users && ["sign", "submit", "counterSign"].includes(s.step_type)
+//track：防止计算陷入死循环
+var getCalculateSteps = function (step, track) {
+	var instance_form_values = Session.get("instance_form_values"); //申请单上的值发生变化时，重新计算步骤
+	if(!step){
+		step = InstanceManager.getStartStep();
+	}
+	if(!track){
+		track = []
+	}
+
+	var _steps = [];
+	var judge = 'approved';
+	var form_version = WorkflowManager.getInstanceFormVersion();
+	var autoFormDoc = {};
+	if (AutoForm.getFormValues("instanceform")) {
+		autoFormDoc = AutoForm.getFormValues("instanceform").insertDoc;
+	} else if (instance_form_values) {
+		autoFormDoc = instance_form_values.values
+	}
+	_steps.push(step);
+	var nextSteps = ApproveManager.getNextSteps(WorkflowManager.getInstance(), step, judge, autoFormDoc, form_version.fields, true);
+	_.each(nextSteps, function (nextStep) {
+		if(!_.contains(track, nextStep._id)){
+			_steps = _steps.concat(getCalculateSteps(nextStep, track.concat(_.pluck(_steps, '_id'))))
 		}
-	);
+	})
+	_steps = _steps.uniqById();
+	return _steps;
+}
 
-	return apporve_stesp;
+InstanceManager.pickApproveSteps = function () {
+	// var steps = WorkflowManager.getInstanceSteps()
+	//
+	// var apporve_stesp = _.filter(steps, function(s){
+	// 		return s.allow_pick_approve_users && ["sign", "submit", "counterSign"].includes(s.step_type)
+	// 	}
+	// );
+	//
+	// var _steps = []
+	//
+	// _.each(steps, function (step) {
+	// 	var judge = 'approved';
+	// 	var form_version = WorkflowManager.getInstanceFormVersion();
+	// 	var autoFormDoc = {};
+	// 	if (AutoForm.getFormValues("instanceform")) {
+	// 		autoFormDoc = AutoForm.getFormValues("instanceform").insertDoc;
+	// 	} else if (Session.get("instance_form_values")) {
+	// 		autoFormDoc = Session.get("instance_form_values").values
+	// 	}
+	// 	if(step.step_type == "start"){
+	// 		_steps.push(step);
+	// 	}
+	// 	var nextSteps = ApproveManager.getNextSteps(WorkflowManager.getInstance(), step, judge, autoFormDoc, form_version.fields);
+	// 	console.log('step to nextSteps...', step, nextSteps);
+	// 	_steps = _steps.concat(nextSteps)
+	// })
+	return getCalculateSteps();
 }
 
 InstanceManager.ccHasEditPermission = function () {

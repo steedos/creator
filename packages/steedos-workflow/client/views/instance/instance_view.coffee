@@ -106,17 +106,14 @@ Template.instance_view.helpers
 	notDistributeAndDraft: (state)->
 		ins = WorkflowManager.getInstance()
 		if ins
-			if state is 'draft' and !ins.distribute_from_instance
+			step_type = InstanceManager.getCurrentStep()?.step_type
+			if (state is 'draft' || step_type == 'start') and !ins.distribute_from_instance
 				return false
 
 		return true
 
 	showPickApproveUsers: ()->
-		if Meteor.settings?.public?.is_group_company
-			steps = InstanceManager.pickApproveSteps()
-			return steps.length > 0
-
-		return false
+		return WorkflowManager.getFlow(WorkflowManager.getInstance().flow).allow_select_step;
 
 Template.instance_view.onCreated ->
 	Form_formula.initFormScripts()

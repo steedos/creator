@@ -171,8 +171,14 @@ Template.creator_table_cell.helpers
 					val = if val then [val] else []
 				_.each val, (v)->
 					reference_to = v["reference_to._o"] || reference_to
-					href = Creator.getObjectUrl(reference_to, v._id)
-					data.push {reference_to: reference_to, rid: v._id, value: v['_NAME_FIELD_VALUE'], href: href, id: this._id}
+					rid = v._id
+					rvalue = v['_NAME_FIELD_VALUE']
+					if _.isString v
+						# 如果未能取到expand数据（包括_id对应记录本身被删除的情况），则直接用_id作为值显示出来，且href能指向正确的url
+						rid = v
+						rvalue = v
+					href = Creator.getObjectUrl(reference_to, rid)
+					data.push {reference_to: reference_to, rid: rid, value: rvalue, href: href, id: this._id}
 
 		else if _field.type == "image"
 			if typeof val is "string"
@@ -241,7 +247,7 @@ Template.creator_table_cell.helpers
 				else
 					val = "否"
 			else if _field.type == "select"
-				_options = _field.options
+				_options = _field.allOptions || _field.options
 				_values = this.doc || {}
 				_record_val = this.record_val
 				if _.isFunction(_field.options)
@@ -284,7 +290,8 @@ Template.creator_table_cell.helpers
 					reg = /(\d)(?=(\d{3})+\b)/g
 				val = val.replace(reg, '$1,')
 			else if _field.type == "markdown"
-				val = Spacebars.SafeString(marked(val))
+				if !_.isEmpty(val)
+					val = Spacebars.SafeString(marked(val))
 
 			if this.parent_view != 'record_details' && this.field_name == this_name_field_key
 				href = Creator.getObjectUrl(this.object_name, this._id)
@@ -296,11 +303,12 @@ Template.creator_table_cell.helpers
 	editable: ()->
 		if !this.field
 			return false
+		safeField = Creator.getRecordSafeField(this.field, this.doc, this.object_name);
 
-		if this.field.omit or this.field.readonly
+		if safeField.omit or safeField.readonly
 			return false
 
-		if this.field.type == "filesize"
+		if safeField.type == "filesize"
 			return false
 
 		permission = Creator.getRecordPermissions(this.object_name, this.doc, Meteor.userId())

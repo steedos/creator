@@ -1,3 +1,5 @@
+clone = require('clone')
+
 Creator.getPermissions = (object_name, spaceId, userId)->
 	if Meteor.isClient
 		if !object_name
@@ -83,6 +85,45 @@ Creator.getRecordPermissions = (object_name, record, userId, spaceId)->
 
 	return permissions
 
+
+# currentObjectName：当前主对象
+# relatedListItem：Creator.getRelatedList(Session.get("object_name"), Session.get("record_id"))中取related_object_name对应的值
+# currentRecord当前主对象的详细记录
+if Meteor.isClient
+	Creator.getRecordRelatedListPermissions = (currentObjectName, relatedListItem, currentRecord, userId, spaceId)->
+		if !currentObjectName and Meteor.isClient
+			currentObjectName = Session.get("object_name")
+
+		if !relatedListItem
+			console.error("relatedListItem must not be empty for the function Creator.getRecordRelatedListPermissions");
+			return {}
+
+		if !currentRecord and Meteor.isClient
+			currentRecord = Creator.getObjectRecord()
+
+		if !userId and Meteor.isClient
+			userId = Meteor.userId()
+
+		if !spaceId and Meteor.isClient
+			spaceId = Session.get("spaceId")
+
+		sharing = relatedListItem.sharing || 'masterWrite'
+		masterAllow = false
+		masterRecordPerm = Creator.getRecordPermissions(currentObjectName, currentRecord, userId, spaceId)
+		if sharing == 'masterRead'
+			masterAllow = masterRecordPerm.allowRead
+		else if sharing == 'masterWrite'
+			masterAllow = masterRecordPerm.allowEdit
+
+		uneditable_related_list = Creator.getRecordSafeRelatedList(currentRecord, currentObjectName)
+		relatedObjectPermissions = Creator.getPermissions(relatedListItem.object_name)
+		isRelateObjectUneditable = uneditable_related_list.indexOf(relatedListItem.object_name) > -1
+
+		result = _.clone relatedObjectPermissions
+		result.allowCreate = masterAllow && relatedObjectPermissions.allowCreate && !isRelateObjectUneditable
+		result.allowEdit = masterAllow && relatedObjectPermissions.allowEdit && !isRelateObjectUneditable
+		return result
+
 if Meteor.isServer
 
 	Creator.getAllPermissions = (spaceId, userId) ->
@@ -147,7 +188,7 @@ if Meteor.isServer
 		_.each Creator.objectsByName, (object, object_name)->
 			_i++
 			if !_.has(object, 'space') || !object.space || object.space == spaceId
-				permissions.objects[object_name] = _.clone Creator.convertObject(Creator.Objects[object_name])
+				permissions.objects[object_name] = Creator.convertObject(clone(Creator.Objects[object_name]), spaceId)
 				permissions.objects[object_name]["permissions"] = Creator.getObjectPermissions.bind(psets)(spaceId, userId, object_name)
 		return permissions
 
@@ -159,6 +200,15 @@ if Meteor.isServer
 		if !other
 			other = []
 		return _.union(array, other)
+
+	intersectionPlus = (array, other) ->
+		if !array and !other
+			return undefined
+		if !array
+			array = []
+		if !other
+			other = []
+		return _.intersection(array, other)
 
 	Creator.getAssignedApps = (spaceId, userId)->
 		psetsAdmin = this.psetsAdmin || Creator.getCollection("permission_set").findOne({space: spaceId, name: 'admin'}, {fields:{_id:1, assigned_apps:1}})
@@ -313,6 +363,7 @@ if Meteor.isServer
 				opsetAdmin.unreadable_fields = posAdmin.unreadable_fields
 				opsetAdmin.uneditable_fields = posAdmin.uneditable_fields
 				opsetAdmin.unrelated_objects = posAdmin.unrelated_objects
+				opsetAdmin.uneditable_related_list = posAdmin.uneditable_related_list
 		if psetsUser
 			posUser = findOne_permission_object(psetsUser_pos, object_name, psetsUser._id)
 			if posUser
@@ -329,6 +380,7 @@ if Meteor.isServer
 				opsetUser.unreadable_fields = posUser.unreadable_fields
 				opsetUser.uneditable_fields = posUser.uneditable_fields
 				opsetUser.unrelated_objects = posUser.unrelated_objects
+				opsetUser.uneditable_related_list = posUser.uneditable_related_list
 		if psetsMember
 			posMember = findOne_permission_object(psetsMember_pos, object_name, psetsMember._id)
 			if posMember
@@ -345,6 +397,7 @@ if Meteor.isServer
 				opsetMember.unreadable_fields = posMember.unreadable_fields
 				opsetMember.uneditable_fields = posMember.uneditable_fields
 				opsetMember.unrelated_objects = posMember.unrelated_objects
+				opsetMember.uneditable_related_list = posMember.uneditable_related_list
 		if psetsGuest
 			posGuest = findOne_permission_object(psetsGuest_pos, object_name, psetsGuest._id)
 			if posGuest
@@ -361,6 +414,7 @@ if Meteor.isServer
 				opsetGuest.unreadable_fields = posGuest.unreadable_fields
 				opsetGuest.uneditable_fields = posGuest.uneditable_fields
 				opsetGuest.unrelated_objects = posGuest.unrelated_objects
+				opsetGuest.uneditable_related_list = posGuest.uneditable_related_list
 
 		if !userId
 			permissions = opsetAdmin
@@ -414,11 +468,12 @@ if Meteor.isServer
 				if po.viewCompanyRecords
 					permissions.viewCompanyRecords = true
 
-				permissions.disabled_list_views = unionPlus(permissions.disabled_list_views, po.disabled_list_views)
-				permissions.disabled_actions = unionPlus(permissions.disabled_actions, po.disabled_actions)
-				permissions.unreadable_fields = unionPlus(permissions.unreadable_fields, po.unreadable_fields)
-				permissions.uneditable_fields = unionPlus(permissions.uneditable_fields, po.uneditable_fields)
-				permissions.unrelated_objects = unionPlus(permissions.unrelated_objects, po.unrelated_objects)
+				permissions.disabled_list_views = intersectionPlus(permissions.disabled_list_views, po.disabled_list_views)
+				permissions.disabled_actions = intersectionPlus(permissions.disabled_actions, po.disabled_actions)
+				permissions.unreadable_fields = intersectionPlus(permissions.unreadable_fields, po.unreadable_fields)
+				permissions.uneditable_fields = intersectionPlus(permissions.uneditable_fields, po.uneditable_fields)
+				permissions.unrelated_objects = intersectionPlus(permissions.unrelated_objects, po.unrelated_objects)
+				permissions.uneditable_related_list = intersectionPlus(permissions.uneditable_related_list, po.uneditable_related_list)
 		
 		if object.is_view
 			permissions.allowCreate = false
@@ -428,6 +483,9 @@ if Meteor.isServer
 			permissions.modifyCompanyRecords = false
 			permissions.disabled_actions = []
 		Creator.processPermissions permissions
+
+		if object.permission_set.owner
+			permissions.owner = object.permission_set.owner
 		return permissions
 
 

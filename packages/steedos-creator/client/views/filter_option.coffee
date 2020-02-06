@@ -11,6 +11,7 @@ Template.filter_option.helpers
 		object_fields = Creator.getObject(object_name).fields
 
 		filter_field_type = object_fields[schema_key]?.type
+		filedOptions = Creator.getObjectFilterFieldOptions object_name
 		schema=
 			is_default:
 				type: Boolean
@@ -22,10 +23,11 @@ Template.filter_option.helpers
 				autoform:
 					type: "select"
 					defaultValue: ()->
-						return "name"
+						# 默认取字段待选项列表中第一项
+						return if filedOptions?.length then filedOptions[0].value else "name"
 					firstOption: ""
 					options: ()->
-						Creator.getObjectFilterFieldOptions object_name
+						return filedOptions
 			operation:
 				type: String
 				label: "operation"
@@ -129,6 +131,17 @@ Template.filter_option.helpers
 				else
 					if schema.value.autoform
 						schema.value.autoform.outFormat = 'yyyy-MM-dd';
+			
+			else if ["boolean"].includes(filter_field_type)
+				schema.value.autoform.type = "boolean-select"
+				schema.value.autoform.trueLabel = t("True")
+				schema.value.autoform.falseLabel = t("False")
+		delete schema.value?.min
+		delete schema.value?.max
+		delete schema.start_value?.min
+		delete schema.start_value?.max
+		delete schema.end_value?.min
+		delete schema.end_value?.max
 		new SimpleSchema(schema)
 
 	filter_item: ()->
@@ -241,9 +254,17 @@ Template.filter_option.onCreated ->
 			object_name = Session.get("object_name")
 
 		key = filter_item.field
+		unless key
+			# key不存在时取第一个key，否则界面中无法正常选中第一个字段及其操作符
+			filedOptions = Creator.getObjectFilterFieldOptions object_name
+			key = if filedOptions?.length then filedOptions[0].value else "name"
+		
 		key_obj = Creator.getSchema(object_name)._schema[key]
 		object_fields = Creator.getObject(object_name).fields
 		filter_field_type = object_fields[key]?.type
+
+		unless filter_field_type
+			filter_field_type = "text"
 
 		operation = filter_item.operation
 		unless operation

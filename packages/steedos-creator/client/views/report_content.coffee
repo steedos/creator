@@ -207,6 +207,9 @@ renderChart = (self)->
 			return
 		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
 		objectGroupField = objectFields[firstRowField.dataField]
+		unless objectGroupField
+			toastr.error "未找到对象#{objectName}的字段#{firstRowField.dataField}，请确认该报表中指定的字段名是否正确"
+			return
 		isSelectType = objectGroupField?.type == "select"
 		isDateType = objectGroupField?.type == "date"
 		isDatetimeType = objectGroupField?.type == "datetime"
@@ -326,6 +329,9 @@ renderTabularReport = (reportObject)->
 				expandFields[fieldKeys[0]] = []
 			expandFields[fieldKeys[0]].push fieldKeys[1]
 		itemField = objectFields[fieldKeys[0]]
+		unless itemField
+			toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+			return
 		caption = getFieldLabel itemField, item
 		field = {
 			caption: caption
@@ -456,6 +462,9 @@ renderSummaryReport = (reportObject)->
 				expandFields[fieldKeys[0]] = []
 			expandFields[fieldKeys[0]].push fieldKeys[1]
 		itemField = objectFields[fieldKeys[0]]
+		unless itemField
+			toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+			return
 		itemLabel = getFieldLabel itemField, item
 		field = {
 			caption: itemLabel
@@ -495,6 +504,9 @@ renderSummaryReport = (reportObject)->
 				expandFields[fieldKeys[0]] = []
 			expandFields[fieldKeys[0]].push fieldKeys[1]
 		groupField = objectFields[fieldKeys[0]]
+		unless groupField
+			toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+			return
 		groupLabel = getFieldLabel groupField, group
 		field = {
 			caption: groupLabel
@@ -563,6 +575,9 @@ renderSummaryReport = (reportObject)->
 					expandFields[fieldKeys[0]] = []
 				expandFields[fieldKeys[0]].push fieldKeys[1]
 			valueField = objectFields[fieldKeys[0]]
+			unless valueField
+				toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+				return
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
 			if valueField.type == "number" or valueField.type == "currency"
@@ -707,6 +722,9 @@ renderMatrixReport = (reportObject)->
 					expandFields[fieldKeys[0]] = []
 				expandFields[fieldKeys[0]].push fieldKeys[1]
 			rowField = objectFields[fieldKeys[0]]
+			unless rowField
+				toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+				return
 			caption = getFieldLabel rowField, row
 			field = {
 				caption: caption
@@ -736,6 +754,9 @@ renderMatrixReport = (reportObject)->
 					expandFields[fieldKeys[0]] = []
 				expandFields[fieldKeys[0]].push fieldKeys[1]
 			columnField = objectFields[fieldKeys[0]]
+			unless columnField
+				toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+				return
 			caption = getFieldLabel columnField, column
 			field = {
 				caption: caption
@@ -781,6 +802,9 @@ renderMatrixReport = (reportObject)->
 					expandFields[fieldKeys[0]] = []
 				expandFields[fieldKeys[0]].push fieldKeys[1]
 			valueField = objectFields[fieldKeys[0]]
+			unless valueField
+				toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+				return
 			operation = "count"
 			# 数值类型就定为sum统计，否则默认为计数统计
 			if valueField.type == "number" or valueField.type == "currency"
@@ -816,6 +840,9 @@ renderMatrixReport = (reportObject)->
 					expandFields[fieldKeys[0]] = []
 				expandFields[fieldKeys[0]].push fieldKeys[1]
 			itemField = objectFields[fieldKeys[0]]
+			unless itemField
+				toastr.error "未找到对象#{objectName}的字段#{fieldKeys[0]}，请确认该报表中指定的字段名是否正确"
+				return
 			caption = getFieldLabel itemField, item
 			field = {
 				caption: caption
@@ -902,33 +929,99 @@ renderMatrixReport = (reportObject)->
 	module.dynamicImport('devextreme/ui/popup').then (dxPopup)->
 		DevExpress.ui.dxPopup = dxPopup;
 		salesPopup = $('#drill-down-popup').dxPopup(
-			width: 600
+			width: "60%"
 			height: 400
 			contentTemplate: (contentElement) ->
 				drillDownFields = _.union reportObject.rows, reportObject.columns, reportObject.values, reportObject.fields
 				drillDownFields = _.without drillDownFields, null, undefined
 				drillDownColumns = []
 				gridFields = self.pivotGridInstance.get().getDataSource()._fields
+				object = Creator.getObject(reportObject.object_name)
 				drillDownFields.forEach (n)->
 					if n == "_id"
 						return
 					# gridFieldItem = _.findWhere(gridFields,{dataField:n.replace(/\./g,"*%*")})
 					gridFieldItem = _.findWhere(gridFields,{dataField:n})
 					drillDownColumns.push {
+						cssClass: "cell-wrap"
 						dataField: gridFieldItem.dataField
 						caption: gridFieldItem.caption
 						sortingMethod: Creator.sortingMethod
+						minWidth: 100
+						cellTemplate: (container, options) ->
+							object_name = object.name
+							doc = options.data
+							column = n
+							field_name = column
+							if /\w+\.\$\.\w+/g.test(field_name)
+								# object类型带子属性的field_name要去掉中间的美元符号，否则显示不出字段值
+								field_name = column.replace(/\$\./,"")
+							fieldLevels = field_name.split(".");
+							fieldFirstLevelKey = fieldLevels[0]
+							fieldFirstLevelValue = doc[fieldFirstLevelKey]
+							field = object.fields[fieldFirstLevelKey]
+							# 需要考虑field_name为 a.b 这种格式，不需要考虑a.b.c这种格式
+							if fieldFirstLevelValue
+								# fieldFirstLevelValue为空时，eval会报错
+								field_val = eval("doc." + field_name)
+							else
+								field_val = fieldFirstLevelValue
+							if fieldLevels.length > 1
+								# 报表只支持fieldLevels.length最多为2层
+								if field?.reference_to and _.isString(field.reference_to)
+									referenceObject = Creator.getObject(field.reference_to)
+									if referenceObject
+										if referenceObject.NAME_FIELD_KEY == fieldLevels[1]
+											# name字段则显示为lookup、master_detail类型，带链接
+											field_val = fieldFirstLevelValue
+											field_name = fieldFirstLevelKey
+										else
+											# 否则按referenceObject对应的类型来显示
+											field_val = if fieldFirstLevelValue then fieldFirstLevelValue[fieldLevels[1]] else fieldFirstLevelValue
+											doc = fieldFirstLevelValue
+											field_name = fieldLevels[1]
+											object_name = referenceObject.name
+											field = referenceObject.fields[field_name]
+							if _.isArray doc
+								cellDocs = doc
+							else
+								cellDocs = [doc]
+							
+							cellDocs.forEach (docItem, docIndex)->
+								# 因为fieldFirstLevelValue可能是数组，所以需要分别对每项调用Template.creator_table_cell来加载
+								if _.isArray doc
+									# 值为数组时，从指定索引中分别取出对应项的值
+									field_val = fieldFirstLevelValue[docIndex]
+									field_val = if field_val then field_val[field_name] else field_val
+								unless docItem
+									return
+								cellOption = {
+									_id: docItem._id, val: field_val, doc: docItem, 
+									field: field, field_name: field_name, 
+									object_name: object_name, agreement: "odata", 
+									is_related: false, open_window: true, hideIcon: true
+								}
+								if field.type is "markdown"
+									cellOption["full_screen"] = true
+								
+								if docIndex > 0
+									# lookup、master_detail类型数组，显示为一行
+									cellContainer = $(container[0]).find(".creator_table_cell .cell-container")[0]
+								else
+									cellContainer = container[0]
+								Blaze.renderWithData Template.creator_table_cell, cellOption, cellContainer
 					}
-					module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
-						DevExpress.ui.dxDataGrid = dxDataGrid;
-						$('<div />').addClass('drill-down-content').dxDataGrid(
-							width: 560
-							height: 300
-							columns: drillDownColumns).appendTo contentElement
+				if drillDownFields.length
+					$('<div />').addClass('drill-down-content').dxDataGrid(
+						width: "100%"
+						height: "100%"
+						allowColumnResizing: true
+						columnResizingMode: "widget"
+						columnAutoWidth: true
+						columns: drillDownColumns).appendTo contentElement
 			onShowing: ->
-				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
-					DevExpress.ui.dxDataGrid = dxDataGrid;
-					$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
+				$('.drill-down-content').dxDataGrid('instance').pageIndex(0)
+				$('.drill-down-content').dxDataGrid('instance').option 'dataSource', drillDownDataSource
 		).dxPopup('instance')
 		dxOptions.onCellClick = (e)->
 			if e.area == 'data'
@@ -937,11 +1030,15 @@ renderMatrixReport = (reportObject)->
 				rowPathName = e.cell.rowPath[rowPathLength - 1]
 				popupTitle = (if rowPathName then rowPathName else t('creator_report_drill_down_total_label')) + t('creator_report_drill_down_label')
 				drillDownDataSource = pivotGridDataSource.createDrillDownDataSource(e.cell)
-				salesPopup.option 'title', popupTitle
-				salesPopup.show()
+				module.dynamicImport('devextreme/ui/data_grid').then (dxDataGrid)->
+					DevExpress.ui.dxDataGrid = dxDataGrid;
+					salesPopup.option 'title', popupTitle
+					salesPopup.content().addClass("dx-popup-content-report")
+					salesPopup.show()
 
 		module.dynamicImport('devextreme/ui/pivot_grid').then (dxPivotGrid)->
 			DevExpress.ui.dxPivotGrid = dxPivotGrid;
+			self.pivotGridInstance?.get()?.dispose()
 			pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
 			self.pivotGridInstance?.set pivotGrid
 

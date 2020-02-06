@@ -1,4 +1,5 @@
 loadRecordFromOdata = (template, object_name, record_id)->
+	template.record.set({});
 	object = Creator.getObject(object_name)
 	selectFields = Creator.objectOdataSelectFields(object)
 	expand = Creator.objectOdataExpandFields(object)
@@ -33,6 +34,10 @@ loadRecord = ()->
 	object_name = Session.get "object_name"
 	record_id = Session.get "record_id"
 	object = Creator.getObject(object_name)
+
+	if Meteor.loggingIn() || Meteor.loggingOut() || !Meteor.userId()
+		return;
+
 	object_fields = object.fields
 #	if object_name and record_id
 #		if !object.database_name || !object.database_name == 'meteor-mongo'
@@ -95,8 +100,10 @@ Template.creator_view.onRendered ->
 
 			$(".creator-view-tabs-content").removeClass("slds-show").addClass("slds-hide")
 			$("#creator-quick-form").addClass("slds-show")
-
-	loadRecord()
+	this.autorun ->
+		record_id = Session.get("record_id")
+		if record_id
+			loadRecord()
 	# if Steedos.isMobile()
 	# 	this.autorun ->
 	# 		loadRecord()
@@ -260,7 +267,9 @@ Template.creator_view.helpers
 		record = Creator.getObjectRecord()
 		name_field_key = Creator.getObject()?.NAME_FIELD_KEY
 		if record and name_field_key
-			return record.label || record[name_field_key]
+			record_name = record.label || record[name_field_key]
+			Session.set('record_name', record_name)
+		return record_name;
 
 	backUrl: ()->
 		return Creator.getObjectUrl(Session.get("object_name"), null)
@@ -336,14 +345,7 @@ Template.creator_view.helpers
 		return Creator.getObject(this.object_name)
 
 	allowCreate: ()->
-		sharing = this.sharing || 'masterWrite'
-		masterAllow = false
-		masterRecordPerm = Creator.getRecordPermissions(Session.get('object_name'), Creator.getObjectRecord(), Meteor.userId(), Session.get('spaceId'))
-		if sharing == 'masterRead'
-			masterAllow = masterRecordPerm.allowRead
-		else if sharing == 'masterWrite'
-			masterAllow = masterRecordPerm.allowEdit
-		return masterAllow && Creator.getPermissions(this.object_name).allowCreate
+		return Creator.getRecordRelatedListPermissions(Session.get('object_name'), this).allowCreate
 
 	isUnlocked: ()->
 		if Creator.getPermissions(Session.get('object_name')).modifyAllRecords
@@ -411,10 +413,11 @@ Template.creator_view.helpers
 		data.parent_view = "record_details"
 		return data
 
-	list_data: (obj) ->
+	list_data: (item) ->
 		object_name = Session.get "object_name"
-		related_object_name = obj.object_name
-		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true}
+		related_list_item_props = item
+		related_object_name = item.object_name
+		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true, related_list_item_props: related_list_item_props}
 
 	enable_chatter: ()->
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
@@ -440,7 +443,7 @@ Template.creator_view.helpers
 		return ReactDesignSystem.Illustration
 
 	notFoundPath: ()->
-		return Steedos.absoluteUrl("/assets/images/illustrations/empty-state-no-results.svg#no-results")
+		return Creator.getRelativeUrl("/assets/images/illustrations/empty-state-no-results.svg#no-results")
 
 	notFoundHeading: ()->
 		return "似乎出现了一个问题。"

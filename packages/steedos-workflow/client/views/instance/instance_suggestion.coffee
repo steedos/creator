@@ -1,3 +1,11 @@
+getStepsApproves = ()->
+	return WorkflowManager.getInstance()?.step_approve || {}
+getStepApproves = (stepId)->
+	selectedStepApproves = getStepsApproves()[stepId]
+	if !_.isArray(selectedStepApproves)
+		selectedStepApproves = [selectedStepApproves]
+	return selectedStepApproves;
+
 Template.instance_suggestion.helpers
 
 	step_selected: ()->
@@ -60,7 +68,20 @@ Template.instance_suggestion.helpers
 
 	#next_user_options: ->
 	#    return InstanceManager.getNextUserOptions();
-
+	all_users_context: ->
+		nextStep = WorkflowManager.getInstanceStep(Session.get("next_step_id"))
+		return {
+			dataset: {},
+			name: 'selectNextStepUsersInAllUsers',
+			atts: {
+				name: 'selectNextStepUsersInAllUsers',
+				id: 'selectNextStepUsersInAllUsers',
+				class: 'selectUser selectNextStepUsersInAllUsers form-control',
+				placeholder: t("instance_next_step_users_placeholder"),
+				title: t("instance_next_step_users_placeholder")
+				multiple: nextStep.step_type == 'counterSign'
+			}
+		}
 	next_user_context: ->
 
 		data = {
@@ -118,6 +139,10 @@ Template.instance_suggestion.helpers
 		if users.length == 1 && selectedUser.length < 1
 			selectedUser = [users[0]];
 
+		currentApprove = Tracker.nonreactive(InstanceManager.getCurrentApprove);
+		currentStep = InstanceManager.getCurrentStep();
+		if (currentStep?.step_type == 'start' || !currentApprove?.next_steps) && nextStep?.step_type == 'counterSign' && !_.isEmpty(getStepApproves(nextStep._id))
+			selectedUser = users
 
 		if next_user && next_user.length > 0
 
@@ -288,7 +313,11 @@ Template.instance_suggestion.helpers
 		else
 			return InstanceManager.getCurrentApprove()?.description || InstanceSignText.helpers.getLastSignApprove()?.description || ""
 
-
+	showSelsectInAllUsers: ()->
+		if WorkflowManager.getFlow(WorkflowManager.getInstance().flow).allow_select_step && InstanceManager.getCurrentStep().step_type != 'start'
+			nextStep = WorkflowManager.getInstanceStep(Session.get("next_step_id"));
+			return nextStep?.allow_pick_approve_users
+		return false
 Template.instance_suggestion.events
 
 	'change .suggestion': (event) ->
@@ -387,7 +416,22 @@ Template.instance_suggestion.events
 
 		Meteor.call 'update_approve_sign', myApprove.instance, myApprove.trace, myApprove._id, event.target.value, $("#suggestion").val(), "update", InstanceSignText.helpers.getLastSignApprove(), ()->
 			Session.set("instance_my_approve_description", $("#suggestion").val())
+	'click .select-all-users-btn': (event, template)->
+		console.log('click .select-all-users-btn');
+		$(".selectNextStepUsersInAllUsers").click()
 
+	'change .selectNextStepUsersInAllUsers': (event, template)->
+		console.log('change .selectNextStepUsersInAllUsers');
+		next_user = $("input[name='nextStepUsers']");
+		all_next_user = $("#selectNextStepUsersInAllUsers");
+		value = all_next_user.val()
+		values = all_next_user[0].dataset.values
+		if next_user && next_user.length > 0
+			next_user[0].value = ''
+			next_user[0].dataset.values = ''
+			next_user[0].value = value;
+			next_user[0].dataset.values = values;
+			next_user.trigger('change')
 
 Template.instance_suggestion.onCreated ->
 	console.log("instance_suggestion onCreated...");

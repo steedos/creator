@@ -361,25 +361,24 @@ Template.creator_grid.onRendered ->
 		# Template.currentData() 这个代码不能删除，用于更新self.data中的数据
 		templateData = Template.currentData()
 		is_related = self.data.is_related
+		object_name = self.data.object_name
+		creator_obj = Creator.getObject(object_name)
+		if !creator_obj
+			return
+		related_object_name = self.data.related_object_name
 		if is_related
-			list_view_id = Creator.getListView(self.data.related_object_name, "all")._id
+			list_view_id = Creator.getListView(related_object_name, "all")._id
 		else
 			list_view_id = Session.get("list_view_id")
 		unless list_view_id
 			toastr.error t("creator_list_view_permissions_lost")
 			return
 
-		object_name = self.data.object_name
-		creator_obj = Creator.getObject(object_name)
-
-		if !creator_obj
-			return
 		if !is_related
 			grid_paging = Tracker.nonreactive ()->
 							_grid_paging = Session.get('grid_paging')
 							if _grid_paging?.object_name == object_name && _grid_paging.list_view_id == list_view_id
 								return _grid_paging
-		related_object_name = self.data.related_object_name
 		curObjectName = if is_related then related_object_name else object_name
 		curObject = Creator.getObject(curObjectName)
 
@@ -724,6 +723,14 @@ Template.creator_grid.onRendered ->
 										utcOffset = moment().utcOffset() / 60
 										val = moment(val).add(utcOffset, "hours").format('YYYY-MM-DD H:mm')
 										r.values[index] = val
+								else
+									dataField = col[index]?.dataField
+									if fields and fields[dataField]?.type == "select"
+										options = fields[dataField].options
+										valOpt = _.find options, (opt)->
+											return opt.value == val
+										if valOpt
+											r.values[index] = valOpt.label
 				onCellClick: (e)->
 					if e.column?.dataField ==  "_id_actions"
 						_itemClick.call(self, e, curObjectName, list_view_id)

@@ -38,7 +38,7 @@ Creator.getObjectSchema = (obj) ->
 		else if field.type == "textarea"
 			fs.type = String
 			fs.autoform.type = "widearea"
-			fs.autoform.rows = field.rows || 6
+			fs.autoform.rows = field.rows || 2
 		else if field.type == "password"
 			fs.type = String
 			fs.autoform.type = "password"
@@ -406,8 +406,8 @@ Creator.getObjectSchema = (obj) ->
 		if field.label
 			fs.label = field.label
 
-		if field.allowedValues
-			fs.allowedValues = field.allowedValues
+#		if field.allowedValues
+#			fs.allowedValues = field.allowedValues
 
 		if !field.required
 			fs.optional = true
@@ -462,6 +462,11 @@ Creator.getObjectSchema = (obj) ->
 
 		if field.blackbox
 			fs.blackbox = true
+
+		if _.has(field, 'min')
+			fs.min = field.min
+		if _.has(field, 'max')
+			fs.max = field.max
 
 		# 只有生产环境才重建索引
 		if Meteor.isProduction
