@@ -93,14 +93,8 @@ FlowRouter.route '/app/:app_id',
 			FlowRouter.go('/app/' + app_id + '/meeting/calendar')
 		else
 			main = 'creator_app_home'
-			if Steedos.isMobile()
-				Session.set('hidden_header', true)
 			BlazeLayout.render Creator.getLayout(),
 				main: main
-	triggersExit: [(context, redirect) ->
-		if Steedos.isMobile()
-			Session.set("hidden_header", undefined)
-	]
 
 FlowRouter.route '/app/:app_id/home',
 	triggersEnter: [ checkUserSigned, checkAppPermission ],
