@@ -43,3 +43,23 @@
 		display: block;
 	}
 }
+
+.gridSidebarContainer.dx-treeview{
+	.dx-treeview-item{
+		.dx-treeview-item-content{
+			display: flex;
+			align-items: center;
+			span{
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				flex: 1;
+				&.creator-table-actions{
+					flex: 0.1;
+					text-align: right;
+					margin-top: -3px;
+				}
+			}
+		}
+	}
+}
