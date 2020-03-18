@@ -26,7 +26,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 	result = Creator.getAllPermissions(spaceId, userId)
 	result.user = userSession
 	result.space = space
-	result.apps = _.extend Creator.getDBApps(spaceId), Creator.Apps
+	result.apps = Creator.Apps
 	result.object_listviews = Creator.getUserObjectsListViews(userId, spaceId, result.objects)
 	result.object_workflows = Meteor.call 'object_workflows.get', spaceId, userId
 
@@ -47,6 +47,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 			)
 	_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
 		result.apps = _.extend result.apps, datasource.getAppsConfig()
+	result.apps = _.extend( result.apps || {}, Creator.getDBApps(spaceId))
 
 	tryFetchPluginsInfo = (fun)->
 		try
