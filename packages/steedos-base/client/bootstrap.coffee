@@ -192,7 +192,6 @@ handleBootstrapData = (result, callback)->
 			object.list_views[_key] = _object_listview
 		Creator.loadObjects object, object_name
 
-	_Apps = {}
 	_.each result.apps, (app, key) ->
 		if !app._id
 			app._id = key
@@ -203,11 +202,8 @@ handleBootstrapData = (result, callback)->
 		else
 			# 非creator应该一律不显示
 			app.visible = false
-		if app.code
-			app._id = app.code
-		_Apps[app._id] = app
 
-	sortedApps = _.sortBy _.values(_Apps), 'sort'
+	sortedApps = _.sortBy _.values(result.apps), 'sort'
 	# 按钮sort排序次序设置Creator.Apps值
 	Creator.Apps = {}
 	adminApp = {}

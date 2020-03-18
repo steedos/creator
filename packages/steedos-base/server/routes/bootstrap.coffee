@@ -49,6 +49,16 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 		result.apps = _.extend result.apps, datasource.getAppsConfig()
 	result.apps = _.extend( result.apps || {}, Creator.getDBApps(spaceId))
 
+	_Apps = {}
+	_.each result.apps, (app, key) ->
+		if !app._id
+			app._id = key
+		if app.code
+			app._dbid = app._id
+			app._id = app.code
+		_Apps[app._id] = app
+	result.apps = _Apps
+
 	tryFetchPluginsInfo = (fun)->
 		try
 			# 因为require函数中参数用变量传入的话，可能会造成直接报错
