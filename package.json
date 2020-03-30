@@ -23,6 +23,7 @@
     "@steedos/auth": "^1.18.9",
     "@steedos/core": "^1.18.9",
     "@steedos/filters": "^1.18.9",
+    "@steedos/i18n": "file:.yalc/@steedos/i18n",
     "@steedos/objectql": "^1.18.9",
     "@steedos/odata-v4-typeorm": "^0.1.0",
     "@steedos/schemas": "^1.18.9",

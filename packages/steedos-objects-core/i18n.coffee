@@ -1,24 +1,17 @@
 import i18n from 'meteor/universe:i18n';
+I18n = require('@steedos/i18n');
+console.log('I18n', I18n);
 sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
 @t = (key, parameters, locale) ->
 	if locale == "zh-cn"
 		locale = "zh-CN"
-
-	if locale
-		translator = i18n.createTranslator('', locale);
-	else
-		translator = i18n.__;
-
-	if parameters?.context
-		key = key + "_" + parameters.context;
-			
 	if parameters? and !(_.isObject parameters)
-		# 兼容老格式 key中包含 %s，只支持一个参数。
-		return sprintf(translator(key), parameters)
+		return I18n.t(key, {lng: locale, postProcess: 'sprintf', sprintf: [parameters] });
+	else
+		return I18n.t(key, Object.assign({lng: locale}, parameters)); #TODO lng
 
-	return translator(key, parameters)
 
 @tr = t
 
@@ -56,7 +49,7 @@ if TAPi18n?
 		if translated != key
 			return translated
 
-		# i18n 翻译不出来，尝试用 tap:i18n 翻译
+		# i18n 翻译不出来，尝试用 tap:i18n 翻译 TODO remove
 		return TAPi18n.__original key, options, locale
 
 	TAPi18n._getLanguageFilePath = (lang_tag) ->
@@ -78,7 +71,7 @@ if Meteor.isClient
 		return locale
 
 
-	# 停用业务对象翻译
+	# 停用业务对象翻译 TODO 标准化此功能
 	SimpleSchema.prototype.i18n = (prefix) ->
 		return
 		# self = this
@@ -104,11 +97,13 @@ if Meteor.isClient
 			if Session.get("steedos-locale") != "en-us"
 				if TAPi18n?
 					TAPi18n.setLanguage("zh-CN")
+				I18n.changeLanguage("zh-CN")
 				i18n.setLocale("zh-CN")
 				moment.locale("zh-cn")
 			else
 				if TAPi18n?
 					TAPi18n.setLanguage("en")
+				I18n.changeLanguage("en")
 				i18n.setLocale("en")
 				moment.locale("en")
 

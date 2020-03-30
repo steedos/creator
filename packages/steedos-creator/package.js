@@ -90,9 +90,6 @@ Package.onUse(function (api) {
 	api.use('universe:i18n');
 	api.use('steedos:app-base');
 
-	api.addFiles('i18n/en.i18n.json');
-	api.addFiles('i18n/zh-CN.i18n.json');
-
 	api.addFiles('checkNpm.js', "server");
 
 	api.addFiles('core.coffee');
