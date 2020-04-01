@@ -94,16 +94,17 @@ if Meteor.isClient
 		Session.set("steedos-locale", getBrowserLocale())
 
 		Tracker.autorun ()->
+			console.log('steedos-locale is ', Session.get("steedos-locale"));
 			if Session.get("steedos-locale") != "en-us"
 				if TAPi18n?
 					TAPi18n.setLanguage("zh-CN")
-				I18n.changeLanguage("zh-CN")
+				I18n.changeLanguage("zh-CN", {rootUrl: Meteor.absoluteUrl()})
 				i18n.setLocale("zh-CN")
 				moment.locale("zh-cn")
 			else
 				if TAPi18n?
 					TAPi18n.setLanguage("en")
-				I18n.changeLanguage("en")
+				I18n.changeLanguage("en", {rootUrl: Meteor.absoluteUrl()})
 				i18n.setLocale("en")
 				moment.locale("en")
 

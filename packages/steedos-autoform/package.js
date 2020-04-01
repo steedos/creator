@@ -42,8 +42,6 @@ Package.onUse(function(api) {
 
 	api.use('steedos:base@0.1.4');
 	api.use('rubaxa:sortable@1.3.0');
-	tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json']
-	api.addFiles(tapi18nFiles, ['client', 'server']);
 
 
 	api.addFiles('client/core.coffee');

@@ -30,10 +30,6 @@ Package.onUse(function(api) {
 	api.use('flemay:less-autoprefixer@1.2.0');
 	api.use('templating@1.2.15');
 
-	// tapi18nFiles = ['i18n/en.i18n.json', 'i18n/zh-CN.i18n.json'];
-	// api.addFiles(tapi18nFiles, ['client', 'server']);
-	// api.addFiles('package.app.coffee');
-
 	api.addFiles('client/template_apps_list_modal.less', 'client');
 	api.addFiles('client/template_apps_list_modal.html', 'client');
 	api.addFiles('client/template_apps_list_modal.coffee', 'client');
