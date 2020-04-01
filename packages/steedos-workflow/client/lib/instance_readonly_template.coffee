@@ -613,7 +613,7 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 
 	creatorService = Meteor.settings.public.webservices?.creator?.url
 	ins_record_ids = instance.record_ids
-
+	locale = _getLocale(user);
 	openFileScript = """
 			if(window.isNode && isNode()){
 				attachs = document.getElementsByClassName("ins_attach_href");
@@ -717,8 +717,8 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 		showTracesBtn = """
 			<div class="navigation-bar btn-group no-print" style="min-width: 600px; z-index: 999">
 				<div class="print-tool">
-					<label class="cbx-label"><input type="checkbox" class="cbx-print cbx-print-attachments" id="cbx-print-attachments" checked="checked"><span>附件</span></label>
-					<label class="cbx-label"><input type="checkbox" class="cbx-print cbx-print-traces" id="cbx-print-traces" checked="#{traceCheck}"><span>#{t('instance_approval_history')}</span></label>
+					<label class="cbx-label"><input type="checkbox" class="cbx-print cbx-print-attachments" id="cbx-print-attachments" checked="checked"><span>#{TAPi18n.__('instance_attachment', {}, locale)}</span></label>
+					<label class="cbx-label"><input type="checkbox" class="cbx-print cbx-print-traces" id="cbx-print-traces" checked="#{traceCheck}"><span>#{TAPi18n.__('instance_approval_history', {}, locale)}</span></label>
 				</div>
 			</div>
 			"""

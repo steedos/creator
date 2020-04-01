@@ -44,8 +44,7 @@ if TAPi18n?
 	TAPi18n.__original = TAPi18n.__
 
 	TAPi18n.__ = (key, options, locale)->
-
-		translated = t(key, options, locale);		
+		translated = t(key, options, locale);
 		if translated != key
 			return translated
 
