@@ -2,7 +2,7 @@ if (Meteor.isClient) {
 	Meteor.startup(function () {
 		Meteor.autorun(function () {
 			var lang = TAPi18n.getLanguage();
-			var localMessages = TAPi18n.__("simpleschema.messages", {returnObjectTrees: true});
+			var localMessages = TAPi18n.__("simpleschema.messages", {returnObjects: true});
 			localMessages.regEx = _.map(localMessages.regEx, function (item) {
 				if (item.exp) {
 					var obj = window;
