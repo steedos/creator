@@ -1,4 +1,14 @@
 steedosAuth = require("@steedos/auth");
+steedosI18n = require("@steedos/i18n");
+
+_getLocale = (user)->
+	if user?.locale?.toLocaleLowerCase() == 'zh-cn'
+		locale = "zh-CN"
+	else if user?.locale?.toLocaleLowerCase() == 'en-us'
+		locale = "en"
+	else
+		locale = "zh-CN"
+	return locale
 
 JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 	userId = req.headers['x-user-id']
@@ -23,7 +33,11 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 
 	space = Creator.Collections["spaces"].findOne({_id: spaceId}, {fields: {name: 1}})
 
-	result = Creator.getAllPermissions(spaceId, userId)
+	result = Creator.getAllPermissions(spaceId, userId);
+	console.time('translationObjects');
+	lng = _getLocale(db.users.findOne(userId, {fields: {locale: 1}}))
+	steedosI18n.translationObjects(lng, result.objects);
+	console.timeEnd('translationObjects');
 	result.user = userSession
 	result.space = space
 	result.apps = Creator.Apps
