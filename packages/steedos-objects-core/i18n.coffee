@@ -1,6 +1,5 @@
 import i18n from 'meteor/universe:i18n';
 I18n = require('@steedos/i18n');
-console.log('I18n', I18n);
 sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
@@ -9,7 +8,7 @@ sprintf = require('sprintf-js').sprintf;
 @tr = t
 
 @trl = t
-######## TODO 清理无用代码
+
 absoluteUrl = (url)->
 	if url
 		# url以"/"开头的话，去掉开头的"/"
