@@ -4,18 +4,12 @@ console.log('I18n', I18n);
 sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
-@t = (key, parameters, locale) ->
-	if locale == "zh-cn"
-		locale = "zh-CN"
-	if parameters? and !(_.isObject parameters)
-		return I18n.t(key, {lng: locale, postProcess: 'sprintf', sprintf: [parameters] });
-	else
-		return I18n.t(key, Object.assign({lng: locale}, parameters)); #TODO lng
-
+@t = I18n.t
 
 @tr = t
 
 @trl = t
+######## TODO 清理无用代码
 absoluteUrl = (url)->
 	if url
 		# url以"/"开头的话，去掉开头的"/"
@@ -70,17 +64,9 @@ if Meteor.isClient
 		return locale
 
 
-	# 停用业务对象翻译 TODO 标准化此功能
+	# 停用业务对象翻译 此函数已弃用
 	SimpleSchema.prototype.i18n = (prefix) ->
 		return
-		# self = this
-		# _.each(self._schema, (value, key) ->
-		# 	if (!value)
-		# 		return
-		# 	if !self._schema[key].label
-		# 		self._schema[key].label = ()->
-		# 			return t(prefix + "_" + key.replace(/\./g,"_"))
-		# )
 
 	Template.registerHelper '_', (key, args)->
 		return TAPi18n.__(key, args);
@@ -93,7 +79,6 @@ if Meteor.isClient
 		Session.set("steedos-locale", getBrowserLocale())
 
 		Tracker.autorun ()->
-			console.log('steedos-locale is ', Session.get("steedos-locale"));
 			if Session.get("steedos-locale") != "en-us"
 				if TAPi18n?
 					TAPi18n.setLanguage("zh-CN")
