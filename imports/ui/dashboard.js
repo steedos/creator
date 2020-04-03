@@ -6,8 +6,8 @@ Template.dashboard.helpers({
 		return DashboardContainer
 	},
 	config: function(){
-		var app = Creator.getApp();
-		return app ? app.dashboard : {}
+		var dashboard = Creator.getAppDashboard()
+		return dashboard ? dashboard : {}
 	}
 });
 

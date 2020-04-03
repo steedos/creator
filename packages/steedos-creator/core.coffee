@@ -184,6 +184,13 @@ Creator.getApp = (app_id)->
 	Creator.deps?.app?.depend()
 	return app
 
+Creator.getAppDashboard = (app_id)->
+	app = Creator.getApp(app_id)
+	dashboard = {}
+	_.each Creator.Dashboards, (v, k)->
+		if v.apps.contains(app._id)
+			dashboard = v;
+	return dashboard;
 
 Creator.getAppObjectNames = (app_id)->
 	app = Creator.getApp(app_id)
