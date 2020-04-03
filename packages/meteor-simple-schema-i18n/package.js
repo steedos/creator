@@ -18,5 +18,5 @@ Package.onUse(function(api, where) {
 
   api.addFiles([
     'shared/lib.js'
-  ]);
+  ], 'client');
 });
