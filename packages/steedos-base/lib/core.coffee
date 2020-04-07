@@ -861,7 +861,7 @@ Creator.getDBApps = (space_id)->
 
 Creator.getDBDashboards = (space_id)->
 	dbDashboards = {}
-	Creator.Collections["dashboards"].find({space: space_id}, {
+	Creator.Collections["dashboard"].find({space: space_id}, {
 		fields: {
 			created: 0,
 			created_by: 0,

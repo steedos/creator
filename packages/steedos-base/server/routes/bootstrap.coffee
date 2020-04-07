@@ -28,6 +28,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 	result.user = userSession
 	result.space = space
 	result.apps = Creator.Apps
+	console.log "==Creator.Dashboards==0=", JSON.stringify(Creator.Dashboards)
 	result.dashboards = Creator.Dashboards
 	result.object_listviews = Creator.getUserObjectsListViews(userId, spaceId, result.objects)
 	result.object_workflows = Meteor.call 'object_workflows.get', spaceId, userId
@@ -47,6 +48,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 				_obj.permissions = permissions(v, userSession)
 				result.objects[_obj.name] = _obj
 			)
+	console.log "==result.dashboards==0=", JSON.stringify(result.dashboards)
 	_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
 		result.apps = _.extend result.apps, datasource.getAppsConfig()
 		result.dashboards = _.extend result.dashboards, datasource.getDashboardsConfig()
