@@ -7,7 +7,7 @@ Template.dashboard.helpers({
 	},
 	config: function(){
 		var dashboard = Creator.getAppDashboard()
-		return dashboard ? dashboard : {}
+		return dashboard ? dashboard.widgets : {}
 	}
 });
 
