@@ -330,7 +330,7 @@ Template.instance_suggestion.events
 		currentStep = InstanceManager.getCurrentStep();
 		# 当前步骤为会签时，不显示下一步步骤、处理人
 		if currentStep && currentStep.step_type == 'counterSign'
-			if currentStep.oneClickRejection && judge == 'rejected' && Meteor.settings?.public?.is_group_company
+			if currentStep.oneClickRejection && judge == 'rejected'
 				$(".instance-suggestion #instance_next").show();
 			else
 				$(".instance-suggestion #instance_next").hide();
@@ -366,6 +366,8 @@ Template.instance_suggestion.events
 		Session.set("instance_my_approve_description", $("#suggestion").val())
 
 	'click #instance_submit': (event)->
+		if Session.get("box") == "draft" && !Template.instance_pick_approve_users.validate()
+			return
 		if WorkflowManager.isArrearageSpace()
 			ins = WorkflowManager.getInstance();
 			if ins.state == "draft"
@@ -442,7 +444,7 @@ Template.instance_suggestion.onRendered ->
 	# 当前步骤为会签时，不显示下一步步骤、处理人
 	if currentStep && currentStep.step_type == 'counterSign'
 		myApprove = InstanceManager.getCurrentApprove()
-		if currentStep.oneClickRejection && myApprove.judge == 'rejected' && Meteor.settings?.public?.is_group_company
+		if currentStep.oneClickRejection && myApprove.judge == 'rejected'
 			$(".instance-suggestion #instance_next").show();
 		else
 			$(".instance-suggestion #instance_next").hide();

@@ -1,5 +1,7 @@
 steedosAuth = require("@steedos/auth");
 steedosI18n = require("@steedos/i18n");
+steedosCore = require("@steedos/core");
+clone = require("clone");
 
 _getLocale = (user)->
 	if user?.locale?.toLocaleLowerCase() == 'zh-cn'
@@ -40,7 +42,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 #	console.timeEnd('translationObjects');
 	result.user = userSession
 	result.space = space
-	result.apps = Creator.Apps
+	result.apps = clone(Creator.Apps);
 	result.object_listviews = Creator.getUserObjectsListViews(userId, spaceId, result.objects)
 	result.object_workflows = Meteor.call 'object_workflows.get', spaceId, userId
 
@@ -73,24 +75,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 		_Apps[app._id] = app
 	result.apps = _Apps
 
-	tryFetchPluginsInfo = (fun)->
-		try
-			# 因为require函数中参数用变量传入的话，可能会造成直接报错
-			# 具体`name = "@steedos/objectql/package.json",info = require(name)`会报错，只能用`info = require("@steedos/objectql/package.json")`
-			# 但是`name = "@steedos/core/package.json",info = require(name)`却不会报错
-			# 所以这里把整个fun传入执行
-			fun()
-		catch
-
-	result.plugins = {}
-	tryFetchPluginsInfo ->
-		result.plugins["@steedos/core"] = version: require("@steedos/core/package.json")?.version
-	tryFetchPluginsInfo ->
-		result.plugins["@steedos/objectql"] = version: require("@steedos/objectql/package.json")?.version
-	tryFetchPluginsInfo ->
-		result.plugins["@steedos/accounts"] = version: require("@steedos/accounts/package.json")?.version
-	tryFetchPluginsInfo ->
-		result.plugins["@steedos/steedos-plugin-workflow"] = version: require("@steedos/steedos-plugin-workflow/package.json")?.version
+	result.plugins = steedosCore.getPlugins?()
 
 	JsonRoutes.sendResult res,
 		code: 200,
