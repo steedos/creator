@@ -5,6 +5,8 @@ Template.creator_app_home.onRendered ()->
 		if isBootstrapLoaded && appId
 			console.log("===creator_app_home=====isBootstrapLoaded====")
 			dashboard = Creator.getAppDashboard()
+			unless dashboard
+				dashboard = Creator.getAppDashboardComponent()
 			if dashboard and !Steedos.isMobile()
 				FlowRouter.go "/app/#{appId}/home"
 			else

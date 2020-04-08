@@ -28,12 +28,12 @@ set_sessions = (context, redirect)->
 	app_id = context.params.app_id
 	if (app_id != "-")
 		Session.set("app_id", app_id)
-	Session.set("object_name", context.params.object_name)
-	Session.set("record_id", context.params.record_id)
 	object_name = context.params.object_name
-	objectHomeComponent = ReactSteedos.pluginComponentSelector(ReactSteedos.store.getState(), "ObjectHome", context.params.object_name)
+	Session.set("object_name", object_name)
+	Session.set("record_id", context.params.record_id)
+	objectHomeComponent = ReactSteedos.pluginComponentSelector(ReactSteedos.store.getState(), "ObjectHome", object_name)
 	if objectHomeComponent
-		Session.set("object_home_component", objectHomeComponent.toString());
+		Session.set("object_home_component", object_name);
 	else
 		Session.set("object_home_component", null)
 

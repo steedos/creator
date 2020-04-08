@@ -61,8 +61,9 @@ Template.creatorNavigation.helpers
 		else
 			return false
 	hasAppDashboard: ()->
-		dashboard = Creator.getAppDashboard()
-		return dashboard and !Steedos.isMobile()
+		if Steedos.isMobile()
+			return false;
+		return Creator.getAppDashboard() or Creator.getAppDashboardComponent()
 	dashboard_url: ()->
 		return Steedos.absoluteUrl("app/#{Session.get('app_id')}/home")
 	dashboard_class_name: ()->

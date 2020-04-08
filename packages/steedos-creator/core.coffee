@@ -192,6 +192,10 @@ Creator.getAppDashboard = (app_id)->
 			dashboard = v;
 	return dashboard;
 
+Creator.getAppDashboardComponent = (app_id)->
+	app = Creator.getApp(app_id)
+	return ReactSteedos.pluginComponentSelector(ReactSteedos.store.getState(), "Dashboard", app._id);
+
 Creator.getAppObjectNames = (app_id)->
 	app = Creator.getApp(app_id)
 	isMobile = Steedos.isMobile()
