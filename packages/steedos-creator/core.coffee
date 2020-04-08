@@ -188,7 +188,7 @@ Creator.getAppDashboard = (app_id)->
 	app = Creator.getApp(app_id)
 	dashboard = {}
 	_.each Creator.Dashboards, (v, k)->
-		if v.apps?.contains(app._id)
+		if v.apps?.indexOf(app._id) > -1
 			dashboard = v;
 	return dashboard;
 
