@@ -3,7 +3,6 @@ Template.creator_app_home.onRendered ()->
 		isBootstrapLoaded = Creator.bootstrapLoaded.get()
 		appId = Session.get('app_id')
 		if isBootstrapLoaded && appId
-			console.log("===creator_app_home=====isBootstrapLoaded====")
 			dashboard = Creator.getAppDashboard()
 			unless dashboard
 				dashboard = Creator.getAppDashboardComponent()
