@@ -184,6 +184,17 @@ Creator.getApp = (app_id)->
 	Creator.deps?.app?.depend()
 	return app
 
+Creator.getAppDashboard = (app_id)->
+	app = Creator.getApp(app_id)
+	dashboard = null
+	_.each Creator.Dashboards, (v, k)->
+		if v.apps?.indexOf(app._id) > -1
+			dashboard = v;
+	return dashboard;
+
+Creator.getAppDashboardComponent = (app_id)->
+	app = Creator.getApp(app_id)
+	return ReactSteedos.pluginComponentSelector(ReactSteedos.store.getState(), "Dashboard", app._id);
 
 Creator.getAppObjectNames = (app_id)->
 	app = Creator.getApp(app_id)
