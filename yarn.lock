@@ -457,11 +457,12 @@
     moment "^2.24.0"
     underscore "^1.9.1"
 
-"@steedos/i18n@file:.yalc/@steedos/i18n":
-  version "1.0.0-6004cda1"
+"@steedos/i18n@^1.18.14":
+  version "1.18.14"
+  resolved "https://registry.yarnpkg.com/@steedos/i18n/-/i18n-1.18.14.tgz#a3929fda85e0135c97ce317dbf427b7249d165ee"
+  integrity sha512-cgW3YlnjVzEmB/hddQSfQBApBTe43UnUbDykvZXZyXmPrpVDxxvWSM/TZ8WgeVoNsMlYHzKBrPNVujOPYZUZZA==
   dependencies:
     i18next "^19.3.4"
-    i18next-fluent "^1.0.1"
     i18next-sprintf-postprocessor "^0.2.2"
     i18next-xhr-backend "^3.2.2"
 
@@ -2706,23 +2707,6 @@ flowstate@^0.4.0:
     uid-safe "^2.1.0"
     utils-flatten "^1.0.0"
 
-fluent-syntax@0.8.1:
-  version "0.8.1"
-  resolved "https://registry.npm.taobao.org/fluent-syntax/download/fluent-syntax-0.8.1.tgz#02eddd4861b453e614e071016dea3d4395b27f6e"
-  integrity sha1-Au3dSGG0U+YU4HEBbeo9Q5Wyf24=
-
-fluent@^0.8.0:
-  version "0.8.1"
-  resolved "https://registry.npm.taobao.org/fluent/download/fluent-0.8.1.tgz#7fb1608264466b1ac750e1be29a6d9f27af82b0c"
-  integrity sha1-f7FggmRGaxrHUOG+KabZ8nr4Kww=
-
-fluent_conv@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.npm.taobao.org/fluent_conv/download/fluent_conv-1.1.1.tgz#5190aefc33bbd54d346a0d7caf9165d57d25af7d"
-  integrity sha1-UZCu/DO71U00ag18r5Fl1X0lr30=
-  dependencies:
-    fluent-syntax "0.8.1"
-
 flushwritable@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/flushwritable/-/flushwritable-1.0.0.tgz#3e328d8fde412ad47e738e3be750b4d290043498"
@@ -3238,14 +3222,6 @@ humanize-ms@^1.2.0:
 hyphenate-style-name@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/hyphenate-style-name/-/hyphenate-style-name-1.0.3.tgz#097bb7fa0b8f1a9cf0bd5c734cf95899981a9b48"
-
-i18next-fluent@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npm.taobao.org/i18next-fluent/download/i18next-fluent-1.0.1.tgz#75f37494ea0eb72b4cc084e2c799201b2dc720dc"
-  integrity sha1-dfN0lOoOtytMwITix5kgGy3HINw=
-  dependencies:
-    fluent "^0.8.0"
-    fluent_conv "^1.1.1"
 
 i18next-sprintf-postprocessor@^0.2.2:
   version "0.2.2"
