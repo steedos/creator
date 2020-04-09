@@ -50,7 +50,7 @@ DesignerAPI =
 							left: 0px;
 							right: 0px;
 							top: 50%;
-							z-index: 1100;
+							z-index: -1;/*设置为-1，可以在iframe加载出来后自动消失*/
 							text-align: center;
 							margin-top: -30px;
 							font-size: 36px;
@@ -128,9 +128,6 @@ DesignerAPI =
 						};
 						$(function(){
 							designer.run();
-							setTimeout(function(){
-								$(".loading").remove();
-							}, 800);
 						});
 					</script>
 				<body>
