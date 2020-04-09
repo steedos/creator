@@ -22,7 +22,7 @@ Meteor.methods
 		Accounts.setPassword(user_id, password, {logout: true})
 
 		# 如果用户手机号通过验证，就发短信提醒
-		if userCP.mobile
+		if userCP.mobile && userCP.mobile_verified
 			lang = 'en'
 			if userCP.locale is 'zh-cn'
 				lang = 'zh-CN'
