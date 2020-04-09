@@ -186,8 +186,8 @@ InstanceRecordQueue.Configure = function (options) {
 		var
 			obj = {},
 			tableFieldCodes = [],
-			tableFieldMap = [];
-		tableToRelatedMap = {};
+			tableFieldMap = [],
+			tableToRelatedMap = {};
 
 		field_map_back = field_map_back || [];
 
