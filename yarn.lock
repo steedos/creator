@@ -466,10 +466,10 @@
     i18next-sprintf-postprocessor "^0.2.2"
     i18next-xhr-backend "^3.2.2"
 
-"@steedos/migrate@^1.18.9":
-  version "1.18.9"
-  resolved "https://registry.npm.taobao.org/@steedos/migrate/download/@steedos/migrate-1.18.9.tgz#3d86bd8962a8e72640ba5239c0cb658282925fe5"
-  integrity sha1-PYa9iWKo5yZAulI5wMtlgoKSX+U=
+"@steedos/migrate@^1.18.15":
+  version "1.18.15"
+  resolved "https://registry.yarnpkg.com/@steedos/migrate/-/migrate-1.18.15.tgz#8e7746a6e6bc967ce38e3e456fda8079c5f08a25"
+  integrity sha512-51CXPZqo12ND/yWaJ58+vl1ashJlrUOyGSD8mE+HrkDLC/bH1OWgqDIbZLiDHyfQiFSTSfN/Pw9IMgISlCVmnQ==
   dependencies:
     migrate "^1.6.2"
 
