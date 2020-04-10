@@ -41,6 +41,26 @@ Template.instancePrint.helpers
 	isShowTraces: ->
 		return Template.instance().isShowTraces?.get()
 
+	isShowTracesSimplify: ->
+		return Template.instance().isShowTracesSimplify?.get()
+
+	simplifyTraces: (traces)->
+		startStep = _.find WorkflowManager.getInstanceSteps(), (s)->
+			return s.step_type == "start"
+		if !startStep
+			return []
+		startStepId = startStep._id
+
+		traces.forEach (t, index)->
+			if ['rejected', 'relocated'].includes(t.judge) || t.step == startStepId
+				delete traces[index]
+				return
+			t.approves?.forEach (a, idx)->
+				if ['terminated', 'reassigned'].includes(a.judge)
+					delete t.approves[idx]
+					return
+		return traces
+
 Template.instancePrint.step = 1;
 
 Template.instancePrint.plusFontSize = (node)->
@@ -118,6 +138,14 @@ Template.instancePrint.events
 		else
 			localStorage.removeItem "print_is_show_traces"
 
+	"click .cbx-print-traces-simplify": (event, template) ->
+		isChecked = $(event.currentTarget).is(':checked')
+		template.isShowTracesSimplify.set(isChecked)
+		if isChecked
+			localStorage.setItem "print_is_show_traces_simplify", isChecked
+		else
+			localStorage.removeItem "print_is_show_traces_simplify"
+
 	"change input[name='printWidthA4']": (event, template)->
 		$('#printWidth').val(event.target.value).trigger('change')
 
@@ -128,6 +156,7 @@ Template.instancePrint.onCreated ->
 	Form_formula.initFormScripts()
 	this.isShowAttachments = new ReactiveVar(false)
 	this.isShowTraces = new ReactiveVar(false)
+	this.isShowTracesSimplify = new ReactiveVar(false)
 
 Template.instancePrint.onRendered ->
 
@@ -149,3 +178,6 @@ Template.instancePrint.onRendered ->
 	if localStorage.getItem "print_is_show_traces"
 		Template.instance().isShowTraces.set(true)
 		$(".instance-print .cbx-print-traces").attr("checked",true)
+	if localStorage.getItem "print_is_show_traces_simplify"
+		Template.instance().isShowTracesSimplify.set(true)
+		$(".instance-print .cbx-print-traces-simplify").attr("checked",true)

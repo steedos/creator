@@ -71,6 +71,7 @@ workflowSpaceRoutes.route '/print/:instanceId',
 
 		localStorage.setItem "print_is_show_attachments", !!queryParams.show_attachments
 		localStorage.setItem "print_is_show_traces", !!queryParams.show_traces
+		localStorage.setItem "print_is_show_traces_simplify", !!queryParams.show_traces_simplify
 
 		BlazeLayout.render 'printLayout',
 			main: "instancePrint"
