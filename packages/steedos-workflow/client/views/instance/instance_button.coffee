@@ -401,7 +401,7 @@ instanceButtonHelpers =
 		return false
 
 	enabled_remind: ->
-		if not Meteor.settings.public or not Meteor.settings.public.phone or Meteor.settings.public.phone.notShowRemindButton
+		if not Meteor.settings.public or not Meteor.settings.public.phone or !Meteor.settings.public.phone.showRemindButton
 			return false
 
 		ins = WorkflowManager.getInstance()
