@@ -33,5 +33,5 @@ Meteor.methods
 				RecNum: userCP.mobile,
 				SignName: '华炎办公',
 				TemplateCode: 'SMS_67200967',
-				msg: TAPi18n.__('sms.change_password.template', {name:currentUser.name}, lang)
+				msg: TAPi18n.__('sms.change_password.template', {}, lang)
 

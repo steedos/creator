@@ -1,5 +1,7 @@
 Meteor.methods
 	instance_remind: (remind_users, remind_count, remind_deadline, instance_id, action_types, trace_id)->
+		if Meteor.settings.public?.phone?.notShowRemindButton
+			return false
 		check remind_users, Array
 		check remind_count, Match.OneOf('single', 'multi')
 		check remind_deadline, Date
