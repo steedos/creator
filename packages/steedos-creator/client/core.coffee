@@ -447,6 +447,11 @@ if Meteor.isClient
 			return !isFiltering;
 		return isFiltering
 	
+	Creator.pushCurrentPathToUrlQuery = ()->
+		currentPath = FlowRouter.current().path
+		if currentPath != urlQuery[urlQuery.length - 1]
+			urlQuery.push currentPath
+	
 
 # 切换工作区时，重置下拉框的选项
 Meteor.startup ->
