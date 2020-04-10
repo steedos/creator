@@ -20,8 +20,10 @@ DesignerAPI =
 		query = req.query
 		url = query.url
 
-		unless url
-			DesignerAPI.sendInvalidURLResponse res 
+		if url
+			url = decodeURIComponent(url)
+		else
+			DesignerAPI.sendInvalidURLResponse res
 		
 		title = query.title
 		if title

@@ -14,6 +14,7 @@ if Meteor.isClient
 			flowName = db.flows.findOne(flow)?.name
 			if flowName
 				title = "#{flowName} | #{title}"
+		title = encodeURIComponent(title)
 		iframe_url = "/api/workflow/designer?url=#{url}&title=#{title}"
 		Steedos.openWindow Steedos.absoluteUrl(iframe_url)
 	WorkflowCore.openFormDesign = (locale, space, form, companyId)->
