@@ -538,17 +538,15 @@ Template.instance_button.onRendered ->
 	copyUrlClipboard.on 'success', (e) ->
 		toastr.success(t("instance_readonly_view_url_copy_success"))
 		e.clearSelection()
-	
-	Meteor.defer ->
-		# 这里加Meteor.defer是因为Workflow.checkInstanceMaxUnfoldedButtonsCount依赖了界面dom加载完成
-		if !Steedos.isMobile()
-			Workflow.checkInstanceMaxUnfoldedButtonsCount()
-		self.autorun ()->
-			buttons = getDefaultButtonsMap()
-			_.forEach buttons, (item, key)->
-				item.enabled = getButtonEnabled(key, item)
-			buttons = getResponsiveButtons buttons, Session.get("workflow_max_unfolded_buttons_count")
-			self.buttons.set buttons
+
+	if !Steedos.isMobile()
+		Workflow.checkInstanceMaxUnfoldedButtonsCount()
+	self.autorun ()->
+		buttons = getDefaultButtonsMap()
+		_.forEach buttons, (item, key)->
+			item.enabled = getButtonEnabled(key, item)
+		buttons = getResponsiveButtons buttons, Session.get("workflow_max_unfolded_buttons_count")
+		self.buttons.set buttons
 
 Template.instance_button.onCreated ->
 	self = this
