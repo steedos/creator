@@ -667,9 +667,12 @@ InstanceRecordQueue.Configure = function (options) {
 							ids: [record._id]
 						}
 					})
-					cfs.files.remove({
-						'metadata.record_id': record._id
-					})
+					var removeOldFiles = function (cb) {
+						return cfs.files.remove({
+							'metadata.record_id': record._id
+						}, cb);
+					};
+					Meteor.wrapAsync(removeOldFiles)();
 					// 同步新附件
 					self.syncAttach(sync_attachment, insId, record.space, record._id, objectName);
 				} catch (error) {
