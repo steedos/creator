@@ -96,6 +96,7 @@ InstanceRecordQueue.Configure = function (options) {
 						cb(null);
 					});
 					newFile.once('error', function (error) {
+						console.error('syncAttach-error: ', error);
 						cb(error);
 					});
 				})(newFile, Creator, cmsFileId, objectName, newRecordId, spaceId, f);
@@ -172,6 +173,7 @@ InstanceRecordQueue.Configure = function (options) {
 						cb(null);
 					});
 					newFile.once('error', function (error) {
+						console.error('syncAttach-error: ', error);
 						cb(error);
 					});
 				})(newFile, Creator, cmsFileId, f);
