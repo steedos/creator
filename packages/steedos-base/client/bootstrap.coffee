@@ -192,38 +192,7 @@ handleBootstrapData = (result, callback)->
 			object.list_views[_key] = _object_listview
 		Creator.loadObjects object, object_name
 
-	_.each result.apps, (app, key) ->
-		if !app._id
-			app._id = key
-		if app.is_creator
-			if isSpaceAdmin
-				# 如果是工作区管理员应该强制把is_creator的应用显示出来
-				app.visible = true
-		else
-			# 非creator应该一律不显示
-			app.visible = false
-
-	sortedApps = _.sortBy _.values(result.apps), 'sort'
-	# 按钮sort排序次序设置Creator.Apps值
-	Creator.Apps = {}
-	adminApp = {}
-	_.each sortedApps, (n) ->
-		if n._id == "admin"
-			adminApp = n
-		else
-			Creator.Apps[n._id] = n
-
-	# admin菜单显示在最后
-	Creator.Apps.admin = adminApp
-
-	apps = result.assigned_apps
-	if apps.length
-		_.each Creator.Apps, (app, key)->
-			if apps.indexOf(key) > -1
-				app.visible = app.is_creator
-			else
-				app.visible = false
-
+	Creator.Apps = ReactSteedos.creatorAppsSelector(ReactSteedos.store.getState())
 	Creator.Menus = result.assigned_menus
 
 	appIds = _.pluck(Creator.getVisibleApps(true), "_id")
