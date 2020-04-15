@@ -292,9 +292,6 @@ instanceButtonHelpers =
 
 
 	enabled_forward: ->
-		if Meteor.settings.public?.workflow?.disableInstanceForward
-			return false
-
 		ins = WorkflowManager.getInstance()
 		if !ins
 			return false
