@@ -816,8 +816,12 @@ renderMatrixReport = (reportObject)->
 					if relate_valueField?.type == "number" or relate_valueField?.type == "currency"
 						operation = "sum"	
 			caption = valueField.label
-			unless caption
+			unless valueField.label
 				caption = objectName + "_" + value
+			if relate_valueField
+				caption += "." + relate_valueField.label
+				unless relate_valueField.label
+					caption += "." + valueField.reference_to
 			caption = "#{getSummaryTypeLabel operation} #{caption}"
 			if operation != "count"
 				format = 

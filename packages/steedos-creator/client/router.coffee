@@ -112,6 +112,7 @@ FlowRouter.route '/app/:app_id/home',
 			if Steedos.isMobile()
 				Session.set('hidden_header', true)
 				main = 'dashboard'
+			Steedos.setAppTitle([t("Home"), "Steedos"].join(" | "));
 			BlazeLayout.render Creator.getLayout(),
 				main: main
 	triggersExit: [(context, redirect) ->
