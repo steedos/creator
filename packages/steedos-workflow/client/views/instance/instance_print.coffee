@@ -50,7 +50,7 @@ Template.instancePrint.helpers
 		if !startStep
 			return []
 		startStepId = startStep._id
-
+		steps = {}
 		traces.forEach (t, index)->
 			if ['rejected', 'relocated'].includes(t.judge) || t.step == startStepId
 				delete traces[index]
@@ -59,6 +59,10 @@ Template.instancePrint.helpers
 				if ['terminated', 'reassigned'].includes(a.judge)
 					delete t.approves[idx]
 					return
+			if _.has steps, t.step
+				delete traces[steps[t.step]]
+			steps[t.step] = index
+
 		return traces
 
 Template.instancePrint.step = 1;
