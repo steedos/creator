@@ -2,6 +2,106 @@
 	.content-wrapper{
 		margin-left: 0;
 	}
+
+	.chooseFlow{
+		border-bottom: none !important;
+		.chooseFlow-header-close{
+			display: none !important;
+		}
+	}
+
+	#chooseFlow-modal-content{
+		//height: 100%;
+		&>div{
+			height: 100%;
+			&>div{
+				height: 100%;
+			}
+		}
+		.slds-tree_container{
+			overflow: hidden;
+			overflow-y: auto;
+			//height: calc(~"100% - 32px") !important;
+			max-height: calc(~"100% - 32px") !important;
+		}
+
+		.slds-tree_container{
+			.slds-tree{
+				.slds-tree__item{
+					.slds-tree__item-label{
+						.slds-button{
+							padding: 0;
+							margin: 0;
+							background: none;
+							border: 0;
+							line-height: inherit;
+							text-align: left;
+							color: #080707;
+						}
+						.flow-label-icon{
+							top: -2px;
+							position: relative;
+							color: rgba(51, 51, 51, 0.71);
+						}
+						.all-flow-label-icon{
+							top: -2px;
+							position: relative;
+							color: rgba(51, 51, 51, 0.71);
+						}
+					}
+				}
+			}
+		}
+		.slds-input{
+			border-left: 0;
+			border-right: 0;
+		}
+	}
+
+	@media screen and (max-width: 647px){
+		.ReactModalPortal{
+			.slds-modal__container{
+				margin: 0;
+				padding: 0;
+				.chooseFlow-header-close{
+					display: block !important;
+				}
+				.slds-modal__header{
+					height: 49px;
+					border-radius: 0;
+					padding: 0.5rem;
+					.slds-modal__close{
+						display: none;
+						//left: 0.25rem;
+						//top: 0.50rem;
+						//right: 1rem;
+						//color: #0070d2;
+					}
+					.slds-text-heading_medium{
+						font-size: 18px;
+						color: #080707;
+						line-height: 30px;
+					}
+				}
+				.slds-modal__content{
+					height: 100%;
+					&>div{
+						height: 100%;
+						&>div{
+							height: 100%;
+						}
+					}
+					border-radius: 0 !important;
+					.slds-tree_container{
+						overflow: hidden;
+						overflow-y: auto;
+						height: calc(~"100% - 32px") !important;
+						max-height: calc(~"100% - 32px") !important;
+					}
+				}
+			}
+		}
+	}
 }
 
 .workflow-main {
