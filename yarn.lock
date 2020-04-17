@@ -518,10 +518,10 @@
     odata-v4-parser "0.1.13"
     odata-v4-sql "^0.1.2"
 
-"@steedos/react@1.19.2":
-  version "1.18.15"
-  resolved "https://registry.npm.taobao.org/@steedos/react/download/@steedos/react-1.18.15.tgz#7668eb29e2c30fcc4c40e2aad365723d646ca82d"
-  integrity sha1-dmjrKeLDD8xMQOKq02VyPWRsqC0=
+"@steedos/react@1.18.16":
+  version "1.18.16"
+  resolved "https://registry.npm.taobao.org/@steedos/react/download/@steedos/react-1.18.16.tgz?cache=0&sync_timestamp=1587119543226&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40steedos%2Freact%2Fdownload%2F%40steedos%2Freact-1.18.16.tgz#8f3f53633651a0d257f1f4152705314fa201c268"
+  integrity sha1-jz9TYzZRoNJX8fQVJwUxT6IBwmg=
   dependencies:
     "@material-ui/core" "^4.4.0"
     "@material-ui/icons" "^4.2.1"
