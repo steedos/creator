@@ -209,7 +209,11 @@
 									</div>
 								{{/if}}
 								<div class="slds-table tale-content list-table-container td-cell-wrap">
-									{{> Template.dynamic template=list_template data=list_data}}
+									{{#if showAsGrid}}
+										{{> Template.dynamic template=list_template data=list_data}}
+									{{else}}
+										{{> list}}
+									{{/if}}
 								</div>
 							{{/if}}
 						{{/if}}
