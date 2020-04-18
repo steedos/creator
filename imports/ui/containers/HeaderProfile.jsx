@@ -6,7 +6,7 @@ function HeaderProfileContainer(prop){
 	return (
 		<Provider store={store}>
 			<Bootstrap>
-				<HeaderProfile avatarURL={prop.avatarURL} logoutAccountClick={prop.logoutAccountClick} settingsAccountClick={prop.settingsAccountClick}/>
+				<HeaderProfile avatarURL={prop.avatarURL} logoutAccountClick={prop.logoutAccountClick} settingsAccountClick={prop.settingsAccountClick} footers={prop.footers}/>
 			</Bootstrap>
 		</Provider>
 	)

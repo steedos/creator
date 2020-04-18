@@ -28,5 +28,12 @@ Template.headerProfile.helpers({
 			var url = Steedos.getUserRouter();
 			FlowRouter.go(url);
 		}
+	},
+	footers: function(){
+		return [
+			{label: "帮助文档", onClick: function(){return Steedos.openWindow("https://www.steedos.com/help")}},
+			{label: "下载客户端", onClick: function(){return Steedos.openWindow("https://www.steedos.com/help/download")}},
+			{label: "关于", onClick: function(){return FlowRouter.go("/app/admin/page/creator_about");}}
+		]
 	}
 });
