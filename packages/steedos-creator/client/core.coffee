@@ -451,6 +451,168 @@ if Meteor.isClient
 		currentPath = FlowRouter.current().path
 		if currentPath != urlQuery[urlQuery.length - 1]
 			urlQuery.push currentPath
+
+	Creator.getStandardQuery = (curObjectName, standard_query)->
+		object_fields = Creator.getObject(curObjectName).fields
+		if !standard_query or !standard_query.query or !_.size(standard_query.query) or standard_query.object_name != curObjectName
+			delete Session.keys["standard_query"]
+			return;
+		else
+			object_name = standard_query.object_name
+			query = standard_query.query
+			query_arr = []
+			if standard_query.is_mini
+				_.each query, (val, key)->
+					if object_fields[key]
+						if ["currency", "number"].includes(object_fields[key].type)
+							query_arr.push([key, "=", val])
+						else if ["text", "textarea", "html", "select"].includes(object_fields[key].type)
+							if _.isString(val)
+								vals = val.trim().split(" ")
+								query_or = []
+								vals.forEach (val_item)->
+									# 特殊字符编码
+									val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+									query_or.push([key, "contains", val_item])
+								if query_or.length > 0
+									query_arr.push Creator.formatFiltersToDev(query_or, object_name, {is_logic_or: false})
+							else if _.isArray(val)
+								query_arr.push([key, "=", val])
+			else
+				_.each query, (val, key)->
+					if object_fields[key]
+						if ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+							query_arr.push([key, ">=", val])
+						else if ["text", "textarea", "html"].includes(object_fields[key].type)
+							if _.isString(val)
+								vals = val.trim().split(" ")
+								query_or = []
+								vals.forEach (val_item)->
+									# 特殊字符编码
+									val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+									query_or.push([key, "contains", val_item])
+								if query_or.length > 0
+									query_arr.push Creator.formatFiltersToDev(query_or, object_name, {is_logic_or: false})
+							else if _.isArray(val)
+								query_arr.push([key, "=", val])
+
+						else if ["boolean"].includes(object_fields[key].type)
+							query_arr.push([key, "=", JSON.parse(val)])
+
+						else if ["lookup", "master_detail"].includes(object_fields[key].type)
+							_f = object_fields[key]
+							_reference_to = _f?.reference_to
+							if _.isFunction(_reference_to)
+								_reference_to = _reference_to()
+							if _.isArray(_reference_to)
+								if val?.ids
+									query_arr.push {
+										field: key+".ids"
+										operation: '='
+										value: val?.ids
+									}
+								if val?.o
+									_ro = Creator.getObject(val?.o)
+									query_arr.push {
+										field: key+".o"
+										operation: '='
+										value: _ro._collection_name
+									}
+							else
+								query_arr.push([key, "=", val])
+						else
+							query_arr.push([key, "=", val])
+					else
+						key = key.replace(/(_endLine)$/, "")
+						if object_fields[key] and ["date", "datetime", "currency", "number"].includes(object_fields[key].type)
+							query_arr.push([key, "<=", val])
+
+			is_logic_or = if standard_query.is_mini then true else false
+			options = is_logic_or: is_logic_or
+			return Creator.formatFiltersToDev(query_arr, object_name, options)
+
+	Creator.getListViewFilters = (object_name, list_view_id, is_related, related_object_name, record_id)->
+		creator_obj = Creator.getObject(object_name)
+		if is_related
+			# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
+			filter = Creator.getODataRelatedFilter(object_name, related_object_name, record_id, list_view_id)
+		else
+			filter_logic = Session.get("filter_logic")
+			filter_scope = Session.get("filter_scope")
+
+			filter_items = Session.get("filter_items")
+			_objFields = creator_obj.fields
+
+			_filters = []
+			_.forEach filter_items, (fi)->
+				if fi.value == undefined
+					# value为undefined时不应该生成过滤条件，dev过滤器不支持
+					return
+				_f = _objFields[fi?.field]
+				if ["text", "textarea", "html", "code"].includes(_f?.type)
+					if _.isString(fi.value)
+						vals = fi.value.trim().split(" ")
+						query_or = []
+						vals.forEach (val_item)->
+							val_item = encodeURIComponent(Creator.convertSpecialCharacter(val_item))
+							query_or.push([fi.field, fi.operation, val_item])
+						if query_or.length > 0
+							is_logic_or = false
+							if ['<>','notcontains'].includes(fi.operation)
+								is_logic_or = false
+							_filters.push Creator.formatFiltersToDev(query_or, object_name, {is_logic_or: is_logic_or})
+				else if ["lookup", "master_detail"].includes(_f?.type)
+					_reference_to = _f?.reference_to
+					if _.isFunction(_reference_to)
+						_reference_to = _reference_to()
+					if _.isArray(_reference_to)
+						if fi.value?.ids
+							_filters.push {
+								field: fi.field+".ids"
+								operation: fi.operation
+								value: fi.value?.ids
+							}
+						if fi.value?.o
+							_ro = Creator.getObject(fi.value?.o)
+							_filters.push {
+								field: fi.field+".o"
+								operation: fi.operation
+								value: _ro._collection_name
+							}
+					else
+						_filters.push fi
+				else
+					_filters.push fi
+
+			if _filters.length > 0
+				# 支持直接把过虑器变更的过虑条件应用到grid列表，而不是非得先保存到视图中才生效
+				filters_set =
+					filter_logic: filter_logic
+					filter_scope: filter_scope
+					filters: _filters
+			# 因为有权限判断需求，所以最近查看也需要调用过虑条件逻辑，而不应该设置为undefined
+			filter = Creator.getODataFilter(list_view_id, object_name, filters_set)
+			standardQuery = Creator.getStandardQuery(object_name, Session.get("standard_query"))
+			if standardQuery and standardQuery.length
+				if filter
+					filter = [filter, "and", standardQuery]
+				else
+					filter = standardQuery
+
+			unless is_related
+				# 左侧sidebar有grid列表时，应该过虑左侧选中值相关数据，相关项列表不支持sidebar
+				sidebarFilter = Session.get("grid_sidebar_filters")
+				if sidebarFilter and sidebarFilter.length
+					if filter
+						filter = [ filter, "and", sidebarFilter ]
+					else
+						filter = sidebarFilter
+
+		if !filter
+			# filter 为undefined时要设置为空，否则dxDataGrid控件会使用上次使用过的filter
+			filter = null
+		console.log("filter=======", filter);
+		return filter
 	
 
 # 切换工作区时，重置下拉框的选项
