@@ -7,7 +7,7 @@ function ListContainer(prop){
 	return (
 		<Provider store={store}>
 			<Bootstrap>
-				<List {...prop.listProps}/>
+				<List id={prop.id} {...prop.listProps}/>
 			</Bootstrap>
 		</Provider>
 	)
