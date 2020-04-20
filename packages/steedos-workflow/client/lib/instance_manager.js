@@ -1169,7 +1169,7 @@ InstanceManager.uploadAttach = function (files, isAddVersion, isMainAttach) {
 		if (attachment_size_limit) {
 			maximumFileSize = attachment_size_limit;
 		}
-		limitSize = maximumFileSize;
+		limitSize = maximumFileSize * 1024 * 1024;
 		warnStr = t("workflow_attachment_paid_size_limit") + maximumFileSize + "MB";
 	} else {
 		// 免费版大小不能超过10M
