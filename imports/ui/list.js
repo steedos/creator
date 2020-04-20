@@ -57,7 +57,11 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		filters: filters,
 		pageSize: pageSize,
 		pager: pager,
-		initializing: 1
+		initializing: 1,
+		showMoreLink: true,
+		moreLinkHref: (props)=> {
+			return Creator.getRelatedObjectUrl(object_name, "-", record_id, related_object_name)
+		}
 	}
 }
 
