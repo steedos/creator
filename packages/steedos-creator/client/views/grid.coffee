@@ -391,7 +391,7 @@ Template.creator_grid.onRendered ->
 		isSpaceAdmin = Creator.isSpaceAdmin()
 		isOrganizationAdmin = _.include(user_permission_sets,"organization_admin")
 
-		record_id = Session.get("record_id")
+		record_id = self.data.record_id ||  Session.get("record_id")
 
 		listTreeCompany = Session.get('listTreeCompany')
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()

@@ -420,7 +420,10 @@ Template.creator_view.helpers
 		object_name = Session.get "object_name"
 		related_list_item_props = item
 		related_object_name = item.object_name
-		return {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true, related_list_item_props: related_list_item_props}
+		data = {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true, related_list_item_props: related_list_item_props}
+		if object_name == 'objects'
+			data.record_id = Creator.getObjectRecord().name
+		return data
 
 	enable_chatter: ()->
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter
