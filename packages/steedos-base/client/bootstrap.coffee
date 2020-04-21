@@ -189,6 +189,8 @@ handleBootstrapData = (result, callback)->
 				_key = _object_listview.api_name
 			else
 				_key = _object_listview._id
+			if !object.list_views
+				object.list_views = {}
 			object.list_views[_key] = _object_listview
 		Creator.loadObjects object, object_name
 
