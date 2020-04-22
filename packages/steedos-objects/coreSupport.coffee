@@ -55,9 +55,10 @@ Creator.getObject = (object_name, space_id)->
 		Creator.deps?.object?.depend()
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
-	if !space_id && object_name
-		if Meteor.isClient && !object_name.endsWith('__c')
-			space_id = Session.get("spaceId")
+
+#	if !space_id && object_name
+#		if Meteor.isClient && !object_name.startsWith('c_')
+#			space_id = Session.get("spaceId")
 
 	if object_name
 #		if space_id
