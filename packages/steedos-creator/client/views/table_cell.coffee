@@ -141,7 +141,7 @@ Template.creator_table_cell.helpers
 			data.push {value: val?.address || '', id: this._id}
 		else if (_field.type == "lookup" || _field.type == "master_detail") && !_.isEmpty(val)
 			# 有optionsFunction的情况下，reference_to不考虑数组
-			if _.isFunction(_field.optionsFunction) && !_field.reference_to
+			if _.isFunction(_field.optionsFunction)
 				_values = this.doc || {}
 				_record_val = this.record_val
 				_val = val
@@ -160,10 +160,18 @@ Template.creator_table_cell.helpers
 						if val && _.isArray(val) && _.isArray(selectedOptions)
 							selectedOptions = Creator.getOrderlySetByIds(selectedOptions, val, "value")
 						val = selectedOptions.getProperty("label")
-				if reference_to && false
-					_.each val, (v)->
-						href = Creator.getObjectUrl(reference_to, v)
-						data.push {reference_to: reference_to,  rid: v, value: v, id: this._id, href: href}
+				if reference_to
+					_.each selectedOptions, (option)->
+						if reference_to == 'objects'
+							v = option.label
+							_robj = Creator.getObject(option.value)
+							if _robj?._id
+								href = Creator.getObjectUrl(reference_to, _robj._id)
+								data.push {reference_to: reference_to,  rid: v, value: v, id: this._id, href: href}
+							else
+								data.push {value: val, id: this._id}
+						else
+							data.push {value: val, id: this._id}
 				else
 					data.push {value: val, id: this._id}
 			else
