@@ -1,6 +1,6 @@
 {
   "name": "steedos",
-  "version": "1.19.2",
+  "version": "1.19.3",
   "private": true,
   "scripts": {
     "start": "env-cmd -f ./.env.local meteor run --settings settings.json --port 3100",
@@ -102,7 +102,7 @@
   },
   "devDependencies": {
     "@steedos/app-contracts": "^1.19.2",
-    "@steedos/react": "1.18.17",
+    "@steedos/react": "1.18.18",
     "@steedos/steedos-plugin-workflow": "^2.0.6",
     "bootstrap": "^3.3.7",
     "bootstrap-tagsinput": "0.7.1",
