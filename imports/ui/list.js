@@ -5,7 +5,7 @@ import { store, loadGridEntitiesData } from '@steedos/react';
 let isListRendered = false;
 const defaultListId = "steedos-list";
 
-const getListProps = ({id, object_name, related_object_name, is_related, recordsTotal}, withoutFilters) => {
+const getListProps = ({id, object_name, related_object_name, is_related, recordsTotal, total}, withoutFilters) => {
 	let object, list_view_id;
 	object = Creator.getObject(object_name);
 	if (!object) {
@@ -48,8 +48,16 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	}
 	columns = _.without(columns, undefined, null);
 	console.log("====getListProps==filters=", filters);
-	let pageSize = is_related ? 5 : 10;
-	let pager = is_related ? false : true;
+	// let pageSize = is_related ? 5 : 10;
+	// let pager = is_related ? false : true;
+
+	let pageSize = 10;
+	let pager = true;
+	if(is_related && recordsTotal){
+		// 详细界面相关列表
+		pageSize = 5;
+		pager = false;
+	}
 	return {
 		id: id ? id : defaultListId,
 		objectName: curObjectName,
@@ -78,7 +86,7 @@ Template.list.helpers({
 
 Template.list.onCreated(function () {
 	// 切换对象或视图时，会再进一次onCreated，所以object、listview、options不需要放到autorun中
-	let { id, object_name, related_object_name, is_related, recordsTotal } = this.data.options;
+	let { id, object_name, related_object_name, is_related, recordsTotal, total } = this.data.options;
 	console.log("Template.list.onCreated===", id);
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
@@ -87,11 +95,19 @@ Template.list.onCreated(function () {
 			this.unsubscribe();
 		}
 		this.unsubscribe = store.subscribe(()=>{
+			// 订阅store中列表数量值
 			let listState = ReactSteedos.viewStateSelector(store.getState(), id);
 			if(listState && !listState.loading){
-				recordsTotalValue = Tracker.nonreactive(()=>{return recordsTotal.get()});
-				recordsTotalValue[curObjectName] = listState.totalCount;
-				recordsTotal.set(recordsTotalValue);
+				if(recordsTotal){
+					// 详细界面相关列表
+					let recordsTotalValue = Tracker.nonreactive(()=>{return recordsTotal.get()});
+					recordsTotalValue[curObjectName] = listState.totalCount;
+					recordsTotal.set(recordsTotalValue);
+				}
+				else if(total){
+					// 主列表或独立的相关列表界面
+					total.set(listState.totalCount);
+				}
 			}
 		});
 	}

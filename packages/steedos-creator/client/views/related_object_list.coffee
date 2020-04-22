@@ -49,7 +49,14 @@ Template.related_object_list.helpers
 		relatedList = Creator.getRelatedList(Session.get("object_name"), Session.get("record_id"))
 		related_object_name = Session.get "related_object_name"
 		related_list_item_props = relatedList.find((item)-> return item.object_name == related_object_name)
-		return {related_object_name: related_object_name, object_name: object_name, total: Template.instance().recordsTotal, is_related: true, related_list_item_props: related_list_item_props}
+		return {
+			id: "steedos-list-related-object-list", 
+			related_object_name: related_object_name, 
+			object_name: object_name, 
+			total: Template.instance().recordsTotal, 
+			is_related: true, 
+			related_list_item_props: related_list_item_props
+		}
 
 
 Template.related_object_list.events
