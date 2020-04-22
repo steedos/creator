@@ -90,6 +90,10 @@ Template.related_object_list.events
 
 Template.related_object_list.onCreated ->
 	this.recordsTotal = new ReactiveVar(0)
+	this.record = new ReactiveVar({});
 	object_name = Session.get "object_name"
 	record_id = Session.get "record_id"
-	this.record = new ReactiveVar(Creator.getCollection(object_name).findOne(record_id) || {})
+	self = this
+	this.autorun ()->
+		self.record.set(Creator.getCollection(object_name).findOne(record_id) || {})
+
