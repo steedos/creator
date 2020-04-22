@@ -74,14 +74,29 @@ Template.list.helpers({
 		console.log("===Template.list.helpers=listProps======")
 		return getListProps(this.options);
 	}
-})
+});
 
 Template.list.onCreated(function () {
 	// 切换对象或视图时，会再进一次onCreated，所以object、listview、options不需要放到autorun中
-	console.log("Template.list.onCreated===");
 	let { id, object_name, related_object_name, is_related, recordsTotal } = this.data.options;
-	if(!is_related){
-		let object = Creator.getObject(object_name);
+	console.log("Template.list.onCreated===", id);
+	let curObjectName;
+	curObjectName = is_related ? related_object_name : object_name;
+	if(is_related){
+		if(this.unsubscribe){
+			this.unsubscribe();
+		}
+		this.unsubscribe = store.subscribe(()=>{
+			let listState = ReactSteedos.viewStateSelector(store.getState(), id);
+			if(listState && !listState.loading){
+				recordsTotalValue = Tracker.nonreactive(()=>{return recordsTotal.get()});
+				recordsTotalValue[curObjectName] = listState.totalCount;
+				recordsTotal.set(recordsTotalValue);
+			}
+		});
+	}
+	else{
+		// let object = Creator.getObject(object_name);
 		let list_view_id = Session.get("list_view_id");
 		let listview = Creator.getListView(object_name, list_view_id);
 		let props = getListProps(this.data.options, true);
@@ -113,5 +128,8 @@ Template.list.onCreated(function () {
 Template.list.onDestroyed(function () {
 	console.log("Template.list.onDestroyed===xx====");
 	isListRendered = false;
+	if(this.unsubscribe){
+		this.unsubscribe();
+	}
 })
 
