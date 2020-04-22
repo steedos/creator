@@ -6,6 +6,7 @@ let isListRendered = false;
 const defaultListId = "steedos-list";
 
 const getListProps = ({id, object_name, related_object_name, is_related, recordsTotal, total}, withoutFilters) => {
+	console.log("====getListProps=====", {id, object_name, related_object_name, is_related});
 	let object, list_view_id;
 	object = Creator.getObject(object_name);
 	if (!object) {
@@ -44,13 +45,10 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	let filters = [];
 	if (!withoutFilters) {
 		// 这里不可以用Tracker.nonreactive，因为当有过滤条件时，滚动翻页及滚动刷新需要传入这里的过滤条件
-		filters = Creator.getListViewFilters(object_name, listview._id, is_related, related_object_name, record_id);
+		filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
 	}
 	columns = _.without(columns, undefined, null);
 	console.log("====getListProps==filters=", filters);
-	// let pageSize = is_related ? 5 : 10;
-	// let pager = is_related ? false : true;
-
 	let pageSize = 10;
 	let pager = true;
 	if(is_related && recordsTotal){
@@ -58,6 +56,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		pageSize = 5;
 		pager = false;
 	}
+	let endpoint = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name);
 	return {
 		id: id ? id : defaultListId,
 		objectName: curObjectName,
@@ -67,6 +66,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		pager: pager,
 		initializing: 1,
 		showMoreLink: true,
+		endpoint: endpoint,
 		moreLinkHref: (props)=> {
 			return Creator.getRelatedObjectUrl(object_name, "-", record_id, related_object_name)
 		}

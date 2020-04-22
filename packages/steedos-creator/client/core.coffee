@@ -614,6 +614,24 @@ if Meteor.isClient
 		console.log("filter=======", filter);
 		return filter
 	
+	Creator.getODataEndpointUrl = (object_name, list_view_id, is_related, related_object_name) ->
+		if is_related
+			_obj_name = Creator.formatObjectName(related_object_name)
+			if Creator.getListViewIsRecent(object_name, list_view_id)
+				#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}/recent"
+				url = "/api/v4/#{_obj_name}/recent"
+			else
+				#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}"
+				url = "/api/v4/#{_obj_name}"
+		else
+			_obj_name = Creator.formatObjectName(object_name)
+			if Creator.getListViewIsRecent(object_name, list_view_id)
+				#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}/recent"
+				url = "/api/v4/#{_obj_name}/recent"
+			else
+				#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
+				url = "/api/v4/#{_obj_name}"
+		return Steedos.absoluteUrl(url)
 
 # 切换工作区时，重置下拉框的选项
 Meteor.startup ->

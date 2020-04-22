@@ -511,7 +511,7 @@ _getDataSourceUrl = (object_name, list_view_id, is_related, related_object_name)
 		else
 			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
 			url = "/api/v4/#{_obj_name}"
-	return url
+	return Steedos.absoluteUrl(url)
 
 Template.creator_grid.onRendered ->
 	self = this
@@ -552,7 +552,7 @@ Template.creator_grid.onRendered ->
 		record_id = Session.get("record_id")
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
-			url = _getDataSourceUrl(object_name, list_view_id, is_related, related_object_name)
+			url = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name)
 			filter = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id)
 			# if is_related
 			# 	_obj_name = Creator.formatObjectName(related_object_name)
@@ -847,7 +847,7 @@ Template.creator_grid.onRendered ->
 					store:
 						type: "odata"
 						version: 4
-						url: Steedos.absoluteUrl(url)
+						url: url
 						withCredentials: false
 						beforeSend: (request) ->
 							request.headers['X-User-Id'] = Meteor.userId()
