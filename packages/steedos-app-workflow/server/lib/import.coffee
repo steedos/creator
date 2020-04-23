@@ -368,6 +368,8 @@ steedosImport.workflow = (uid, spaceId, form, enabled, company_id, options)->
 
 			flow.form = form_id
 
+			flow.category = form.category
+
 			if enabled
 				flow.state = 'enabled'
 				flow.is_valid = true #直接启用的流程设置is valid值为true
