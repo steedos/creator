@@ -29,10 +29,10 @@ Package.onUse(function(api) {
 	api.use('universe:i18n@1.20.0');
 	api.use('steedos:objects@0.0.11');
 
-	api.addFiles('models/object.coffee');
-	api.addFiles('models/object_fields.coffee');
-	api.addFiles('models/object_triggers.coffee');
-	api.addFiles('models/object_actions.coffee');
+	// api.addFiles('models/object.coffee');
+	// api.addFiles('models/object_fields.coffee');
+	// api.addFiles('models/object_triggers.coffee');
+	// api.addFiles('models/object_actions.coffee');
 
 	// // api.addFiles('server/routes/api_creator_apps.coffee', 'server');
 	// api.addFiles('server/routes/api_creator_objects.coffee', 'server');
