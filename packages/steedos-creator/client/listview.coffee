@@ -80,7 +80,7 @@ _getExtraColumns = (curObject, object_name, is_related) ->
 		extra_columns.push("parent")
 		extra_columns.push("children")
 	# object = Creator.getObject(curObjectName)
-	defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
+	defaultExtraColumns = Creator.getObjectDefaultExtraColumns(curObject.name)
 	if defaultExtraColumns
 		extra_columns = _.union extra_columns, defaultExtraColumns
 	return extra_columns
@@ -217,7 +217,4 @@ Creator.getListviewColumns = (curObject, object_name, is_related, list_view_id)-
 Creator.getListviewColumnsWithExtraAndDepandOn = (curObject, object_name, is_related, list_view_id)->
 	selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id)
 	selectColumns = Creator.unionSelectColumnsWithExtraAndDepandOn(selectColumns, curObject, object_name, is_related)
-	# 对于a.b的字段，发送odata请求时需要转换为a/b
-	selectColumns = selectColumns.map (n)->
-		return n.replace(".", "/");
 	return selectColumns;
