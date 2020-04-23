@@ -26,10 +26,11 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
 	let curObject = Creator.getObject(curObjectName);
-	let listview = Creator.getListView(curObjectName, list_view_id);
-	let columns = listview.columns.map((item) => {
+	// let listview = Creator.getListView(curObjectName, list_view_id);
+	let columns = Creator.getListviewColumnsWithExtraAndDepandOn(curObject, object_name, is_related, list_view_id);
+	columns = columns.map((item) => {
 		let fieldName = typeof item === "string" ? item : item.field;
-		let field = curObject.fields[fieldName];
+		let field = curObject.fields[fieldName.replace("/", ".")];
 		if (field) {
 			return {
 				field: fieldName,
@@ -114,9 +115,9 @@ Template.list.onCreated(function () {
 	else{
 		// let object = Creator.getObject(object_name);
 		let list_view_id = Session.get("list_view_id");
-		let listview = Creator.getListView(object_name, list_view_id);
+		// let listview = Creator.getListView(object_name, list_view_id);
 		let props = getListProps(this.data.options, true);
-		console.log("Template.list.onCreated==listview=", listview.label);
+		// console.log("Template.list.onCreated==listview=", listview.label);
 		Meteor.defer(()=>{
 			this.autorun((c) => {
 				// TODO:部分对象切换视图时会进两次该函数，比如合同对象，估计是getListViewFilters监听了什么额外变量

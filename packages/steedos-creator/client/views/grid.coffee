@@ -68,72 +68,72 @@ _actionItems = (object_name, record_id, record_permissions)->
 			return false
 	return actions
 
-_fields = (object_name, list_view_id)->
-	object = Creator.getObject(object_name)
-	name_field_key = object.NAME_FIELD_KEY
-	if object.name == "organizations"
-		# 显示组织列表时，特殊处理name_field_key为name字段
-		name_field_key = "name"
-	fields = [name_field_key]
-	listView = Creator.getCollection("object_listviews").findOne(list_view_id)
-	if listView
-		fields = listView.columns
-		if !fields
-			defaultColumns = Creator.getObjectDefaultColumns(object_name)
-			if defaultColumns
-				fields = defaultColumns
-	else if object.list_views
-		if object.list_views[list_view_id]?.columns
-			fields = object.list_views[list_view_id].columns
-		else
-			defaultColumns = Creator.getObjectDefaultColumns(object_name)
-			if defaultColumns
-				fields = defaultColumns
+# _fields = (object_name, list_view_id)->
+# 	object = Creator.getObject(object_name)
+# 	name_field_key = object.NAME_FIELD_KEY
+# 	if object.name == "organizations"
+# 		# 显示组织列表时，特殊处理name_field_key为name字段
+# 		name_field_key = "name"
+# 	fields = [name_field_key]
+# 	listView = Creator.getCollection("object_listviews").findOne(list_view_id)
+# 	if listView
+# 		fields = listView.columns
+# 		if !fields
+# 			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+# 			if defaultColumns
+# 				fields = defaultColumns
+# 	else if object.list_views
+# 		if object.list_views[list_view_id]?.columns
+# 			fields = object.list_views[list_view_id].columns
+# 		else
+# 			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+# 			if defaultColumns
+# 				fields = defaultColumns
 
-	fields = fields.map (field)->
-		if _.isObject(field)
-			n = field.field
-		else
-			n = field
-		if object.fields[n]?.type # and !object.fields[n].hidden
-			# 对于a.b类型的字段，不应该替换字段名
-			#return n.split(".")[0]
-			return n
-		else
-			return undefined
+# 	fields = fields.map (field)->
+# 		if _.isObject(field)
+# 			n = field.field
+# 		else
+# 			n = field
+# 		if object.fields[n]?.type # and !object.fields[n].hidden
+# 			# 对于a.b类型的字段，不应该替换字段名
+# 			#return n.split(".")[0]
+# 			return n
+# 		else
+# 			return undefined
 
-	if Creator.isCommonSpace(Session.get("spaceId")) && fields.indexOf("space") < 0
-		fields.push('space')
+# 	if Creator.isCommonSpace(Session.get("spaceId")) && fields.indexOf("space") < 0
+# 		fields.push('space')
 
-	fields = _.compact(fields)
-	fieldsName = Creator.getObjectFieldsName(object_name)
-	# 注意这里intersection函数中两个参数次序不能换，否则字段的先后显示次序就错了
-	return _.intersection(fields, fieldsName)
+# 	fields = _.compact(fields)
+# 	fieldsName = Creator.getObjectFieldsName(object_name)
+# 	# 注意这里intersection函数中两个参数次序不能换，否则字段的先后显示次序就错了
+# 	return _.intersection(fields, fieldsName)
 
-_removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
-	# 移除主键字段，即columns中的reference_to等于object_name的字段
-	unless object_name
-		return columns
-	fields = Creator.getObject(curObjectName).fields
-	if is_related
-		columns = columns.filter (n)->
-			if fields[n]?.type == "master_detail"
-				if fields[n].multiple
-					# 多选字段不移除
-					return true
-				if fields[n].reference_to
-					ref = fields[n].reference_to
-					if _.isFunction(ref)
-						ref = ref()
-				else
-					ref = fields[n].optionsFunction({}).getProperty("value")
-				if _.isArray(ref)
-					return true
-				else
-					return ref != object_name
-			else
-				return true
-	return columns
+# _removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
+# 	# 移除主键字段，即columns中的reference_to等于object_name的字段
+# 	unless object_name
+# 		return columns
+# 	fields = Creator.getObject(curObjectName).fields
+# 	if is_related
+# 		columns = columns.filter (n)->
+# 			if fields[n]?.type == "master_detail"
+# 				if fields[n].multiple
+# 					# 多选字段不移除
+# 					return true
+# 				if fields[n].reference_to
+# 					ref = fields[n].reference_to
+# 					if _.isFunction(ref)
+# 						ref = ref()
+# 				else
+# 					ref = fields[n].optionsFunction({}).getProperty("value")
+# 				if _.isArray(ref)
+# 					return true
+# 				else
+# 					return ref != object_name
+# 			else
+# 				return true
+# 	return columns
 
 _expandFields = (object_name, columns)->
 	expand_fields = []
@@ -161,7 +161,7 @@ _expandFields = (object_name, columns)->
 			ref = ref.join(",")
 
 			if ref
-#				expand_fields.push(n + "($select=" + ref + ")")
+				# expand_fields.push(n + "($select=" + ref + ")")
 				expand_fields.push(n)
 			# expand_fields.push n + "($select=name)"
 	return expand_fields
@@ -269,32 +269,32 @@ _defaultWidth = (columns, isTree, i)->
 	content_width = $(".gridContainer").width() - subWidth
 	return content_width/column_counts
 
-_depandOnFields = (object_name, columns)->
-	fields = Creator.getObject(object_name).fields
-	depandOnFields = []
-	_.each columns, (column)->
-		if fields[column]?.depend_on
-			depandOnFields = _.union(fields[column].depend_on)
-	return depandOnFields
+# _depandOnFields = (object_name, columns)->
+# 	fields = Creator.getObject(object_name).fields
+# 	depandOnFields = []
+# 	_.each columns, (column)->
+# 		if fields[column]?.depend_on
+# 			depandOnFields = _.union(fields[column].depend_on)
+# 	return depandOnFields
 
-_getSelectColumns = (curObject, object_name, is_related, list_view_id) ->
-	curObjectName = curObject.name
-	if false && Steedos.isMobile() && curObject.NAME_FIELD_KEY
-		selectColumns = [curObject.NAME_FIELD_KEY]
-	else
-		selectColumns = Tracker.nonreactive ()->
-			# grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
-			# if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
-			# 	settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-			# if settingColumns
-			# 	defaultColumns = _fields(curObjectName, list_view_id)
-			# 	selectColumns = _.intersection(settingColumns, defaultColumns)
-			# 	selectColumns = _.union(selectColumns, defaultColumns)
-			# else
-			# 	selectColumns = _fields(curObjectName, list_view_id)
-			return _fields(curObjectName, list_view_id)
-	selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
-	return selectColumns
+# _getSelectColumns = (curObject, object_name, is_related, list_view_id) ->
+# 	curObjectName = curObject.name
+# 	if false && Steedos.isMobile() && curObject.NAME_FIELD_KEY
+# 		selectColumns = [curObject.NAME_FIELD_KEY]
+# 	else
+# 		selectColumns = Tracker.nonreactive ()->
+# 			# grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
+# 			# if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
+# 			# 	settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
+# 			# if settingColumns
+# 			# 	defaultColumns = _fields(curObjectName, list_view_id)
+# 			# 	selectColumns = _.intersection(settingColumns, defaultColumns)
+# 			# 	selectColumns = _.union(selectColumns, defaultColumns)
+# 			# else
+# 			# 	selectColumns = _fields(curObjectName, list_view_id)
+# 			return _fields(curObjectName, list_view_id)
+# 	selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
+# 	return selectColumns
 
 _getShowColumns = (curObject, selectColumns, is_related, list_view_id) ->
 	self = this
@@ -404,35 +404,35 @@ _getPageIndex = (grid_paging, curObjectName) ->
 		pageIndex = grid_paging.pageIndex
 	return pageIndex
 
-_getExtraColumns = (curObject, object_name, is_related) ->
-	extra_columns = _.intersection(["owner", "company_id", "company_ids", "locked"], _.keys(curObject.fields));
-	if !is_related and curObject.enable_tree
-		extra_columns.push("parent")
-		extra_columns.push("children")
-	# object = Creator.getObject(curObjectName)
-	defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
-	if defaultExtraColumns
-		extra_columns = _.union extra_columns, defaultExtraColumns
-	return extra_columns
+# _getExtraColumns = (curObject, object_name, is_related) ->
+# 	extra_columns = _.intersection(["owner", "company_id", "company_ids", "locked"], _.keys(curObject.fields));
+# 	if !is_related and curObject.enable_tree
+# 		extra_columns.push("parent")
+# 		extra_columns.push("children")
+# 	# object = Creator.getObject(curObjectName)
+# 	defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
+# 	if defaultExtraColumns
+# 		extra_columns = _.union extra_columns, defaultExtraColumns
+# 	return extra_columns
 
-_getDataSourceUrl = (object_name, list_view_id, is_related, related_object_name) ->
-	if is_related
-		_obj_name = Creator.formatObjectName(related_object_name)
-		if Creator.getListViewIsRecent(object_name, list_view_id)
-			#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}/recent"
-			url = "/api/v4/#{_obj_name}/recent"
-		else
-			#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}"
-			url = "/api/v4/#{_obj_name}"
-	else
-		_obj_name = Creator.formatObjectName(object_name)
-		if Creator.getListViewIsRecent(object_name, list_view_id)
-			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}/recent"
-			url = "/api/v4/#{_obj_name}/recent"
-		else
-			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
-			url = "/api/v4/#{_obj_name}"
-	return Steedos.absoluteUrl(url)
+# _getDataSourceUrl = (object_name, list_view_id, is_related, related_object_name) ->
+# 	if is_related
+# 		_obj_name = Creator.formatObjectName(related_object_name)
+# 		if Creator.getListViewIsRecent(object_name, list_view_id)
+# 			#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}/recent"
+# 			url = "/api/v4/#{_obj_name}/recent"
+# 		else
+# 			#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}"
+# 			url = "/api/v4/#{_obj_name}"
+# 	else
+# 		_obj_name = Creator.formatObjectName(object_name)
+# 		if Creator.getListViewIsRecent(object_name, list_view_id)
+# 			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}/recent"
+# 			url = "/api/v4/#{_obj_name}/recent"
+# 		else
+# 			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
+# 			url = "/api/v4/#{_obj_name}"
+# 	return Steedos.absoluteUrl(url)
 
 Template.creator_grid.onRendered ->
 	self = this
@@ -475,29 +475,27 @@ Template.creator_grid.onRendered ->
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			url = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name)
 			filter = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id)
-			
 			pageIndex = _getPageIndex(grid_paging, curObjectName)
-			
-			extra_columns = _getExtraColumns(curObject, object_name, is_related)
-
-			selectColumns = _getSelectColumns(curObject, object_name, is_related, list_view_id)
-			#expand_fields 不需要包含 extra_columns
+			# extra_columns = _getExtraColumns(curObject, object_name, is_related)
+			selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id)
+			# #expand_fields 不需要包含 extra_columns
 			expand_fields = _expandFields(curObjectName, selectColumns)
-			
 			showColumns = _getShowColumns.call(self, curObject, selectColumns, is_related, list_view_id)
-			
 			pageSize = _getPageSize(grid_paging, is_related)
 			
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
-			selectColumns = _.union(selectColumns, extra_columns)
-			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
-			# 对于a.b的字段，发送odata请求时需要转换为a/b
-			selectColumns = selectColumns.map (n)->
-				return n.replace(".", "/");
+			selectColumns = Creator.unionSelectColumnsWithExtraAndDepandOn(selectColumns, curObject, object_name, is_related)
 
-			# if !filter
-			# 	# filter 为undefined时要设置为空，否则dxDataGrid控件会使用上次使用过的filter
-			# 	filter = null
+
+			# selectColumns = _.union(selectColumns, extra_columns)
+			# selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
+			# # 对于a.b的字段，发送odata请求时需要转换为a/b
+			# selectColumns = selectColumns.map (n)->
+			# 	return n.replace(".", "/");
+
+			if !filter
+				# filter 为undefined时要设置为空，否则dxDataGrid控件会使用上次使用过的filter
+				filter = null
 
 			_listView = Creator.getListView(object_name, list_view_id, true)
 
