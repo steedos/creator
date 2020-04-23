@@ -113,30 +113,34 @@ Template.list.onCreated(function () {
 		});
 	}
 	else{
-		// let object = Creator.getObject(object_name);
+		let object_name = Session.get("object_name");
 		let list_view_id = Session.get("list_view_id");
-		// let listview = Creator.getListView(object_name, list_view_id);
 		let props = getListProps(this.data.options, true);
-		// console.log("Template.list.onCreated==listview=", listview.label);
+		// 加Meteor.defer可以在刷新浏览器时少进一次
 		Meteor.defer(()=>{
 			this.autorun((c) => {
-				// TODO:部分对象切换视图时会进两次该函数，比如合同对象，估计是getListViewFilters监听了什么额外变量
-				console.log("Template.list.onCreated=====autorun==outside==", isListRendered);
-				console.log("Template.list.onCreated=====autorun==bootstrapLoaded==", Creator.bootstrapLoaded.get());
-				let filters = Creator.getListViewFilters(object_name, list_view_id);
-				if(isListRendered){
-					props.filters = filters;
-					let newProps = {
-						id: id ? id : defaultListId,
-						initializing: 1
-					};
-					if (props.pager) {
-						newProps.count = true;
-					}
-					store.dispatch(loadGridEntitiesData(Object.assign({}, props, newProps)))
-					console.log("Template.list.onCreated=====autorun====", filters);
+				let currentObjectName = Tracker.nonreactive(()=>{return Session.get("object_name");});
+				let currentListViewId = Tracker.nonreactive(()=>{return Session.get("list_view_id");});
+				if(list_view_id !== currentListViewId || object_name !== currentObjectName){
+					// 合同、报表等对象视图中定义了filters，会造成切换视图时多请求一次odata接口
+					return;
 				}
-				isListRendered = true;
+				if(Steedos.spaceId() && Creator.subs["CreatorListViews"].ready() && Creator.subs["TabularSetting"].ready()){
+					let filters = Creator.getListViewFilters(object_name, list_view_id);
+					if(isListRendered){
+						props.filters = filters;
+						let newProps = {
+							id: id ? id : defaultListId,
+							initializing: 1
+						};
+						if (props.pager) {
+							newProps.count = true;
+						}
+						store.dispatch(loadGridEntitiesData(Object.assign({}, props, newProps)))
+						console.log("Template.list.onCreated=====autorun====", filters);
+					}
+					isListRendered = true;
+				}
 			});
 		});
 	}
