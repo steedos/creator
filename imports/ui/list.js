@@ -26,21 +26,21 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
 	let curObject = Creator.getObject(curObjectName);
-	// let listview = Creator.getListView(curObjectName, list_view_id);
-	let columns = Creator.getListviewColumnsWithExtraAndDepandOn(curObject, object_name, is_related, list_view_id);
+	let mainColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id);
+	let columns = Creator.unionSelectColumnsWithExtraAndDepandOn(mainColumns, curObject, object_name, is_related);
 	columns = columns.map((item) => {
-		let fieldName = typeof item === "string" ? item : item.field;
-		let field = curObject.fields[fieldName.replace("/", ".")];
+		let field = curObject.fields[item];
 		if (field) {
 			return {
-				field: fieldName,
+				field: item,
 				label: field.label,
 				type: field.type,
-				is_wide: field.is_wide
+				is_wide: field.is_wide,
+				hidden: !mainColumns.contains(item)
 			}
 		}
 		else {
-			console.error(`The object ${curObject.name} don't exist field '${fieldName}'`);
+			console.error(`The object ${curObject.name} don't exist field '${item}'`);
 		}
 	});
 	let filters = [];
