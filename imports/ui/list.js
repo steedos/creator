@@ -58,7 +58,6 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	console.log("====getListProps==filters=", filters);
 	let pageSize = 10;
 	let pager = true;
-	debugger;
 	if(is_related && recordsTotal){
 		// 详细界面相关列表
 		pageSize = 5;
@@ -72,7 +71,6 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		filters: filters,
 		pageSize: pageSize,
 		pager: pager,
-		initializing: 1,
 		showMoreLink: true,
 		endpoint: endpoint,
 		moreLinkHref: (props)=> {
@@ -108,8 +106,7 @@ Template.list.onCreated(function () {
 	}
 	let props = getListProps(this.data.options, true);
 	let newProps = {
-		id: listId,
-		initializing: 1
+		id: listId
 	};
 	if (props.pager || props.showMoreLink) {
 		newProps.count = true;
