@@ -404,36 +404,6 @@ _getPageIndex = (grid_paging, curObjectName) ->
 		pageIndex = grid_paging.pageIndex
 	return pageIndex
 
-# _getExtraColumns = (curObject, object_name, is_related) ->
-# 	extra_columns = _.intersection(["owner", "company_id", "company_ids", "locked"], _.keys(curObject.fields));
-# 	if !is_related and curObject.enable_tree
-# 		extra_columns.push("parent")
-# 		extra_columns.push("children")
-# 	# object = Creator.getObject(curObjectName)
-# 	defaultExtraColumns = Creator.getObjectDefaultExtraColumns(object_name)
-# 	if defaultExtraColumns
-# 		extra_columns = _.union extra_columns, defaultExtraColumns
-# 	return extra_columns
-
-# _getDataSourceUrl = (object_name, list_view_id, is_related, related_object_name) ->
-# 	if is_related
-# 		_obj_name = Creator.formatObjectName(related_object_name)
-# 		if Creator.getListViewIsRecent(object_name, list_view_id)
-# 			#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}/recent"
-# 			url = "/api/v4/#{_obj_name}/recent"
-# 		else
-# 			#url = "#{Creator.getObjectODataRouterPrefix(Creator.getObject(related_object_name))}/#{Steedos.spaceId()}/#{_obj_name}"
-# 			url = "/api/v4/#{_obj_name}"
-# 	else
-# 		_obj_name = Creator.formatObjectName(object_name)
-# 		if Creator.getListViewIsRecent(object_name, list_view_id)
-# 			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}/recent"
-# 			url = "/api/v4/#{_obj_name}/recent"
-# 		else
-# 			#url = "#{Creator.getObjectODataRouterPrefix(creator_obj)}/#{Steedos.spaceId()}/#{_obj_name}"
-# 			url = "/api/v4/#{_obj_name}"
-# 	return Steedos.absoluteUrl(url)
-
 Template.creator_grid.onRendered ->
 	self = this
 	self.autorun (c)->
@@ -476,7 +446,6 @@ Template.creator_grid.onRendered ->
 			url = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name)
 			filter = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id)
 			pageIndex = _getPageIndex(grid_paging, curObjectName)
-			# extra_columns = _getExtraColumns(curObject, object_name, is_related)
 			selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id)
 			# #expand_fields 不需要包含 extra_columns
 			expand_fields = _expandFields(curObjectName, selectColumns)
@@ -485,10 +454,6 @@ Template.creator_grid.onRendered ->
 			
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = Creator.unionSelectColumnsWithExtraAndDepandOn(selectColumns, curObject, object_name, is_related)
-
-
-			# selectColumns = _.union(selectColumns, extra_columns)
-			# selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
 			
 			# 对于a.b的字段，发送odata请求时需要转换为a/b
 			selectColumns = selectColumns.map (n)->
