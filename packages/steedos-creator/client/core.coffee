@@ -250,8 +250,8 @@ if Meteor.isClient
 			addSelector(["parent/o", "=", object_name])
 			addSelector(["parent/ids", "=", record_id])
 		else if object_name == "objects"
-			record_object_name = Creator.getObjectRecord().name
-			addSelector([related_field_name, "=", record_object_name])
+#			record_object_name = Creator.getObjectRecord().name
+			addSelector([related_field_name, "=", record_id])
 		else
 
 			related_object_fields = Creator.getObject(related_object_name)?.fields

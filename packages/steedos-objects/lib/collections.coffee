@@ -7,11 +7,15 @@ Meteor.startup ()->
 				throw new Meteor.Error(500, "Please configure environment variables: MONGO_OPLOG_URL_CREATOR")
 			Creator._CREATOR_DATASOURCE = {_driver: new MongoInternals.RemoteCollectionDriver(creator_db_url, {oplogUrl: oplog_url})}
 
-Creator.createCollection = (object)->
-	collection_key = object.name
-	if object.space #object.custom &&
-		collection_key = "c_" + object.space + "_" + object.name
+Creator.getCollectionName = (object)->
+#	if object.table_name && object.table_name.endsWith("__c")
+#		return object.table_name
+#	else
+#		return object.name
+	return object.name
 
+Creator.createCollection = (object)->
+	collection_key = Creator.getCollectionName(object)
 	if db[collection_key]
 		return db[collection_key]
 	else if object.db

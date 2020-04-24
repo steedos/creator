@@ -423,7 +423,7 @@ Template.creator_view.helpers
 		related_list_item_props = item
 		related_object_name = item.object_name
 		console.log("=====list_data===related_object_name=", related_object_name);
-		return {
+		data = {
 			id: getRelatedListTemplateId(related_object_name)
 			related_object_name: related_object_name, 
 			object_name: object_name, 
@@ -431,6 +431,9 @@ Template.creator_view.helpers
 			is_related: true, 
 			related_list_item_props: related_list_item_props
 		}
+		if object_name == 'objects'
+			data.record_id = Creator.getObjectRecord().name
+		return data
 
 	enable_chatter: ()->
 		return Creator.getObject(Session.get("object_name"))?.enable_chatter

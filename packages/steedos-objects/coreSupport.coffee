@@ -29,7 +29,7 @@ Creator.loadObjects = (obj, object_name)->
 		obj.list_views = {}
 
 	if obj.space
-		object_name = 'c_' + obj.space + '_' + obj.name
+		object_name = Creator.getCollectionName(obj)
 	if object_name == 'cfs_files_filerecord'
 		object_name = 'cfs.files.filerecord'
 		obj = _.clone(obj)
@@ -55,20 +55,21 @@ Creator.getObject = (object_name, space_id)->
 		Creator.deps?.object?.depend()
 	if !object_name and Meteor.isClient
 		object_name = Session.get("object_name")
-	if !space_id && object_name
-		if Meteor.isClient && !object_name.startsWith('c_')
-			space_id = Session.get("spaceId")
+
+#	if !space_id && object_name
+#		if Meteor.isClient && !object_name.startsWith('c_')
+#			space_id = Session.get("spaceId")
 
 	if object_name
-		if space_id
-			obj = Creator.objectsByName["c_#{space_id}_#{object_name}"]
-			if obj
-				return obj
-
-		obj = _.find Creator.objectsByName, (o)->
-				return o._collection_name == object_name
-		if obj
-			return obj
+#		if space_id
+#			obj = Creator.objectsByName["c_#{space_id}_#{object_name}"]
+#			if obj
+#				return obj
+#
+#		obj = _.find Creator.objectsByName, (o)->
+#				return o._collection_name == object_name
+#		if obj
+#			return obj
 
 		return Creator.objectsByName[object_name]
 

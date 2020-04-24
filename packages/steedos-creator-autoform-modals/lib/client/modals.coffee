@@ -35,7 +35,7 @@ oDataOperation = (type, url, data, object_name)->
 			request.setRequestHeader 'X-Auth-Token', Accounts._storedLoginToken()
 			request.setRequestHeader 'X-Space-Id', Steedos.spaceId()
 		success: (data) ->
-			console.log('oDataOperation success');
+#			console.log('oDataOperation success');
 			if Session.get("cmOperation") == "insert"
 				_id = data.value[0]._id
 			else if Session.get("cmOperation") == "update"
@@ -672,7 +672,7 @@ Template.CreatorAfModal.events
 						data = updateDoc
 						type = "put"
 
-					console.log "begin......", data
+#					console.log "begin......", data
 					if triggers
 						if Session.get("cmOperation") == "insert"
 							_.each triggers, (trigger, key)->

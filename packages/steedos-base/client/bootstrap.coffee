@@ -174,6 +174,7 @@ Creator.bootstrapLoaded = new ReactiveVar(false)
 handleBootstrapData = (result, callback)->
 	Creator._recordSafeObjectCache = []; # 切换工作区时，情况object缓存
 	Creator.Objects = result.objects
+	Creator.objectsByName = {};
 	object_listviews = result.object_listviews
 	Creator.object_workflows = result.object_workflows
 	isSpaceAdmin = Steedos.isSpaceAdmin()
@@ -189,6 +190,8 @@ handleBootstrapData = (result, callback)->
 				_key = _object_listview.api_name
 			else
 				_key = _object_listview._id
+			if !object.list_views
+				object.list_views = {}
 			object.list_views[_key] = _object_listview
 		Creator.loadObjects object, object_name
 
