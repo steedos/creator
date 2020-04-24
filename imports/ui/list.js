@@ -129,6 +129,21 @@ Template.list.onCreated(function () {
 			console.log("Template.list.onCreated=====reload====", filters);
 		}
 	}
+	if(is_related){
+		if(recordsTotal){
+			// 详细界面相关列表，新建记录后刷新当前列表
+			AutoForm.hooks({
+				creatorAddRelatedForm: {
+					onSuccess: (formType, result)=> {
+						this.refresh();
+					}
+				}
+			});
+		}
+		else if(total){
+			// 主列表或独立的相关列表界面不需要新建记录后刷新当前列表，因为会跳转到详细界面
+		}
+	}
 	listInstances[listId] = this;
 	if(is_related){
 		if(this.unsubscribe){
