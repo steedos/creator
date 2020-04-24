@@ -1,6 +1,6 @@
 import './list.html';
 import ListContainer from './containers/ListContainer.jsx'
-import { store, loadGridEntitiesData, createGridAction } from '@steedos/react';
+import { store, createGridAction } from '@steedos/react';
 
 let isListRendered = false;
 let listInstances = {};
@@ -123,8 +123,7 @@ Template.list.onCreated(function () {
 		// 过滤条件变更时用新的过滤条件重新加载数据
 		let filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
 		if(isListRendered){
-			props.filters = filters;
-			store.dispatch(loadGridEntitiesData(Object.assign({}, props, newProps)));
+			store.dispatch(createGridAction('filters', filters, Object.assign({}, props, newProps)))
 			console.log("Template.list.onCreated=====reload====", filters);
 		}
 	}
@@ -151,9 +150,6 @@ Template.list.onCreated(function () {
 		});
 	}
 	else{
-		// let object_name = Session.get("object_name");
-		// let list_view_id = Session.get("list_view_id");
-		// let props = getListProps(this.data.options, true);
 		// 加Meteor.defer可以在刷新浏览器时少进一次
 		Meteor.defer(()=>{
 			this.autorun((c) => {
