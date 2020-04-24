@@ -1,28 +1,34 @@
 import './list.html';
 import ListContainer from './containers/ListContainer.jsx'
-import { store, loadGridEntitiesData } from '@steedos/react';
+import { store, loadGridEntitiesData, createGridAction } from '@steedos/react';
 
 let isListRendered = false;
+let listInstances = {};
+
 const defaultListId = "steedos-list";
 
-const getListProps = ({id, object_name, related_object_name, is_related, recordsTotal, total}, withoutFilters) => {
-	console.log("====getListProps=====", {id, object_name, related_object_name, is_related});
-	let object, list_view_id;
-	object = Creator.getObject(object_name);
-	if (!object) {
-		return;
-	}
-	let record_id = Session.get("record_id");
+const getListViewId = (is_related, related_object_name) => {
 	if (is_related) {
 		list_view_id = Creator.getListView(related_object_name, "all")._id;
 	} else {
 		list_view_id = Session.get("list_view_id");
 	}
+	return list_view_id;
+}
 
+const getListProps = ({id, object_name, related_object_name, is_related, recordsTotal, total}, withoutFilters) => {
+	console.log("====getListProps=====", {id, object_name, related_object_name, is_related});
+	let object = Creator.getObject(object_name);
+	if (!object) {
+		return;
+	}
+	let record_id = Session.get("record_id");
+	let list_view_id = getListViewId(is_related, related_object_name);
 	if (!list_view_id) {
 		toastr.error(t("creator_list_view_permissions_lost"));
 		return;
 	}
+	const listId = id ? id : defaultListId;
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
 	let curObject = Creator.getObject(curObjectName);
@@ -52,6 +58,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	console.log("====getListProps==filters=", filters);
 	let pageSize = 10;
 	let pager = true;
+	debugger;
 	if(is_related && recordsTotal){
 		// 详细界面相关列表
 		pageSize = 5;
@@ -59,7 +66,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	}
 	let endpoint = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name);
 	return {
-		id: id ? id : defaultListId,
+		id: listId,
 		objectName: curObjectName,
 		columns: columns,
 		filters: filters,
@@ -80,24 +87,55 @@ Template.list.helpers({
 	},
 	listProps: function () {
 		debugger;
-		console.log("===Template.list.helpers=listProps======")
-		return getListProps(this.options);
+		let props = getListProps(this.options)
+		console.log("===Template.list.helpers=listProps======", props)
+		return props;
 	}
 });
 
 Template.list.onCreated(function () {
 	// 切换对象或视图时，会再进一次onCreated，所以object、listview、options不需要放到autorun中
-	let { id, object_name, related_object_name, is_related, recordsTotal, total } = this.data.options;
+	const { id, object_name, related_object_name, is_related, recordsTotal, total } = this.data.options;
 	console.log("Template.list.onCreated===", id);
+	const listId = id ? id : defaultListId;
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
+	let record_id = Session.get("record_id");
+	let list_view_id = getListViewId(is_related, related_object_name);
+	if (!list_view_id) {
+		toastr.error(t("creator_list_view_permissions_lost"));
+		return;
+	}
+	let props = getListProps(this.data.options, true);
+	let newProps = {
+		id: listId,
+		initializing: 1
+	};
+	if (props.pager || props.showMoreLink) {
+		newProps.count = true;
+	}
+	this.refresh = ()=>{
+		// 保持过滤条件不变，刷新到第一页数据
+		store.dispatch(createGridAction('currentPage', 0, Object.assign({}, props, newProps)))
+		console.log("Template.list.onCreated=====refresh====");
+	}
+	this.reload = ()=>{
+		// 过滤条件变更时用新的过滤条件重新加载数据
+		let filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
+		if(isListRendered){
+			props.filters = filters;
+			store.dispatch(loadGridEntitiesData(Object.assign({}, props, newProps)));
+			console.log("Template.list.onCreated=====reload====", filters);
+		}
+	}
+	listInstances[listId] = this;
 	if(is_related){
 		if(this.unsubscribe){
 			this.unsubscribe();
 		}
 		this.unsubscribe = store.subscribe(()=>{
 			// 订阅store中列表数量值
-			let listState = ReactSteedos.viewStateSelector(store.getState(), id);
+			let listState = ReactSteedos.viewStateSelector(store.getState(), listId);
 			if(listState && !listState.loading){
 				if(recordsTotal){
 					// 详细界面相关列表
@@ -113,9 +151,9 @@ Template.list.onCreated(function () {
 		});
 	}
 	else{
-		let object_name = Session.get("object_name");
-		let list_view_id = Session.get("list_view_id");
-		let props = getListProps(this.data.options, true);
+		// let object_name = Session.get("object_name");
+		// let list_view_id = Session.get("list_view_id");
+		// let props = getListProps(this.data.options, true);
 		// 加Meteor.defer可以在刷新浏览器时少进一次
 		Meteor.defer(()=>{
 			this.autorun((c) => {
@@ -126,19 +164,7 @@ Template.list.onCreated(function () {
 					return;
 				}
 				if(Steedos.spaceId() && Creator.subs["CreatorListViews"].ready() && Creator.subs["TabularSetting"].ready()){
-					let filters = Creator.getListViewFilters(object_name, list_view_id);
-					if(isListRendered){
-						props.filters = filters;
-						let newProps = {
-							id: id ? id : defaultListId,
-							initializing: 1
-						};
-						if (props.pager) {
-							newProps.count = true;
-						}
-						store.dispatch(loadGridEntitiesData(Object.assign({}, props, newProps)))
-						console.log("Template.list.onCreated=====autorun====", filters);
-					}
+					this.reload();
 					isListRendered = true;
 				}
 			});
@@ -148,9 +174,17 @@ Template.list.onCreated(function () {
 
 Template.list.onDestroyed(function () {
 	console.log("Template.list.onDestroyed===xx====");
+	const { id } = this.data.options;
+	const listId = id ? id : defaultListId;
 	isListRendered = false;
 	if(this.unsubscribe){
 		this.unsubscribe();
 	}
-})
+	listInstances[listId] = null;
+});
+
+Template.list.refresh = (id)=>{
+	const listId = id ? id : defaultListId;
+	listInstances[listId].refresh();
+}
 

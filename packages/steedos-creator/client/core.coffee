@@ -373,16 +373,14 @@ if Meteor.isClient
 	#			expand_fields.push(n)
 		return expand_fields.join(",")
 	
-	Creator.relatedObjectFileUploadHandler = (event, gridContainerWrap)->
+	Creator.relatedObjectFileUploadHandler = (event, callback)->
 		dataset = event.currentTarget.dataset
 		parent = dataset?.parent
-		targetObjectName = dataset?.targetObjectName
 		files = event.currentTarget.files
 		i = 0
 		record_id = Session.get("record_id")
 		object_name = Session.get("object_name")
 		spaceId = Session.get("spaceId")
-		dxDataGridInstance = gridContainerWrap.find(".gridContainer.#{targetObjectName}").dxDataGrid().dxDataGrid('instance')
 		while i < files.length
 			file = files[i]
 			if !file.name
@@ -425,7 +423,7 @@ if Meteor.isClient
 							return
 						return
 					toastr.success TAPi18n.__('Attachment was added successfully')
-					Template.creator_grid.refresh dxDataGridInstance
+					callback()
 					return
 				error: (xhr, msg, ex) ->
 					$(document.body).removeClass 'loading'

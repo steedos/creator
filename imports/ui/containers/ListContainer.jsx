@@ -4,6 +4,9 @@ import { List, Bootstrap, store } from '@steedos/react';
 
 function ListContainer(prop){
 	console.log('ListContainer prop', prop);
+	if(!prop.listProps){
+		return null;
+	}
 	return (
 		<Provider store={store}>
 			<Bootstrap>
