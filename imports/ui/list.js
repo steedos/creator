@@ -116,6 +116,8 @@ Template.list.onCreated(function () {
 	}
 	this.refresh = ()=>{
 		// 保持过滤条件不变，刷新到第一页数据
+		let filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
+		newProps.filters = filters;
 		store.dispatch(createGridAction('currentPage', 0, Object.assign({}, props, newProps)))
 		console.log("Template.list.onCreated=====refresh====");
 	}
