@@ -366,6 +366,7 @@ Template.creator_grid.onRendered ->
 		templateData = Template.currentData()
 		is_related = self.data.is_related
 		object_name = self.data.object_name
+		_pageSize = self.data.pageSize
 		creator_obj = Creator.getObject(object_name)
 		if !creator_obj
 			return
@@ -608,7 +609,9 @@ Template.creator_grid.onRendered ->
 			localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 			if !is_related and localPageSize
 				pageSize = localPageSize
-			if is_related
+			if _pageSize
+				pageSize = _pageSize
+			else if is_related
 				pageSize = 5
 			else
 				if grid_paging
