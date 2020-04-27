@@ -64,6 +64,11 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		pager = false;
 	}
 	let endpoint = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name);
+	let isFiltering = Creator.getIsFiltering();
+	let filteringText = isFiltering ? "以下为过滤后结果" : null;
+	const handleResetFiltering = ()=> {
+		Session.set("filter_items", []);
+	}
 	return {
 		id: listId,
 		objectName: curObjectName,
@@ -73,6 +78,8 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		pager: pager,
 		showMoreLink: true,
 		endpoint: endpoint,
+		resetFiltering: handleResetFiltering,
+		filteringText: filteringText,
 		moreLinkHref: (props)=> {
 			return Creator.getRelatedObjectUrl(object_name, "-", record_id, related_object_name)
 		}
