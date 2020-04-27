@@ -69,6 +69,8 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	const handleResetFiltering = ()=> {
 		Session.set("filter_items", []);
 	}
+	let listView = Creator.getListView(curObjectName, list_view_id);
+	let sort = listView.sort;
 	return {
 		id: listId,
 		objectName: curObjectName,
@@ -78,6 +80,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		pager: pager,
 		showMoreLink: true,
 		endpoint: endpoint,
+		sort: sort,
 		resetFiltering: handleResetFiltering,
 		filteringText: filteringText,
 		moreLinkHref: (props)=> {
