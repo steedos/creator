@@ -17,7 +17,6 @@ const getListViewId = (is_related, related_object_name) => {
 }
 
 const getListProps = ({id, object_name, related_object_name, is_related, recordsTotal, total}, withoutFilters) => {
-	console.log("====getListProps=====", {id, object_name, related_object_name, is_related});
 	let object = Creator.getObject(object_name);
 	if (!object) {
 		return;
@@ -58,8 +57,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 		filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
 	}
 	columns = _.without(columns, undefined, null);
-	console.log("====getListProps==filters=", filters);
-	let pageSize = 10;
+	let pageSize = 20;
 	let pager = true;
 	if(is_related && recordsTotal){
 		// 详细界面相关列表
@@ -97,9 +95,7 @@ Template.list.helpers({
 		return ListContainer;
 	},
 	listProps: function () {
-		debugger;
 		let props = getListProps(this.options)
-		console.log("===Template.list.helpers=listProps======", props)
 		return props;
 	}
 });
@@ -107,7 +103,6 @@ Template.list.helpers({
 Template.list.onCreated(function () {
 	// 切换对象或视图时，会再进一次onCreated，所以object、listview、options不需要放到autorun中
 	const { id, object_name, related_object_name, is_related, recordsTotal, total } = this.data.options;
-	console.log("Template.list.onCreated===", id);
 	const listId = id ? id : defaultListId;
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
@@ -129,14 +124,12 @@ Template.list.onCreated(function () {
 		let filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
 		newProps.filters = filters;
 		store.dispatch(createGridAction('currentPage', 0, Object.assign({}, props, newProps)))
-		console.log("Template.list.onCreated=====refresh====");
 	}
 	this.reload = ()=>{
 		// 过滤条件变更时用新的过滤条件重新加载数据
 		let filters = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id);
 		if(isListRendered){
 			store.dispatch(createGridAction('filters', filters, Object.assign({}, props, newProps)))
-			console.log("Template.list.onCreated=====reload====", filters);
 		}
 	}
 	if(is_related){
@@ -196,7 +189,6 @@ Template.list.onCreated(function () {
 })
 
 Template.list.onDestroyed(function () {
-	console.log("Template.list.onDestroyed===xx====");
 	const { id } = this.data.options;
 	const listId = id ? id : defaultListId;
 	isListRendered = false;
