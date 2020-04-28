@@ -375,11 +375,13 @@ _getGridPaging = (object_name, list_view_id) ->
 		if _grid_paging?.object_name == object_name && _grid_paging.list_view_id == list_view_id
 			return _grid_paging
 
-_getPageSize = (grid_paging, is_related) ->
+_getPageSize = (grid_paging, is_related, selfPageSize) ->
 	localPageSize = localStorage.getItem("creator_pageSize:"+Meteor.userId())
 	if !is_related and localPageSize
 		pageSize = localPageSize
-	if is_related
+	if selfPageSize
+		pageSize = selfPageSize
+	else if is_related
 		pageSize = 5
 	else
 		if grid_paging
@@ -451,7 +453,7 @@ Template.creator_grid.onRendered ->
 			# #expand_fields 不需要包含 extra_columns
 			expand_fields = _expandFields(curObjectName, selectColumns)
 			showColumns = _getShowColumns.call(self, curObject, selectColumns, is_related, list_view_id)
-			pageSize = _getPageSize(grid_paging, is_related)
+			pageSize = _getPageSize(grid_paging, is_related, _pageSize)
 			
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = Creator.unionSelectColumnsWithExtraAndDepandOn(selectColumns, curObject, object_name, is_related)

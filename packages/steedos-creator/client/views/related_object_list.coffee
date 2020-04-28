@@ -56,7 +56,8 @@ Template.related_object_list.helpers
 			object_name: object_name, 
 			total: Template.instance().recordsTotal, 
 			is_related: true, 
-			related_list_item_props: related_list_item_props
+			related_list_item_props: related_list_item_props,
+			pageSize: 50
 		}
 		if object_name == 'objects'
 			data.record_id = Template.instance()?.record.get().name;
