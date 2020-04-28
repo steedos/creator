@@ -68,6 +68,8 @@ Template.related_object_list.events
 		related_object_name = Session.get "related_object_name"
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
+		if object_name == 'objects'
+			record_id = template?.record?.get().name;
 		action_collection_name = Creator.getObject(related_object_name).label
 		
 		ids = Creator.TabularSelectedIds[related_object_name]

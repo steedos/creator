@@ -4,26 +4,28 @@
 	}
 
 	.chooseFlow{
-		border-bottom: none !important;
+		//border-bottom: none !important;
 		.chooseFlow-header-close{
 			display: none !important;
 		}
 	}
 
 	#chooseFlow-modal-content{
+		overflow: hidden !important;
+		overflow-y: auto !important;
 		//height: 100%;
-		&>div{
-			height: 100%;
-			&>div{
-				height: 100%;
-			}
-		}
-		.slds-tree_container{
-			overflow: hidden;
-			overflow-y: auto;
-			//height: calc(~"100% - 32px") !important;
-			max-height: calc(~"100% - 32px") !important;
-		}
+		//&>div{
+		//	height: 100%;
+		//	&>div{
+		//		height: 100%;
+		//	}
+		//}
+		//.slds-tree_container{
+		//	overflow: hidden;
+		//	overflow-y: auto;
+		//	//height: calc(~"100% - 32px") !important;
+		//	max-height: calc(~"100% - 32px") !important;
+		//}
 
 		.slds-tree_container{
 			.slds-tree{
@@ -53,12 +55,16 @@
 			}
 		}
 		.slds-input{
+			border-top: 0;
 			border-left: 0;
 			border-right: 0;
 		}
 	}
 
 	@media screen and (max-width: 647px){
+		#chooseFlow-modal-content {
+			overflow-y: hidden !important;
+		}
 		.ReactModalPortal{
 			.slds-modal__container{
 				margin: 0;

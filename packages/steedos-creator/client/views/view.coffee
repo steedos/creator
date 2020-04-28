@@ -603,14 +603,27 @@ Template.creator_view.events
 		full_screen = this.full_screen
 		field = this.field_name
 		_fs = field.split('.')
+		schema = Creator.getObject(Session.get("object_name")).schema
 		if _fs.length > 1
-			schema = Creator.getObject(Session.get("object_name")).schema
 			_obj_fields = _.map(schema._objectKeys[_fs[0] + '.'], (k)->
 				return _fs[0] + '.' + k
 			)
 			field = _fs[0] + ',' + _obj_fields.join(',')
-
-		if this.field.depend_on && _.isArray(this.field.depend_on)
+		if this.field.type == 'grid'
+			fieldName = this.field_name
+			_obj_fields = _.map(schema._objectKeys[fieldName + '.$.'], (k)->
+				return fieldName + '.$.' + k
+			)
+			_.map(_obj_fields, (key)->
+				dependOn = schema._schema[key]?.autoform?.dependOn
+				dependOns = []
+				if _.isArray(dependOn) && dependOn.length > 0
+					dependOns = dependOn.concat(dependOn)
+				dependOns = _.uniq(_.compact(dependOns));
+				if dependOns.length > 0
+					field = field + ',' + dependOns.join(',')
+			)
+		else if this.field.depend_on && _.isArray(this.field.depend_on)
 			field = _.clone(this.field.depend_on)
 			field.push(this.field_name)
 			field = field.join(",")

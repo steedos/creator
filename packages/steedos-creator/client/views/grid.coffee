@@ -414,6 +414,7 @@ Template.creator_grid.onRendered ->
 		templateData = Template.currentData()
 		is_related = self.data.is_related
 		object_name = self.data.object_name
+		_pageSize = self.data.pageSize
 		creator_obj = Creator.getObject(object_name)
 		if !creator_obj
 			return
