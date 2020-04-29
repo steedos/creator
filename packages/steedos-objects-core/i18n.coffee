@@ -1,6 +1,5 @@
 import i18n from 'meteor/universe:i18n';
 I18n = require('@steedos/i18n');
-sprintf = require('sprintf-js').sprintf;
 @i18n = i18n;
 
 @t = I18n.t
