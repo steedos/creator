@@ -1,5 +1,5 @@
 
-_fields = (object_name, list_view_id)->
+_fields = (object_name, list_view_id, use_mobile_columns)->
 	object = Creator.getObject(object_name)
 	name_field_key = object.NAME_FIELD_KEY
 	if object.name == "organizations"
@@ -9,15 +9,19 @@ _fields = (object_name, list_view_id)->
 	listView = Creator.getCollection("object_listviews").findOne(list_view_id)
 	if listView
 		fields = listView.columns
+		if use_mobile_columns and listView.mobile_columns
+			fields = listView.mobile_columns
 		if !fields
-			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+			defaultColumns = Creator.getObjectDefaultColumns(object_name, use_mobile_columns)
 			if defaultColumns
 				fields = defaultColumns
 	else if object.list_views
-		if object.list_views[list_view_id]?.columns
-			fields = object.list_views[list_view_id].columns
-		else
-			defaultColumns = Creator.getObjectDefaultColumns(object_name)
+		objectListView = object.list_views[list_view_id]
+		fields = objectListView?.columns
+		if use_mobile_columns and objectListView.mobile_columns
+			fields = objectListView.mobile_columns
+		unless fields
+			defaultColumns = Creator.getObjectDefaultColumns(object_name, use_mobile_columns)
 			if defaultColumns
 				fields = defaultColumns
 
@@ -195,22 +199,19 @@ Creator.getODataEndpointUrl = (object_name, list_view_id, is_related, related_ob
 			url = "/api/v4/#{_obj_name}"
 	return Steedos.absoluteUrl(url)
 
-Creator.getListviewColumns = (curObject, object_name, is_related, list_view_id)->
+Creator.getListviewColumns = (curObject, object_name, is_related, list_view_id, use_mobile_columns)->
 	curObjectName = curObject.name
-	if false && Steedos.isMobile() && curObject.NAME_FIELD_KEY
-		selectColumns = [curObject.NAME_FIELD_KEY]
-	else
-		selectColumns = Tracker.nonreactive ()->
-			# grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
-			# if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
-			# 	settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-			# if settingColumns
-			# 	defaultColumns = _fields(curObjectName, list_view_id)
-			# 	selectColumns = _.intersection(settingColumns, defaultColumns)
-			# 	selectColumns = _.union(selectColumns, defaultColumns)
-			# else
-			# 	selectColumns = _fields(curObjectName, list_view_id)
-			return _fields(curObjectName, list_view_id)
+	selectColumns = Tracker.nonreactive ()->
+		# grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
+		# if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
+		# 	settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
+		# if settingColumns
+		# 	defaultColumns = _fields(curObjectName, list_view_id)
+		# 	selectColumns = _.intersection(settingColumns, defaultColumns)
+		# 	selectColumns = _.union(selectColumns, defaultColumns)
+		# else
+		# 	selectColumns = _fields(curObjectName, list_view_id)
+		return _fields(curObjectName, list_view_id, use_mobile_columns)
 	selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
 	return selectColumns
 

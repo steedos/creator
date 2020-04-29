@@ -187,9 +187,12 @@ Creator.getObjectDefaultView = (object_name)->
 ###
     获取对象的列表默认显示字段
 ###
-Creator.getObjectDefaultColumns = (object_name)->
+Creator.getObjectDefaultColumns = (object_name, use_mobile_columns)->
 	defaultView = Creator.getObjectDefaultView(object_name)
-	return defaultView?.columns
+	columns = defaultView?.columns
+	if use_mobile_columns and defaultView.mobile_columns
+		columns = defaultView.mobile_columns
+	return columns
 
 ###
 	获取对象的列表默认额外加载的字段
