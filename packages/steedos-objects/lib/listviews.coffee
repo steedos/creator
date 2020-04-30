@@ -95,7 +95,6 @@ if Meteor.isClient
 	Creator.getRelatedList = (object_name)->
 		list = []
 		related_objects = Creator.getRelatedObjects(object_name)
-
 		_.each related_objects, (related_object_item) ->
 			related_object_name = related_object_item.object_name
 			related_field_name = related_object_item.foreign_key
@@ -120,6 +119,20 @@ if Meteor.isClient
 				sharing: sharing
 
 			list.push related
+		_object = Creator.Objects[object_name]
+		if _object
+			relatedList = _object.relatedList
+			if !_.isEmpty relatedList
+				_.each relatedList, (objOrName)->
+					if _.isObject objOrName
+						related =
+							object_name: objOrName.objectName
+							columns: objOrName.columns
+							is_file: objOrName.objectName == "cms_files"
+							filtersFunction: objOrName.filters
+							sort: objOrName.sort
+							related_field_name: ''
+						list.push related
 
 		return list
 

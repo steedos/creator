@@ -313,10 +313,12 @@ getColumnItem = (object, list_view, column, list_view_sort, column_default_sort,
 
 	return columnItem;
 
-_columns = (object_name, columns, list_view_id, is_related)->
+_columns = (object_name, columns, list_view_id, is_related, relatedSort)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
+	if is_related && !_.isEmpty(relatedSort)
+		column_default_sort = Creator.transformSortToDX(relatedSort)
 	if grid_settings and grid_settings.settings
 		column_width_settings = grid_settings.settings[list_view_id]?.column_width
 		column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
@@ -393,7 +395,7 @@ Template.creator_grid.onRendered ->
 		isOrganizationAdmin = _.include(user_permission_sets,"organization_admin")
 
 		record_id = self.data.record_id ||  Session.get("record_id")
-
+		related_list_item_props = self.data.related_list_item_props || {}
 		listTreeCompany = Session.get('listTreeCompany')
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			if is_related
@@ -509,6 +511,8 @@ Template.creator_grid.onRendered ->
 #					else
 #						selectColumns = _fields(curObjectName, list_view_id)
 					return _fields(curObjectName, list_view_id)
+				if related_list_item_props.columns
+					selectColumns = related_list_item_props.columns
 			pageIndex = Tracker.nonreactive ()->
 				if Session.get("page_index")
 					if Session.get("page_index").object_name == curObjectName
@@ -536,7 +540,7 @@ Template.creator_grid.onRendered ->
 			expand_fields = _expandFields(curObjectName, selectColumns)
 
 			# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
-			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
+			showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related, related_list_item_props.sort)
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
 			selectColumns = _.union(selectColumns, extra_columns)
 			selectColumns = _.union(selectColumns, _depandOnFields(curObjectName, selectColumns))
