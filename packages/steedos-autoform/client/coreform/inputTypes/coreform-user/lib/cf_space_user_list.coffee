@@ -75,8 +75,9 @@ Template.cf_space_user_list.helpers
 					else
 						spaceIds = db.spaces.find().fetch().getProperty("_id")
 
-					if !Steedos.isSpaceAdmin()
-						query.organizations = {$nin: Template.instance().hidden_orgs.get()}
+					hidden_orgs = Template.instance().hidden_orgs.get()
+					if !Steedos.isSpaceAdmin() && hidden_orgs?.length
+						query.organizations = {$nin: hidden_orgs}
 
 					query.space = {$in: spaceIds}
 		return query;
