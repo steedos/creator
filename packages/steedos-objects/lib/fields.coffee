@@ -98,6 +98,7 @@ Creator.getObjectSchema = (obj) ->
 						['view', ['codeview']]
 					]
 					fontNames: ['Arial', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', '宋体','黑体','微软雅黑','仿宋','楷体','隶书','幼圆']
+					lang: 'zh-CN'
 
 		else if (field.type == "lookup" or field.type == "master_detail")
 			fs.type = String
