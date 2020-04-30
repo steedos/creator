@@ -7,7 +7,7 @@ Template.cf_space_user_list.onCreated ->
 
 		spaceId = Template.instance().data.spaceId || Session.get("cf_space")
 
-		childrens = SteedosDataManager.organizationRemote.find({space: spaceId, hidden: {$ne: true}}, {
+		childrens = SteedosDataManager.organizationRemote.find({space: spaceId, hidden: {$eq: true}}, {
 			fields: {
 				_id: 1
 			}
@@ -16,7 +16,7 @@ Template.cf_space_user_list.onCreated ->
 		orgs = childrens.getProperty("_id")
 
 
-	self.unhidden_orgs = new ReactiveVar(orgs);
+	self.hidden_orgs = new ReactiveVar(orgs);
 
 	Session.set("cf_contact_list_search", false)
 
@@ -76,7 +76,7 @@ Template.cf_space_user_list.helpers
 						spaceIds = db.spaces.find().fetch().getProperty("_id")
 
 					if !Steedos.isSpaceAdmin()
-						query.organizations = {$in: Template.instance().unhidden_orgs.get()}
+						query.organizations = {$nin: Template.instance().hidden_orgs.get()}
 
 					query.space = {$in: spaceIds}
 		return query;
