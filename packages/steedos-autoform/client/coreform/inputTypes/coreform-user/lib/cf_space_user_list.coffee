@@ -167,3 +167,10 @@ Template.cf_space_user_list.onRendered ->
 
 # CFDataManager.setContactModalValue(@data.defaultValues);
 # $("#contact_list_load").hide();
+
+Template.cf_space_user_list.onDestroyed ->
+	if $("#cf_space_user_list").length > 0
+		console.error('cf_space_user_list.onDestroyed。。。render user list....', (new Date).getTime());
+		TabularTables.cf_tabular_space_user.customData = @data
+		if !@data.multiple
+			$("#cf_reverse").hide();
