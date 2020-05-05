@@ -206,6 +206,7 @@ if Meteor.isClient
 		userId = Meteor.userId()
 		related_lists = Creator.getRelatedList(object_name, record_id)
 		related_field_name = ""
+		filtersFunction = ""
 		selector = []
 		addSelector = (select)->
 			if selector.length > 0
@@ -213,8 +214,11 @@ if Meteor.isClient
 			selector.push(select)
 		_.each related_lists, (obj)->
 			if obj.object_name == related_object_name
-				related_field_name = obj.related_field_name
-
+				if obj.filtersFunction
+					filtersFunction = obj.filtersFunction
+				else
+					related_field_name = obj.related_field_name
+		
 		related_field_name = related_field_name.replace(/\./g, "/")
 		if list_view_id
 			custom_list_view = Creator.getListView(related_object_name, list_view_id)
@@ -222,6 +226,9 @@ if Meteor.isClient
 				filter_logic = custom_list_view.filter_logic
 				filter_scope = custom_list_view.filter_scope
 				filters = custom_list_view.filters
+				if filtersFunction
+					filters = filtersFunction(Creator.odata.get(object_name, record_id))
+					return filters
 
 				if filter_logic
 					format_logic = Creator.formatLogicFiltersToDev(filters, filter_logic)

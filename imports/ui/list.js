@@ -31,7 +31,7 @@ const getListProps = ({id, object_name, related_object_name, is_related, records
 	let curObjectName;
 	curObjectName = is_related ? related_object_name : object_name;
 	let curObject = Creator.getObject(curObjectName);
-	let mainColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id, true);
+	let mainColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id, null, true);
 	let columns = Creator.unionSelectColumnsWithExtraAndDepandOn(mainColumns, curObject, object_name, is_related);
 	columns = columns.map((item) => {
 		let field = curObject.fields[item];

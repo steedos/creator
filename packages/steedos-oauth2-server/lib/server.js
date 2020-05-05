@@ -40,6 +40,7 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.all('/oauth2/token', oAuth2Server.oauthserver.grant());
+// app.all('/oauth2/token', bodyParser.urlencoded({ extended: true }), bodyParser.json(), oAuth2Server.oauthserver.grant());
 
 WebApp.rawConnectHandlers.use(app);
 

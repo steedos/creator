@@ -199,7 +199,7 @@ Creator.getODataEndpointUrl = (object_name, list_view_id, is_related, related_ob
 			url = "/api/v4/#{_obj_name}"
 	return Steedos.absoluteUrl(url)
 
-Creator.getListviewColumns = (curObject, object_name, is_related, list_view_id, use_mobile_columns)->
+Creator.getListviewColumns = (curObject, object_name, is_related, list_view_id, related_list_item_props, use_mobile_columns)->
 	curObjectName = curObject.name
 	selectColumns = Tracker.nonreactive ()->
 		# grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
@@ -212,10 +212,12 @@ Creator.getListviewColumns = (curObject, object_name, is_related, list_view_id, 
 		# else
 		# 	selectColumns = _fields(curObjectName, list_view_id)
 		return _fields(curObjectName, list_view_id, use_mobile_columns)
+	if related_list_item_props?.columns
+		selectColumns = related_list_item_props.columns
 	selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
 	return selectColumns
 
-Creator.getListviewColumnsWithExtraAndDepandOn = (curObject, object_name, is_related, list_view_id)->
-	selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id)
-	selectColumns = Creator.unionSelectColumnsWithExtraAndDepandOn(selectColumns, curObject, object_name, is_related)
-	return selectColumns;
+# Creator.getListviewColumnsWithExtraAndDepandOn = (curObject, object_name, is_related, list_view_id)->
+# 	selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id)
+# 	selectColumns = Creator.unionSelectColumnsWithExtraAndDepandOn(selectColumns, curObject, object_name, is_related)
+# 	return selectColumns;

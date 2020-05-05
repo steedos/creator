@@ -68,73 +68,6 @@ _actionItems = (object_name, record_id, record_permissions)->
 			return false
 	return actions
 
-# _fields = (object_name, list_view_id)->
-# 	object = Creator.getObject(object_name)
-# 	name_field_key = object.NAME_FIELD_KEY
-# 	if object.name == "organizations"
-# 		# 显示组织列表时，特殊处理name_field_key为name字段
-# 		name_field_key = "name"
-# 	fields = [name_field_key]
-# 	listView = Creator.getCollection("object_listviews").findOne(list_view_id)
-# 	if listView
-# 		fields = listView.columns
-# 		if !fields
-# 			defaultColumns = Creator.getObjectDefaultColumns(object_name)
-# 			if defaultColumns
-# 				fields = defaultColumns
-# 	else if object.list_views
-# 		if object.list_views[list_view_id]?.columns
-# 			fields = object.list_views[list_view_id].columns
-# 		else
-# 			defaultColumns = Creator.getObjectDefaultColumns(object_name)
-# 			if defaultColumns
-# 				fields = defaultColumns
-
-# 	fields = fields.map (field)->
-# 		if _.isObject(field)
-# 			n = field.field
-# 		else
-# 			n = field
-# 		if object.fields[n]?.type # and !object.fields[n].hidden
-# 			# 对于a.b类型的字段，不应该替换字段名
-# 			#return n.split(".")[0]
-# 			return n
-# 		else
-# 			return undefined
-
-# 	if Creator.isCommonSpace(Session.get("spaceId")) && fields.indexOf("space") < 0
-# 		fields.push('space')
-
-# 	fields = _.compact(fields)
-# 	fieldsName = Creator.getObjectFieldsName(object_name)
-# 	# 注意这里intersection函数中两个参数次序不能换，否则字段的先后显示次序就错了
-# 	return _.intersection(fields, fieldsName)
-
-# _removeCurrentRelatedFields = (curObjectName, columns, object_name, is_related)->
-# 	# 移除主键字段，即columns中的reference_to等于object_name的字段
-# 	unless object_name
-# 		return columns
-# 	fields = Creator.getObject(curObjectName).fields
-# 	if is_related
-# 		columns = columns.filter (n)->
-# 			if fields[n]?.type == "master_detail"
-# 				if fields[n].multiple
-# 					# 多选字段不移除
-# 					return true
-# 				if fields[n].reference_to
-# 					ref = fields[n].reference_to
-# 					if _.isFunction(ref)
-# 						ref = ref()
-# 				else
-# 					ref = fields[n].optionsFunction({}).getProperty("value")
-# 				if _.isArray(ref)
-# 					return true
-# 				else
-# 					return ref != object_name
-# 			else
-# 				return true
-# 	return columns
-
 _expandFields = (object_name, columns)->
 	expand_fields = []
 	fields = Creator.getObject(object_name).fields
@@ -234,10 +167,12 @@ getColumnItem = (object, list_view, column, list_view_sort, column_default_sort,
 
 	return columnItem;
 
-_columns = (object_name, columns, list_view_id, is_related)->
+_columns = (object_name, columns, list_view_id, is_related, relatedSort)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
+	if is_related && !_.isEmpty(relatedSort)
+		column_default_sort = Creator.transformSortToDX(relatedSort)
 	if grid_settings and grid_settings.settings
 		column_width_settings = grid_settings.settings[list_view_id]?.column_width
 		column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
@@ -296,11 +231,11 @@ _defaultWidth = (columns, isTree, i)->
 # 	selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
 # 	return selectColumns
 
-_getShowColumns = (curObject, selectColumns, is_related, list_view_id) ->
+_getShowColumns = (curObject, selectColumns, is_related, list_view_id, related_list_item_props) ->
 	self = this
 	curObjectName = curObject.name
 	# 这里如果不加nonreactive，会因为后面customSave函数插入数据造成表Creator.Collections.settings数据变化进入死循环
-	showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related)
+	showColumns = Tracker.nonreactive ()-> return _columns(curObjectName, selectColumns, list_view_id, is_related, related_list_item_props.sort)
 	actions = Creator.getActions(curObjectName)
 	if true || !Steedos.isMobile() && actions.length
 		showColumns.push
@@ -444,15 +379,16 @@ Template.creator_grid.onRendered ->
 		isOrganizationAdmin = _.include(user_permission_sets,"organization_admin")
 
 		record_id = self.data.record_id ||  Session.get("record_id")
+		related_list_item_props = self.data.related_list_item_props || {}
 
 		if Steedos.spaceId() and (is_related or Creator.subs["CreatorListViews"].ready()) and Creator.subs["TabularSetting"].ready()
 			url = Creator.getODataEndpointUrl(object_name, list_view_id, is_related, related_object_name)
 			filter = Creator.getListViewFilters(object_name, list_view_id, is_related, related_object_name, record_id)
 			pageIndex = _getPageIndex(grid_paging, curObjectName)
-			selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id)
+			selectColumns = Creator.getListviewColumns(curObject, object_name, is_related, list_view_id, related_list_item_props)
 			# #expand_fields 不需要包含 extra_columns
 			expand_fields = _expandFields(curObjectName, selectColumns)
-			showColumns = _getShowColumns.call(self, curObject, selectColumns, is_related, list_view_id)
+			showColumns = _getShowColumns.call(self, curObject, selectColumns, is_related, list_view_id, related_list_item_props)
 			pageSize = _getPageSize(grid_paging, is_related, _pageSize)
 			
 			# extra_columns不需要显示在表格上，因此不做_columns函数处理
