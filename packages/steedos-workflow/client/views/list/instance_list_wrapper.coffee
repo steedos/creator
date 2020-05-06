@@ -23,13 +23,14 @@ Template.instance_list_wrapper.helpers
 		if !space
 			return false;
 		if Session.get("box") == "monitor"
-			if space.admins.contains(Meteor.userId())
-				return true;
-			else
-				flow_ids = WorkflowManager.getMyAdminOrMonitorFlows()
-				if flow_ids.includes(flowId)
-					return true
-				return false;
+			# if space.admins.contains(Meteor.userId())
+			# 	return true;
+			# else
+			# 	flow_ids = WorkflowManager.getMyAdminOrMonitorFlows()
+			# 	if flow_ids.includes(flowId)
+			# 		return true
+			# 	return false;
+			return true
 		else
 			return false;
 
