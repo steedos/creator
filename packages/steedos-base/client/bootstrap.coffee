@@ -124,7 +124,7 @@ Meteor.startup ->
 
 	Setup.validate();
 	Accounts.onLogin ()->
-		console.log("onLogin...")
+		console.log("onLogin")
 		
 		if Meteor.userId() != Setup.lastUserId
 			Setup.validate();
@@ -250,7 +250,7 @@ requestBootstrapDataUseAjax = (spaceId, callback)->
 
 requestBootstrapDataUseAction = (spaceId)->
 	SteedosReact = require('@steedos/react');
-	SteedosReact.store.dispatch(SteedosReact.loadBootstrapEntitiesData({spaceId: spaceId}))
+	store.dispatch(SteedosReact.loadBootstrapEntitiesData({spaceId: spaceId}))
 
 requestBootstrapData = (spaceId, callback)->
 	SteedosReact = require('@steedos/react');
