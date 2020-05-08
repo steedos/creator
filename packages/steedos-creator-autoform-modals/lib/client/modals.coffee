@@ -705,9 +705,9 @@ Template.CreatorAfModal.events
 					console.log('onError......');
 					console.error error
 					if error.reason
-						toastr?.error?(TAPi18n.__(error.reason))
+						toastr?.error?(TAPi18n.__(error.reason, error.details))
 					else if error.message
-						toastr?.error?(TAPi18n.__(error.message))
+						toastr?.error?(TAPi18n.__(error.message, error.details))
 					else
 						toastr?.error?(error)
 
