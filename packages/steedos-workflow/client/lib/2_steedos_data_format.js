@@ -232,6 +232,8 @@ var s_autoform = function (schema, field) {
             break;
         case 'html':
             schema.type = String;
+            autoform.readonly = (permission === 'readonly');
+            autoform.disabled = (permission === 'readonly');
             if(permission == 'readonly'){
                 autoform.type = 'steedosHtml';
             }
