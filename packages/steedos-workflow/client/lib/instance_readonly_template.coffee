@@ -313,6 +313,8 @@ InstanceReadOnlyTemplate.getValue = (value, field, locale, utcOffset) ->
 					return getLinkText(item, item['@label'], detail_url)
 			else
 				value = getLinkText(value, value['@label'], detail_url)
+		when 'html'
+			value = if value then value else ''
 
 	return value;
 

@@ -83,7 +83,7 @@ Creator.getObjectSchema = (obj) ->
 			fs.type = String
 			fs.autoform.afFieldInput =
 				type: "summernote"
-				class: 'editor'
+				class: 'summernote-editor'
 				settings:
 					height: 200
 					dialogsInBody: true

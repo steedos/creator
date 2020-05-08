@@ -230,6 +230,28 @@ var s_autoform = function (schema, field) {
             autoform.formula = field.formula;
             autoform.search_field = field.search_field;
             break;
+        case 'html':
+            schema.type = String;
+            if(permission == 'readonly'){
+                // autoform.type = "summernote"
+                autoform.type = 'summernote-readonly';
+                autoform.readonly = true;
+                autoform.disabled = true;
+            }
+            else{
+                autoform.afFieldInput = {
+                    type: "summernote",
+                    class: 'summernote-editor',
+                    settings: {
+                        height: 200,
+                        dialogsInBody: true,
+                        toolbar: [['font1', ['style']], ['font2', ['bold', 'underline', 'italic', 'clear']], ['font3', ['fontname']], ['color', ['color']], ['para', ['ul', 'ol', 'paragraph']], ['table', ['table']], ['insert', ['link', 'picture']], ['view', ['codeview']]],
+                        fontNames: ['Arial', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', '宋体', '黑体', '微软雅黑', '仿宋', '楷体', '隶书', '幼圆'],
+                        lang: 'zh-CN'
+                    }
+                };
+            }
+            break;
         default:
             schema.type = String;
             autoform.readonly = (permission == 'readonly');

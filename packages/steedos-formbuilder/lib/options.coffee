@@ -4,7 +4,7 @@ FORMBUILDERFIELDTYPES = ["autocomplete", "paragraph", "header", "select",
 	"date", "number", "textarea",
 	"dateTime", "dateNew", "checkboxBoolean", "email", "url", "password", "user", "group",
 	"table", "section",
-	"odata"]
+	"odata", "html"]
 
 # 定义 禁用 的字段类型
 DISABLEFIELDS = ['button', 'file', 'paragraph', 'autocomplete', 'hidden', 'date', 'header']
@@ -18,7 +18,7 @@ DISABLEDATTRS = ['description', 'maxlength', 'placeholder', "access", "value", '
 
 # 定义字段类型排序
 CONTROLORDER = ['text', 'textarea', 'number', 'dateNew', 'dateTime', 'date', 'checkboxBoolean',
-	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group", "odata", 'table', 'section']
+	'email', 'url', 'password', 'select', 'user', 'group', "radio-group", "checkbox-group", "odata", "html", 'table', 'section']
 
 # 获取各字段类型禁用的字段属性
 #TYPEUSERDISABLEDATTRS = (()->
@@ -205,6 +205,8 @@ getTypeUserAttrs = ()->
 						value: ''
 					}
 				}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display'), MULTISELECTUSERATTRS, FORMULAUSERATTRS_REQUIRED
+			when 'html'
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'default_value')
 			else
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs
@@ -347,6 +349,13 @@ getFields = ()->
 				type: "odata"
 			}
 			icon: "OD"
+		},
+		{
+			label: "HTML"
+			attrs: {
+				type: "html"
+			}
+			icon: "H"
 		}
 	]
 
@@ -465,6 +474,12 @@ getFieldTemplates = ()->
 #				onRender: (a, b, c)->
 #					console.log(a, b, c);
 #					console.log('this', this);
+			};
+		html: (fieldData)->
+			if !fieldData.className
+				fieldData.className = 'form-control'
+			return {
+				field: "<input id='#{fieldData.name}' type='text' autocomplete='off' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 	}
 
