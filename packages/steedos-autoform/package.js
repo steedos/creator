@@ -115,6 +115,9 @@ Package.onUse(function(api) {
 	
 	api.addFiles('client/coreform/inputTypes/coreform-summernote/summernote-zh-CN.js', 'client');
 
+	api.addFiles('client/coreform/inputTypes/coreform-html/html.html', 'client');
+	api.addFiles('client/coreform/inputTypes/coreform-html/html.js', 'client');
+
 	api.addFiles('routes/formula_space_users.coffee', 'server');
 	api.addFiles('routes/formula_organizations.coffee', 'server');
 

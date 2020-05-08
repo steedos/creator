@@ -233,10 +233,7 @@ var s_autoform = function (schema, field) {
         case 'html':
             schema.type = String;
             if(permission == 'readonly'){
-                // autoform.type = "summernote"
-                autoform.type = 'summernote-readonly';
-                autoform.readonly = true;
-                autoform.disabled = true;
+                autoform.type = 'steedosHtml';
             }
             else{
                 autoform.afFieldInput = {
