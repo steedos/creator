@@ -116,6 +116,7 @@ OPTIONSUSERATTRS = {
 
 # 获取各字段类型的属性
 getTypeUserAttrs = ()->
+	clone = require('clone')
 	typeUserAttrs = {}
 	_.each FORMBUILDERFIELDTYPES, (item)->
 		switch item
@@ -128,7 +129,9 @@ getTypeUserAttrs = ()->
 			when 'text'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, OPTIONSUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 			when 'textarea'
-				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, OPTIONSUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
+				textareaBaseAttrs = clone(BASEUSERATTRS)
+				textareaBaseAttrs.default_value.type = "textarea"
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, OPTIONSUSERATTRS, textareaBaseAttrs, FORMULAUSERATTRS
 			when 'number'
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, {
 					digits: {
@@ -206,7 +209,9 @@ getTypeUserAttrs = ()->
 					}
 				}, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'is_list_display'), MULTISELECTUSERATTRS, FORMULAUSERATTRS_REQUIRED
 			when 'html'
-				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, _.pick(BASEUSERATTRS, '_id', 'is_wide', 'default_value')
+				htmlBaseAttrs = clone _.pick(BASEUSERATTRS, '_id', 'default_value', 'is_wide')
+				htmlBaseAttrs.default_value.type = "textarea"
+				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, htmlBaseAttrs
 			else
 				typeUserAttrs[item] = _.extend {}, CODEUSERATTRS, BASEUSERATTRS, FORMULAUSERATTRS
 	return typeUserAttrs
@@ -479,7 +484,7 @@ getFieldTemplates = ()->
 			if !fieldData.className
 				fieldData.className = 'form-control'
 			return {
-				field: "<input id='#{fieldData.name}' type='text' autocomplete='off' #{Creator.formBuilder.utils.attrString(fieldData)}>",
+				field: "<textarea id='#{fieldData.name}' autocomplete='off' #{Creator.formBuilder.utils.attrString(fieldData)}>",
 			};
 	}
 
