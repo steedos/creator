@@ -7,6 +7,12 @@
 		padding: 9.5px;
 		margin: 0 0 10px;
 	}
+	blockquote {
+		padding: 10px 20px;
+		margin: 0 0 20px;
+		font-size: 17.5px;
+		border-left: 5px solid #eeeeee;
+	}
 	h2, .h2 {
 		font-size: 22px;
 	}
@@ -21,8 +27,60 @@
 	p {
 		margin: 0 0 10px;
 	}
+
+	// fix summernote控件字体大小被其他库样式覆盖了，从bootstrap.css的样式中copy过来
+	h1,
+	.h1 {
+		font-size: 36px;
+	}
+	h2,
+	.h2 {
+		font-size: 30px;
+	}
+	h3,
+	.h3 {
+		font-size: 24px;
+	}
+	h4,
+	.h4 {
+		font-size: 18px;
+	}
+	h5,
+	.h5 {
+		font-size: 14px;
+	}
+	h6,
+	.h6 {
+		font-size: 12px;
+	}
 }
 .note-editor{
+	.fix-note-editor-in-steedos
+}
+.note-editor{
+	.note-toolbar{
+		// fix summernote控件toolbar样式应该在fix-note-editor-in-steedos代码基础上优化下
+		pre{
+			padding: 3px 6px 6px 6px;
+			margin: 0;
+			color: #777;
+		}
+		blockquote {
+			padding: 5px 10px;
+			margin: 0;
+		}
+		h1, .h1, h2, .h2, h3, .h3 {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+		p {
+			margin: 0;
+			padding: 0 0 3px 0;
+		}
+	}
+}
+.steedos-html{
+	// 审批王html只读字段效果在这里用到
 	.fix-note-editor-in-steedos
 }
 .creator_table_cell {

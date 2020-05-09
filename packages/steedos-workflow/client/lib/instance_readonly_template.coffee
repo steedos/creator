@@ -314,7 +314,7 @@ InstanceReadOnlyTemplate.getValue = (value, field, locale, utcOffset) ->
 			else
 				value = getLinkText(value, value['@label'], detail_url)
 		when 'html'
-			value = if value then value else ''
+			value = if value then "<div class=\"steedos-html\">#{value}</div>" else ''
 
 	return value;
 
