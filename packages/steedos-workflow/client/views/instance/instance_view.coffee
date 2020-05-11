@@ -149,6 +149,13 @@ Template.instance_view.onRendered ->
 				unless $('.instance-wrapper .instance-view').hasClass 'suggestion-active'
 					$('.instance-wrapper .instance-view').toggleClass 'suggestion-active'
 					InstanceManager.fixInstancePosition(true)
+
+		summernoteContainer = $(".instance .note-editor .note-editable")
+		if summernoteContainer.length
+			# 如果申请单中存在summernote控件，则应该阻止其鼠标滚轮事件冒泡，否则控件内无法通过鼠标滚轮来滚动内容
+			summernoteContainer.on 'mousewheel DOMMouseScroll', (e) ->
+				e.stopPropagation()
+
 	else if isNeedActiveSuggestion
 		preScrollTop = 0
 		loap = 0
