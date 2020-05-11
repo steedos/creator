@@ -87,9 +87,24 @@
 	overflow: auto;
 	table{
 		border: solid 1px #dddbda;
-		td{
-			border-top: 1px solid #dddbda!important;
-			border-left: 1px solid #dddbda!important;
+		tr{
+			height: auto!important;
+			width: auto!important;
+			td{
+				border-top: 1px solid #dddbda!important;
+				border-left: 1px solid #dddbda!important;
+				height: auto!important;
+				width: auto!important;
+				white-space: nowrap;
+			}
+			&:first-child{
+				td{
+					background-color: #fafaf9;
+					color: #514f4d;
+					padding: .25rem .5rem;
+					font-weight: 700;
+				}
+			}
 		}
 	}
 }
