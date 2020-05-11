@@ -30,8 +30,8 @@ _getFlowByForm = (form, flowId, is_copy, company_id)->
 #
 #				step.approver_orgs = []
 
-		if !is_copy || (!company_id && flow.company_id) || (company_id && !flow.company_id) || (company_id != flow.company_id)
-			delete flow.perms
+#		if !is_copy || (!company_id && flow.company_id) || (company_id && !flow.company_id) || (company_id != flow.company_id)
+#			delete flow.perms
 
 	return flows;
 
