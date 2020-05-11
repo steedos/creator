@@ -89,12 +89,16 @@ if Meteor.isClient
 				I18n.changeLanguage("en", {rootUrl: Meteor.absoluteUrl()})
 				i18n.setLocale("en")
 				moment.locale("en")
-
+		userLastLocale = null
 		Tracker.autorun ()->
 			Session.set("steedos-locale", "zh-CN")
+			userLastLocale =
 			if Meteor.user()
 				if Meteor.user().locale
-					Session.set("steedos-locale",Meteor.user().locale)
+					Session.set("steedos-locale", Meteor.user().locale);
+					if userLastLocale && userLastLocale != Meteor.user().locale
+						window.location.reload(true);
+					userLastLocale = Meteor.user().locale
 
 		i18n.onChangeLocale (newLocale)->
 
