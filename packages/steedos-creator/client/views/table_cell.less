@@ -53,6 +53,30 @@
 	.h6 {
 		font-size: 12px;
 	}
+	// 表格样式统一显示为类似saleforce样式效果
+	table{
+		border: solid 1px #dddbda;
+		tr{
+			height: auto!important;
+			width: auto!important;
+			td{
+				border-top: 1px solid #dddbda!important;
+				border-left: 1px solid #dddbda!important;
+				height: auto!important;
+				width: auto!important;
+				white-space: nowrap;
+			}
+			&:first-child{
+				// 因为从excel中copy表格内容进来不带thead/th标签，所以统一把第一行tr/td优化为表头样式
+				td{
+					background-color: #fafaf9;
+					color: #514f4d;
+					padding: .25rem .5rem;
+					font-weight: 700;
+				}
+			}
+		}
+	}
 }
 .note-editor{
 	.fix-note-editor-in-steedos
@@ -84,29 +108,8 @@
 	.fix-note-editor-in-steedos
 }
 .steedos-html{
+	// fix 审批王申请单html字段只读时可能会出现表格溢出
 	overflow: auto;
-	table{
-		border: solid 1px #dddbda;
-		tr{
-			height: auto!important;
-			width: auto!important;
-			td{
-				border-top: 1px solid #dddbda!important;
-				border-left: 1px solid #dddbda!important;
-				height: auto!important;
-				width: auto!important;
-				white-space: nowrap;
-			}
-			&:first-child{
-				td{
-					background-color: #fafaf9;
-					color: #514f4d;
-					padding: .25rem .5rem;
-					font-weight: 700;
-				}
-			}
-		}
-	}
 }
 .creator_table_cell {
 	//flex-wrap: wrap;
