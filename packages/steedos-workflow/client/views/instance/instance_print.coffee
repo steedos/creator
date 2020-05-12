@@ -45,18 +45,19 @@ Template.instancePrint.helpers
 		return Template.instance().isShowTracesSimplify?.get()
 
 	simplifyTraces: (traces)->
-		startStep = _.find WorkflowManager.getInstanceSteps(), (s)->
-			return s.step_type == "start"
-		if !startStep
+		startEndStepIds = []
+		_.each WorkflowManager.getInstanceSteps(), (s)->
+			if s.step_type == "start" || s.step_type == "end"
+				startEndStepIds.push(s._id)
+		if _.isEmpty startEndStepIds
 			return []
-		startStepId = startStep._id
 		steps = {}
 		traces.forEach (t, index)->
-			if ['rejected', 'relocated'].includes(t.judge) || t.step == startStepId
+			if ['rejected', 'relocated', 'retrieved', 'returned'].includes(t.judge) || startEndStepIds.includes(t.step)
 				delete traces[index]
 				return
 			t.approves?.forEach (a, idx)->
-				if ['terminated', 'reassigned'].includes(a.judge)
+				if ['terminated', 'reassigned', 'retrieved', 'returned', 'rejected'].includes(a.judge) || ['cc', 'forward', 'distribute'].includes(a.type)
 					delete t.approves[idx]
 					return
 			if _.has steps, t.step
