@@ -2,7 +2,7 @@
 	.title{
 		th{
 			font-weight: bold;
-			border: solid 1px #000000;
+			border: solid 1px #d2d6de;
 		}
 		.step{
 			text-align: center;
@@ -70,11 +70,11 @@
 			}
 
 			background:transparent;
-			border: solid 2px #000;
+			border: solid 2px #d2d6de;
 
 			td {
 				background: transparent;
-				border: solid 1px #000;
+				border: solid 1px #d2d6de;
 				vertical-align: middle;
 				padding: 6px;
 				font-weight: normal;
@@ -87,6 +87,30 @@
 
 				&.td-approve {
 					padding: 0px;
+				}
+
+				@media (max-width: 768px){
+					&.td-stepname {
+						width: auto;
+					}
+					&.td-step-check{
+						width: 50px;
+					}
+					&.td-step-approves{
+						.radio-inline{
+							display: block;
+							margin: 0;
+						}
+					}
+				}
+			}
+			th{
+				white-space: nowrap;
+			}
+			.instance-table &{
+				border-color: #000;
+				th,td{
+					border-color: #000;
 				}
 			}
 		}
