@@ -1,10 +1,9 @@
 <template name="instance_attachments" >
 	{{#if showAttachments}}
 		<div class="instance_attachments col-md-12">
-			<div>
-				{{#if showMainTitle}}
-					<span class="box-title" style="display: inline-block;font-weight: bold;">{{_t "instance_main_attachment"}}</span>
-				{{/if}}
+			{{#if showMainTitle}}
+			<div class="attachments-btns">
+				<span class="box-title" style="display: inline-block;font-weight: bold;">{{_t "instance_main_attachment"}}</span>
 
 				<div class="slds-button slds-button_neutral slds-m-left_x-small ins-upload" title='{{_ "instance_main_attachment"}}' style="{{#if enabled_add_main_attachment}}{{else}}display: none{{/if}}">
 					<input type="file" name="file" class="ins-file-input" id="ins_upload_main_attach">
@@ -20,6 +19,8 @@
 					</div>
 				{{/if}}
 			</div>
+			{{/if}}
+			{{#if main_attachment}}
 			<div class="attachments-list">
 				<table class='table table-condensed attachments' style="margin-bottom: 0px;">
 					<tbody>
@@ -29,8 +30,9 @@
 					</tbody>
 				</table>
 			</div>
+			{{/if}}
 
-			<div>
+			<div class="attachments-btns">
 				{{#if enabled_edit_normal_attachment}}
 					<span class="box-title" style="display: inline-block;font-weight: bold;">{{_t "Attachments"}}</span>
 					<div class="slds-button slds-button_neutral slds-m-left_x-small ins-upload" title='{{_ "Attachments"}}'>
@@ -61,6 +63,7 @@
 					{{/with}}
 				{{/if}}
 			</div>
+			{{#if normal_attachments.length}}
 			<div class="attachments-list">
 				<table class='table table-condensed attachments' style="margin-bottom: 0px;">
 					<tbody>
@@ -70,6 +73,7 @@
 					</tbody>
 				</table>
 			</div>
+			{{/if}}
 		</div>
 	{{/if}}
 </template>
