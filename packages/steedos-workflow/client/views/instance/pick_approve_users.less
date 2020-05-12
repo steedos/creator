@@ -58,4 +58,37 @@
 		border: none !important;
 		background-color: inherit !important;
 	}
+
+	.instance-traces{
+		&>.pull-left{
+			padding-bottom: 4px;
+			font-size: 15px;
+		}
+		table.traces {
+			tr {
+				background: #fff;
+			}
+
+			background:transparent;
+			border: solid 2px #000;
+
+			td {
+				background: transparent;
+				border: solid 1px #000;
+				vertical-align: middle;
+				padding: 6px;
+				font-weight: normal;
+				font-size: 14px;
+
+				&.td-stepname {
+					width: 16%;
+					text-align: center;
+				}
+
+				&.td-approve {
+					padding: 0px;
+				}
+			}
+		}
+	}
 }
