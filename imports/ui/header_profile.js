@@ -30,14 +30,14 @@ Template.headerProfile.helpers({
 		}
 	},
 	footers: function(){
-		let links = Meteor.settings.public && Meteor.settings.public.links;
+		let urls = Meteor.settings.public && Meteor.settings.public.urls;
 		let helpUrl = "https://www.steedos.com/help";
 		let downloadUrl = "https://www.steedos.com/help/download";
-		if(links && links.help){
-			helpUrl = links.help;
+		if(urls && urls.help){
+			helpUrl = urls.help;
 		}
-		if(links && links.download){
-			downloadUrl = links.download;
+		if(urls && urls.download){
+			downloadUrl = urls.download;
 		}
 		return [
 			{label: "帮助文档", onClick: function(){return Steedos.openWindow(helpUrl)}},
