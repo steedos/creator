@@ -251,9 +251,9 @@ Template.creator_table_cell.helpers
 				val = ""
 			else if _field.type == "boolean"
 				if this.val
-					val = "是"
+					val = t "YES"
 				else
-					val = "否"
+					val = t "NO"
 			else if _field.type == "select"
 				_options = _field.allOptions || _field.options
 				_values = this.doc || {}
