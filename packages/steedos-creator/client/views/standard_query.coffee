@@ -95,6 +95,10 @@ Template.standard_query_modal.helpers
 				group = schema[field].autoform?.group
 				schema[field].autoform = {group: group}
 				schema[field].autoform.type = "text"
+			
+			if ["html"].includes(object_fields[field].type)
+				schema[field].autoform.type = "textarea"
+				delete schema[field].autoform.afFieldInput
 
 			if schema[field].autoform
 				schema[field].autoform.readonly = false

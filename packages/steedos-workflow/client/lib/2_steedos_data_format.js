@@ -238,6 +238,12 @@ var s_autoform = function (schema, field) {
                 autoform.type = 'steedosHtml';
             }
             else{
+                var locale = Steedos.locale();
+                if (locale === "zh-cn" || locale === "zh-CN") {
+                    locale = "zh-CN";
+                } else {
+                    locale = "en-US";
+                }
                 autoform.afFieldInput = {
                     type: "summernote",
                     class: 'summernote-editor',
@@ -246,7 +252,7 @@ var s_autoform = function (schema, field) {
                         dialogsInBody: true,
                         toolbar: [['font1', ['style']], ['font2', ['bold', 'underline', 'italic', 'clear']], ['font3', ['fontname']], ['color', ['color']], ['insert', ['link']]],
                         fontNames: ['Arial', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', '宋体', '黑体', '微软雅黑', '仿宋', '楷体', '隶书', '幼圆'],
-                        lang: 'zh-CN'
+                        lang: locale
                     }
                 };
             }
