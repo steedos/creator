@@ -514,11 +514,11 @@ Template.CreatorAfModal.events
 
 		if t.data.collectionName
 			if t.data.operation == "update"
-				title = "编辑#{t.data.collectionName}"
+				title = "#{window.t('Edit')} #{t.data.collectionName}"
 			else if t.data.operation == "insert"
-				title = "新建#{t.data.collectionName}"
+				title = "#{window.t('New')} #{t.data.collectionName}"
 			else if t.data.operation == "remove"
-				title = "删除#{t.data.collectionName}"
+				title = "#{window.t('Delete')} #{t.data.collectionName}"
 		else
 			title = html
 
