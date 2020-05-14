@@ -302,15 +302,22 @@
 	}
 }
 
-#afModal .view-page-section-row{
-	.uiInput.slds-form-element{
-		textarea.form-control {
-			line-height: 1.5rem!important;
-			padding-top: 0.3rem;
-			padding-bottom: 0.3rem;
-			overflow-y: auto;
-		}
-	} 
+.creator-auotform-modals,.creator-object-modals,.standard-query-modal,#afModal,#standQueryModal {
+	.view-page-section-row{
+		.uiInput.slds-form-element{
+			textarea.form-control {
+				line-height: 1.5rem!important;
+				padding-top: 0.3rem;
+				padding-bottom: 0.3rem;
+				overflow-y: auto;
+			}
+			.form-control {
+				&.dx-datebox{
+					padding: 0 0.25rem 0 .75rem;
+				}
+			}
+		} 
+	}
 }
 
 /* safari hack......start:IPAD,iPhone，新建编辑窗口lookup文本框行高没对齐，PC上是好的 #1595*/

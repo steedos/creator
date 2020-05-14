@@ -9,6 +9,16 @@ Template.standard_query_modal.onCreated ->
 Template.standard_query_modal.onRendered ->
 	this.$("input[type='number']").val("")
 
+	# 设置dxOverlay的zIndex值，解决dxOverlay弹出窗口被modal窗口覆盖的问题
+	# 比如弹出的时间、日期控件，popup控件等
+	# 因modal的z-index值为2000，所以这里要比它大
+	DevExpress.ui.dxOverlay.baseZIndex(2100)
+
+Template.standard_query_modal.onDestroyed ->
+	# 还原dxOverlay原来默认的zIndex值
+	DevExpress.ui.dxOverlay.baseZIndex(1500)
+
+
 Template.standard_query_modal.helpers
 	isNotMobile: ()->
 		return !Steedos.isMobile();
