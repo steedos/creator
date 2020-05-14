@@ -4,10 +4,10 @@ Template.instance_list_wrapper.helpers
 		return "task"
 
 	objectLabel: ->
-		return "Workflow"
+		return "instance__object"
 
 	objectSearchLabel: ->
-		return "申请单"
+		return "instance__object"
 
 	btnToggleColumnsIcon: ->
 		return Template.instance()?.btnToggleColumnsIcon.get()

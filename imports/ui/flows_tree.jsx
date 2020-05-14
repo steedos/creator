@@ -81,10 +81,9 @@ export function getNodeItemLabel(item, flowLabelClick) {
 };
 
 function getMyFavoriteNodeLabel() {
-	// return "星标流程"
 	return (
 		<div>
-			<a>星标流程
+			<a>{window.t("star_flows")}
 				<span style={{marginLeft: "0.25rem", top: "-2px", position: "relative"}}>
 					<Icon category="utility" name="favorite" size="x-small" colorVariant="warning"/>
 				</span>
@@ -110,7 +109,7 @@ export function getModalHeading(str, helpUrl) {
 				iconCategory="utility"
 				iconName="question_mark"
 				iconPosition="left"
-				label="帮助"
+				label={window.t("Help")}
 				style={{float: "right", fontSize: "1rem"}}
 				onClick={(e) => {
 					if (helpUrl) {
@@ -127,7 +126,7 @@ export function getModalHeader(modalId, heading, helpUrl){
 		<div>
 			<Button
 				className="chooseFlow-header-close"
-				label="取消"
+				label={window.t("Cancel")}
 				style={{float: "left", display: "block"}}
 				onClick={(e) => {
 					store.dispatch(createModalAction('isOpen', false, {id: modalId}))
@@ -138,7 +137,7 @@ export function getModalHeader(modalId, heading, helpUrl){
 				// iconCategory="utility"
 				// iconName="question_mark"
 				// iconPosition="left"
-				label="帮助"
+				label={window.t("Help")}
 				style={{float: "right", display: "block"}}
 				onClick={(e) => {
 					if (helpUrl) {
@@ -160,7 +159,7 @@ export function getAllFlowNode(id, flowLabelClick){
 				onClick={(e) => {
 					labelClick(e, {}, flowLabelClick)
 				}}
-				label="所有流程"
+				label={window.t("All flows")}
 				iconCategory="utility"
 				iconName="rows"
 				iconPosition="left"
