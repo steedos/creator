@@ -40,9 +40,9 @@ Template.headerProfile.helpers({
 			downloadUrl = urls.download;
 		}
 		return [
-			{label: "帮助文档", onClick: function(){return Steedos.openWindow(helpUrl)}},
-			{label: "下载客户端", onClick: function(){return Steedos.openWindow(downloadUrl)}},
-			{label: "关于", onClick: function(){return FlowRouter.go("/app/admin/page/creator_about");}}
+			{label: t("Online Help"), onClick: function(){return Steedos.openWindow(helpUrl)}},
+			{label: t("Client download"), onClick: function(){return Steedos.openWindow(downloadUrl)}},
+			{label: t("About"), onClick: function(){return FlowRouter.go("/app/admin/page/creator_about");}}
 		]
 	}
 });
