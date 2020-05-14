@@ -48,19 +48,19 @@
 				{{#if isNode}}
 					<li class="history-back slds-dropdown-trigger slds-dropdown-trigger_click slds-p-horizontal_xxx-small">
 						<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
-								title="点击可后退">
+								title="{{_ "nw_top_button_history_back"}}">
 							{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="back"}}
 						</button>
 					</li>
 					<li class="history-forward slds-dropdown-trigger slds-dropdown-trigger_click slds-p-horizontal_xxx-small">
 						<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
-								title="点击可前进">
+								title="{{_ "nw_top_button_history_forward"}}">
 							{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="forward"}}
 						</button>
 					</li>
 					<li class="refresh slds-dropdown-trigger slds-dropdown-trigger_click slds-p-horizontal_xxx-small">
 						<button class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
-								title="重新加载此页面">
+								title="{{_ "nw_top_button_refresh"}}">
 							{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="refresh"}}
 						</button>
 					</li>
@@ -70,13 +70,13 @@
 				</li>
 				<li class="slds-dropdown-trigger slds-dropdown-trigger_click">
 					<a class="creator-button-help slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
-							title="帮助">
+							title="{{_ "Help"}}">
 						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="question" title="帮助"}}
 					</a>
 				</li>
 				<li class="slds-dropdown-trigger slds-dropdown-trigger_click">
 					<button class="creator-button-setup slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
-							title="设置">
+							title="{{_ "app_admin_name"}}">
 						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="setup" title="Setup"}}
 					</button>
 				</li>
