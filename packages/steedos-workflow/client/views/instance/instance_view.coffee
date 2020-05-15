@@ -154,7 +154,9 @@ Template.instance_view.onRendered ->
 		if summernoteContainer.length
 			# 如果申请单中存在summernote控件，则应该阻止其鼠标滚轮事件冒泡，否则控件内无法通过鼠标滚轮来滚动内容
 			summernoteContainer.on 'mousewheel DOMMouseScroll', (e) ->
-				e.stopPropagation()
+				if this.scrollHeight > $(this).outerHeight()
+					# 只有出现滚动条时才阻止其鼠标滚轮事件冒泡，这样字段内容少时，可以正常滚动最外面的滚动条
+					e.stopPropagation()
 
 	else if isNeedActiveSuggestion
 		preScrollTop = 0
