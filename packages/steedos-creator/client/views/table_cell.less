@@ -65,14 +65,13 @@
 				height: auto!important;
 				width: auto!important;
 				white-space: nowrap;
-				padding: .5rem .75rem;
+				padding: .25rem .75rem;
 			}
 			&:first-child{
 				// 因为从excel中copy表格内容进来不带thead/th标签，所以统一把第一行tr/td优化为表头样式
 				td{
-					background-color: #fafaf9;
+					background-color: #f4f4f4;
 					color: #514f4d;
-					padding: .25rem .75rem;
 					font-weight: 700;
 				}
 			}
@@ -116,6 +115,16 @@
 .steedos-html{
 	// fix 审批王申请单html字段只读时可能会出现表格溢出
 	overflow: auto;
+}
+.steedos-html{
+	&.steedos-html-table-only{
+		// 审批王中需要把表格撑满,边线也不需要
+		margin: -7px;
+		table{
+			border: none;
+			width: 100%!important;
+		}
+	}
 }
 .creator_table_cell {
 	//flex-wrap: wrap;

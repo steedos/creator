@@ -136,6 +136,13 @@ Template.instance_view.onRendered ->
 
 	$(".workflow-main").addClass("instance-show")
 
+	# 判断html字段中是否只有table标签，如果是，则加上样式类steedos-html-table-only，其会实现表格撑滿的样式
+	htmlFieldContainer = $(".instance .td-field .steedos-html")
+	htmlFieldContainer.each (key, item)->
+		htmlItem = $(item);
+		if htmlItem.find("> table").length == htmlItem.children().length
+			htmlItem.addClass("steedos-html-table-only")
+
 	# isNeedActiveSuggestion = Session.get("box") == "inbox" and WorkflowManager.getInstance()?.state == "pending"
 	isNeedActiveSuggestion = true
 	if !Steedos.isMobile() && !Steedos.isPad()

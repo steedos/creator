@@ -186,3 +186,10 @@ Template.instancePrint.onRendered ->
 	if localStorage.getItem "print_is_show_traces_simplify"
 		Template.instance().isShowTracesSimplify.set(true)
 		$(".instance-print .cbx-print-traces-simplify").attr("checked",true)
+
+	# 判断html字段中是否只有table标签，如果是，则加上样式类steedos-html-table-only，其会实现表格撑滿的样式
+	htmlFieldContainer = $(".instance .td-field .steedos-html")
+	htmlFieldContainer.each (key, item)->
+		htmlItem = $(item);
+		if htmlItem.find("> table").length == htmlItem.children().length
+			htmlItem.addClass("steedos-html-table-only")
