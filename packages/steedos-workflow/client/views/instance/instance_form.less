@@ -1497,3 +1497,18 @@ _:-ms-fullscreen,
     text-decoration: underline
   }
 }
+
+
+.steedos-html{
+  &.steedos-html-table-only{
+    // 审批王中html字段需要把表格撑满,边线也不需要
+    margin: -6px -12px -6px -13px;
+    table{
+      border: none;
+      width: 100%!important;
+    }
+    .workflow-main .instance-table &{
+      margin: -7px;
+    }
+  }
+}
