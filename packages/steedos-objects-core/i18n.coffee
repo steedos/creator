@@ -80,13 +80,13 @@ if Meteor.isClient
 			if Session.get("steedos-locale") != "en-us"
 				if TAPi18n?
 					TAPi18n.setLanguage("zh-CN")
-				I18n.changeLanguage("zh-CN", {rootUrl: Meteor.absoluteUrl()})
+				I18n.changeLanguage("zh-CN", {rootUrl: Steedos.absoluteUrl() })
 				i18n.setLocale("zh-CN")
 				moment.locale("zh-cn")
 			else
 				if TAPi18n?
 					TAPi18n.setLanguage("en")
-				I18n.changeLanguage("en", {rootUrl: Meteor.absoluteUrl()})
+				I18n.changeLanguage("en", {rootUrl: Steedos.absoluteUrl() })
 				i18n.setLocale("en")
 				moment.locale("en")
 		userLastLocale = null
