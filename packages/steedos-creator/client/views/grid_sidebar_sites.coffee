@@ -218,6 +218,7 @@ _itemDropdownClick = (e, selectionInfo)->
 		dataSource: actionSheetItems
 		showTitle: false
 		usePopover: true
+		width: "auto"
 		onItemClick: (value)->
 			object = Creator.getObject(curObjectName)
 			action = value.itemData.action

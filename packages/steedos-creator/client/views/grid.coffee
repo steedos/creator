@@ -99,6 +99,7 @@ _itemClick = (e, curObjectName, list_view_id)->
 		dataSource: actionSheetItems
 		showTitle: false
 		usePopover: true
+		width: "auto"
 		onItemClick: (value)->
 			action = value.itemData.action
 			recordId = value.itemData.record._id
