@@ -71,13 +71,13 @@
 				<li class="slds-dropdown-trigger slds-dropdown-trigger_click">
 					<a class="creator-button-help slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
 							title="{{_ "Help"}}">
-						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="question" title="帮助"}}
+						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="question"}}
 					</a>
 				</li>
 				<li class="slds-dropdown-trigger slds-dropdown-trigger_click">
 					<button class="creator-button-setup slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon"
 							title="{{_ "app_admin_name"}}">
-						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="setup" title="Setup"}}
+						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="setup"}}
 					</button>
 				</li>
 				{{#unless isMobile}}
@@ -85,12 +85,6 @@
 						{{> notifications}}
 					</li>
 				{{/unless}}
-				<li class="slds-hide slds-dropdown-trigger slds-dropdown-trigger_click">
-					<button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-header__button_icon slds-is-disabled"
-							title="Notifications">
-						{{> steedos_button_icon class="slds-button__icon slds-global-header__icon" source="utility-sprite" name="notification" title="Notifications"}}
-					</button>
-				</li>
 				<li class="slds-dropdown-trigger slds-m-left_x-small">
 					{{> headerProfile}}
 				</li>

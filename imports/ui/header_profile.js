@@ -44,5 +44,11 @@ Template.headerProfile.helpers({
 			{label: t("Client download"), onClick: function(){return Steedos.openWindow(downloadUrl)}},
 			{label: t("About"), onClick: function(){return FlowRouter.go("/app/admin/page/creator_about");}}
 		]
+	},
+	assistiveText: function(){
+		return {
+			settings: window.t("webapp_header_profile_settings"),
+			logout: window.t("webapp_header_profile_logout"),
+		}
 	}
 });
