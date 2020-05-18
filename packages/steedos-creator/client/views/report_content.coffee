@@ -1,5 +1,9 @@
 Template.creator_report_content.helpers Creator.helpers
 
+Template.creator_report_content.helpers 
+	filterEmptyText: ()->
+		return t "creator_report_filter_empty"
+
 getODataFilterForReport = (object_name, filter_scope, filters, filter_logic)->
 	unless object_name
 		return ["_id", "=", -1]
