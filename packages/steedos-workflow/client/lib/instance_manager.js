@@ -572,8 +572,10 @@ InstanceManager.getInstanceValuesByAutoForm = function () {
 		if (field.type == 'table') {
 			t_values = new Array();
 			if (field.sfields) {
-				if (!autoFormValue[field.code])
+				if (!autoFormValue[field.code]) {
+					values[field.code] = t_values;
 					return;
+				}
 				autoFormValue[field.code].forEach(function (t_row_value) {
 					field.sfields.forEach(function (sfield) {
 						//if(sfield.type == 'checkbox'){
