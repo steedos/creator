@@ -1124,7 +1124,6 @@ renderReport = (reportObject)->
 
 
 Template.creator_report_content.onRendered ->
-	DevExpress.localization.locale("zh")
 	self = this.data
 	this.autorun (c)->
 		spaceId = Session.get("spaceId")
