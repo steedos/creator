@@ -13,6 +13,7 @@ getRelatedListTemplateId = (related_object_name)->
 	return "steedos-list-related-#{related_object_name}"
 
 Template.creator_view.onCreated ->
+	Template.creator_view.currentInstance = this
 	this.recordsTotal = new ReactiveVar({})
 	# this.recordLoad = new ReactiveVar(false)
 	this.record = new ReactiveVar()
