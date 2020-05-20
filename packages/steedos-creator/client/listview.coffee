@@ -1,3 +1,20 @@
+_listViewColumns = (object_name, listView, use_mobile_columns)->
+	columns = listView?.columns
+	if use_mobile_columns
+		# 手机上优先取当前视图mobile_columns，其次取默认视图mobile_columns，最后才取当前视图columns前4个
+		if listView.mobile_columns
+			columns = listView.mobile_columns
+		else
+			defaultView = Creator.getObjectDefaultView(object_name)
+			if defaultView.mobile_columns
+				columns = defaultView.mobile_columns
+			else if columns
+				columns = columns.slice(0,4)
+	unless columns
+		defaultColumns = Creator.getObjectDefaultColumns(object_name, use_mobile_columns)
+		if defaultColumns
+			columns = defaultColumns
+	return columns
 
 _fields = (object_name, list_view_id, use_mobile_columns)->
 	object = Creator.getObject(object_name)
@@ -8,22 +25,10 @@ _fields = (object_name, list_view_id, use_mobile_columns)->
 	fields = [name_field_key]
 	listView = Creator.getCollection("object_listviews").findOne(list_view_id)
 	if listView
-		fields = listView.columns
-		if use_mobile_columns and listView.mobile_columns
-			fields = listView.mobile_columns
-		if !fields
-			defaultColumns = Creator.getObjectDefaultColumns(object_name, use_mobile_columns)
-			if defaultColumns
-				fields = defaultColumns
+		fields = _listViewColumns(object_name, listView, use_mobile_columns)
 	else if object.list_views
 		objectListView = object.list_views[list_view_id]
-		fields = objectListView?.columns
-		if use_mobile_columns and objectListView.mobile_columns
-			fields = objectListView.mobile_columns
-		unless fields
-			defaultColumns = Creator.getObjectDefaultColumns(object_name, use_mobile_columns)
-			if defaultColumns
-				fields = defaultColumns
+		fields = _listViewColumns(object_name, objectListView, use_mobile_columns)
 
 	fields = fields.map (field)->
 		if _.isObject(field)

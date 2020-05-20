@@ -208,8 +208,11 @@ Creator.getObjectDefaultView = (object_name)->
 Creator.getObjectDefaultColumns = (object_name, use_mobile_columns)->
 	defaultView = Creator.getObjectDefaultView(object_name)
 	columns = defaultView?.columns
-	if use_mobile_columns and defaultView.mobile_columns
-		columns = defaultView.mobile_columns
+	if use_mobile_columns
+		if defaultView.mobile_columns
+			columns = defaultView.mobile_columns
+		else if columns
+			columns = columns.slice(0,4)
 	return columns
 
 ###
