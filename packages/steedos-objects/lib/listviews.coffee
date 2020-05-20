@@ -53,15 +53,20 @@ Creator.initListViews = (object_name)->
 	if Meteor.isClient
 		Creator.TabularSelectedIds?[object_name] = []
 
-Creator.convertListView = (default_columens, list_view, list_view_name)->
+Creator.convertListView = (default_view, list_view, list_view_name)->
+	default_columns = default_view.columns
+	default_mobile_columns = default_view.mobile_columns
 	oitem = _.clone(list_view)
 	if !_.has(oitem, "name")
 		oitem.name = list_view_name
 	if !oitem.columns
-		if default_columens
-			oitem.columns = default_columens
+		if default_columns
+			oitem.columns = default_columns
 	if !oitem.columns
 		oitem.columns = ["name"]
+	if !oitem.mobile_columns
+		if default_mobile_columns
+			oitem.mobile_columns = default_mobile_columns
 
 	if Meteor.isClient
 		if Creator.isCloudAdminSpace(Session.get("spaceId")) && !_.include(oitem.columns, 'space')

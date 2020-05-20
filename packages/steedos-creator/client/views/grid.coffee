@@ -205,33 +205,6 @@ _defaultWidth = (columns, isTree, i)->
 	content_width = $(".gridContainer").width() - subWidth
 	return content_width/column_counts
 
-# _depandOnFields = (object_name, columns)->
-# 	fields = Creator.getObject(object_name).fields
-# 	depandOnFields = []
-# 	_.each columns, (column)->
-# 		if fields[column]?.depend_on
-# 			depandOnFields = _.union(fields[column].depend_on)
-# 	return depandOnFields
-
-# _getSelectColumns = (curObject, object_name, is_related, list_view_id) ->
-# 	curObjectName = curObject.name
-# 	if false && Steedos.isMobile() && curObject.NAME_FIELD_KEY
-# 		selectColumns = [curObject.NAME_FIELD_KEY]
-# 	else
-# 		selectColumns = Tracker.nonreactive ()->
-# 			# grid_settings = Creator.Collections.settings.findOne({object_name: curObjectName, record_id: "object_gridviews"})
-# 			# if grid_settings and grid_settings.settings and grid_settings.settings[list_view_id] and grid_settings.settings[list_view_id].column_width
-# 			# 	settingColumns = _.keys(grid_settings.settings[list_view_id].column_width)
-# 			# if settingColumns
-# 			# 	defaultColumns = _fields(curObjectName, list_view_id)
-# 			# 	selectColumns = _.intersection(settingColumns, defaultColumns)
-# 			# 	selectColumns = _.union(selectColumns, defaultColumns)
-# 			# else
-# 			# 	selectColumns = _fields(curObjectName, list_view_id)
-# 			return _fields(curObjectName, list_view_id)
-# 	selectColumns = _removeCurrentRelatedFields(curObjectName, selectColumns, object_name, is_related)
-# 	return selectColumns
-
 _getShowColumns = (curObject, selectColumns, is_related, list_view_id, related_list_item_props) ->
 	self = this
 	curObjectName = curObject.name
