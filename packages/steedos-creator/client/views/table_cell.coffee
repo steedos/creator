@@ -154,15 +154,16 @@ Template.creator_table_cell.helpers
 							_val = [_val._id]
 						else
 							_val = [_val]
-					selectedOptions = _.filter _field.optionsFunction(_record_val || _values), (_o)->
+					_ofOptions =  _field.optionsFunction(_record_val || _values)
+					selectedOptions = _.filter _ofOptions, (_o)->
 						return _val.indexOf(_o?.value) > -1
 					if selectedOptions
 						if val && _.isArray(val) && _.isArray(selectedOptions)
 							selectedOptions = Creator.getOrderlySetByIds(selectedOptions, val, "value")
 						val = selectedOptions.getProperty("label")
 				if reference_to
-					_.each selectedOptions, (option)->
-						if reference_to == 'objects'
+					if reference_to == 'objects'
+						_.each selectedOptions, (option)->
 							v = option.label
 							_robj = Creator.getObject(option.value)
 							if _robj?._id
@@ -170,8 +171,21 @@ Template.creator_table_cell.helpers
 								data.push {reference_to: reference_to,  rid: v, value: v, id: this._id, href: href}
 							else
 								data.push {value: val, id: this._id}
-						else
-							data.push {value: val, id: this._id}
+					else
+						_fvs = this.val
+						if !_.isArray(_fvs)
+							_fvs = if _fvs then [_fvs] else []
+						_.each _fvs, (fv)->
+							if _.isString fv
+								selectedOptions = _.filter _ofOptions, (_o)->
+									return fv == _o?.value
+								data.push {value: selectedOptions.getProperty("label"), id: this._id}
+							else
+								reference_to = fv["reference_to._o"] || reference_to
+								rid = fv._id
+								rvalue = fv['_NAME_FIELD_VALUE']
+								href = Creator.getObjectUrl(reference_to, rid)
+								data.push {reference_to: reference_to, rid: rid, value: rvalue, href: href, id: this._id}
 				else
 					data.push {value: val, id: this._id}
 			else
