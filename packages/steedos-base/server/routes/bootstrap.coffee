@@ -63,7 +63,7 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 				result.objects[_obj.name] = _obj
 			)
 	_.each Creator.steedosSchema.getDataSources(), (datasource, name) ->
-		result.apps = _.extend result.apps, datasource.getAppsConfig()
+		result.apps = _.extend result.apps, clone(datasource.getAppsConfig())
 		result.dashboards = _.extend result.dashboards, datasource.getDashboardsConfig()
 	result.apps = _.extend( result.apps || {}, Creator.getDBApps(spaceId))
 	result.dashboards = _.extend( result.dashboards || {}, Creator.getDBDashboards(spaceId))
@@ -76,7 +76,11 @@ JsonRoutes.add "get", "/api/bootstrap/:spaceId/",(req, res, next)->
 			app._dbid = app._id
 			app._id = app.code
 		_Apps[app._id] = app
-	result.apps = _Apps
+	steedosI18n.translationApps(lng, _Apps);
+	result.apps = _Apps;
+	assigned_menus = clone(result.assigned_menus);
+	steedosI18n.translationMenus(lng, assigned_menus);
+	result.assigned_menus = assigned_menus;
 
 	_Dashboards = {}
 	_.each result.dashboards, (dashboard, key) ->

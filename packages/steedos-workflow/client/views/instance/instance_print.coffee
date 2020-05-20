@@ -45,18 +45,19 @@ Template.instancePrint.helpers
 		return Template.instance().isShowTracesSimplify?.get()
 
 	simplifyTraces: (traces)->
-		startStep = _.find WorkflowManager.getInstanceSteps(), (s)->
-			return s.step_type == "start"
-		if !startStep
+		startEndStepIds = []
+		_.each WorkflowManager.getInstanceSteps(), (s)->
+			if s.step_type == "start" || s.step_type == "end"
+				startEndStepIds.push(s._id)
+		if _.isEmpty startEndStepIds
 			return []
-		startStepId = startStep._id
 		steps = {}
 		traces.forEach (t, index)->
-			if ['rejected', 'relocated'].includes(t.judge) || t.step == startStepId
+			if ['rejected', 'relocated', 'retrieved', 'returned'].includes(t.judge) || startEndStepIds.includes(t.step)
 				delete traces[index]
 				return
 			t.approves?.forEach (a, idx)->
-				if ['terminated', 'reassigned'].includes(a.judge)
+				if ['terminated', 'reassigned', 'retrieved', 'returned', 'rejected'].includes(a.judge) || ['cc', 'forward', 'distribute'].includes(a.type)
 					delete t.approves[idx]
 					return
 			if _.has steps, t.step
@@ -185,3 +186,10 @@ Template.instancePrint.onRendered ->
 	if localStorage.getItem "print_is_show_traces_simplify"
 		Template.instance().isShowTracesSimplify.set(true)
 		$(".instance-print .cbx-print-traces-simplify").attr("checked",true)
+
+	# 判断html字段中是否只有table标签，如果是，则加上样式类steedos-html-table-only，其会实现表格撑滿的样式
+	htmlFieldContainer = $(".instance-print .instance .steedos-html")
+	htmlFieldContainer.each (key, item)->
+		htmlItem = $(item);
+		if htmlItem.find("> table").length == htmlItem.children().length
+			htmlItem.addClass("steedos-html-table-only")

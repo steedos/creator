@@ -30,10 +30,25 @@ Template.headerProfile.helpers({
 		}
 	},
 	footers: function(){
+		let urls = Meteor.settings.public && Meteor.settings.public.urls;
+		let helpUrl = "https://www.steedos.com/help";
+		let downloadUrl = "https://www.steedos.com/help/download";
+		if(urls && urls.help){
+			helpUrl = urls.help;
+		}
+		if(urls && urls.download){
+			downloadUrl = urls.download;
+		}
 		return [
-			{label: "帮助文档", onClick: function(){return Steedos.openWindow("https://www.steedos.com/help")}},
-			{label: "下载客户端", onClick: function(){return Steedos.openWindow("https://www.steedos.com/help/download")}},
-			{label: "关于", onClick: function(){return FlowRouter.go("/app/admin/page/creator_about");}}
+			{label: t("Online Help"), onClick: function(){return Steedos.openWindow(helpUrl)}},
+			{label: t("Client download"), onClick: function(){return Steedos.openWindow(downloadUrl)}},
+			{label: t("About"), onClick: function(){return FlowRouter.go("/app/admin/page/creator_about");}}
 		]
+	},
+	assistiveText: function(){
+		return {
+			settings: window.t("webapp_header_profile_settings"),
+			logout: window.t("webapp_header_profile_logout"),
+		}
 	}
 });

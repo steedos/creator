@@ -301,6 +301,8 @@ Package.onUse(function(api) {
 
 	api.addFiles('client/autoupdate_cordova.coffee', 'web.cordova');
 
+	api.addFiles('server/startup.coffee', 'server');
+
 
 	api.export('Selector');
 	api.export('Steedos');

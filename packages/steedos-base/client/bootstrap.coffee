@@ -173,7 +173,8 @@ Creator.bootstrapLoaded = new ReactiveVar(false)
 
 handleBootstrapData = (result, callback)->
 	Creator._recordSafeObjectCache = []; # 切换工作区时，情况object缓存
-	Creator.Objects = result.objects
+	Creator.Objects = result.objects;
+	Creator.baseObject = Creator.Objects.base;
 	Creator.objectsByName = {};
 	object_listviews = result.object_listviews
 	Creator.object_workflows = result.object_workflows

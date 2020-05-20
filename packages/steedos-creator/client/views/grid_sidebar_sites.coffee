@@ -108,7 +108,7 @@ getExtraActions = (object_name, record_id, record_permissions)->
 	self = this
 	if object_name == "cms_sites"
 		return [
-			label: "新建栏目",
+			label: t("cms_sites_action_new_category_of_site"),
 			name: "new_category_of_site",
 			visible: (object_name, record_id, record_permissions) ->
 				allowCreate = false
@@ -144,7 +144,7 @@ getExtraActions = (object_name, record_id, record_permissions)->
 		]
 	if object_name == "cms_categories"
 		return [
-			label: "新建子栏目",
+			label: t("cms_categories_action_new_sub_category_of_category"),
 			name: "new_sub_category_of_category",
 			visible: (object_name, record_id, record_permissions) ->
 				allowCreate = false
@@ -218,6 +218,7 @@ _itemDropdownClick = (e, selectionInfo)->
 		dataSource: actionSheetItems
 		showTitle: false
 		usePopover: true
+		width: "auto"
 		onItemClick: (value)->
 			object = Creator.getObject(curObjectName)
 			action = value.itemData.action
