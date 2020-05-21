@@ -80,13 +80,21 @@ Meteor.startup ->
 						"success": false
 				return;
 
-		data = steedosExport.form(formId);
+		try
+			data = steedosExport.form(formId);
 
-		if _.isEmpty(data)
-			fileName = 'null'
-		else
-			fileName = data.name
+			if _.isEmpty(data)
+				fileName = 'null'
+			else
+				fileName = data.name
 
-		res.setHeader('Content-type', 'application/x-msdownload');
-		res.setHeader('Content-Disposition', 'attachment;filename='+encodeURI(fileName)+'.json');
-		res.end(JSON.stringify(data))
+			res.setHeader('Content-type', 'application/x-msdownload');
+			res.setHeader('Content-Disposition', 'attachment;filename='+encodeURI(fileName)+'.json');
+			res.end(JSON.stringify(data))
+		catch e
+			JsonRoutes.sendResult res,
+				code: 500,
+				data:
+					"error": e.message,
+					"success": false
+			return;
