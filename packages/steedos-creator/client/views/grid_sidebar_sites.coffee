@@ -14,6 +14,11 @@ setGridSidebarFilters = ()->
 		# 未选中站点时，不显示右侧文档列表
 		Session.set "grid_sidebar_filters", [ "_id", "=", "-1" ]
 
+resetFilters = ()->
+	Session.set("standard_query", null)
+	Session.set("filter_items", null)
+	$("#grid-search").val('')
+
 loadCategories = ()->
 	self = this
 	sites = self.sites.get()
@@ -337,6 +342,7 @@ Template.creator_grid_sidebar_sites.onRendered ->
 						Session.set "site", null
 					else
 						Session.set "category", null
+				resetFilters()
 				setGridSidebarFilters()
 
 			dxOptions.keyExpr = "_id"
