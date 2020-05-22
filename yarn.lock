@@ -2965,7 +2965,7 @@ fbjs@^0.8.9:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
-fibers@^3.1.1, fibers@^4.0.0:
+fibers@^3.1.1, fibers@^4.0.3:
   version "4.0.3"
   resolved "https://registry.npm.taobao.org/fibers/download/fibers-4.0.3.tgz#dda5918280a48507f5d8a96dd9a525e8f4a532e2"
   integrity sha1-3aWRgoCkhQf12Klt2aUl6PSlMuI=
