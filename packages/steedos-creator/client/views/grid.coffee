@@ -512,8 +512,6 @@ Template.creator_grid.onRendered ->
 #					else
 #						selectColumns = _fields(curObjectName, list_view_id)
 					return _fields(curObjectName, list_view_id)
-				if related_list_item_props.columns
-					selectColumns = related_list_item_props.columns
 			pageIndex = Tracker.nonreactive ()->
 				if Session.get("page_index")
 					if Session.get("page_index").object_name == curObjectName
