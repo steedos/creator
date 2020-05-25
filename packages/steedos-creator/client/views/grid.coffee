@@ -512,7 +512,7 @@ Template.creator_grid.onRendered ->
 #					else
 #						selectColumns = _fields(curObjectName, list_view_id)
 					return _fields(curObjectName, list_view_id)
-				if related_list_item_props.customRelatedList && related_list_item_props.columns
+				if related_list_item_props.customRelatedListObject && related_list_item_props.columns
 					selectColumns = related_list_item_props.columns
 					selectColumns = selectColumns.map (field)->
 						if _.isObject field
