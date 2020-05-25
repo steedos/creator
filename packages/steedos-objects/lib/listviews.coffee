@@ -93,6 +93,23 @@ Creator.convertListView = (default_columens, list_view, list_view_name)->
 
 if Meteor.isClient
 	Creator.getRelatedList = (object_name)->
+		relatedListObjects = {}
+		_object = Creator.Objects[object_name]
+		if _object
+			relatedList = _object.relatedList
+			if !_.isEmpty relatedList
+				_.each relatedList, (objOrName)->
+					if _.isObject objOrName
+						related =
+							object_name: objOrName.objectName
+							columns: objOrName.columns
+							is_file: objOrName.objectName == "cms_files"
+							filtersFunction: objOrName.filters
+							sort: objOrName.sort
+							related_field_name: ''
+							customRelatedList: true
+						relatedListObjects[objOrName.objectName] = related
+
 		list = []
 		related_objects = Creator.getRelatedObjects(object_name)
 		_.each related_objects, (related_object_item) ->
@@ -118,21 +135,20 @@ if Meteor.isClient
 				is_file: related_object_name == "cms_files"
 				sharing: sharing
 
+			relatedObject = relatedListObjects[related_object_name]
+			if relatedObject
+				if relatedObject.columns
+					related.columns = relatedObject.columns
+				if relatedObject.filtersFunction
+					related.filtersFunction = relatedObject.filtersFunction
+				if relatedObject.customRelatedList
+					related.customRelatedList = relatedObject.customRelatedList
+				delete relatedListObjects[related_object_name]
+
 			list.push related
-		_object = Creator.Objects[object_name]
-		if _object
-			relatedList = _object.relatedList
-			if !_.isEmpty relatedList
-				_.each relatedList, (objOrName)->
-					if _.isObject objOrName
-						related =
-							object_name: objOrName.objectName
-							columns: objOrName.columns
-							is_file: objOrName.objectName == "cms_files"
-							filtersFunction: objOrName.filters
-							sort: objOrName.sort
-							related_field_name: ''
-						list.push related
+
+		_.each relatedListObjects, (v, k)->
+			list.push v
 
 		return list
 

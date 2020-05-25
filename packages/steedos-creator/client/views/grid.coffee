@@ -512,6 +512,16 @@ Template.creator_grid.onRendered ->
 #					else
 #						selectColumns = _fields(curObjectName, list_view_id)
 					return _fields(curObjectName, list_view_id)
+				if related_list_item_props.customRelatedList && related_list_item_props.columns
+					selectColumns = related_list_item_props.columns
+					selectColumns = selectColumns.map (field)->
+						if _.isObject field
+							return field.field
+						else if _.isString field
+							return field
+						else
+							return undefined
+					selectColumns = _.uniq(_.compact(selectColumns))
 			pageIndex = Tracker.nonreactive ()->
 				if Session.get("page_index")
 					if Session.get("page_index").object_name == curObjectName
