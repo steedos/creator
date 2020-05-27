@@ -363,35 +363,37 @@ Template.creator_view.helpers
 		actions = Creator.getActions()
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		record = Creator.getCollection(object_name).findOne(record_id)
-		userId = Meteor.userId()
-		record_permissions = Creator.getRecordPermissions object_name, record, userId
-		actions = _.filter actions, (action)->
-			if action.on == "record" or action.on == "record_only"
-				if typeof action.visible == "function"
-					return action.visible(object_name, record_id, record_permissions)
+		if record_id
+			record = Creator.getCollection(object_name).findOne(record_id)
+			userId = Meteor.userId()
+			record_permissions = Creator.getRecordPermissions object_name, record, userId
+			actions = _.filter actions, (action)->
+				if action.on == "record" or action.on == "record_only"
+					if typeof action.visible == "function"
+						return action.visible(object_name, record_id, record_permissions)
+					else
+						return action.visible
 				else
-					return action.visible
-			else
-				return false
-		return actions
+					return false
+			return actions
 
 	moreActions: ()->
 		actions = Creator.getActions()
 		object_name = Session.get "object_name"
 		record_id = Session.get "record_id"
-		record = Creator.getCollection(object_name).findOne(record_id)
-		userId = Meteor.userId()
-		record_permissions = Creator.getRecordPermissions object_name, record, userId
-		actions = _.filter actions, (action)->
-			if action.on == "record_more"
-				if typeof action.visible == "function"
-					return action.visible(object_name, record_id, record_permissions)
+		if record_id
+			record = Creator.getCollection(object_name).findOne(record_id)
+			userId = Meteor.userId()
+			record_permissions = Creator.getRecordPermissions object_name, record, userId
+			actions = _.filter actions, (action)->
+				if action.on == "record_more" or action.on == "record_only_more"
+					if typeof action.visible == "function"
+						return action.visible(object_name, record_id, record_permissions)
+					else
+						return action.visible
 				else
-					return action.visible
-			else
-				return false
-		return actions
+					return false
+			return actions
 
 	isFileDetail: ()->
 		return "cms_files" == Session.get "object_name"
@@ -423,6 +425,8 @@ Template.creator_view.helpers
 		data = {related_object_name: related_object_name, object_name: object_name, recordsTotal: Template.instance().recordsTotal, is_related: true, related_list_item_props: related_list_item_props}
 		if object_name == 'objects'
 			data.record_id = Creator.getObjectRecord().name
+		else
+			data.record_id = Session.get("record_id")
 		return data
 
 	enable_chatter: ()->
