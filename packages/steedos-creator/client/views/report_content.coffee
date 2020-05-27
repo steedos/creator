@@ -209,8 +209,18 @@ renderChart = (self)->
 		firstRowField = _.findWhere(grid._options.columns, {groupIndex:0})
 		unless firstRowField
 			return
+		fieldKeys = firstRowField.dataField.split(".")
 		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
-		objectGroupField = objectFields[firstRowField.dataField]
+		objectGroupField = objectFields[fieldKeys[0]]
+		if fieldKeys.length == 2 and ["lookup","master-detail"].indexOf(objectGroupField.type) > -1 and objectGroupField.reference_to
+			# 当objectGroupField为"lookup","master-detail"类型时，找到对应的关联字段
+			if _.isFunction(objectGroupField.reference_to)
+				reference_to = objectGroupField.reference_to()
+			else
+				reference_to = objectGroupField.reference_to
+			if reference_to and _.isString(reference_to)
+				# 不支持reference_to为数组的情况
+				objectGroupField = Creator.getObject(reference_to)?.fields?[fieldKeys[1]]
 		unless objectGroupField
 			toastr.error t("creator_report_error_object_field_not_found", {object_name: objectName, field_name: firstRowField.dataField})
 			return
@@ -1047,6 +1057,7 @@ renderMatrixReport = (reportObject)->
 		module.dynamicImport('devextreme/ui/pivot_grid').then (dxPivotGrid)->
 			DevExpress.ui.dxPivotGrid = dxPivotGrid;
 			self.pivotGridInstance?.get()?.dispose()
+			console.log("===dxOptions===", dxOptions);
 			pivotGrid = $('#pivotgrid').show().dxPivotGrid(dxOptions).dxPivotGrid('instance')
 			self.pivotGridInstance?.set pivotGrid
 
