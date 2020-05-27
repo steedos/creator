@@ -139,6 +139,8 @@ if Meteor.isClient
 			if relatedObject
 				if relatedObject.columns
 					related.columns = relatedObject.columns
+				if relatedObject.sort
+					related.sort = relatedObject.sort
 				if relatedObject.filtersFunction
 					related.filtersFunction = relatedObject.filtersFunction
 				if relatedObject.customRelatedListObject

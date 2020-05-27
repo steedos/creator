@@ -318,8 +318,6 @@ _columns = (object_name, columns, list_view_id, is_related, relatedSort)->
 	object = Creator.getObject(object_name)
 	grid_settings = Creator.getCollection("settings").findOne({object_name: object_name, record_id: "object_gridviews"})
 	column_default_sort = Creator.transformSortToDX(Creator.getObjectDefaultSort(object_name))
-	if is_related && !_.isEmpty(relatedSort)
-		column_default_sort = Creator.transformSortToDX(relatedSort)
 	if grid_settings and grid_settings.settings
 		column_width_settings = grid_settings.settings[list_view_id]?.column_width
 		column_sort_settings = Creator.transformSortToDX(grid_settings.settings[list_view_id]?.sort)
@@ -327,6 +325,8 @@ _columns = (object_name, columns, list_view_id, is_related, relatedSort)->
 	list_view_sort = Creator.transformSortToDX(list_view?.sort)
 	if column_sort_settings and column_sort_settings.length > 0
 		list_view_sort = column_sort_settings
+	else if is_related && !_.isEmpty(relatedSort)
+		list_view_sort = Creator.transformSortToDX(relatedSort)
 	else if !_.isEmpty(list_view_sort)
 		list_view_sort = list_view_sort
 	else
