@@ -218,7 +218,9 @@ if Meteor.isClient
 					filtersFunction = obj.filtersFunction
 				else
 					related_field_name = obj.related_field_name
-		
+		if !related_field_name && !filtersFunction
+			# 关联字段和子表过滤函数都没有的话说明两表之间没任何关联，子表使用默认的视图过滤
+			return undefined
 		related_field_name = related_field_name.replace(/\./g, "/")
 		if list_view_id
 			custom_list_view = Creator.getListView(related_object_name, list_view_id)
