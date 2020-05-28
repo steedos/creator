@@ -288,9 +288,10 @@ renderChart = (self)->
 				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryTypeLabel}", argumentField: tempKey
 		dxOptions = 
 			dataSource: chartData, 
-			commonSeriesSettings: {
+			commonSeriesSettings: 
 				type: "bar"
-			},
+			tooltip:
+				enabled: true
 			equalBarWidth: false,
 			panes: chartPanes,
 			series: chartSeries,
