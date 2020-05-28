@@ -629,7 +629,8 @@ Template.CreatorAfModal.events
 						schema = schemaInstance._schema
 						disabledFields = Creator.getDisabledFields(schema)
 						_.each disabledFields, (disabledField)->
-							delete insertDoc[disabledField]
+							if schema[disabledField].type != Boolean
+								delete insertDoc[disabledField]
 
 					if Session.get("cmOperation") == "insert"
 						data = insertDoc
