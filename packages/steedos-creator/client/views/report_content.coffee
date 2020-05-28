@@ -801,6 +801,7 @@ renderMatrixReport = (reportObject)->
 			dataField: "_id"
 			summaryType: "count"
 			area: 'data'
+			dataType: "numeric"
 		if !reportObject.values or reportObject.values.indexOf("_id") < 0
 			reportFields.push defaultCounterSum
 	
