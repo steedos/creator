@@ -53,6 +53,10 @@ AutoForm.addInputType('steedosLookups', {
 				context.atts.disabled = true
 			}
 
+			if(_.has(context.atts, "readonly")){
+				context.atts.readonly = true
+			}
+
 			context.atts.disabled = !!AutoForm.getCurrentDataForForm().disabled || context.atts.disabled || false;
 		}
 
@@ -435,6 +439,10 @@ Template.steedosLookups.helpers({
 
 		if(data.atts.create && !AutoForm.getFormId().startsWith("new"))
 			return true
+	},
+	fieldReadonly: function(){
+		console.log('Template.instance().data', Template.instance().data);
+		return Template.instance().data.readonly
 	}
 });
 
