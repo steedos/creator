@@ -6,6 +6,7 @@ if (Meteor.isServer) {
 
 	let mongoOptions = {
 		ignoreUndefined: false,
+		useUnifiedTopology: true // Required to silence deprecation warnings https://github.com/steedos/steedos-platform/issues/342
 	};
 
 	const mongoOptionStr = process.env.MONGO_OPTIONS;
