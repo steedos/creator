@@ -186,7 +186,6 @@ Package.onUse(function(api) {
 		'client/views/sidebar_user_panel.less',
 		'client/dataTables_bootstrap.less',
 		'client/my_contacts_limit.coffee',
-		'client/my_company_ids.coffee',
 		'client/company.coffee'
 	], "client");
 
