@@ -336,6 +336,16 @@ if Meteor.isClient
 		url = Creator.getRelativeUrl("/plugins/jsreport/api/report_db/#{report_id}/pdf")
 		url += Creator.getJsReportUrlQuery()
 		return url;
+
+	Creator.getStimulsoftReportViewUrl = (report_id)->
+		url = Creator.getRelativeUrl("/plugins/stimulsoft/web/viewer_db/#{report_id}")
+		url += Creator.getJsReportUrlQuery()
+		return url;
+
+	Creator.getStimulsoftReportDesignerUrl = (report_id)->
+		url = Creator.getRelativeUrl("/plugins/stimulsoft/web/designer_db/#{report_id}")
+		url += Creator.getJsReportUrlQuery()
+		return url;
 	
 	Creator.objectOdataSelectFields = (object)->
 		_fields = object.fields
