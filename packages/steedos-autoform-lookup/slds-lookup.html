@@ -80,7 +80,7 @@
 									   autocomplete="off"
 									   role="textbox"
 									   placeholder="{{_ "Search"}} {{placeholder}}..."
-									   aria-activedescendant="{{value}}" readonly="{{isReadOnly}}" value="{{label}}">
+									   aria-activedescendant="{{value}}" readonly="{{isReadOnly}}" {{readonlyStr}} value="{{label}}">
 								{{#unless fieldReadonly}}
 									{{#if isReadOnly}}
 										<a class="slds-button slds-button_icon slds-input__icon slds-input__icon_right slds-pill__remove">

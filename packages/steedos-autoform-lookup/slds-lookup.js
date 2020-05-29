@@ -442,6 +442,11 @@ Template.steedosLookups.helpers({
 	},
 	fieldReadonly: function(){
 		return Template.instance().data.readonly
+	},
+	readonlyStr: function(){
+		if(Template.instance().data.readonly){
+			return "readonly"
+		}
 	}
 });
 
