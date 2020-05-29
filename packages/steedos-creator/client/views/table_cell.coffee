@@ -20,6 +20,15 @@ formatFileSize = (filesize)->
 
 	return rev.toFixed(2) + unit
 
+getSafeObjectUrl = (object_name, record_id, app_id)->
+	if object_name == 'users'
+		object = Creator.getObject("space_users")
+	else
+		object = Creator.getObject(object_name)
+	if object.permissions.get().allowRead
+		return Creator.getObjectUrl(object_name, record_id, app_id);
+
+
 Template.creator_table_cell.onRendered ->
 	self = this
 	self.autorun ->
@@ -167,7 +176,7 @@ Template.creator_table_cell.helpers
 							v = option.label
 							_robj = Creator.getObject(option.value)
 							if _robj?._id
-								href = Creator.getObjectUrl(reference_to, _robj._id)
+								href = getSafeObjectUrl(reference_to, _robj._id)
 								data.push {reference_to: reference_to,  rid: v, value: v, id: this._id, href: href}
 							else
 								data.push {value: val, id: this._id}
@@ -184,7 +193,7 @@ Template.creator_table_cell.helpers
 								reference_to = fv["reference_to._o"] || reference_to
 								rid = fv._id
 								rvalue = fv['_NAME_FIELD_VALUE']
-								href = Creator.getObjectUrl(reference_to, rid)
+								href = getSafeObjectUrl(reference_to, rid)
 								data.push {reference_to: reference_to, rid: rid, value: rvalue, href: href, id: this._id}
 				else
 					data.push {value: val, id: this._id}
@@ -199,7 +208,7 @@ Template.creator_table_cell.helpers
 						# 如果未能取到expand数据（包括_id对应记录本身被删除的情况），则直接用_id作为值显示出来，且href能指向正确的url
 						rid = v
 						rvalue = v
-					href = Creator.getObjectUrl(reference_to, rid)
+					href = getSafeObjectUrl(reference_to, rid)
 					data.push {reference_to: reference_to, rid: rid, value: rvalue, href: href, id: this._id}
 
 		else if _field.type == "image"
