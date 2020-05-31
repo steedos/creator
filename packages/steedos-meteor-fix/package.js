@@ -13,7 +13,7 @@ Package.onUse(function (api) {
 	api.use('ecmascript');
 	api.use('tracker');
 
-	api.addFiles('lib/meteor_fix.js', 'server');
+	api.addFiles('lib/meteor_fix.js', ['client', 'server']);
 
 });
 
