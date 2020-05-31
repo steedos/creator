@@ -71,7 +71,6 @@ Package.onUse(function(api) {
 
 	api.addFiles('checkNpm.js', "server");
 
-	api.addFiles('lib/meteor_fix.js', ['client', 'server']);
 	api.addFiles('lib/steedos_util.js', ['client', 'server']);
 
 	api.addFiles([
