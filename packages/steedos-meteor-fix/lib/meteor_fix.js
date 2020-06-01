@@ -5,7 +5,6 @@ import { Mongo } from 'meteor/mongo'
 if (Meteor.isServer) {
 
 	let mongoOptions = {
-		ignoreUndefined: false,
 		useUnifiedTopology: true, // Required to silence deprecation warnings
 		autoReconnect: undefined,
 		reconnectTries: undefined
