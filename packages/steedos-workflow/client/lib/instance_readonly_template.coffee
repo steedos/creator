@@ -87,7 +87,12 @@ InstanceReadOnlyTemplate.afFormGroup = """
 					{{#if equals type 'input'}}
 						<div class="form-group" data-required="{{#if is_required}}true{{/if}}">
 							<label for="7ZQnDsXBGohZMetA5" class="control-label">{{getLabel code}}</label>
-							<input type="text" title="{{getLabel code}}" name="{{code}}" {{getPermissions code}} data-schema-key="{{getLabel code}}" class="form-control">
+							{{#if is_textarea}}
+								<textarea title="{{getLabel code}}" name="{{code}}" {{getPermissions code}} data-schema-key="{{getLabel code}}" class="form-control"></textarea>
+							{{/if}}
+							{{#unless is_textarea}}
+								<input type="text" title="{{getLabel code}}" name="{{code}}" {{getPermissions code}} data-schema-key="{{getLabel code}}" class="form-control">
+							{{/unless}}
 						</div>
 					{{else}}
 						{{#if equals type 'number'}}
@@ -713,7 +718,7 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 	traceCheck = ""
 	if !_.isEmpty(trace)
 		traceCheck = "checked"
-	if options?.tagger == 'email'
+	if options?.tagger == 'email' || options?.editable
 		showTracesBtn = ""
 	else
 		showTracesBtn = """
@@ -729,33 +734,38 @@ InstanceReadOnlyTemplate.getInstanceHtml = (user, space, instance, options)->
 		$( document ).ready(function(){
 			var b = document.getElementById('cbx-print-traces');
 			var t = document.getElementsByClassName('instance-traces')[0];
-			if (b.checked){
+			if (b && b.checked && t){
 				t.style = 'display: block;'
-			} else {
+			} else if(t){
 				t.style = 'display: none;'
 			}
-			b.addEventListener('change', function(e){
-				if (e.target.checked){
-					t.style = 'display: block;'
-				} else {
-					t.style = 'display: none;'
-				}
-			});
+			if(b){
+				b.addEventListener('change', function(e){
+					if (e.target.checked){
+						t.style = 'display: block;'
+					} else {
+						t.style = 'display: none;'
+					}
+				});
+			}
+
 
 			var attachmentsCheckbox = document.getElementById('cbx-print-attachments');
 			var attachmentsView = document.getElementsByClassName('attachments-section')[0];
-			if (attachmentsCheckbox.checked){
+			if (attachmentsCheckbox && attachmentsCheckbox.checked && attachmentsView){
 				attachmentsView.style = 'display: block;'
-			} else {
+			} else if(attachmentsView){
 				attachmentsView.style = 'display: none;'
 			}
-			attachmentsCheckbox.addEventListener('change', function(e){
-				if (e.target.checked){
-					attachmentsView.style = 'display: block;'
-				} else {
-					attachmentsView.style = 'display: none;'
-				}
-			});
+			if(attachmentsCheckbox){
+				attachmentsCheckbox.addEventListener('change', function(e){
+					if (e.target.checked){
+						attachmentsView.style = 'display: block;'
+					} else {
+						attachmentsView.style = 'display: none;'
+					}
+				});
+			}
 		});
 
 	"""

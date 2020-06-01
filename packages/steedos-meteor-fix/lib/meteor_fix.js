@@ -1,11 +1,13 @@
-import { Mongo } from 'meteor/mongo'       
+import { Mongo } from 'meteor/mongo'
 
 // Revert change from Meteor 1.6.1 who set ignoreUndefined: true
 // more information https://github.com/meteor/meteor/pull/9444
 if (Meteor.isServer) {
 
 	let mongoOptions = {
-		ignoreUndefined: false,
+		useUnifiedTopology: true, // Required to silence deprecation warnings
+		autoReconnect: undefined,
+		reconnectTries: undefined
 	};
 
 	const mongoOptionStr = process.env.MONGO_OPTIONS;
@@ -14,7 +16,6 @@ if (Meteor.isServer) {
 
 		mongoOptions = Object.assign({}, mongoOptions, jsonMongoOptions);
 	}
-
 	Mongo.setConnectionOptions(mongoOptions);
 }
 

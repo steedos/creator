@@ -307,6 +307,8 @@ Creator.getObjectSchema = (obj) ->
 				fs.decimal = true
 		else if field.type == "boolean"
 			fs.type = Boolean
+			if field.readonly
+				fs.autoform.disabled = true
 			fs.autoform.type = "steedos-boolean-checkbox"
 		else if field.type == "reference"
 			fs.type = String

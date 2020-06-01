@@ -1,6 +1,6 @@
 {
   "name": "steedos",
-  "version": "1.20.0",
+  "version": "1.20.7",
   "private": true,
   "scripts": {
     "start": "env-cmd -f ./.env.local meteor run --settings settings.json --port 3100",
@@ -15,7 +15,8 @@
     "osy": "cd ../object-server/ && yarn",
     "os": "cp -r ../object-server/packages/* node_modules/@steedos/ && cp -r ../object-server/apps/contracts/src/* node_modules/@steedos/app-contracts/src/",
     "oss": "cp -r ../object-server/packages/standard-objects/* node_modules/@steedos/standard-objects/ && yarn start",
-    "osw": "cd ../steedos-webapp/ && yarn build-lib && cd ../creator/ && cp -r ../steedos-webapp/lib/* node_modules/@steedos/react/lib/"
+    "osw": "cd ../steedos-webapp/ && yarn build-lib && cd ../creator/ && cp -r ../steedos-webapp/lib/* node_modules/@steedos/react/lib/",
+    "sr": "cp -r ../steedos-plugin-stimulsoft-report/lib/* node_modules/@steedos/plugin-stimulsoft-report/lib/ && rm -rf node_modules/@steedos/plugin-stimulsoft-report/node_modules/@steedos"
   },
   "dependencies": {
     "@babel/runtime": "^7.2.0",
@@ -50,7 +51,7 @@
     "env-cmd": "^10.0.1",
     "eval": "0.1.2",
     "express": "^4.16.4",
-    "fibers": "^3.1.1",
+    "fibers": "^4.0.3",
     "formBuilder": "^3.2.4",
     "gm": "^1.17.0",
     "gridfs-stream": "^1.1.1",
@@ -97,7 +98,7 @@
   },
   "devDependencies": {
     "@steedos/app-contracts": "^1.19.8",
-    "@steedos/react": "1.20.0",
+    "@steedos/react": "1.20.1",
     "@steedos/steedos-plugin-workflow": "^2.0.6",
     "bootstrap": "^3.3.7",
     "bootstrap-tagsinput": "0.7.1",
@@ -120,6 +121,7 @@
     "**/debug": "^3.1.0",
     "**/hoek": "^5.0.3",
     "**/cryptiles": "^4.1.2",
-    "**/bcrypt": "3.0.6"
+    "**/bcrypt": "3.0.6",
+    "**/fibers": "^4.0.3"
   }
 }

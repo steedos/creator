@@ -209,8 +209,18 @@ renderChart = (self)->
 		firstRowField = _.findWhere(grid._options.columns, {groupIndex:0})
 		unless firstRowField
 			return
+		fieldKeys = firstRowField.dataField.split(".")
 		dataSourceItems = DevExpress.data.query(gridLoadedArray).groupBy(firstRowField.dataField).toArray()
-		objectGroupField = objectFields[firstRowField.dataField]
+		objectGroupField = objectFields[fieldKeys[0]]
+		if fieldKeys.length == 2 and ["lookup","master-detail"].indexOf(objectGroupField.type) > -1 and objectGroupField.reference_to
+			# 当objectGroupField为"lookup","master-detail"类型时，找到对应的关联字段
+			if _.isFunction(objectGroupField.reference_to)
+				reference_to = objectGroupField.reference_to()
+			else
+				reference_to = objectGroupField.reference_to
+			if reference_to and _.isString(reference_to)
+				# 不支持reference_to为数组的情况
+				objectGroupField = Creator.getObject(reference_to)?.fields?[fieldKeys[1]]
 		unless objectGroupField
 			toastr.error t("creator_report_error_object_field_not_found", {object_name: objectName, field_name: firstRowField.dataField})
 			return
@@ -278,9 +288,10 @@ renderChart = (self)->
 				chartSeries.push pane: tempPaneName, valueField: tempSummaryType, name: "#{dsi.key} #{tempSummaryTypeLabel}", argumentField: tempKey
 		dxOptions = 
 			dataSource: chartData, 
-			commonSeriesSettings: {
+			commonSeriesSettings: 
 				type: "bar"
-			},
+			tooltip:
+				enabled: true
 			equalBarWidth: false,
 			panes: chartPanes,
 			series: chartSeries,
@@ -790,6 +801,7 @@ renderMatrixReport = (reportObject)->
 			dataField: "_id"
 			summaryType: "count"
 			area: 'data'
+			dataType: "numeric"
 		if !reportObject.values or reportObject.values.indexOf("_id") < 0
 			reportFields.push defaultCounterSum
 	
@@ -1054,6 +1066,10 @@ renderJsReport = (reportObject)->
 	url = Creator.getJsReportViewUrl(reportObject._id)
 	$('#jsreport').html("<iframe src=\"#{url}\"></iframe>");
 
+renderStimulsoftReport = (reportObject)->
+	url = Creator.getStimulsoftReportViewUrl(reportObject._id)
+	$('#stimulsoft-report').html("<iframe src=\"#{url}\"></iframe>");
+
 renderReport = (reportObject)->
 	unless reportObject
 		reportObject = Creator.Reports[Session.get("record_id")] or Creator.getObjectRecord()
@@ -1083,6 +1099,7 @@ renderReport = (reportObject)->
 		pivotGridChart.dispose()
 	innerStackingBox = $(".filter-list-wraper .innerStacking") #tabular/summary/matrix三种dx控件报表容器
 	jsreportBox = $(".filter-list-wraper #jsreport") #jsreport报表容器
+	stimulsoftReportBox = $(".filter-list-wraper #stimulsoft-report") #stimulsoft-report报表容器
 	emptyBox = $(".filter-list-wraper .creator-report-empty")
 	if filter_items and filter_items.length and filter_items.find((n)-> return n.is_required && Creator.isFilterValueEmpty(n.value))
 		# 存在未填写的必要过滤条件则显示提示
@@ -1098,29 +1115,42 @@ renderReport = (reportObject)->
 			gridLoadedArray = null
 			self.pivotGridInstance?.get()?.dispose()
 			jsreportBox.hide()
-			innerStackingBox.show();
+			stimulsoftReportBox.hide()
+			innerStackingBox.show()
 			renderTabularReport.bind(self)(reportObject)
 		when 'summary'
 			# 报表类型从matrix转变成summary时，需要把原来matrix报表清除
 			self.pivotGridInstance?.get()?.dispose()
 			jsreportBox.hide()
-			innerStackingBox.show();
+			stimulsoftReportBox.hide()
+			innerStackingBox.show()
 			renderSummaryReport.bind(self)(reportObject)
 		when 'matrix'
 			# 报表类型从summary转变成matrix时，需要把原来summary报表清除
 			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
 			jsreportBox.hide()
-			innerStackingBox.show();
+			stimulsoftReportBox.hide()
+			innerStackingBox.show()
 			renderMatrixReport.bind(self)(reportObject)
 		when 'jsreport'
 			# 报表类型从dx控件报表转变成jsreport时，需要把原来报表相关内容清除
 			gridLoadedArray = null
 			self.dataGridInstance?.get()?.dispose()
 			self.pivotGridInstance?.get()?.dispose()
-			innerStackingBox.hide();
+			innerStackingBox.hide()
+			stimulsoftReportBox.hide()
 			jsreportBox.show()
 			renderJsReport.bind(self)(reportObject)
+		when 'stimulsoft-report'
+			# 报表类型从dx控件报表转变成stimulsoft-report时，需要把原来报表相关内容清除
+			gridLoadedArray = null
+			self.dataGridInstance?.get()?.dispose()
+			self.pivotGridInstance?.get()?.dispose()
+			innerStackingBox.hide()
+			jsreportBox.hide()
+			stimulsoftReportBox.show()
+			renderStimulsoftReport.bind(self)(reportObject)
 
 
 Template.creator_report_content.onRendered ->

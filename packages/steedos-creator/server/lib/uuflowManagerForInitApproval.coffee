@@ -198,28 +198,100 @@ uuflowManagerForInitApproval.create_instance = (instance_from_client, user_info)
 
 uuflowManagerForInitApproval.initiateValues = (recordIds, flowId, spaceId, fields) ->
 	fieldCodes = []
-	_.each fields, (f)->
+	_.each fields, (f) ->
 		if f.type == 'section'
-			_.each f.fields, (ff)->
+			_.each f.fields, (ff) ->
 				fieldCodes.push ff.code
 		else
 			fieldCodes.push f.code
 
 	values = {}
+	objectName = recordIds.o
+	object = Creator.getObject(objectName, spaceId)
+	recordId = recordIds.ids[0]
 	ow = Creator.Collections.object_workflows.findOne({
-		object_name: recordIds.o,
+		object_name: objectName,
 		flow_id: flowId
 	})
-	record = Creator.getCollection(recordIds.o, spaceId).findOne(recordIds.ids[0])
+	record = Creator.getCollection(objectName, spaceId).findOne(recordId)
+	flow = Creator.getCollection('flows').findOne(flowId, { fields: { form: 1 } })
 	if ow and record
+		form = Creator.getCollection("forms").findOne(flow.form)
+		formFields = form.current.fields || []
+		relatedObjects = Creator.getRelatedObjects(objectName, spaceId)
+		relatedObjectsKeys = _.pluck(relatedObjects, 'object_name')
+		formTableFields = _.filter formFields, (formField) ->
+			return formField.type == 'table'
+		formTableFieldsCode = _.pluck(formTableFields, 'code')
+
+		getRelatedObjectFieldCode =  (key) ->
+			return _.find relatedObjectsKeys,  (relatedObjectsKey) ->
+				return key.startsWith(relatedObjectsKey + '.')
+
+		getFormTableFieldCode = (key) ->
+			return _.find formTableFieldsCode,  (formTableFieldCode) ->
+				return key.startsWith(formTableFieldCode + '.')
+
+		getFormTableField = (key) ->
+			return _.find formTableFields,  (f) ->
+				return f.code == key
+		
+		getFormField = (key) ->
+			return _.find formFields,  (f) ->
+				return f.code == key
+
+		getFormTableSubField = (tableField, subFieldCode) ->
+			return _.find tableField.fields,  (f) ->
+				return f.code == subFieldCode
+
+		getFieldOdataValue = (objName, id) ->
+			obj = Creator.getCollection(objName)
+			if !obj
+				return
+			if _.isString id
+				_record = obj.findOne(id)
+				if _record
+					_record['@label'] = _record.name
+					return _record
+			else if _.isArray id
+				_records = []
+				obj.find({ _id: { $in: id } }).forEach (_record) ->
+					_record['@label'] = _record.name
+					_records.push _record
+
+				if !_.isEmpty _records
+					return _records
+			return
+
 		tableFieldCodes = []
 		tableFieldMap = []
+		tableToRelatedMap = {}
 
-		ow.field_map.forEach (fm) ->
-			# 判断是否是子表字段
-			if fm.workflow_field.indexOf('.$.') > 0 and fm.object_field.indexOf('.$.') > 0
-				wTableCode = fm.workflow_field.split('.$.')[0]
-				oTableCode = fm.object_field.split('.$.')[0]
+		ow.field_map?.forEach (fm) ->
+			object_field = fm.object_field
+			workflow_field = fm.workflow_field
+			relatedObjectFieldCode = getRelatedObjectFieldCode(object_field)
+			formTableFieldCode = getFormTableFieldCode(workflow_field)
+			objField = object.fields[object_field]
+			formField = getFormField(workflow_field)
+			# 处理子表字段
+			if relatedObjectFieldCode
+				
+				oTableCode = object_field.split('.')[0]
+				oTableFieldCode = object_field.split('.')[1]
+				tableToRelatedMapKey = oTableCode
+				if !tableToRelatedMap[tableToRelatedMapKey]
+					tableToRelatedMap[tableToRelatedMapKey] = {}
+
+				if formTableFieldCode
+					wTableCode = workflow_field.split('.')[0]
+					tableToRelatedMap[tableToRelatedMapKey]['_FROM_TABLE_CODE'] = wTableCode
+
+				tableToRelatedMap[tableToRelatedMapKey][oTableFieldCode] = workflow_field
+			# 判断是否是表格字段
+			else if workflow_field.indexOf('.$.') > 0 and object_field.indexOf('.$.') > 0
+				wTableCode = workflow_field.split('.$.')[0]
+				oTableCode = object_field.split('.$.')[0]
 				if record.hasOwnProperty(oTableCode) and _.isArray(record[oTableCode])
 					tableFieldCodes.push(JSON.stringify({
 						workflow_table_field_code: wTableCode,
@@ -227,11 +299,10 @@ uuflowManagerForInitApproval.initiateValues = (recordIds, flowId, spaceId, field
 					}))
 					tableFieldMap.push(fm)
 
-			# 处理lookup类型字段
-			else if fm.object_field.indexOf('.') > 0 and fm.object_field.indexOf('.$.') == -1
-				objectFieldName = fm.object_field.split('.')[0]
-				lookupFieldName = fm.object_field.split('.')[1]
-				object = Creator.getObject(recordIds.o, spaceId)
+			# 处理lookup、master_detail类型字段
+			else if object_field.indexOf('.') > 0 and object_field.indexOf('.$.') == -1
+				objectFieldName = object_field.split('.')[0]
+				lookupFieldName = object_field.split('.')[1]
 				if object
 					objectField = object.fields[objectFieldName]
 					if objectField && (objectField.type == "lookup" || objectField.type == "master_detail") && !objectField.multiple
@@ -239,11 +310,22 @@ uuflowManagerForInitApproval.initiateValues = (recordIds, flowId, spaceId, field
 						fieldsObj[lookupFieldName] = 1
 						lookupObject = Creator.getCollection(objectField.reference_to, spaceId).findOne(record[objectFieldName], { fields: fieldsObj })
 						if lookupObject
-							values[fm.workflow_field] = lookupObject[lookupFieldName]
+							values[workflow_field] = lookupObject[lookupFieldName]
 
-			else if record.hasOwnProperty(fm.object_field)
-				values[fm.workflow_field] = record[fm.object_field]
+			# lookup、master_detail字段同步到odata字段
+			else if formField && objField && formField.type == 'odata' && ['lookup', 'master_detail'].includes(objField.type) && _.isString(objField.reference_to)
+				referenceToObjectName = objField.reference_to
+				referenceToFieldValue = record[objField.name]
+				odataFieldValue
+				if objField.multiple && formField.is_multiselect
+					odataFieldValue = getFieldOdataValue(referenceToObjectName, referenceToFieldValue)
+				else if !objField.multiple && !formField.is_multiselect
+					odataFieldValue = getFieldOdataValue(referenceToObjectName, referenceToFieldValue)
+				values[workflow_field] = odataFieldValue
+			else if record.hasOwnProperty(object_field)
+				values[workflow_field] = record[object_field]
 
+		# 表格字段
 		_.uniq(tableFieldCodes).forEach (tfc) ->
 			c = JSON.parse(tfc)
 			values[c.workflow_table_field_code] = []
@@ -257,19 +339,66 @@ uuflowManagerForInitApproval.initiateValues = (recordIds, flowId, spaceId, field
 				if not _.isEmpty(newTr)
 					values[c.workflow_table_field_code].push(newTr)
 
+		# 同步子表数据至表单表格
+		_.each tableToRelatedMap,  (map, key) ->
+			tableCode = map._FROM_TABLE_CODE
+			formTableField = getFormTableField(tableCode)
+			if !tableCode
+				console.warn('tableToRelated: [' + key + '] missing corresponding table.')
+			else
+				relatedObjectName = key
+				tableValues = []
+				relatedObject = Creator.getObject(relatedObjectName, spaceId)
+				relatedField = _.find relatedObject.fields, (f) ->
+					return ['lookup', 'master_detail'].includes(f.type) && f.reference_to == objectName
+
+				relatedFieldName = relatedField.name
+
+				selector = {}
+				selector[relatedFieldName] = recordId
+				relatedRecords = Creator.getCollection(relatedObjectName).find(selector)
+
+				relatedRecords.forEach (rr) ->
+					tableValueItem = {}
+					_.each map, (valueKey, fieldKey) ->
+						if fieldKey != '_FROM_TABLE_CODE'
+							tableFieldValue
+							formFieldKey
+							if valueKey.startsWith(tableCode + '.')
+								formFieldKey = (valueKey.split(".")[1])
+							else
+								formFieldKey = valueKey
+							
+							formField = getFormTableSubField(formTableField, formFieldKey)
+							relatedObjectField = relatedObject.fields[fieldKey]
+							if formField.type == 'odata' && ['lookup', 'master_detail'].includes(relatedObjectField.type) && _.isString(relatedObjectField.reference_to)
+								referenceToObjectName = relatedObjectField.reference_to
+								referenceToFieldValue = rr[fieldKey]
+								if relatedObjectField.multiple && formField.is_multiselect
+									tableFieldValue = getFieldOdataValue(referenceToObjectName, referenceToFieldValue)
+								else if !relatedObjectField.multiple && !formField.is_multiselect
+									tableFieldValue = getFieldOdataValue(referenceToObjectName, referenceToFieldValue)
+							else
+								tableFieldValue = rr[fieldKey]
+							tableValueItem[formFieldKey] = tableFieldValue
+
+					tableValues.push(tableValueItem)
+
+				values[tableCode] = tableValues
+
 		# 如果配置了脚本则执行脚本
 		if ow.field_map_script
-			_.extend(values, uuflowManagerForInitApproval.evalFieldMapScript(ow.field_map_script, recordIds.o, spaceId, recordIds.ids[0]))
+			_.extend(values, uuflowManagerForInitApproval.evalFieldMapScript(ow.field_map_script, objectName, spaceId, recordId))
 
 	# 过滤掉values中的非法key
 	filterValues = {}
-	_.each _.keys(values), (k)->
+	_.each _.keys(values), (k) ->
 		if fieldCodes.includes(k)
 			filterValues[k] = values[k]
 
 	return filterValues
 
-uuflowManagerForInitApproval.evalFieldMapScript = (field_map_script, objectName, spaceId, objectId)->
+uuflowManagerForInitApproval.evalFieldMapScript = (field_map_script, objectName, spaceId, objectId) ->
 	record = Creator.getCollection(objectName, spaceId).findOne(objectId)
 	script = "module.exports = function (record) { " + field_map_script + " }"
 	func = _eval(script, "field_map_script")
