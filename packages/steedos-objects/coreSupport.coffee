@@ -196,28 +196,32 @@ Creator.getObjectRelateds = (object_name)->
 	relatedList = _object.relatedList
 	if Meteor.isClient && !_.isEmpty relatedList
 		relatedListMap = {}
-		_.each relatedList, (objName)->
+		_.each relatedList, (objName) ->
+			objectName = ''
 			if _.isObject objName
-				relatedListMap[objName.objectName] = {}
+				objectName = objName.objectName
 			else
-				relatedListMap[objName] = {}
-		_.each Creator.Objects, (related_object, related_object_name)->
-			_.each related_object.fields, (related_field, related_field_name)->
-				if (related_field.type == "master_detail" || related_field.type == "lookup") and related_field.reference_to and related_field.reference_to == object_name and relatedListMap[related_object_name]
-					relatedListMap[related_object_name] = { object_name: related_object_name, foreign_key: related_field_name, sharing: related_field.sharing }
-		if relatedListMap['cms_files']
-			relatedListMap['cms_files'] = { object_name: "cms_files", foreign_key: "parent" }
-		if relatedListMap['instances']
-			relatedListMap['instances'] = { object_name: "instances", foreign_key: "record_ids" }
-		_.each ['tasks', 'notes', 'events', 'approvals'], (enableObjName)->
-			if relatedListMap[enableObjName]
-				relatedListMap[enableObjName] = { object_name: enableObjName, foreign_key: "related_to" }
-		if relatedListMap['audit_records']
-			#record 详细下的audit_records仅modifyAllRecords权限可见
-			permissions = Creator.getPermissions(object_name)
-			if _object.enable_audit && permissions?.modifyAllRecords
-				relatedListMap['audit_records'] = { object_name:"audit_records", foreign_key: "related_to" }
-		related_objects = _.values relatedListMap
+				objectName = objName
+			if !objectName
+				return
+			related_object = Creator.Objects[objectName]
+			if !related_object
+				return
+			_.each related_object.fields, (related_field, related_field_name) ->
+				if (related_field.type == "master_detail" || related_field.type == "lookup") and related_field.reference_to and related_field.reference_to == object_name
+					related_objects.push { object_name: objectName, foreign_key: related_field_name, sharing: related_field.sharing }
+			if objName == 'cms_files'
+				related_objects.push { object_name: "cms_files", foreign_key: "parent" }
+			if objName == 'instances'
+				related_objects.push { object_name: "instances", foreign_key: "record_ids" }
+			_.each ['tasks', 'notes', 'events', 'approvals'], (enableObjName) ->
+				if objName == enableObjName
+					related_objects.push { object_name: enableObjName, foreign_key: "related_to" }
+			if objName == 'audit_records'
+				#record 详细下的audit_records仅modifyAllRecords权限可见
+				permissions = Creator.getPermissions(object_name)
+				if _object.enable_audit && permissions?.modifyAllRecords
+					related_objects.push { object_name: "audit_records", foreign_key: "related_to" }
 		return related_objects
 
 	if _object.enable_files

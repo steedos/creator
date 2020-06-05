@@ -98,14 +98,14 @@ Creator.convertListView = (default_view, list_view, list_view_name)->
 
 if Meteor.isClient
 	Creator.getRelatedList = (object_name)->
-		relatedListObjects = {}
+		relatedListObjects = []
 		_object = Creator.Objects[object_name]
 		if _object
 			relatedList = _object.relatedList
 			if !_.isEmpty relatedList
-				_.each relatedList, (objOrName)->
+				_.each relatedList, (objOrName) ->
 					if _.isObject objOrName
-						related =
+						related = {
 							object_name: objOrName.objectName
 							columns: objOrName.columns
 							is_file: objOrName.objectName == "cms_files"
@@ -114,7 +114,8 @@ if Meteor.isClient
 							related_field_name: ''
 							customRelatedListObject: true
 							label: objOrName.label
-						relatedListObjects[objOrName.objectName] = related
+						}
+						relatedListObjects.push related
 
 		list = []
 		related_objects = Creator.getRelatedObjects(object_name)
@@ -141,34 +142,38 @@ if Meteor.isClient
 				is_file: related_object_name == "cms_files"
 				sharing: sharing
 
-			relatedObject = relatedListObjects[related_object_name]
-			if relatedObject
-				if relatedObject.columns
-					related.columns = relatedObject.columns
-				if relatedObject.sort
-					related.sort = relatedObject.sort
-				if relatedObject.filtersFunction
-					related.filtersFunction = relatedObject.filtersFunction
-				if relatedObject.customRelatedListObject
-					related.customRelatedListObject = relatedObject.customRelatedListObject
-				if relatedObject.label
-					related.label = relatedObject.label
-				delete relatedListObjects[related_object_name]
+			tempDeleteRelatedObjectName = ''
+			_.each relatedListObjects, (relatedObject, index) ->
+				if relatedObject.object_name == related_object_name && !tempDeleteRelatedObjectName
+					if relatedObject.columns
+						related.columns = relatedObject.columns
+					if relatedObject.sort
+						related.sort = relatedObject.sort
+					if relatedObject.filtersFunction
+						related.filtersFunction = relatedObject.filtersFunction
+					if relatedObject.customRelatedListObject
+						related.customRelatedListObject = relatedObject.customRelatedListObject
+					if relatedObject.label
+						related.label = relatedObject.label
+
+					tempDeleteRelatedObjectName = relatedObject.object_name
+					delete relatedListObjects[index]
 
 			list.push related
 
-
+		relatedListObjects = _.compact(relatedListObjects)
 		spaceId = Session.get("spaceId")
 		userId = Meteor.userId()
-		related_object_names = _.pluck(_.values(relatedListObjects), "object_name")
+		related_object_names = _.pluck(relatedListObjects, "object_name")
 		permissions = Creator.getPermissions(object_name, spaceId, userId)
 		unrelated_objects = permissions.unrelated_objects
 		related_object_names = _.difference related_object_names, unrelated_objects
-		_.each relatedListObjects, (v, related_object_name) ->
+		_.each relatedListObjects, (related_object) ->
+			related_object_name = related_object.object_name
 			isActive = related_object_names.indexOf(related_object_name) > -1
 			allowRead = Creator.getPermissions(related_object_name, spaceId, userId)?.allowRead
 			if isActive && allowRead
-				list.push v
+				list.push related_object
 
 		return list
 
