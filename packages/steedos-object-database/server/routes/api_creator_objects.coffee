@@ -1,3 +1,4 @@
+clone = require("clone");
 JsonRoutes.add 'get', '/api/creator/:space/objects/:_id', (req, res, next) ->
 	try
 		_id = req.params._id
@@ -10,6 +11,8 @@ JsonRoutes.add 'get', '/api/creator/:space/objects/:_id', (req, res, next) ->
 
 
 		if !_.isEmpty(object)
+			object = clone(new Creator.Object(object))
+			delete object.db
 			object.list_views = Creator.getUserObjectListViews(userId, spaceId, object.name)
 
 			if type == "added"
@@ -18,9 +21,7 @@ JsonRoutes.add 'get', '/api/creator/:space/objects/:_id', (req, res, next) ->
 				psetsCurrent = Creator.getCollection("permission_set").find({users: userId, space: spaceId}, {fields:{_id:1, assigned_apps:1}}).fetch()
 				psets = { psetsAdmin, psetsUser, psetsCurrent }
 
-				if !Creator.getObject(object.name)
-					Creator.Object(object)
-
+#				if !Creator.getObject(object.name)
 				object.permissions = Creator.getObjectPermissions.bind(psets)(spaceId, userId, object.name)
 
 		JsonRoutes.sendResult res, {
