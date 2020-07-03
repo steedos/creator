@@ -1,5 +1,7 @@
 # 华炎魔方服务端
 
+> 本项目代码已合并如 [steedos-platform](https://github.com/steedos/steedos-platform/)
+
 华炎魔方是一款随需应变的管理软件开发工具，旨在通过其强大的敏捷性、灵活性和开放性帮助企业创新、扩展和集成企业业务系统。基于该平台，您可以快速创建智能化、移动化的企业应用。
 
 比如你可以这样定义对象 account.object.yml
