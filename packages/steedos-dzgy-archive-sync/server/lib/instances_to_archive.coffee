@@ -39,32 +39,21 @@ _minxiInstanceData = (formData, instance) ->
 	formData.name = instance?.name
 
 	# 获取当前归档流程的名称
-	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,category:1}})
-	
-	if flow?.name
-		formData.flow_name = flow?.name
-		# 流程分类
-		formData.flow_category = flow?.category
-
 	# 归档到指定流程
-	if instance.flow_to_archive
-		formData.flow = instance.flow_to_archive
-		flowArchive = Creator.Collections["flows"].findOne({_id:instance.flow_to_archive},{fields:{name:1,category:1}})
-		if flowArchive
-			formData.flow_name = flowArchive?.name
-			formData.flow_category = flowArchive?.category
-			
+	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,category_name:1,description:1}})
+	if flow
+		formData.flow_name = flow?.description
+		# 流程分类
+		if flow.category_name
+			category = Creator.Collections["archive_classification"].findOne({name:flow.category_name});
+			if !flow_name
+				Creator.Collections["archive_classification"].insert({name:flow.category_name});
+
+		formData.flow_category = category?._id || "大众公用"
+		formData.flow = flow._id
+		# 公文分类
+		formData.classification = category?._id || "大众公用"
 	
- 	
-	# 公文分类
-	# if flow?.field_map["gongwenfenlei"]
-	# 	gongwenfenlei = flow?.field_map["gongwenfenlei"]
-	# else
-	space = Creator.Collections['spaces'].findOne({_id:instance.space},{fields:{name:1}})
-	gongwenfenlei = space?.name || "大众公用"
-		
-	classification = Creator.Collections["archive_classification"].findOne({name:gongwenfenlei},{fields:{_id:1}})
-	formData.classification = classification?._id
 
 	# 获取提交者主部门id
 	spaceUser = Creator.Collections["space_users"].findOne({space:instance.space, user:instance.submitter},{fields:{organization:1}})
