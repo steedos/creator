@@ -40,7 +40,7 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 获取当前归档流程的名称
 	# 归档到指定流程
-	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,category_name:1,description:1}})
+	flow = Creator.Collections["flows"].findOne({_id:instance.flow,"state":"enabled"},{fields:{name:1,category_name:1,description:1}})
 	if flow
 		formData.flow_name = flow?.description
 		# 流程分类
@@ -49,10 +49,11 @@ _minxiInstanceData = (formData, instance) ->
 			if !flow_name
 				Creator.Collections["archive_classification"].insert({name:flow.category_name});
 
+		# 公文分类
 		formData.flow_category = category?._id || "大众公用"
 		formData.flow = flow._id
-		# 公文分类
-		formData.classification = category?._id || "大众公用"
+		
+		# formData.classification = category?._id || "大众公用"
 	
 
 	# 获取提交者主部门id
@@ -426,7 +427,6 @@ InstancesToArchive::syncInstances = () ->
 	instances = @getInstances()
 	that = @
 	instances.forEach (mini_ins)->
-	
 		instance = Creator.Collections["instances"].findOne({_id: mini_ins._id})
 		if instance
 			try
