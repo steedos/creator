@@ -40,7 +40,7 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 获取当前归档流程的名称
 	# 归档到指定流程
-	flow = Creator.Collections["flows"].findOne({_id:instance.flow,"state":"enabled"},{fields:{name:1,category_name:1,description:1}})
+	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,category_name:1,description:1}})
 	if flow
 		formData.flow_name = flow?.description
 		# 流程分类
