@@ -355,7 +355,7 @@ video {
   vertical-align: middle; }
 
 img {
-  max-width: 100%;
+  max-width: 80%;
   height: auto; }
 
 .slds-modal_form .slds-modal__header,
@@ -12976,7 +12976,7 @@ a.slds-button--inverse:focus {
 .slds-global-header__logo {
   width: 12.5rem;
   height: 2.5rem;
-  background-image: url("/assets/images/logo-noname.svg");
+  /* background-image: url("/assets/images/logo-noname.svg"); */
   background-size: contain;
   background-repeat: no-repeat;
   background-position: left center; }

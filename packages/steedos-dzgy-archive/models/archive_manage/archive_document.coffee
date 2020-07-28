@@ -7,6 +7,11 @@ Creator.Objects.archive_document =
 	enable_api: true
 	open_window: false
 	fields:
+		name:
+			type: "text"
+			label: "标题"
+			sortable: true
+			default_width: 600
 		organization:
 			type: "lookup"
 			label: "部门"
@@ -29,11 +34,6 @@ Creator.Objects.archive_document =
 					return "(#{fs.join(' and ')})"
 				else if _.isString(context?.flow_category) && !_.isEmpty(context?.flow_category)
 					return "(category eq '#{context.flow_category}')"
-		name:
-			type: "text"
-			label: "标题"
-			sortable: true
-			default_width: 600
 		flow_name:
 			type: "text"
 			label: "流程名称"
