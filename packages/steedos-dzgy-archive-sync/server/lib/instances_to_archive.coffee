@@ -40,28 +40,18 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 获取当前归档流程的名称
 	# 归档到指定流程
-	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,space:1,category_name:1,description:1}})
+	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,space:1,category:1,description:1}})
 	if flow
 		console.log(flow.space,"archive_flow: ",flow.name)
 		formData.flow_name = flow?.description || ""
 		# 流程分类
-		if flow.category_name
-			category = Creator.Collections["archive_classification"].findOne({name:flow.category_name});
-			if !flow_name
-				Creator.Collections["archive_classification"].insert({name:flow.category_name});
-
-		# 公文分类
-		formData.flow_category = category?._id || "大众公用"
-		
-		# formData.classification = category?._id || "大众公用"
-	
+		formData.flow_category = flow?.category
 
 	# 获取提交者主部门id
 	spaceUser = Creator.Collections["space_users"].findOne({space:instance.space, user:instance.submitter},{fields:{organization:1}})
 
 	if spaceUser
 		formData.organization = spaceUser.organization
-
 	# OA表单的ID，作为判断OA归档的标志
 	formData.external_id = instance._id
 
@@ -384,11 +374,9 @@ InstancesToArchive.recordInstance = (instance, callback) ->
 	# 对象名
 	object_name = RecordsSync?.settings_records_sync?.to_archive?.object_name
 	collection = Creator.Collections[object_name]
-
 	collection.remove({'external_id':instance._id})
 
 	record_id = collection.insert formData
-
 	# 整理关联档案
 	#_minxiRelatedArchives(instance, record_id)
 
@@ -420,8 +408,10 @@ InstancesToArchive::getInstances = ()->
 
 	if @ins_ids
 		query._id = {$in: @ins_ids}
-	
-	return Creator.Collections["instances"].find(query, {fields: {_id: 1}}).fetch()
+
+	instances = Creator.getCollection("instances").find(query, {fields: {_id: 1}}).fetch()
+	instances = instances.slice(0,5000)
+	return instances
 
 InstancesToArchive::syncInstances = () ->
 	instances = @getInstances()
