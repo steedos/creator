@@ -40,9 +40,9 @@ _minxiInstanceData = (formData, instance) ->
 
 	# 获取当前归档流程的名称
 	# 归档到指定流程
-	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,category_name:1,description:1}})
+	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,space:1,category_name:1,description:1}})
 	if flow
-		console.log("archive_flow: ",flow.name)
+		console.log(flow.space,"archive_flow: ",flow.name)
 		formData.flow_name = flow?.description || ""
 		# 流程分类
 		if flow.category_name
