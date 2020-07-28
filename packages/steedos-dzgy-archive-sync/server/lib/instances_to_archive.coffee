@@ -42,7 +42,8 @@ _minxiInstanceData = (formData, instance) ->
 	# 归档到指定流程
 	flow = Creator.Collections["flows"].findOne({_id:instance.flow},{fields:{name:1,category_name:1,description:1}})
 	if flow
-		formData.flow_name = flow?.description
+		console.log("archive_flow: ",flow.name)
+		formData.flow_name = flow?.description || ""
 		# 流程分类
 		if flow.category_name
 			category = Creator.Collections["archive_classification"].findOne({name:flow.category_name});
@@ -51,7 +52,6 @@ _minxiInstanceData = (formData, instance) ->
 
 		# 公文分类
 		formData.flow_category = category?._id || "大众公用"
-		formData.flow = flow._id
 		
 		# formData.classification = category?._id || "大众公用"
 	
