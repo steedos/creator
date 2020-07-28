@@ -48,7 +48,7 @@ Creator.Objects["cfs.files.filerecord"] =
 	list_views:
 		all:
 			filter_scope: "space"
-			columns: ["original.name", "metadata.owner_name", "uploadedAt", "original.size"]
+			columns: ["original.name", "uploadedAt", "original.size"]
 	
 	permission_set:
 		user:

@@ -7,10 +7,6 @@ Creator.Objects.archive_document =
 	enable_api: true
 	open_window: false
 	fields:
-		classification:
-			type: "lookup"
-			label: "所属单位"
-			reference_to: "archive_classification"
 		organization:
 			type: "lookup"
 			label: "部门"
@@ -41,9 +37,21 @@ Creator.Objects.archive_document =
 		flow_name:
 			type: "text"
 			label: "流程名称"
-			hidden: true
 			sortable: true
 			default_width: 300
+		state:
+			type: "select"
+			label: "审批结果"
+			options:[
+				{label: "审批中",value: "pending"},
+				{label: "已核准",value: "approved"},
+				{label: "已驳回",value: "rejected"},
+				{label: "已取消",value: "terminated"},
+				{label: "已签订",value: "signed"},
+				{label: "已归档",value: "archived"},
+				{label: "已作废",value: "droped"},
+				{label: "已完成",value: "completed"}],
+			allowedValues:["pending","approved","rejected","terminated","signed","archived","droped","completed"]
 		submitter:
 			type: "lookup"
 			label: "提交人"
@@ -71,28 +79,23 @@ Creator.Objects.archive_document =
 			type: "text"
 			label: '表单ID'
 			hidden: true
-		state:
-			type: "text"
-			label: "审批结果"
-			hidden: true
-
 	list_views:
+		all:
+			label: "全部"
+			filter_scope: "space"
+			filters: [[["submitter", "=", "{userId}"], 'or', ["outbox_users", "=", "{userId}"]],["state","=","completed"]]
+			columns: ["name", "flow_name", "submitter", "submit_date"]
+			sort: [{field_name: "submit_date", order: "desc"}]	
 		submit:
 			label: "我发起的"
 			filter_scope: "space"
-			filters: [["submitter", "=", "{userId}"]]
+			filters: [["submitter", "=", "{userId}"],["state","=","completed"]]
 			columns: ["name", "flow_name", "submitter", "submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
 		approved:
 			label: "我审核的"
 			filter_scope: "space"
-			filters: [["outbox_users", "=", "{userId}"]]
-			columns: ["name", "flow_name", "submitter", "submit_date"]
-			sort: [{field_name: "submit_date", order: "desc"}]
-		all:
-			label: "全部"
-			filter_scope: "space"
-			filters: [["submitter", "=", "{userId}"], 'or', ["outbox_users", "=", "{userId}"]]
+			filters: [["outbox_users", "=", "{userId}"],["state","=","completed"]]
 			columns: ["name", "flow_name", "submitter", "submit_date"]
 			sort: [{field_name: "submit_date", order: "desc"}]
 
