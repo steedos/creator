@@ -356,7 +356,8 @@ video {
 
 img {
   max-width: 80%;
-  height: auto; }
+  margin-top: 2px;
+  height: 89%; }
 
 .slds-modal_form .slds-modal__header,
 .slds-modal_form .slds-modal__content:last-child,
