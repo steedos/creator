@@ -4430,7 +4430,7 @@ lodash.templatesettings@^4.0.0:
   dependencies:
     lodash._reinterpolate "^3.0.0"
 
-lodash@4.17.15, lodash@^3.10.1, lodash@^4.15.0, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15:
+lodash@4.17.15, lodash@^3.10.1, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15:
   version "4.17.15"
   resolved "https://registry.npm.taobao.org/lodash/download/lodash-4.17.15.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Flodash%2Fdownload%2Flodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha1-tEf2ZwoEVbv+7dETku/zMOoJdUg=
@@ -6178,7 +6178,7 @@ request@2.81.0:
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
 
-request@^2.54.0, request@^2.74.0, request@^2.83.0, request@^2.87.0:
+request@^2.54.0, request@^2.83.0, request@^2.87.0:
   version "2.88.2"
   resolved "https://registry.npm.taobao.org/request/download/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha1-1zyRhzHLWofaBH4gcjQUb2ZNErM=
@@ -6204,15 +6204,13 @@ request@^2.54.0, request@^2.74.0, request@^2.83.0, request@^2.87.0:
     tunnel-agent "^0.6.0"
     uuid "^3.3.2"
 
-requestretry@1.12.2:
-  version "1.12.2"
-  resolved "https://registry.npm.taobao.org/requestretry/download/requestretry-1.12.2.tgz#13ce38a4ce4e809f3c9ec6d4ca3b7b9ba4acf26c"
-  integrity sha1-E844pM5OgJ88nsbUyjt7m6Ss8mw=
+requestretry@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/requestretry/-/requestretry-7.0.0.tgz#570a9fcbeb2d6a85d7f15eb2265840d787f0c44d"
+  integrity sha512-g1Odu3IBKb6fYQog+HLy5FZ1CMwejIpD0iX1u1qXLsRj8TeQmFCpX9pTe50qhIirKvx1mcmoAeuLBFXLlBw6vA==
   dependencies:
-    extend "^3.0.0"
-    lodash "^4.15.0"
-    request "^2.74.0"
-    when "^3.7.7"
+    extend "^3.0.2"
+    lodash "^4.17.15"
 
 require-directory@^2.1.1:
   version "2.1.1"
@@ -7666,11 +7664,6 @@ whatwg-url@^7.0.0:
     lodash.sortby "^4.7.0"
     tr46 "^1.0.1"
     webidl-conversions "^4.0.2"
-
-when@^3.7.7:
-  version "3.7.8"
-  resolved "https://registry.npm.taobao.org/when/download/when-3.7.8.tgz#c7130b6a7ea04693e842cdc9e7a1f2aa39a39f82"
-  integrity sha1-xxMLan6gRpPoQs3J56Hyqjmjn4I=
 
 which-module@^1.0.0:
   version "1.0.0"
